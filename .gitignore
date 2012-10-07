@@ -85,3 +85,4 @@ TestResults
 *.cachefile
 *.orig
 *TemporaryKey.pfx
+Phantom.sln

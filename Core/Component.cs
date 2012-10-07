@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Phantom.Graphics;
 
 namespace Phantom.Core
 {
-    public class Composite
+    public class Component
     {
         public enum MessageResult
         {
@@ -17,7 +18,7 @@ namespace Phantom.Core
         public uint Flags { get; set; }
         public bool Destroyed { get; set; }
 
-        protected IList<Composite> Components
+        public IList<Component> Components
         {
             get
             {
@@ -25,23 +26,24 @@ namespace Phantom.Core
             }
         }
 
-        protected Composite Parent;
+        public Component Parent { get; private set; }
 
-        private List<Composite> components;
+        private List<Component> components;
 
-        public Composite()
+        public Component()
         {
             this.Flags = 0;
             this.Destroyed = false;
-            this.components = new List<Composite>();
+            this.components = new List<Component>();
         }
 
-        public virtual void OnAdd( Composite parent )
+        public virtual void OnAdd( Component parent )
         {
             this.Parent = parent;
+            this.OnAncestryChanged();
         }
 
-        public virtual void OnAncestoryChanged()
+        public virtual void OnAncestryChanged()
         {
         }
 
@@ -50,29 +52,31 @@ namespace Phantom.Core
             this.Parent = null;
         }
 
-        public virtual void AddComponent(Composite component)
+        public virtual void OnComponentAdded(Component component)
         {
-            this.components.Add(component);
             component.OnAdd(this);
-            component.OnAncestoryChanged();
-        }
-        
-        public virtual void InsertComponent(int index, Composite component)
-        {
-            this.components.Insert(index, component);
-            component.OnAdd(this);
-            component.OnAncestoryChanged();
         }
 
-        public virtual void InsertBeforeComponent(Composite other, Composite component)
+        public void AddComponent(Component component)
+        {
+            this.components.Add(component);
+            OnComponentAdded(component);
+        }
+        
+        public void InsertComponent(int index, Component component)
+        {
+            this.components.Insert(index, component);
+            OnComponentAdded(component);
+        }
+
+        public void InsertBeforeComponent(Component other, Component component)
         {
             // TODO: Test if the index is correct or if it needs a -1.
             this.components.Insert(this.components.IndexOf(other), component);
-            component.OnAdd(this);
-            component.OnAncestoryChanged();
+            OnComponentAdded(component);
         }
 
-        public virtual void RemoveComponent(Composite component)
+        public void RemoveComponent(Component component)
         {
             this.components.Remove(component);
             component.OnRemove();
@@ -96,7 +100,7 @@ namespace Phantom.Core
         {
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
-                Composite component = this.components[i];
+                Component component = this.components[i];
                 component.Update(elapsed);
                 if (component.Destroyed)
                     this.RemoveComponent(component);
@@ -107,7 +111,7 @@ namespace Phantom.Core
         {
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
-                Composite component = this.components[i];
+                Component component = this.components[i];
                 component.Update(elapsed);
                 if (component.Destroyed)
                     this.RemoveComponent(component);
@@ -119,15 +123,15 @@ namespace Phantom.Core
             return true;
         }
 
-        public virtual void AfterCollisionWith(Composite other)
+        public virtual void AfterCollisionWith(Component other)
         {
         }
 
-        public virtual void Render()
+        public virtual void Render( RenderInfo info )
         {
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
-                this.components[i].Render();
+                this.components[i].Render(info);
         }
 
         public virtual bool GetProperty<T>(string name, ref T result )
@@ -139,25 +143,25 @@ namespace Phantom.Core
             return false;
         }
 
-        public IList<T> GetAllComponentsByType<T>() where T : Composite
+        public IList<T> GetAllComponentsByType<T>() where T : Component
         {
             List<T> result = new List<T>();
             int count = this.Components.Count;
             for (int i = 0; i < count; i++)
             {
-                Composite component = this.Components[i];
+                Component component = this.Components[i];
                 if (component is T)
                     result.Add(component as T);
             }
             return result;
         }
 
-        public T GetComponentByType<T>(int nth) where T : Composite
+        public T GetComponentByType<T>(int nth) where T : Component
         {
             int count = this.Components.Count;
             for (int i = 0; i < count; i++)
             {
-                Composite component = this.Components[i];
+                Component component = this.Components[i];
                 if (component is T)
                 {
                     if (nth == 0)
@@ -169,9 +173,18 @@ namespace Phantom.Core
             return null;
         }
 
-        public T GetComponentByType<T>() where T : Composite
+        public T GetComponentByType<T>() where T : Component
         {
             return this.GetComponentByType<T>(0);
+        }
+
+        public T GetAncestor<T>() where T : Component
+        {
+            Component iter = this.Parent;
+            while (iter != null)
+                if (iter is T)
+                    return iter as T;
+            return null;
         }
     }
 }
