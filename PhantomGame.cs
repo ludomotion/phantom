@@ -46,6 +46,7 @@ namespace Phantom
 
         public void Dispose()
         {
+            this.XnaGame.Dispose();
         }
 
         public void Run()

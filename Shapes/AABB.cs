@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Shapes.Visitors;
+using Microsoft.Xna.Framework;
 
 namespace Phantom.Shapes
 {
@@ -17,12 +18,11 @@ namespace Phantom.Shapes
 
         public override CollisionData Collide(Shape other)
         {
-            visitor.SetThis(this);
-            return other.Accept(visitor);
+            return other.Accept<CollisionData, AABB>(visitor, this);
         }
-        public override CollisionData Accept(ShapeVisitor visitor)
+        public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
         {
-            return visitor.Visit(this);
+            return visitor.Visit(this, data);
         }
     }
 }

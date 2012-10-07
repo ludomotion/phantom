@@ -5,23 +5,16 @@ using System.Text;
 
 namespace Phantom.Shapes.Visitors
 {
-    public class CircleVisitor : ShapeVisitor
+    public class CircleVisitor : ShapeVisitor<CollisionData, Circle>
     {
-        private Circle self;
-
-        public void SetThis(Circle self)
+        public CollisionData Visit(Circle shape, Circle self)
         {
-            this.self = self;
+            return CollisionChecks.CircleCircle(self, shape);
         }
 
-        public CollisionData Visit(Circle other)
+        public CollisionData Visit(AABB shape, Circle self)
         {
-            return CollisionChecks.CircleCircle(self, other);
-        }
-
-        public CollisionData Visit(AABB other)
-        {
-            return CollisionChecks.CircleAABB(self, other);
+            return CollisionChecks.CircleAABB(self, shape);
         }
     }
 }

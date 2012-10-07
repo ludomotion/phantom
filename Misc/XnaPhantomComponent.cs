@@ -28,10 +28,12 @@ namespace Phantom.Misc
             get { return 0; }
         }
 
+#pragma warning disable 67
         public event EventHandler<EventArgs> EnabledChanged;
         public event EventHandler<EventArgs> UpdateOrderChanged;
         public event EventHandler<EventArgs> DrawOrderChanged;
         public event EventHandler<EventArgs> VisibleChanged;
+#pragma warning restore 67
 
         private PhantomGame phantom;
         

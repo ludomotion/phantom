@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Phantom.Shapes
 {
-    public interface ShapeVisitor
+    public interface ShapeVisitor<OUT, IN>
     {
-        CollisionData Visit(Circle other);
-        CollisionData Visit(AABB other);
+        OUT Visit(Circle shape, IN data);
+        OUT Visit(AABB shape, IN data);
     }
 }

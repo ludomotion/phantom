@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Core;
+using Microsoft.Xna.Framework.Graphics;
+using Phantom.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Phantom.Shapes
 {
@@ -11,6 +14,6 @@ namespace Phantom.Shapes
         public abstract float RoughRadius { get; }
 
         public abstract CollisionData Collide(Shape other);
-        public abstract CollisionData Accept(ShapeVisitor visitor);
+        public abstract OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data);
     }
 }
