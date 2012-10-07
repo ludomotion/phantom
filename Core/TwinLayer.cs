@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Graphics;
+using Phantom.Physics;
 
 namespace Phantom.Core
 {
     public class TwinLayer : Layer
     {
         private Renderer renderer;
-        private Component integrater;
+        private Integrater integrater;
 
-        public TwinLayer(Renderer renderer, Component integrater)
+        public TwinLayer(Renderer renderer, Integrater integrater)
         {
             this.renderer = renderer;
             this.integrater = integrater;
-            this.renderer.OnAdd(this);
-            this.integrater.OnAdd(this);
+            this.AddComponent(this.renderer);
+            this.AddComponent(this.integrater);
         }
 
         public override void Integrate(float elapsed)
         {
             this.integrater.Integrate(elapsed);
-            //!base.Integrate(elapsed);
+            base.Integrate(elapsed);
         }
 
         public override void Render( RenderInfo info )

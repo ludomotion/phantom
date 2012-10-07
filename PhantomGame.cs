@@ -6,6 +6,9 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Phantom.Misc;
+using System.Reflection;
+using System.Threading;
+using System.Globalization;
 
 namespace Phantom
 {
@@ -13,8 +16,15 @@ namespace Phantom
     {
         public static PhantomGame Game { get; private set; }
 
+#if DEBUG
+        public readonly static Random Randy  = new Random(DateTime.Now.DayOfYear);
+#else
+        public readonly static Random Randy = new Random();
+#endif
+
         public string Name { get; protected set; }
         public Color BackgroundColor { get; protected set; }
+        public bool Paused { get; set; }
 
         public float Width { get; private set; }
         public float Height { get; private set; }
@@ -31,15 +41,25 @@ namespace Phantom
 
             this.Width = width;
             this.Height = height;
+            if (this.Width <= 0 || this.Height <= 0)
+            {
+                this.Width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+                this.Height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            }
 
-            this.Name = "PhantomGame"; // TODO: Get project name from assembly
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+            this.Name = Assembly.GetExecutingAssembly().FullName;
             this.BackgroundColor = 0x123456.ToColor();
+            this.Paused = false;
 
             this.XnaGame = new Microsoft.Xna.Framework.Game();
             this.XnaGame.Window.Title = this.Name;
             this.XnaGame.Components.Add(new XnaPhantomComponent(this));
-            this.graphics = new GraphicsDeviceManager(this.XnaGame);
             this.XnaGame.Content.RootDirectory = "Content";
+
+            this.SetupGraphics();
+            this.graphics.ApplyChanges();
 
             this.StateStack = new List<GameState>();
         }
@@ -52,6 +72,19 @@ namespace Phantom
         public void Run()
         {
             this.XnaGame.Run();
+        }
+
+        public virtual void SetupGraphics()
+        {
+            this.graphics = new GraphicsDeviceManager(this.XnaGame);
+            this.graphics.PreferredBackBufferWidth = (int)this.Width;
+            this.graphics.PreferredBackBufferHeight = (int)this.Height;
+#if DEBUG
+            this.XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
+#endif
+            this.graphics.SynchronizeWithVerticalRetrace = false;
+
+            this.graphics.PreferMultiSampling = false;
         }
 
         protected virtual void Initialize()
@@ -70,10 +103,22 @@ namespace Phantom
                 return;
 
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            for (int i = this.StateStack.Count - 1; i >= 0; i--)
+            {
+                this.StateStack[i].Integrate(elapsed);
+                if (!this.StateStack[i].Propagate)
+                    break;
+                if (this.Paused)
+                    return;
+            }
+
             for (int i = this.StateStack.Count - 1; i >= 0; i--)
             {
                 this.StateStack[i].Update(elapsed);
                 if (!this.StateStack[i].Propagate)
+                    break;
+                if (this.Paused)
                     return;
             }
         }
@@ -98,6 +143,5 @@ namespace Phantom
                 this.StateStack.Add(component as GameState);
             }
         }
-
     }
 }

@@ -8,13 +8,13 @@ namespace Phantom.Core
 {
     public class Mover : EntityComponent
     {
-        protected Vector3 velocity;
-        protected Vector3 friction;
+        public Vector3 Velocity;
+        public Vector3 Friction;
 
         public Mover(Vector3 velocity, Vector3 friction)
         {
-            this.velocity = velocity;
-            this.friction = friction;
+            this.Velocity = velocity;
+            this.Friction = friction;
         }
         public Mover(Vector3 velocity, float friction)
             : this(velocity, Vector3.One * friction)
@@ -23,8 +23,8 @@ namespace Phantom.Core
 
         public override void Integrate(float elapsed)
         {
-            this.Entity.Position += this.velocity * elapsed;
-            this.velocity *= Vector3.One - 2 * this.friction * this.friction * elapsed;
+            this.Entity.Position += this.Velocity * elapsed;
+            this.Velocity *= Vector3.One - 2 * this.Friction * this.Friction * elapsed;
             base.Integrate(elapsed);
         }
     }

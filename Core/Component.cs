@@ -112,7 +112,7 @@ namespace Phantom.Core
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
                 Component component = this.components[i];
-                component.Update(elapsed);
+                component.Integrate(elapsed);
                 if (component.Destroyed)
                     this.RemoveComponent(component);
             }

@@ -3,22 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Core;
-using Microsoft.Xna.Framework;
 
 namespace Phantom.Physics
 {
-    public class Gravity : EntityComponent
+    public class Integrater : Component
     {
-        private Vector3 force;
-
-        public Gravity(Vector3 force)
-        {
-            this.force = force;
-        }
-
         public override void Integrate(float elapsed)
         {
-            this.Entity.Mover.Velocity += this.force * elapsed;
+
             base.Integrate(elapsed);
         }
     }
