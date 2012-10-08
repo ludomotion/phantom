@@ -8,6 +8,7 @@ using Phantom.Misc;
 using System.Reflection;
 using System.Threading;
 using System.Globalization;
+using Microsoft.Xna.Framework.Content;
 
 namespace Phantom
 {
@@ -29,8 +30,14 @@ namespace Phantom
         public float Height { get; private set; }
 
         protected readonly Microsoft.Xna.Framework.Game XnaGame;
+        
         private GraphicsDeviceManager graphics;
         public GraphicsDevice GraphicsDevice { get; private set; }
+
+        public ContentManager Content
+        {
+            get { return this.XnaGame.Content; }
+        }
 
         public IList<GameState> StateStack { get; protected set; }
 
@@ -105,17 +112,22 @@ namespace Phantom
 
             for (int i = this.StateStack.Count - 1; i >= 0; i--)
             {
+                bool propagate = this.StateStack[i].Propagate;
                 this.StateStack[i].Integrate(elapsed);
-                if (!this.StateStack[i].Propagate)
+                if (!propagate)
                     break;
                 if (this.Paused)
                     return;
             }
 
+            if (this.StateStack.Count == 0)
+                return;
+
             for (int i = this.StateStack.Count - 1; i >= 0; i--)
             {
+                bool propagate = this.StateStack[i].Propagate;
                 this.StateStack[i].Update(elapsed);
-                if (!this.StateStack[i].Propagate)
+                if (!propagate)
                     break;
                 if (this.Paused)
                     return;
@@ -141,6 +153,11 @@ namespace Phantom
             {
                 this.StateStack.Add(component as GameState);
             }
+        }
+
+        public void PopState()
+        {
+            this.StateStack.RemoveAt(this.StateStack.Count - 1);
         }
     }
 }

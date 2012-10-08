@@ -13,7 +13,7 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
-    <XnaProfile>HiDef</XnaProfile>
+    <XnaProfile>Reach</XnaProfile>
     <XnaCrossPlatformGroupID>0a03efc9-2c67-49f9-a1b3-e240dd6f5bb9</XnaCrossPlatformGroupID>
     <XnaOutputType>Library</XnaOutputType>
   </PropertyGroup>
@@ -95,6 +95,8 @@
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\ShapeRenderer.cs" />
+    <Compile Include="Graphics\Sprite.cs" />
+    <Compile Include="Graphics\SpriteRenderer.cs" />
     <Compile Include="Misc\DrawUtils.cs" />
     <Compile Include="Misc\VectorUtils.cs" />
     <Compile Include="Misc\XnaPhantomComponent.cs" />

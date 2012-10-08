@@ -32,9 +32,15 @@ namespace Phantom.Core
         private Shape shape;
 
 
-        public Entity()
+        public Entity(Vector3 position, float mass)
         {
-            this.Mass = 1;
+            this.Position = position;
+            this.Mass = mass;
+        }
+
+        public Entity(Vector3 position)
+            :this(position, 1)
+        {
         }
 
         protected override void OnComponentAdded(Component component)
