@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Phantom.Shapes.Visitors
+namespace Phantom.Physics.Visitors
 {
     public class CircleVisitor : ShapeVisitor<CollisionData, Circle>
     {

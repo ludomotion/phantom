@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Phantom.Shapes;
+using Phantom.Physics;
 
 namespace Phantom.Core
 {
@@ -26,15 +26,18 @@ namespace Phantom.Core
             }
         }
 
+        public float Mass { get; protected set; }
+
         private Mover mover;
         private Shape shape;
 
 
         public Entity()
         {
+            this.Mass = 1;
         }
 
-        public override void OnComponentAdded(Component component)
+        protected override void OnComponentAdded(Component component)
         {
             base.OnComponentAdded(component);
             if (component is Mover)

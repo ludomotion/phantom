@@ -37,5 +37,10 @@ namespace Phantom.Misc
         {
             return new Vector2(self.X, self.Y);
         }
+
+        public static Vector3 GetRandom()
+        {
+            return new Vector3((float)PhantomGame.Randy.NextDouble(), (float)PhantomGame.Randy.NextDouble(), (float)PhantomGame.Randy.NextDouble());
+        }
     }
 }

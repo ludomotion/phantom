@@ -52,34 +52,40 @@ namespace Phantom.Core
             this.Parent = null;
         }
 
-        public virtual void OnComponentAdded(Component component)
+        protected virtual void OnComponentAdded(Component component)
         {
             component.OnAdd(this);
+        }
+
+        protected virtual void OnComponentRemoved(Component component)
+        {
+            component.OnRemove();
         }
 
         public void AddComponent(Component component)
         {
             this.components.Add(component);
-            OnComponentAdded(component);
+            this.OnComponentAdded(component);
         }
         
         public void InsertComponent(int index, Component component)
         {
             this.components.Insert(index, component);
-            OnComponentAdded(component);
+            this.OnComponentAdded(component);
         }
 
         public void InsertBeforeComponent(Component other, Component component)
         {
             // TODO: Test if the index is correct or if it needs a -1.
             this.components.Insert(this.components.IndexOf(other), component);
-            OnComponentAdded(component);
+            this.OnComponentAdded(component);
         }
 
         public void RemoveComponent(Component component)
         {
             this.components.Remove(component);
-            component.OnRemove();
+            this.OnComponentRemoved(component);
+
         }
 
         public virtual MessageResult HandleMessage( int message, object data )
@@ -118,7 +124,7 @@ namespace Phantom.Core
             }
         }
 
-        public virtual bool CanCollideWith()
+        public virtual bool CanCollideWith( Component other )
         {
             return true;
         }

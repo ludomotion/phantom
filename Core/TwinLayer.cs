@@ -20,16 +20,28 @@ namespace Phantom.Core
             this.AddComponent(this.integrater);
         }
 
+        protected override void OnComponentAdded(Component component)
+        {
+            this.integrater.OnComponentAddedToLayer(component);
+            base.OnComponentAdded(component);
+        }
+
+        protected override void OnComponentRemoved(Component component)
+        {
+            this.integrater.OnComponentRemovedToLayer(component);
+            base.OnComponentRemoved(component);
+        }
+
         public override void Integrate(float elapsed)
         {
             this.integrater.Integrate(elapsed);
-            base.Integrate(elapsed);
+            //!base.Integrate(elapsed);
         }
 
         public override void Render( RenderInfo info )
         {
             this.renderer.Render( info );
- 	         //!base.Render();
+ 	        //!base.Render();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
@@ -29,7 +28,7 @@ namespace Phantom
         public float Width { get; private set; }
         public float Height { get; private set; }
 
-        private Microsoft.Xna.Framework.Game XnaGame;
+        protected readonly Microsoft.Xna.Framework.Game XnaGame;
         private GraphicsDeviceManager graphics;
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -49,7 +48,7 @@ namespace Phantom
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-            this.Name = Assembly.GetExecutingAssembly().FullName;
+            this.Name = Assembly.GetCallingAssembly().FullName;
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
 
@@ -135,7 +134,7 @@ namespace Phantom
                 this.StateStack[j].Render(null);
         }
 
-        public override void OnComponentAdded(Component component)
+        protected override void OnComponentAdded(Component component)
         {
             base.OnComponentAdded(component);
             if (component is GameState)

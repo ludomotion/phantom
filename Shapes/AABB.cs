@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Phantom.Shapes.Visitors;
+using Phantom.Physics.Visitors;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.Shapes
+namespace Phantom.Physics
 {
     public class AABB : Shape
     {

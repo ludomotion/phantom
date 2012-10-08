@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Phantom.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.Shapes
+namespace Phantom.Physics
 {
     public abstract class Shape : EntityComponent
     {

@@ -5,7 +5,7 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
-using Phantom.Shapes;
+using Phantom.Physics;
 
 namespace Phantom.Graphics
 {
@@ -28,7 +28,9 @@ namespace Phantom.Graphics
 
         public object Visit(Circle shape, RenderInfo info)
         {
-            info.Batch.DrawCircle(this.Entity.Position.Flatten(), shape.Radius, thickness, color);
+            Vector2 position = shape.Entity.Position.Flatten();
+            info.Batch.DrawLine(position, position + Vector2.UnitX * shape.Radius, thickness, color);
+            info.Batch.DrawCircle(position, shape.Radius, thickness, color);
             return null;
         }
 
