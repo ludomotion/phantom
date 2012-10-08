@@ -39,7 +39,7 @@ namespace Phantom
             get { return this.XnaGame.Content; }
         }
 
-        public IList<GameState> StateStack { get; protected set; }
+        private IList<GameState> states;
 
         public PhantomGame( float width, float height )
         {
@@ -67,7 +67,7 @@ namespace Phantom
             this.SetupGraphics();
             this.graphics.ApplyChanges();
 
-            this.StateStack = new List<GameState>();
+            this.states = new List<GameState>();
         }
 
         public void Dispose()
@@ -105,28 +105,25 @@ namespace Phantom
 
         internal void XnaUpdate(GameTime gameTime)
         {
-            if (this.StateStack.Count == 0)
-                return;
 
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            for (int i = this.StateStack.Count - 1; i >= 0; i--)
+            this.Update(elapsed);
+            for (int i = this.states.Count - 1; i >= 0; i--)
             {
-                bool propagate = this.StateStack[i].Propagate;
-                this.StateStack[i].Integrate(elapsed);
+                bool propagate = this.states[i].Propagate;
+                this.states[i].Integrate(elapsed);
                 if (!propagate)
                     break;
                 if (this.Paused)
                     return;
             }
 
-            if (this.StateStack.Count == 0)
-                return;
-
-            for (int i = this.StateStack.Count - 1; i >= 0; i--)
+            this.Integrate(elapsed);
+            for (int i = this.states.Count - 1; i >= 0; i--)
             {
-                bool propagate = this.StateStack[i].Propagate;
-                this.StateStack[i].Update(elapsed);
+                bool propagate = this.states[i].Propagate;
+                this.states[i].Update(elapsed);
                 if (!propagate)
                     break;
                 if (this.Paused)
@@ -136,28 +133,49 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
-            this.GraphicsDevice.Clear(0x123456.ToColor());
-            if (this.StateStack.Count == 0)
-                return;
+            int startIndex;
 
-            int i;
-            for (i = this.StateStack.Count - 1; i >= 0 && this.StateStack[i].Transparent; i--);
-            for (int j = i; j < this.StateStack.Count; j++)
-                this.StateStack[j].Render(null);
+            this.GraphicsDevice.Clear(this.BackgroundColor);
+
+            this.Render(null);
+            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--);
+            for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
+                this.states[i].Render(null);
         }
 
         protected override void OnComponentAdded(Component component)
         {
-            base.OnComponentAdded(component);
             if (component is GameState)
             {
-                this.StateStack.Add(component as GameState);
+                throw new Exception("Don't add GameStates as components to a game, use the PushState method instead.");
             }
+            base.OnComponentAdded(component);
+        }
+
+
+        public void PushState( GameState state )
+        {
+            this.states.Add(state);
+            state.OnAdd(this);
         }
 
         public void PopState()
         {
-            this.StateStack.RemoveAt(this.StateStack.Count - 1);
+            if (this.states.Count > 0)
+            {
+                GameState removed = this.states[this.states.Count - 1];
+                this.states.RemoveAt(this.states.Count - 1);
+                removed.OnRemove();
+            }
+        }
+
+        public void PopAndPushState( GameState state )
+        {
+            GameState removed = this.states[this.states.Count - 1];
+            this.states.RemoveAt(this.states.Count - 1);
+            this.states.Add(state);
+            state.OnAdd(this);
+            removed.OnRemove();
         }
     }
 }
