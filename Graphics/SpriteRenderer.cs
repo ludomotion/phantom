@@ -11,6 +11,7 @@ namespace Phantom.Graphics
     public class SpriteRenderer : EntityComponent
     {
         private Sprite sprite;
+        private float zoom;
         private float timePerFrame;
         private Dictionary<string, int[]> animiations;
 
@@ -18,18 +19,27 @@ namespace Phantom.Graphics
         private int currentFrame;
         private string playing;
 
-        public SpriteRenderer(Sprite sprite, int fps)
+        public SpriteRenderer(Sprite sprite, int frame, float zoom, int fps)
         {
             this.sprite = sprite;
             this.timePerFrame = 1.0f / fps;
             this.animiations = new Dictionary<string, int[]>();
-            this.animiations["idle"] = new int[]{0,};
+            this.animiations["idle"] = new int[] { frame, };
+            this.zoom = zoom;
 
             this.currentFrame = 0;
             this.playing = "idle";
         }
+        public SpriteRenderer(Sprite sprite, int frame, float zoom)
+            : this(sprite, frame, zoom, 30)
+        {
+        }
+        public SpriteRenderer(Sprite sprite, int frame)
+            : this(sprite, frame, 1)
+        {
+        }
         public SpriteRenderer(Sprite sprite)
-            : this(sprite, 30)
+            : this(sprite, 0)
         {
         }
 
@@ -56,8 +66,15 @@ namespace Phantom.Graphics
 
         public override void Render(RenderInfo info)
         {
-            if( this.Entity != null )
-                this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position);
+            if (this.Entity != null)
+            {
+                float zoom = this.zoom;
+                if (this.Entity.Shape != null)
+                {
+                    zoom = (this.Entity.Shape.RoughRadius * 2) / Math.Min(this.sprite.Width, this.sprite.Height) * this.zoom;
+                }
+                this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position, this.Entity.Orientation, zoom);
+            }
             base.Render(info);
         }
     }

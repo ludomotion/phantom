@@ -5,11 +5,16 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.Physics
+namespace Phantom.Physics.Components
 {
     public class Gravity : EntityComponent
     {
         private Vector2 force;
+
+        public Gravity(float force)
+            : this(new Vector2(0, force))
+        {
+        }
 
         public Gravity(Vector2 force)
         {
@@ -18,7 +23,7 @@ namespace Phantom.Physics
 
         public override void Integrate(float elapsed)
         {
-            this.Entity.Mover.Velocity += this.force * elapsed;
+            this.Entity.Mover.Acceleration += this.force * elapsed;
             base.Integrate(elapsed);
         }
     }

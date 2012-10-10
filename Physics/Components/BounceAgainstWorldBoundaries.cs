@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Phantom.Core;
 
-namespace Phantom.Physics
+namespace Phantom.Physics.Components
 {
     public class BounceAgainstWorldBoundaries : EntityComponent
     {

@@ -12,6 +12,8 @@ namespace Phantom.Core
         public const int MImpulse = 1;
 
         public Vector2 Velocity;
+        public Vector2 Acceleration;
+
         public Vector2 Friction;
         public float Restitution;
 
@@ -28,7 +30,10 @@ namespace Phantom.Core
 
         public override void Integrate(float elapsed)
         {
+            this.Velocity += this.Acceleration * elapsed;
             this.Entity.Position += this.Velocity * elapsed;
+            this.Acceleration = Vector2.Zero;
+
             this.Velocity *= Vector2.One - 2 * this.Friction * this.Friction * elapsed;
             base.Integrate(elapsed);
         }
