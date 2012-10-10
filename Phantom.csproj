@@ -92,6 +92,7 @@
     <Compile Include="Core\Layer.cs" />
     <Compile Include="Core\Mover.cs" />
     <Compile Include="Core\GameState.cs" />
+    <Compile Include="Graphics\Components\Background.cs" />
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\ShapeRenderer.cs" />
