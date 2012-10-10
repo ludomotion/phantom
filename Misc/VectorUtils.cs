@@ -28,6 +28,15 @@ namespace Phantom.Misc
             return result;
         }
 
+        public static Vector2 Normalized(this Vector2 self)
+        {
+            if (self.LengthSquared() == 0)
+                return self;
+            Vector2 result = self;
+            result.Normalize();
+            return result;
+        }
+
         public static float Angle(this Vector2 v)
         {
             return (float)Math.Atan2(v.Y, v.X);

@@ -9,9 +9,9 @@ namespace Phantom.Physics
 {
     public class Gravity : EntityComponent
     {
-        private Vector3 force;
+        private Vector2 force;
 
-        public Gravity(Vector3 force)
+        public Gravity(Vector2 force)
         {
             this.force = force;
         }

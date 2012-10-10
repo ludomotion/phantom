@@ -11,25 +11,25 @@ namespace Phantom.Core
     {
         public const int MImpulse = 1;
 
-        public Vector3 Velocity;
-        public Vector3 Friction;
+        public Vector2 Velocity;
+        public Vector2 Friction;
         public float Restitution;
 
-        public Mover(Vector3 velocity, Vector3 friction, float restitution)
+        public Mover(Vector2 velocity, Vector2 friction, float restitution)
         {
             this.Velocity = velocity;
             this.Friction = friction;
             this.Restitution = restitution;
         }
-        public Mover(Vector3 velocity, float friction, float restitution)
-            : this(velocity, Vector3.One * friction, restitution)
+        public Mover(Vector2 velocity, float friction, float restitution)
+            : this(velocity, Vector2.One * friction, restitution)
         {
         }
 
         public override void Integrate(float elapsed)
         {
             this.Entity.Position += this.Velocity * elapsed;
-            this.Velocity *= Vector3.One - 2 * this.Friction * this.Friction * elapsed;
+            this.Velocity *= Vector2.One - 2 * this.Friction * this.Friction * elapsed;
             base.Integrate(elapsed);
         }
 
@@ -38,7 +38,7 @@ namespace Phantom.Core
             switch (message)
             {
                 case Mover.MImpulse:
-                    this.Velocity += (Vector3)data;
+                    this.Velocity += (Vector2)data;
                     return MessageResult.HANDLED;
             }
             return base.HandleMessage(message, data);
@@ -51,7 +51,7 @@ namespace Phantom.Core
 
         public void Bounce(CollisionData collision, float factor)
         {
-            float dot = Vector3.Dot(collision.Normal, this.Velocity);
+            float dot = Vector2.Dot(collision.Normal, this.Velocity);
             if (dot < 0)
                 return;
             factor *= (1 + this.Restitution);
@@ -62,10 +62,10 @@ namespace Phantom.Core
         {
             if (other.Mover == null)
                 return;
-            Vector3 n = this.Entity.Position - other.Position;
+            Vector2 n = this.Entity.Position - other.Position;
             n.Normalize();
-            float a1 = Vector3.Dot(this.Velocity, n);
-            float a2 = Vector3.Dot(other.Mover.Velocity, n);
+            float a1 = Vector2.Dot(this.Velocity, n);
+            float a2 = Vector2.Dot(other.Mover.Velocity, n);
             float optimusP = (2f * (a1 - a2)) / (this.Entity.Mass + other.Mass);
 
             this.Velocity -= n * optimusP * other.Mass;

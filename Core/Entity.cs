@@ -9,7 +9,17 @@ namespace Phantom.Core
 {
     public class Entity : Component
     {
-        public Vector3 Position;
+        public Vector2 Position;
+
+        public float Orientation;
+
+        public Vector2 Direction
+        {
+            get
+            {
+                return new Vector2((float)Math.Cos(this.Orientation), (float)Math.Sin(this.Orientation));
+            }
+        }
 
         public Mover Mover
         {
@@ -32,13 +42,13 @@ namespace Phantom.Core
         private Shape shape;
 
 
-        public Entity(Vector3 position, float mass)
+        public Entity(Vector2 position, float mass)
         {
             this.Position = position;
             this.Mass = mass;
         }
 
-        public Entity(Vector3 position)
+        public Entity(Vector2 position)
             :this(position, 1)
         {
         }

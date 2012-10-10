@@ -18,21 +18,21 @@ namespace Phantom.Physics
             }
         }
 
-        public Vector3 Position;
-        public Vector3 Normal;
+        public Vector2 Position;
+        public Vector2 Normal;
         public float Interpenetration;
 
         public CollisionData(float interpenetration)
         {
-            this.Position = Vector3.Zero;
-            this.Normal = Vector3.Zero;
+            this.Position = Vector2.Zero;
+            this.Normal = Vector2.Zero;
             this.Interpenetration = interpenetration;
         }
 
         public void Clear()
         {
-            this.Position = Vector3.Zero;
-            this.Normal = Vector3.Zero;
+            this.Position = Vector2.Zero;
+            this.Normal = Vector2.Zero;
             this.Interpenetration = float.NaN;
         }
 

@@ -12,7 +12,7 @@ namespace Phantom.Physics
     {
         public static CollisionData CircleCircle(Circle a, Circle b)
         {
-            Vector3 delta = b.Entity.Position - a.Entity.Position;
+            Vector2 delta = b.Entity.Position - a.Entity.Position;
             float length = delta.Length();
             float distance = a.Radius + b.Radius;
             if (length < distance)

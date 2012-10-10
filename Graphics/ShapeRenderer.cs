@@ -28,8 +28,8 @@ namespace Phantom.Graphics
 
         public object Visit(Circle shape, RenderInfo info)
         {
-            Vector2 position = shape.Entity.Position.Flatten();
-            info.Batch.DrawLine(position, position + Vector2.UnitX * shape.Radius, thickness, color);
+            Vector2 position = shape.Entity.Position;
+            info.Batch.DrawLine(position, position + this.Entity.Direction * shape.Radius, thickness, color);
             info.Batch.DrawCircle(position, shape.Radius, thickness, color);
             return null;
         }

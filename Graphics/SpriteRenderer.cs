@@ -57,7 +57,7 @@ namespace Phantom.Graphics
         public override void Render(RenderInfo info)
         {
             if( this.Entity != null )
-                this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position.Flatten());
+                this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position);
             base.Render(info);
         }
     }
