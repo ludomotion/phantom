@@ -93,27 +93,43 @@ namespace Phantom.Graphics
             float left = (resolution.Width - viewport.Width) * .5f;
             float top = (resolution.Height - viewport.Height) * .5f;
 
-            world = Matrix.Identity;
             switch (this.policy)
             {
                 case ViewportPolicy.Full:
                     info.Width = resolution.Width;
                     info.Height = resolution.Height;
+                    break;
+                case ViewportPolicy.Centered:
+                    info.Width = viewport.Width;
+                    info.Height = viewport.Height;
+                    break;
+                case ViewportPolicy.AutoScaled:
+                    info.Width = designSize.X;
+                    info.Height = designSize.Y;
+                    break;
+            }
+
+            world = Matrix.Identity;
+            if (this.layer != null && this.layer.Camera != null)
+            {
+                info.Camera = this.layer.Camera;
+                world *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
+            }
+
+            switch (this.policy)
+            {
+                case ViewportPolicy.Full:
                     info.Projection = Matrix.CreateOrthographicOffCenter(
                         0, info.Width, info.Height, 0,
                         0, 1);
                     break;
                 case ViewportPolicy.Centered:
-                    info.Width = viewport.Width;
-                    info.Height = viewport.Height;
                     info.Projection = Matrix.CreateOrthographicOffCenter(
                         left, left + info.Width, top + info.Height, top,
                         0, 1);
-                    world = Matrix.CreateTranslation(left, top, 0);
+                    world *= Matrix.CreateTranslation(left, top, 0);
                     break;
                 case ViewportPolicy.AutoScaled:
-                    info.Width = designSize.X;
-                    info.Height = designSize.Y;
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
                     {
                         Matrix scale = Matrix.CreateScale(
@@ -121,16 +137,11 @@ namespace Phantom.Graphics
                             viewport.Height / designSize.Y,
                             1);
                         Matrix translate = Matrix.CreateTranslation(left, top, 0);
-                        world = scale * translate;
+                        world *= scale * translate;
                     }
                     break;
             }
 
-            if (this.layer != null && this.layer.Camera != null)
-            {
-                info.Camera = this.layer.Camera;
-                world *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
-            }
             return info;
         }
     }
