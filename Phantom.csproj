@@ -89,11 +89,12 @@
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Entity.cs" />
     <Compile Include="Core\EntityComponent.cs" />
-    <Compile Include="Core\TwinLayer.cs" />
+    <Compile Include="Core\EntityLayer.cs" />
     <Compile Include="Core\Layer.cs" />
     <Compile Include="Core\Mover.cs" />
     <Compile Include="Core\GameState.cs" />
     <Compile Include="Components\Graphics\Background.cs" />
+    <Compile Include="Core\RenderLayer.cs" />
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\ShapeRenderer.cs" />

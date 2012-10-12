@@ -48,7 +48,6 @@ namespace Phantom.Graphics.Components
 
         public override void Render(RenderInfo info)
         {
-            //PhantomGame.Game.GraphicsDevice;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
                 -1, 1, 1, -1,
                 0, 1);

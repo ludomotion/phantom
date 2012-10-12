@@ -48,27 +48,27 @@ namespace Phantom.Graphics
         {
         }
 
-        public void RenderFrame(RenderInfo info, Vector2 position, int frame, float angle, float zoom, Color color, float alpha)
+        public void RenderFrame(RenderInfo info, Vector2 position, int frame, float angle, float scale, Color color, float alpha)
         {
             alpha = MathHelper.Clamp(alpha, 0, 1);
             color.A = (byte)(alpha * 255);
             color.R = (byte)(color.R * alpha);
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
-            this.RenderFrame(info, frame, position, angle, zoom, color);
+            this.RenderFrame(info, frame, position, angle, scale, color);
         }
 
-        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float zoom, Color color)
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color)
         {
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = GetRectByFrame(frame);
-            info.Batch.Draw(this.tex, position, source, color, angle, halfSize, zoom, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            info.Batch.Draw(this.tex, position, source, color, angle, halfSize, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
         }
 
-        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float zoom)
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
         {
-            this.RenderFrame(info, frame, position, angle, zoom, Color.White);
+            this.RenderFrame(info, frame, position, angle, scale, Color.White);
         }
         
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle)

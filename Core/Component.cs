@@ -88,6 +88,14 @@ namespace Phantom.Core
 
         }
 
+        public void Clear()
+        {
+            for (int i = this.components.Count - 1; i >= 0; i--)
+            {
+                this.RemoveComponent(this.components[i]);
+            }
+        }
+
         public virtual MessageResult HandleMessage( int message, object data )
         {
             MessageResult finalResult = MessageResult.IGNORED;

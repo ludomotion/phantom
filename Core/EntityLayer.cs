@@ -7,12 +7,12 @@ using Phantom.Physics;
 
 namespace Phantom.Core
 {
-    public class TwinLayer : Layer
+    public class EntityLayer : Layer
     {
         private Renderer renderer;
         private Integrater integrater;
 
-        public TwinLayer(Renderer renderer, Integrater integrater)
+        public EntityLayer(Renderer renderer, Integrater integrater)
         {
             this.renderer = renderer;
             this.integrater = integrater;

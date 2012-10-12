@@ -26,7 +26,7 @@ namespace Phantom.Misc
             float sf = d.Length();
             float angle = (float)Math.Atan2(d.Y, d.X);
 
-            batch.Draw(DrawUtils.GetWhite(), a + d * .5f, null, color, angle, Vector2.One * .5f, new Vector2(sf, thickness), SpriteEffects.None, 0);
+            batch.Draw(DrawUtils.GetWhite(), a + d * .5f, null, color, angle, Vector2.One * .5f, new Vector2(sf, thickness), SpriteEffects.None, 1);
         }
 
         public static void DrawLineStrip(this SpriteBatch batch, Vector2[] strip, int length, float thickness, Color color)
@@ -63,7 +63,7 @@ namespace Phantom.Misc
             if (DrawUtils.White == null)
             {
                 DrawUtils.White = new Texture2D(PhantomGame.Game.GraphicsDevice, 1, 1);
-                DrawUtils.White.SetData<uint>(new uint[] { 0xffffff });
+                DrawUtils.White.SetData<uint>(new uint[] { 0xffffffff });
             }
             return DrawUtils.White;
         }
