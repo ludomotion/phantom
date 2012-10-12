@@ -9,8 +9,6 @@ namespace Phantom.Core
 {
     public class Mover : EntityComponent
     {
-        public const int MImpulse = 1;
-
         public Vector2 Velocity;
         public Vector2 Acceleration;
 
@@ -42,9 +40,9 @@ namespace Phantom.Core
         {
             switch (message)
             {
-                case Mover.MImpulse:
+                case Messages.MoverImpulse:
                     this.Velocity += (Vector2)data;
-                    return MessageResult.HANDLED;
+                    return MessageResult.CONSUMED;
             }
             return base.HandleMessage(message, data);
         }

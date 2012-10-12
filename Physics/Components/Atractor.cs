@@ -6,7 +6,7 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
 
-namespace Phantom.Components.Physics
+namespace Phantom.Physics.Components
 {
     public class Atractor : EntityComponent
     {

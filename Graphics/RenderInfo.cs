@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Phantom.Cameras;
 
 namespace Phantom.Graphics
 {
@@ -22,6 +23,7 @@ namespace Phantom.Graphics
         public float Height;
         public SpriteBatch Batch;
         public GraphicsDevice GraphicsDevice;
+        public Camera Camera;
         public Matrix Projection;
 
     }

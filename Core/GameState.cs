@@ -9,7 +9,5 @@ namespace Phantom.Core
     {
         public bool Transparent { get; protected set; }
         public bool Propagate { get; protected set; }
-
-        public Component Camera { get; protected set; }
     }
 }

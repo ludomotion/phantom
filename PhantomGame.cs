@@ -181,10 +181,6 @@ namespace Phantom
                 float padding = (resolutionHeight - height) * .5f;
                 this.Viewport = new Viewport(0, (int)padding, resolutionWidth, (int)height);
             }
-
-            Debug.WriteLine("Design size: " + this.Size);
-            Debug.WriteLine("Resolution: " + this.Resolution);
-            Debug.WriteLine("Viewport: " + this.Viewport);
         }
 
         public void SetResolution(int width, int height, bool fullscreen)

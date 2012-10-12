@@ -6,6 +6,7 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Phantom.Cameras;
 
 namespace Phantom.Graphics
 {
@@ -22,6 +23,7 @@ namespace Phantom.Graphics
         private int passes;
         private ViewportPolicy policy;
 
+        private Layer layer;
         private SpriteBatch batch;
         private SpriteSortMode sortMode;
         private BlendState blendState;
@@ -43,6 +45,12 @@ namespace Phantom.Graphics
         public Renderer(int passes)
             :this(passes, ViewportPolicy.Default)
         {
+        }
+
+        public override void OnAncestryChanged()
+        {
+            base.OnAncestryChanged();
+            this.layer = GetAncestor<Layer>();
         }
 
         public override void Render( RenderInfo info )
@@ -104,6 +112,8 @@ namespace Phantom.Graphics
                     world = Matrix.CreateTranslation(left, top, 0);
                     break;
                 case ViewportPolicy.AutoScaled:
+                    info.Width = designSize.X;
+                    info.Height = designSize.Y;
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
                     {
                         Matrix scale = Matrix.CreateScale(
@@ -114,6 +124,12 @@ namespace Phantom.Graphics
                         world = scale * translate;
                     }
                     break;
+            }
+
+            if (this.layer != null && this.layer.Camera != null)
+            {
+                info.Camera = this.layer.Camera;
+                world *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
             }
             return info;
         }

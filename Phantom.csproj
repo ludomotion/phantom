@@ -85,7 +85,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\Physics\Atractor.cs" />
+    <Compile Include="Cameras\CameraComponent.cs" />
+    <Compile Include="Cameras\Components\CameraEase.cs" />
+    <Compile Include="Cameras\Components\DeadZone.cs" />
+    <Compile Include="Cameras\Components\FollowEntity.cs" />
+    <Compile Include="Messages.cs" />
+    <Compile Include="Physics\Components\Atractor.cs" />
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Entity.cs" />
     <Compile Include="Core\EntityComponent.cs" />
@@ -93,8 +98,9 @@
     <Compile Include="Core\Layer.cs" />
     <Compile Include="Core\Mover.cs" />
     <Compile Include="Core\GameState.cs" />
-    <Compile Include="Components\Graphics\Background.cs" />
+    <Compile Include="Graphics\Components\Background.cs" />
     <Compile Include="Core\RenderLayer.cs" />
+    <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Graphics\Renderer.cs" />
     <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\ShapeRenderer.cs" />
@@ -104,9 +110,9 @@
     <Compile Include="Misc\VectorUtils.cs" />
     <Compile Include="Misc\XnaPhantomComponent.cs" />
     <Compile Include="PhantomGame.cs" />
-    <Compile Include="Components\Physics\BounceAgainstWorldBoundaries.cs" />
-    <Compile Include="Components\Physics\Gravity.cs" />
-    <Compile Include="Components\Physics\Rotator.cs" />
+    <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
+    <Compile Include="Physics\Components\Gravity.cs" />
+    <Compile Include="Physics\Components\Rotator.cs" />
     <Compile Include="Physics\Integrater.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\AABB.cs" />
