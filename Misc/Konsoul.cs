@@ -19,6 +19,7 @@ namespace Phantom.Misc
         public int LineCount = 12;
         public float Padding = 4;
         public string Prompt = "] ";
+        public Keys OpenKey = Keys.OemTilde;
     }
     public class Konsoul : Component
     {
@@ -43,9 +44,14 @@ namespace Phantom.Misc
             }
         }
 
+        public bool Visible;
+
+        private float blinkTimer;
+
         private KonsoulSettings settings;
 
-        private KeyboardState previous;
+        private KeyboardState previousKeyboardState;
+        private KeyMap keyMap;
 
         private readonly DebugListener listener;
         private SpriteFont font;
@@ -54,25 +60,34 @@ namespace Phantom.Misc
 
         private int scrollOffset;
         private string input;
+        private float promptWidth;
+        private int cursor;
         private List<string> lines;
         private List<string> wrapBuffer;
         private string nolineBuffer;
 
         private VertexBuffer backgroundBuffer;
+        private VertexBuffer cursorBuffer;
         private IndexBuffer backgroundIndex;
 
         public Konsoul(SpriteFont font, KonsoulSettings settings)
         {
+            this.Visible = false;
             this.font = font;
             this.settings = settings;
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
             this.effect = new BasicEffect(PhantomGame.Game.GraphicsDevice);
 
-            this.input = "sup?";
+            this.input = "";
+            this.cursor = 0;
             this.lines = new List<string>();
+            this.promptWidth = this.font.MeasureString(this.settings.Prompt).X;
             this.wrapBuffer = new List<string>();
             this.nolineBuffer = "";
             this.scrollOffset = 0;
+
+            this.keyMap = new KeyMap();
+            this.previousKeyboardState = Keyboard.GetState();
 
             Debug.Listeners.Add(this.listener=new DebugListener(this));
             this.SetupVertices();
@@ -97,6 +112,14 @@ namespace Phantom.Misc
             this.backgroundBuffer.SetData<VertexPositionColor>(vertices);
             this.backgroundIndex = new IndexBuffer(PhantomGame.Game.GraphicsDevice, IndexElementSize.SixteenBits, 6, BufferUsage.None);
             this.backgroundIndex.SetData<short>(indices);
+
+            VertexPositionColor[] cursor = new VertexPositionColor[] {
+                new VertexPositionColor(new Vector3(0,0,0), Color.White),
+                new VertexPositionColor(new Vector3(0,this.font.LineSpacing,0), Color.White),
+            };
+            this.cursorBuffer = new VertexBuffer(PhantomGame.Game.GraphicsDevice, VertexPositionColor.VertexDeclaration, 2, BufferUsage.None);
+            this.cursorBuffer.SetData<VertexPositionColor>(cursor);
+
         }
 
         public override void Dispose()
@@ -107,8 +130,31 @@ namespace Phantom.Misc
 
         public override void Update(float elapsed)
         {
-            Viewport resolution = PhantomGame.Game.Resolution;
+            this.blinkTimer += elapsed;
+
             KeyboardState current = Keyboard.GetState();
+            KeyboardState previous = this.previousKeyboardState;
+
+            // Open and close logics:
+            if (!this.Visible)
+            {
+                if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
+                    this.Visible = true;
+                this.previousKeyboardState = current;
+                base.Update(elapsed);
+                return;
+            }
+            else if ((current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey)) ||
+                    (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape)))
+            {
+                this.Visible = false;
+                this.previousKeyboardState = current;
+                base.Update(elapsed);
+                return;
+            }
+
+            Viewport resolution = PhantomGame.Game.Resolution;
+
             bool shift = current.IsKeyDown(Keys.LeftShift) || current.IsKeyDown(Keys.RightShift);
             bool ctrl = current.IsKeyDown(Keys.LeftControl) || current.IsKeyDown(Keys.RightControl);
 
@@ -130,14 +176,62 @@ namespace Phantom.Misc
             if (ctrl && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
                 this.settings.LineCount = Math.Min(resolution.Height / this.font.LineSpacing - 1, this.settings.LineCount + (shift ? 5 : 1));
 
+            // Cursor control:
+            int lastCursor = this.cursor;
+            if (current.IsKeyDown(Keys.Left) && !previous.IsKeyDown(Keys.Left))
+                this.cursor -= 1;
+            if (current.IsKeyDown(Keys.Right) && !previous.IsKeyDown(Keys.Right))
+                this.cursor += 1;
+            if (current.IsKeyDown(Keys.Home) && !previous.IsKeyDown(Keys.End))
+                this.cursor = 0;
+            if (current.IsKeyDown(Keys.End) && !previous.IsKeyDown(Keys.End))
+                this.cursor = this.input.Length;
+            this.cursor = (int)MathHelper.Clamp(this.cursor, 0, this.input.Length);
 
+            // Read typed keys using the KeyMap:
+            Keys[] pressedKeys = current.GetPressedKeys();
+            for (int i = 0; i < pressedKeys.Length; i++)
+            {
+                Keys k = pressedKeys[i];
+                if (previous.IsKeyDown(k))
+                    continue;
+                char c = this.keyMap.getChar(k, shift ? KeyMap.Modifier.Shift : KeyMap.Modifier.None);
+                if (c != '\0')
+                    this.input = this.input.Insert(this.cursor++, c.ToString());
+            }
+            if (current.IsKeyDown(Keys.Back) && !previous.IsKeyDown(Keys.Back) && this.cursor > 0)
+            {
+                this.input = this.input.Remove(this.cursor - 1, 1);
+                this.cursor = (int)MathHelper.Clamp(this.cursor - 1, 0, this.input.Length);
+            }
+            if (current.IsKeyDown(Keys.Delete) && !previous.IsKeyDown(Keys.Delete) && this.cursor < this.input.Length)
+            {
+                this.input = this.input.Remove(this.cursor, 1);
+                lastCursor = -1; // force reblink
+            }
 
-            this.previous = current;
+            if (current.IsKeyDown(Keys.Enter) && !previous.IsKeyDown(Keys.Enter))
+            {
+                string line = this.input.Trim();
+                if (line.Length > 0)
+                {
+                    string[] argv = line.Split();
+                    Debug.WriteLine("not executing command: `" + argv[0] + "' (not yet implemented)");
+                }
+                this.input = "";
+                this.cursor = 0;
+            }
+
+            if (this.cursor != lastCursor)
+                this.blinkTimer = 0;
+            this.previousKeyboardState = current;
             base.Update(elapsed);
         }
 
         public override void Render(Graphics.RenderInfo info)
         {
+            if (!this.Visible)
+                return;
             GraphicsDevice graphicsDevice = PhantomGame.Game.GraphicsDevice;
             Viewport resolution = PhantomGame.Game.Resolution;
             float padding = this.settings.Padding;
@@ -145,6 +239,7 @@ namespace Phantom.Misc
             float height = padding * 2 + lineSpace * (this.settings.LineCount+1);
             Color color = this.settings.Color;
 
+            this.effect.World = Matrix.Identity;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
                 0, 1, 1f/(height/resolution.Height), 0,
                 0, 1);
@@ -178,6 +273,23 @@ namespace Phantom.Misc
 
             this.batch.End();
 
+            // Render cursor:
+            if (this.blinkTimer % 2 < 1)
+            {
+                Vector2 cursorPosition = this.font.MeasureString(this.input.Substring(0, this.cursor)) + new Vector2(this.settings.Padding + this.promptWidth, 0);
+                cursorPosition.Y = height - lineSpace - padding;
+
+                this.effect.World = Matrix.CreateTranslation(cursorPosition.X, cursorPosition.Y, 0);
+                this.effect.Projection = Matrix.CreateOrthographicOffCenter(
+                    0, resolution.Width, resolution.Height, 0,
+                    0, 1);
+                this.effect.DiffuseColor = this.settings.Color.ToVector3();
+                this.effect.Alpha = 1;
+
+                this.effect.CurrentTechnique.Passes[0].Apply();
+                graphicsDevice.SetVertexBuffer(this.cursorBuffer);
+                graphicsDevice.DrawPrimitives(PrimitiveType.LineList, 0, 1);
+            }
             base.Render(info);
         }
 
@@ -223,5 +335,92 @@ namespace Phantom.Misc
                 this.nolineBuffer = split[1];
             }
         }
+
+        public class KeyMap
+        {
+            public enum Modifier : int
+            {
+                None,
+                Shift,
+            }
+
+            private Dictionary<Keys, Dictionary<Modifier, char>> map;
+
+            public KeyMap()
+            {
+                map = new Dictionary<Keys, Dictionary<Modifier, char>>();
+                map[Keys.Space] = new Dictionary<Modifier, char>();
+                map[Keys.Space][Modifier.None] = ' ';
+                map[Keys.Space][Modifier.Shift] = ' ';
+
+                char[] specials = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
+
+                for (int i = 0; i <= 9; i++)
+                {
+                    char c = (char)(i + 48);
+                    map[(Keys)c] = new Dictionary<Modifier, char>();
+                    map[(Keys)c][Modifier.None] = c;
+                    map[(Keys)c][Modifier.Shift] = specials[i];
+                }
+
+                for (char c = 'A'; c <= 'Z'; c++)
+                {
+                    map[(Keys)c] = new Dictionary<Modifier, char>();
+                    map[(Keys)c][Modifier.None] = (char)(c + 32);
+                    map[(Keys)c][Modifier.Shift] = c;
+                }
+
+                map[Keys.OemPipe] = new Dictionary<Modifier, char>();
+                map[Keys.OemPipe][Modifier.None] = '\\';
+                map[Keys.OemPipe][Modifier.Shift] = '|';
+
+                map[Keys.OemOpenBrackets] = new Dictionary<Modifier, char>();
+                map[Keys.OemOpenBrackets][Modifier.None] = '[';
+                map[Keys.OemOpenBrackets][Modifier.Shift] = '{';
+
+                map[Keys.OemCloseBrackets] = new Dictionary<Modifier, char>();
+                map[Keys.OemCloseBrackets][Modifier.None] = ']';
+                map[Keys.OemCloseBrackets][Modifier.Shift] = '}';
+
+                map[Keys.OemComma] = new Dictionary<Modifier, char>();
+                map[Keys.OemComma][Modifier.None] = ',';
+                map[Keys.OemComma][Modifier.Shift] = '<';
+
+                map[Keys.OemPeriod] = new Dictionary<Modifier, char>();
+                map[Keys.OemPeriod][Modifier.None] = '.';
+                map[Keys.OemPeriod][Modifier.Shift] = '>';
+
+                map[Keys.OemSemicolon] = new Dictionary<Modifier, char>();
+                map[Keys.OemSemicolon][Modifier.None] = ';';
+                map[Keys.OemSemicolon][Modifier.Shift] = ':';
+
+                map[Keys.OemQuestion] = new Dictionary<Modifier, char>();
+                map[Keys.OemQuestion][Modifier.None] = '/';
+                map[Keys.OemQuestion][Modifier.Shift] = '?';
+
+                map[Keys.OemQuotes] = new Dictionary<Modifier, char>();
+                map[Keys.OemQuotes][Modifier.None] = '\'';
+                map[Keys.OemQuotes][Modifier.Shift] = '"';
+
+                map[Keys.OemMinus] = new Dictionary<Modifier, char>();
+                map[Keys.OemMinus][Modifier.None] = '-';
+                map[Keys.OemMinus][Modifier.Shift] = '_';
+
+                map[Keys.OemPlus] = new Dictionary<Modifier, char>();
+                map[Keys.OemPlus][Modifier.None] = '=';
+                map[Keys.OemPlus][Modifier.Shift] = '+';
+            }
+
+            public char getChar(Keys key, Modifier mod)
+            {
+                if (!map.ContainsKey(key))
+                    return '\0';
+                if (!map[key].ContainsKey(mod))
+                    return '\0';
+                return map[key][mod];
+            }
+        }
+
     }
+
 }
