@@ -78,7 +78,7 @@ namespace Phantom
             this.states = new List<GameState>();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             this.XnaGame.Dispose();
         }
@@ -150,10 +150,10 @@ namespace Phantom
 
             this.GraphicsDevice.Clear(this.BackgroundColor);
 
-            this.Render(null);
             for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--);
             for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
                 this.states[i].Render(null);
+            this.Render(null);
         }
 
         protected override void OnComponentAdded(Component component)

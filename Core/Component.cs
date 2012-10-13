@@ -6,7 +6,7 @@ using Phantom.Graphics;
 
 namespace Phantom.Core
 {
-    public class Component
+    public class Component : IDisposable
     {
         public enum MessageResult
         {
@@ -35,6 +35,10 @@ namespace Phantom.Core
             this.Flags = 0;
             this.Destroyed = false;
             this.components = new List<Component>();
+        }
+
+        public virtual void Dispose()
+        {
         }
 
         public virtual void OnAdd( Component parent )
@@ -88,7 +92,7 @@ namespace Phantom.Core
 
         }
 
-        public void Clear()
+        public void ClearComponents()
         {
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
