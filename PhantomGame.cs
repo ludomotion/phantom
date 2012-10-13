@@ -39,6 +39,8 @@ namespace Phantom
         private GraphicsDeviceManager graphics;
         public GraphicsDevice GraphicsDevice { get; private set; }
 
+        public Konsoul Console { get; private set; }
+
         public ContentManager Content
         {
             get { return this.XnaGame.Content; }
@@ -162,6 +164,10 @@ namespace Phantom
             {
                 throw new Exception("Don't add GameStates as components to a game, use the PushState method instead.");
             }
+            if (component is Konsoul)
+            {
+                this.Console = component as Konsoul;
+            }
             base.OnComponentAdded(component);
         }
 
@@ -219,6 +225,11 @@ namespace Phantom
             this.states.Add(state);
             state.OnAdd(this);
             removed.OnRemove();
+        }
+
+        public void Exit()
+        {
+            this.XnaGame.Exit();
         }
     }
 }

@@ -9,20 +9,24 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Phantom.Misc
 {
-    public delegate void ConsoleAction(string[] argv);
+    public delegate void ConsoleCommand(string[] argv);
 
     public class KonsoulSettings
     {
         public Color BackgroundColor = Color.Black;
-        public Color Color = Color.White;
+        public Color Color = Color.LightGray;
         public float Alpha = 0.8f;
         public int LineCount = 12;
         public float Padding = 4;
         public string Prompt = "] ";
         public Keys OpenKey = Keys.OemTilde;
     }
+
     public class Konsoul : Component
     {
+        private static string WELCOME = " enter command here - type `help' for information";
+        private static string HELP = @"no help yet, survive by your self for now...";
+
         /**
          * Needed to receive debug output. (from `Debug.WriteLine' etc)
          */
@@ -66,6 +70,9 @@ namespace Phantom.Misc
         private List<string> wrapBuffer;
         private string nolineBuffer;
 
+        private Dictionary<string, ConsoleCommand> commands;
+        private Dictionary<string, string> documentation;
+
         private VertexBuffer backgroundBuffer;
         private VertexBuffer cursorBuffer;
         private IndexBuffer backgroundIndex;
@@ -89,6 +96,10 @@ namespace Phantom.Misc
             this.keyMap = new KeyMap();
             this.previousKeyboardState = Keyboard.GetState();
 
+            this.commands = new Dictionary<string, ConsoleCommand>();
+            this.documentation = new Dictionary<string, string>();
+            this.SetupDefaultCommands();
+
             Debug.Listeners.Add(this.listener=new DebugListener(this));
             this.SetupVertices();
             this.lines.Add("] Konsoul initialized");
@@ -97,6 +108,83 @@ namespace Phantom.Misc
         public Konsoul(SpriteFont font)
             : this(font, new KonsoulSettings())
         {
+        }
+
+        private void SetupDefaultCommands()
+        {
+            this.Register("quit", "exit this game.", delegate(string[] argv)
+            {
+                PhantomGame.Game.Exit();
+            });
+            this.Register("echo", "output arguments.", delegate(string[] argv)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i < argv.Length; i++)
+                {
+                    sb.Append(argv[i]);
+                    if (i != argv.Length - 1)
+                        sb.Append(" ");
+                }
+                this.lines.Add(sb.ToString());
+            });
+            this.Register("clear", "clear the scrollback of this terminal.", delegate(string[] argv)
+            {
+                this.Clear();
+            });
+            this.Register("help", "use for information.", delegate(string[] argv)
+            {
+                if (argv.Length > 1)
+                {
+                    if (this.documentation.ContainsKey(argv[1]))
+                        this.lines.AddRange(this.documentation[argv[1]].Split("\n".ToCharArray()));
+                    else
+                        this.lines.Add("no help for " + argv[1]);
+                    return;
+                }
+                this.lines.AddRange(Konsoul.HELP.Split("\n".ToCharArray()));
+            });
+
+            this.Register("commands", "print this list of commands.", delegate(string[] argv)
+            {
+                StringBuilder builder = new StringBuilder();
+                this.lines.Add("Available commands:");
+                int maxWidth = int.MinValue;
+                foreach (string k in this.commands.Keys)
+                    maxWidth = Math.Max(k.Length, maxWidth);
+                foreach (string k in this.commands.Keys)
+                {
+                    builder.Clear();
+                    builder.Append("  " + k);
+                    for (int i = 0; i < maxWidth - k.Length; i++)
+                        builder.Append(" ");
+                    if (this.documentation.ContainsKey(k))
+                    {
+                        builder.Append(" - ");
+                        string doc = this.documentation[k];
+                        if (doc.Contains("\n"))
+                            builder.Append(this.documentation[k].Substring(0, doc.IndexOf("\n")));
+                        else
+                            builder.Append(this.documentation[k]);
+                    }
+                    this.lines.Add(builder.ToString());
+                }
+            });
+
+            this.Register("dump", "write console scrollback to a file.", delegate(string[] argv)
+            {
+                string filename = "dump-" + DateTime.Now.ToString("yyyyMMdd") + ".log";
+                if (argv.Length > 1)
+                    filename = argv[1];
+                try
+                {
+                    System.IO.File.WriteAllLines(filename, this.lines.ToArray());
+                    this.lines.Add("successfully written to: " + filename);
+                }
+                catch (Exception e)
+                {
+                    this.lines.Add(argv[0]+": failed to write file: " + e.Message);
+                }
+            });
         }
 
         private void SetupVertices()
@@ -215,8 +303,16 @@ namespace Phantom.Misc
                 string line = this.input.Trim();
                 if (line.Length > 0)
                 {
-                    string[] argv = line.Split();
-                    Debug.WriteLine("not executing command: `" + argv[0] + "' (not yet implemented)");
+                    string[] commands = line.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < commands.Length; i++)
+                    {
+                        string[] argv = commands[i].Trim().Split();
+                        string command = argv[0].ToLower();
+                        if (this.commands.ContainsKey(command))
+                            this.commands[command](argv);
+                        else
+                            this.lines.Add(command + ": command not found");
+                    }
                 }
                 this.input = "";
                 this.cursor = 0;
@@ -254,6 +350,8 @@ namespace Phantom.Misc
             this.batch.Begin();
             float y = height - padding - lineSpace;
             this.batch.DrawString(this.font, this.settings.Prompt + this.input, new Vector2(padding, y), color);
+            if (this.input.Length == 0)
+                this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding+promptWidth, y), new Color(.2f,.2f,.2f,this.settings.Alpha*.5f));
             y -= lineSpace;
             
             int count = this.lines.Count;
@@ -262,10 +360,17 @@ namespace Phantom.Misc
             while ((index - this.scrollOffset) <= this.settings.LineCount && count - index >= 0)
             {
                 string line = this.lines[count - index];
-                IList<string> chunks = WordWrap(line, resolution.Width - padding * 2);
-                for (int i = 0; i < chunks.Count; i++)
+                if (line.Length > 0)
                 {
-                    this.batch.DrawString(this.font, chunks[i], new Vector2(padding, y), color);
+                    IList<string> chunks = WordWrap(line, resolution.Width - padding * 2);
+                    for (int i = 0; i < chunks.Count; i++)
+                    {
+                        this.batch.DrawString(this.font, chunks[i], new Vector2(padding, y), color);
+                        y -= lineSpace;
+                    }
+                }
+                else
+                {
                     y -= lineSpace;
                 }
                 index++;
@@ -313,6 +418,36 @@ namespace Phantom.Misc
         public void Clear()
         {
             this.lines.Clear();
+        }
+
+        public void Register(string name, string documentation, ConsoleCommand command)
+        {
+            name = name.Trim().ToLower();
+            this.commands[name] = command;
+
+            if (documentation != null && documentation.Length > 0)
+            {
+                // Trim documentation:
+                string[] lines = documentation.Replace("\t", "    ").Split("\n".ToCharArray());
+                int indent = int.MaxValue;
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string stripped = lines[i].TrimStart();
+                    if (stripped.Length > 0)
+                        indent = Math.Min(indent, lines[i].Length - stripped.Length);
+                }
+                List<string> trimmed = new List<string>();
+                trimmed.Add(lines[0].Trim());
+                if (indent < int.MaxValue)
+                    for (int i = 1; i < lines.Length; i++)
+                        trimmed.Add(lines[i].Substring(Math.Min(lines[i].Length,indent)).TrimEnd());
+                while (trimmed.Count > 0 && trimmed[trimmed.Count-1].Length == 0)
+                    trimmed.RemoveAt(trimmed.Count - 1);
+                while (trimmed.Count > 0 && trimmed[0].Length == 0)
+                    trimmed.RemoveAt(0);
+                documentation = string.Join("\n", trimmed);
+                this.documentation[name] = documentation;
+            }
         }
 
         public void WriteLine(string message)
