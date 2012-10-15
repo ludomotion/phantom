@@ -110,7 +110,12 @@ namespace Phantom.Misc
 #if WINDOWS || LINUX || MONOMAC
             try
             {
-                this.history = new List<string>(System.IO.File.ReadAllLines("history.log"));
+                this.history = new List<string>(System.IO.File.ReadAllLines("konsoul.dat"));
+                if (this.history.Count > 0)
+                {
+                    int.TryParse(this.history[0], out this.settings.LineCount);
+                    this.history.RemoveAt(0);
+                }
             }
             catch (System.IO.FileNotFoundException)
             {
@@ -140,7 +145,8 @@ namespace Phantom.Misc
                 this.history.RemoveAt(this.history.Count - 1);
             try
             {
-                System.IO.File.WriteAllLines("history.log", this.history.ToArray());
+                this.history.Insert(0, "" + this.settings.LineCount);
+                System.IO.File.WriteAllLines("konsoul.dat", this.history.ToArray());
             }
             catch (System.IO.IOException)
             {
