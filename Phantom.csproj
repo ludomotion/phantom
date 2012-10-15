@@ -90,6 +90,7 @@
     <Compile Include="Cameras\Components\DeadZone.cs" />
     <Compile Include="Cameras\Components\FollowEntity.cs" />
     <Compile Include="Messages.cs" />
+    <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
     <Compile Include="Physics\Components\Atractor.cs" />
     <Compile Include="Core\Component.cs" />

@@ -64,6 +64,7 @@ namespace Phantom.Misc
 
         private int scrollOffset;
         private string input;
+        private float controlDelay;
         private float promptWidth;
         private int cursor;
         private List<string> lines;
@@ -98,6 +99,7 @@ namespace Phantom.Misc
             this.scrollOffset = 0;
             this.history = new List<string>();
             this.historyIndex = 0;
+            this.controlDelay = -1;
 
             this.keyMap = new KeyMap();
             this.previousKeyboardState = Keyboard.GetState();
@@ -238,7 +240,7 @@ namespace Phantom.Misc
                     this.lines.Add(argv[0] + ": failed to write file: " + e.Message);
                 }
             });
-#endif // WINDOWS | LINUX | MONOMAC
+#endif // WINDOWS || LINUX || MONOMAC
         }
 
         private void SetupVertices()
@@ -284,6 +286,9 @@ namespace Phantom.Misc
                     (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape)))
             {
                 this.Visible = false;
+                this.historySavedInput = null;
+                this.input = "";
+                this.cursor = 0;
                 this.previousKeyboardState = current;
                 base.Update(elapsed);
                 return;
@@ -314,15 +319,31 @@ namespace Phantom.Misc
 
             // Cursor control:
             int lastCursor = this.cursor;
-            if (current.IsKeyDown(Keys.Left) && !previous.IsKeyDown(Keys.Left))
+            if (current.IsKeyDown(Keys.Left) && (this.controlDelay -= elapsed) < 0 && (this.controlDelay += .1f) > 0)
                 this.cursor -= 1;
-            if (current.IsKeyDown(Keys.Right) && !previous.IsKeyDown(Keys.Right))
+            if (current.IsKeyDown(Keys.Right) && (this.controlDelay -= elapsed) < 0 && (this.controlDelay += .1f) > 0)
                 this.cursor += 1;
             if (current.IsKeyDown(Keys.Home) && !previous.IsKeyDown(Keys.End))
                 this.cursor = 0;
             if (current.IsKeyDown(Keys.End) && !previous.IsKeyDown(Keys.End))
                 this.cursor = this.input.Length;
             this.cursor = (int)MathHelper.Clamp(this.cursor, 0, this.input.Length);
+
+            if (current.GetPressedKeys().Length == 0)
+                this.controlDelay = 0;
+
+            // Clear line, from beginning of the line until the cursor:
+            if (ctrl && current.IsKeyDown(Keys.U) && !previous.IsKeyDown(Keys.U))
+            {
+                this.input = this.input.Substring(this.cursor);
+                this.cursor = 0;
+            }
+            if (ctrl && current.IsKeyDown(Keys.C) && !previous.IsKeyDown(Keys.C))
+            {
+                this.historySavedInput = null;
+                this.input = "";
+                this.cursor = 0;
+            }
 
             // Cycle through history:
             if (current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
@@ -358,7 +379,7 @@ namespace Phantom.Misc
             for (int i = 0; i < pressedKeys.Length; i++)
             {
                 Keys k = pressedKeys[i];
-                if (previous.IsKeyDown(k))
+                if (ctrl || previous.IsKeyDown(k))
                     continue;
                 char c = this.keyMap.getChar(k, shift ? KeyMap.Modifier.Shift : KeyMap.Modifier.None);
                 if (c != '\0')
@@ -375,6 +396,42 @@ namespace Phantom.Misc
                 lastCursor = -1; // force reblink
             }
 
+
+            // (Awesome)Tab completion:
+            if (current.IsKeyDown(Keys.Tab) && !previous.IsKeyDown(Keys.Tab))
+            {
+                // Find beginning of current command and substract the partical typed command:
+                int commandStart = this.input.LastIndexOf(';', this.cursor - 1) + 1;
+                while (commandStart < this.input.Length &&  this.input[commandStart] == ' ')
+                        commandStart += 1;
+                string partical = this.input.Substring(commandStart, this.cursor - commandStart).Trim();
+
+                // Find the common text within all commands (could be completed):
+                string common = null;
+                foreach (string command in this.commands.Keys)
+                {
+                    if (!command.StartsWith(partical))
+                        continue;
+                    if (common == null)
+                        common = command + ' ';
+                    else
+                        common = MiscUtils.findOverlap(common, command);
+                }
+
+                // Found a common text:
+                if (common != null)
+                {
+                    // Insert new common part of the command:
+                    this.input = this.input.Substring(0, commandStart) + common + this.input.Substring(this.cursor);
+                    this.cursor = commandStart + common.Length;
+                    if (partical.Equals(common)) // Not completed yet, print list of possible commands:
+                        foreach (string command in this.commands.Keys)
+                            if( command.StartsWith(common) )
+                                this.lines.Add(" " + command);
+                }
+            }
+
+
             if (current.IsKeyDown(Keys.Enter) && !previous.IsKeyDown(Keys.Enter))
             {
                 string line = this.input.Trim();
@@ -389,7 +446,20 @@ namespace Phantom.Misc
                         string[] argv = commands[i].Trim().Split();
                         string command = argv[0].ToLower();
                         if (this.commands.ContainsKey(command))
+                        {
+#if DEBUG
                             this.commands[command](argv);
+#else
+                            try
+                            {
+                                this.commands[command](argv);
+                            }
+                            catch (Exception e)
+                            {
+                                this.lines.Add("error executing `"+command+"': " + e.Message);
+                            }
+#endif // DEBUG
+                        }
                         else
                             this.lines.Add(command + ": command not found");
                     }
