@@ -28,6 +28,8 @@ namespace Phantom.Graphics
         private SpriteSortMode sortMode;
         private BlendState blendState;
 
+        private Canvas canvas;
+
         public Renderer(int passes, ViewportPolicy viewportPolicy, SpriteSortMode sortMode, BlendState blendState)
         {
             this.sortMode = sortMode;
@@ -35,6 +37,7 @@ namespace Phantom.Graphics
             this.passes = passes;
             this.policy = viewportPolicy;
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
+            this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
@@ -130,6 +133,9 @@ namespace Phantom.Graphics
                     world *= Matrix.CreateTranslation(left, top, 0);
                     break;
                 case ViewportPolicy.AutoScaled:
+                    info.Projection = Matrix.CreateOrthographicOffCenter(
+                        left, left + info.Width, top + info.Height, top,
+                        0, 1);
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
                     {
                         Matrix scale = Matrix.CreateScale(
@@ -141,6 +147,11 @@ namespace Phantom.Graphics
                     }
                     break;
             }
+
+            info.World = world;
+
+            this.canvas.SetRenderInfo(info);
+            info.Canvas = this.canvas;
 
             return info;
         }

@@ -21,9 +21,11 @@ namespace Phantom.Graphics
         public int Pass;
         public float Width;
         public float Height;
+        public Canvas Canvas;
         public SpriteBatch Batch;
         public GraphicsDevice GraphicsDevice;
         public Camera Camera;
+        public Matrix World;
         public Matrix Projection;
 
     }

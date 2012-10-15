@@ -50,6 +50,14 @@ namespace Phantom.Misc
 
         public bool Visible;
 
+        public SpriteFont Font
+        {
+            get
+            {
+                return this.font;
+            }
+        }
+
         private float blinkTimer;
 
         private KonsoulSettings settings;
