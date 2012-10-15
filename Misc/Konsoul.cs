@@ -30,10 +30,10 @@ namespace Phantom.Misc
         /**
          * Needed to receive debug output. (from `Debug.WriteLine' etc)
          */
-        private class DebugListener : TraceListener
+        private class KonsoulTraceListener : TraceListener
         {
             private Konsoul console;
-            public DebugListener( Konsoul console )
+            public KonsoulTraceListener(Konsoul console)
             {
                 this.console = console;
             }
@@ -57,7 +57,7 @@ namespace Phantom.Misc
         private KeyboardState previousKeyboardState;
         private KeyMap keyMap;
 
-        private readonly DebugListener listener;
+        private readonly KonsoulTraceListener listener;
         private SpriteFont font;
         private SpriteBatch batch;
         private BasicEffect effect;
@@ -69,6 +69,10 @@ namespace Phantom.Misc
         private List<string> lines;
         private List<string> wrapBuffer;
         private string nolineBuffer;
+
+        private List<string> history;
+        private int historyIndex;
+        private string historySavedInput;
 
         private Dictionary<string, ConsoleCommand> commands;
         private Dictionary<string, string> documentation;
@@ -92,22 +96,55 @@ namespace Phantom.Misc
             this.wrapBuffer = new List<string>();
             this.nolineBuffer = "";
             this.scrollOffset = 0;
+            this.history = new List<string>();
+            this.historyIndex = 0;
 
             this.keyMap = new KeyMap();
             this.previousKeyboardState = Keyboard.GetState();
 
             this.commands = new Dictionary<string, ConsoleCommand>();
             this.documentation = new Dictionary<string, string>();
-            this.SetupDefaultCommands();
 
-            Debug.Listeners.Add(this.listener=new DebugListener(this));
+#if WINDOWS || LINUX || MONOMAC
+            try
+            {
+                this.history = new List<string>(System.IO.File.ReadAllLines("history.log"));
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+            }
+            catch (System.IO.IOException e)
+            {
+                this.lines.Add("failed to load history: " + e.Message);
+            }
+#endif // WINDOWS || LINUX || MONOMAC
+
+            Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
             this.SetupVertices();
-            this.lines.Add("] Konsoul initialized");
+            this.SetupDefaultCommands();
+            this.lines.Add("] Konsoul Initialized");
         }
 
         public Konsoul(SpriteFont font)
             : this(font, new KonsoulSettings())
         {
+        }
+
+        public override void Dispose()
+        {
+            Debug.Listeners.Remove(this.listener);
+#if WINDOWS || LINUX || MONOMAC
+            while (this.history.Count > 0 && this.history[this.history.Count - 1].Trim().ToLower() == "quit")
+                this.history.RemoveAt(this.history.Count - 1);
+            try
+            {
+                System.IO.File.WriteAllLines("history.log", this.history.ToArray());
+            }
+            catch (System.IO.IOException)
+            {
+            }
+#endif // WINDOWS || LINUX || MONOMAC
+            base.Dispose();
         }
 
         private void SetupDefaultCommands()
@@ -147,7 +184,7 @@ namespace Phantom.Misc
             this.Register("commands", "print this list of commands.", delegate(string[] argv)
             {
                 StringBuilder builder = new StringBuilder();
-                this.lines.Add("Available commands:");
+                this.lines.Add("available commands:");
                 int maxWidth = int.MinValue;
                 foreach (string k in this.commands.Keys)
                     maxWidth = Math.Max(k.Length, maxWidth);
@@ -170,6 +207,22 @@ namespace Phantom.Misc
                 }
             });
 
+            this.Register("history", "show command history.\n\nuse the -c option to clear the history.", delegate(string[] argv)
+            {
+                if (argv.Length > 1 && argv[1].Trim().ToLower() == "-c")
+                {
+                    this.history.Clear();
+                    this.lines.Add("history cleared.");
+                }
+                else
+                {
+                    this.lines.Add("history:");
+                    for (int i = 0; i < this.history.Count; i++)
+                        this.lines.Add(string.Format("{0,6} {1}", i+1, this.history[i]));
+                }
+            });
+
+#if WINDOWS || LINUX || MONOMAC
             this.Register("dump", "write console scrollback to a file.", delegate(string[] argv)
             {
                 string filename = "dump-" + DateTime.Now.ToString("yyyyMMdd") + ".log";
@@ -182,9 +235,10 @@ namespace Phantom.Misc
                 }
                 catch (Exception e)
                 {
-                    this.lines.Add(argv[0]+": failed to write file: " + e.Message);
+                    this.lines.Add(argv[0] + ": failed to write file: " + e.Message);
                 }
             });
+#endif // WINDOWS | LINUX | MONOMAC
         }
 
         private void SetupVertices()
@@ -208,12 +262,6 @@ namespace Phantom.Misc
             this.cursorBuffer = new VertexBuffer(PhantomGame.Game.GraphicsDevice, VertexPositionColor.VertexDeclaration, 2, BufferUsage.None);
             this.cursorBuffer.SetData<VertexPositionColor>(cursor);
 
-        }
-
-        public override void Dispose()
-        {
-            Debug.Listeners.Remove(this.listener);
-            base.Dispose();
         }
 
         public override void Update(float elapsed)
@@ -276,6 +324,35 @@ namespace Phantom.Misc
                 this.cursor = this.input.Length;
             this.cursor = (int)MathHelper.Clamp(this.cursor, 0, this.input.Length);
 
+            // Cycle through history:
+            if (current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
+            {
+                if (this.historyIndex == 0 && this.input.Length > 0)
+                {
+                    this.historySavedInput = this.input;
+                }
+                if (this.history.Count - (this.historyIndex + 1) >= 0)
+                {
+                    this.historyIndex += 1;
+                    this.input = this.history[this.history.Count - this.historyIndex];
+                    this.cursor = this.input.Length;
+                }
+            }
+            if (current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down) && this.historyIndex > 0)
+            {
+                this.historyIndex -= 1;
+                if (this.historyIndex == 0)
+                {
+                    this.input = this.historySavedInput == null ? "" : this.historySavedInput;
+                    this.cursor = this.input.Length;
+                }
+                else
+                {
+                    this.input = this.history[this.history.Count - this.historyIndex];
+                    this.cursor = this.input.Length;
+                }
+            }
+
             // Read typed keys using the KeyMap:
             Keys[] pressedKeys = current.GetPressedKeys();
             for (int i = 0; i < pressedKeys.Length; i++)
@@ -303,6 +380,9 @@ namespace Phantom.Misc
                 string line = this.input.Trim();
                 if (line.Length > 0)
                 {
+                    if (!this.input.StartsWith(" "))
+                        this.history.Add(line);
+
                     string[] commands = line.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < commands.Length; i++)
                     {
@@ -316,6 +396,7 @@ namespace Phantom.Misc
                 }
                 this.input = "";
                 this.cursor = 0;
+                this.historyIndex = 0;
             }
 
             if (this.cursor != lastCursor)
@@ -332,12 +413,12 @@ namespace Phantom.Misc
             Viewport resolution = PhantomGame.Game.Resolution;
             float padding = this.settings.Padding;
             float lineSpace = this.font.LineSpacing;
-            float height = padding * 2 + lineSpace * (this.settings.LineCount+1);
+            float height = padding * 2 + lineSpace * (this.settings.LineCount + 1);
             Color color = this.settings.Color;
 
             this.effect.World = Matrix.Identity;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
-                0, 1, 1f/(height/resolution.Height), 0,
+                0, 1, 1f / (height / resolution.Height), 0,
                 0, 1);
             this.effect.DiffuseColor = this.settings.BackgroundColor.ToVector3();
             this.effect.Alpha = this.settings.Alpha;
@@ -351,9 +432,9 @@ namespace Phantom.Misc
             float y = height - padding - lineSpace;
             this.batch.DrawString(this.font, this.settings.Prompt + this.input, new Vector2(padding, y), color);
             if (this.input.Length == 0)
-                this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding+promptWidth, y), new Color(.2f,.2f,.2f,this.settings.Alpha*.5f));
+                this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
             y -= lineSpace;
-            
+
             int count = this.lines.Count;
             this.scrollOffset = (int)MathHelper.Clamp(this.scrollOffset, 0, count - this.settings.LineCount);
             int index = 1 + this.scrollOffset;
@@ -407,7 +488,7 @@ namespace Phantom.Misc
             while (text.Length > 0)
             {
                 int length;
-                for( length = Math.Min(guess,text.Length); this.font.MeasureString( text.Substring(0,length)).X > widthInPixels; --length );
+                for (length = Math.Min(guess, text.Length); this.font.MeasureString(text.Substring(0, length)).X > widthInPixels; --length) ;
                 this.wrapBuffer.Add(text.Substring(0, length));
                 text = text.Substring(length);
             }
@@ -440,8 +521,8 @@ namespace Phantom.Misc
                 trimmed.Add(lines[0].Trim());
                 if (indent < int.MaxValue)
                     for (int i = 1; i < lines.Length; i++)
-                        trimmed.Add(lines[i].Substring(Math.Min(lines[i].Length,indent)).TrimEnd());
-                while (trimmed.Count > 0 && trimmed[trimmed.Count-1].Length == 0)
+                        trimmed.Add(lines[i].Substring(Math.Min(lines[i].Length, indent)).TrimEnd());
+                while (trimmed.Count > 0 && trimmed[trimmed.Count - 1].Length == 0)
                     trimmed.RemoveAt(trimmed.Count - 1);
                 while (trimmed.Count > 0 && trimmed[0].Length == 0)
                     trimmed.RemoveAt(0);
@@ -450,7 +531,7 @@ namespace Phantom.Misc
             }
         }
 
-        public void WriteLine(string message)
+        private void WriteLine(string message)
         {
             if (this.nolineBuffer.Length > 0)
             {
@@ -460,12 +541,12 @@ namespace Phantom.Misc
             this.lines.Add(message);
         }
 
-        public void Write(string message)
+        private void Write(string message)
         {
             this.nolineBuffer += message;
             while (this.nolineBuffer.Contains("\n"))
             {
-                string[] split = this.nolineBuffer.Split(new char[]{'\n'},1);
+                string[] split = this.nolineBuffer.Split(new char[] { '\n' }, 1);
                 this.lines.Add(split[0]);
                 this.nolineBuffer = split[1];
             }
@@ -555,7 +636,6 @@ namespace Phantom.Misc
                 return map[key][mod];
             }
         }
-
     }
 
 }

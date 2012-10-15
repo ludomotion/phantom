@@ -27,6 +27,8 @@ namespace Phantom
         public Color BackgroundColor { get; protected set; }
         public bool Paused { get; set; }
 
+        public float TotalTime { get; private set; }
+
         public readonly float Width;
         public readonly float Height;
         public readonly Vector2 Size;
@@ -64,11 +66,12 @@ namespace Phantom
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-            this.Name = Assembly.GetCallingAssembly().FullName;
+            this.Name = Assembly.GetEntryAssembly().FullName;
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
 
             this.XnaGame = new Microsoft.Xna.Framework.Game();
+            this.XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
             this.XnaGame.Window.Title = this.Name;
             this.XnaGame.Components.Add(new XnaPhantomComponent(this));
             this.XnaGame.Content.RootDirectory = "Content";
@@ -115,13 +118,16 @@ namespace Phantom
         internal void XnaInitialize()
         {
             this.GraphicsDevice = this.XnaGame.GraphicsDevice;
+            this.TotalTime = 0;
             this.Initialize();
+            Trace.WriteLine("PhantomGame Initialized: " + Assembly.GetEntryAssembly().FullName);
         }
 
         internal void XnaUpdate(GameTime gameTime)
         {
 
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            this.TotalTime += elapsed;
 
             this.Update(elapsed);
             for (int i = this.states.Count - 1; i >= 0; i--)
@@ -225,6 +231,12 @@ namespace Phantom
             this.states.Add(state);
             state.OnAdd(this);
             removed.OnRemove();
+        }
+
+        protected virtual void OnExit(object sender, EventArgs e)
+        {
+            if (this.Console != null)
+                this.Console.Dispose();
         }
 
         public void Exit()
