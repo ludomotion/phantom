@@ -61,10 +61,9 @@ namespace Phantom.Graphics
             if (this.Parent == null)
                 return;
 
-            Matrix world;
-            info = this.BuildRenderInfo(out world);
+            info = this.BuildRenderInfo();
 
-            this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, world);
+            this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
             for (int pass = 0; pass < this.passes; pass++)
             {
                 info.Pass = pass;
@@ -83,7 +82,7 @@ namespace Phantom.Graphics
             base.Render(info);
         }
 
-        private RenderInfo BuildRenderInfo(out Matrix world)
+        private RenderInfo BuildRenderInfo()
         {
             RenderInfo info = new RenderInfo();
             info.Pass = 0;
@@ -112,7 +111,7 @@ namespace Phantom.Graphics
                     break;
             }
 
-            world = Matrix.Identity;
+            Matrix world = Matrix.Identity;
             if (this.layer != null && this.layer.Camera != null)
             {
                 info.Camera = this.layer.Camera;

@@ -108,7 +108,7 @@ namespace Phantom
 #endif
             this.graphics.SynchronizeWithVerticalRetrace = false;
 
-            this.graphics.PreferMultiSampling = false;
+            this.graphics.PreferMultiSampling = true;
         }
 
         protected virtual void Initialize()

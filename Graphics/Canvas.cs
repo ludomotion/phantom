@@ -30,7 +30,6 @@ namespace Phantom.Graphics
 
         public float LineWidth;
         public Color StrokeStyle;
-        public string LineJoin;
 
         private RenderInfo info;
         private GraphicsDevice device;
@@ -39,6 +38,8 @@ namespace Phantom.Graphics
 
         // Buffers:
         private VertexPositionColor[] line;
+        private Dictionary<int, VertexPositionColor[]> circles;
+        private Dictionary<int, short[]> circleIndices;
 
         public Canvas(GraphicsDevice graphicsDevice)
         {
@@ -52,7 +53,6 @@ namespace Phantom.Graphics
             // Canvas Attributes Defaults:
             this.LineWidth = 1;
             this.StrokeStyle = Color.Black;
-            this.LineJoin = "miter";
 
 
             this.SetupGraphics();
@@ -68,6 +68,33 @@ namespace Phantom.Graphics
                 new VertexPositionColor(new Vector3(.5f,-.5f,0),Color.White),
                 new VertexPositionColor(new Vector3(.5f,.5f,0),Color.White)
             };
+
+            short[] segments = new short[] { 12, 16, 24, 32, 48 };
+            this.circles = new Dictionary<int, VertexPositionColor[]>();
+            this.circleIndices = new Dictionary<int, short[]>();
+
+            for (int i = 0; i < segments.Length; i++)
+            {
+                int sc = segments[i];
+                float step = MathHelper.TwoPi / sc;
+                this.circleIndices[sc] = new short[sc * 3];
+                this.circles[sc] = new VertexPositionColor[sc + 1];
+                this.circles[sc][0] = new VertexPositionColor(new Vector3(0, 0, 0), Color.White);
+                this.circles[sc][1] = new VertexPositionColor(new Vector3(1, 0, 0), Color.White);
+                int c = 0;
+                for (short j = 1; j < sc; j++)
+                {
+                    float a = j * step;
+                    Vector3 v = new Vector3((float)Math.Cos(a), (float)Math.Sin(a), 0);
+                    this.circles[sc][j + 1] = new VertexPositionColor(v, Color.White);
+                    this.circleIndices[sc][c++] = 0;
+                    this.circleIndices[sc][c++] = j;
+                    this.circleIndices[sc][c++] = (short)(j + 1);
+                }
+                this.circleIndices[sc][c++] = 0;
+                this.circleIndices[sc][c++] = (short)sc;
+                this.circleIndices[sc][c++] = 1;
+            }
         }
 
         public void Begin()
@@ -108,20 +135,38 @@ namespace Phantom.Graphics
                         pointer = ca.Position;
                         break;
                     case 1:
-                        Vector2 delta = ca.Position - pointer;
-                        Vector2 direction = delta.Normalized();
-                        Vector2 a = pointer;
-                        Vector2 b = ca.Position;
-                        if (i > 1)
-                            a += direction * halfWidth;
-                        if (i != this.stack.Count - 1)
-                            b -= direction * halfWidth;
-                        this.StrokeLine(a, b);
+                        //Vector2 delta = ca.Position - pointer;
+                        //Vector2 direction = delta.Normalized();
+                        this.StrokeLine(pointer, ca.Position);
+                        if (i > 1 && i < this.stack.Count)
+                            this.FillCircle(pointer, halfWidth);
                         prev = pointer;
                         pointer = ca.Position;
                         break;
                 }
             }
+            if (this.stack[0].Position == this.stack[this.stack.Count - 1].Position)
+                this.FillCircle(this.stack[0].Position, halfWidth);
+        }
+
+        public void FillCircle(Vector2 position, float radius)
+        {
+            int segments = (int)Math.Max(12,Math.Log(radius) * (Math.Log(radius) * .75) * 12);
+            int last = 12;
+            foreach( int key in this.circles.Keys )
+                if (segments < (last=key))
+                    segments = key;
+            segments = Math.Min(segments, last);
+
+            Matrix scale = Matrix.CreateScale(radius);
+            Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
+            this.effect.World = scale * translation * this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = this.StrokeStyle.ToVector3();
+            this.effect.Alpha = this.StrokeStyle.A / 255f;
+
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.circles[segments], 0, segments + 1, this.circleIndices[segments], 0, segments);
         }
 
         public void StrokeLine(Vector2 a, Vector2 b)
@@ -137,6 +182,7 @@ namespace Phantom.Graphics
             this.effect.World = scale * rotation * translation * this.info.World;
             this.effect.Projection = this.info.Projection;
             this.effect.DiffuseColor = this.StrokeStyle.ToVector3();
+            this.effect.Alpha = this.StrokeStyle.A / 255f;
 
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.line, 0, 2);
