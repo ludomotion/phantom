@@ -30,6 +30,7 @@ namespace Phantom.Graphics
 
         public float LineWidth;
         public Color StrokeStyle;
+        public Color FillStyle;
 
         private RenderInfo info;
         private GraphicsDevice device;
@@ -53,6 +54,7 @@ namespace Phantom.Graphics
             // Canvas Attributes Defaults:
             this.LineWidth = 1;
             this.StrokeStyle = Color.Black;
+            this.FillStyle = Color.White;
 
 
             this.SetupGraphics();
@@ -139,14 +141,14 @@ namespace Phantom.Graphics
                         //Vector2 direction = delta.Normalized();
                         this.StrokeLine(pointer, ca.Position);
                         if (i > 1 && i < this.stack.Count)
-                            this.FillCircle(pointer, halfWidth);
+                            this.fillCircleColored(pointer, halfWidth, this.StrokeStyle);
                         prev = pointer;
                         pointer = ca.Position;
                         break;
                 }
             }
             if (this.stack[0].Position == this.stack[this.stack.Count - 1].Position)
-                this.FillCircle(this.stack[0].Position, halfWidth);
+                this.fillCircleColored(pointer, halfWidth, this.StrokeStyle);
         }
 
         public void FillCircle(Vector2 position, float radius)
@@ -162,11 +164,26 @@ namespace Phantom.Graphics
             Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
             this.effect.World = scale * translation * this.info.World;
             this.effect.Projection = this.info.Projection;
-            this.effect.DiffuseColor = this.StrokeStyle.ToVector3();
-            this.effect.Alpha = this.StrokeStyle.A / 255f;
+            this.effect.DiffuseColor = this.FillStyle.ToVector3();
+            this.effect.Alpha = this.FillStyle.A / 255f;
 
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.circles[segments], 0, segments + 1, this.circleIndices[segments], 0, segments);
+        }
+
+        public void FillRect(Vector2 position, Vector2 halfSize, float angle)
+        {
+            Matrix scale = Matrix.CreateScale(new Vector3(halfSize,0));
+            Matrix rotation = Matrix.CreateRotationZ(angle);
+            Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
+
+            this.effect.World = scale * rotation * translation * this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = this.FillStyle.ToVector3();
+            this.effect.Alpha = this.FillStyle.A / 255f;
+
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.line, 0, 2);
         }
 
         public void StrokeLine(Vector2 a, Vector2 b)
@@ -192,6 +209,14 @@ namespace Phantom.Graphics
         internal void SetRenderInfo(RenderInfo info)
         {
             this.info = info;
+        }
+
+        private void fillCircleColored(Vector2 position, float radius, Color c )
+        {
+            Color old = this.FillStyle;
+            this.FillStyle = c;
+            this.FillCircle(this.stack[0].Position, radius);
+            this.FillStyle = old;
         }
 
         private void debugline(Vector2 a, Vector2 b, Color c)

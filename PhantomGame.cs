@@ -48,6 +48,8 @@ namespace Phantom
             get { return this.XnaGame.Content; }
         }
 
+        private float multiplier;
+
         private IList<GameState> states;
 
         public PhantomGame( float width, float height )
@@ -55,14 +57,16 @@ namespace Phantom
             PhantomGame.Game = this;
 
 #if DEBUG
-            if (width <= 0 || height <= 0 || height > width)
+            if (width < 10 || height < 10)
             {
-                throw new Exception("Please create a PhantomGame with a sensable size.");
+                throw new Exception("Please create a PhantomGame with a sensable size (width >= 10 || height >= 10).");
             }
 #endif
             this.Width = (float)Math.Floor(width);
             this.Height = (float)Math.Floor(height);
             this.Size = new Vector2(this.Width, this.Height);
+
+            this.multiplier = 1;
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
@@ -127,6 +131,7 @@ namespace Phantom
         {
 
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            elapsed *= this.multiplier;
             this.TotalTime += elapsed;
 
             this.Update(elapsed);
@@ -173,8 +178,21 @@ namespace Phantom
             if (component is Konsoul)
             {
                 this.Console = component as Konsoul;
+                this.RegisterPhantomCommands();
             }
             base.OnComponentAdded(component);
+        }
+
+        private void RegisterPhantomCommands()
+        {
+            this.Console.Register("multiplier", "change the games update speed.", delegate(string[] argv)
+            {
+                if (argv.Length > 1)
+                {
+                    float.TryParse(argv[1], out this.multiplier);
+                }
+                Trace.WriteLine("Multiplier is " + this.multiplier);
+            });
         }
 
         private void UpdateViewports(int resolutionWidth, int resolutionHeight)
