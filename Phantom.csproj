@@ -93,6 +93,7 @@
     <Compile Include="Messages.cs" />
     <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
+    <Compile Include="Misc\Triangulator.cs" />
     <Compile Include="Physics\Components\Atractor.cs" />
     <Compile Include="Core\Component.cs" />
     <Compile Include="Core\Entity.cs" />

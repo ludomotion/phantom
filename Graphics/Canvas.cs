@@ -25,12 +25,9 @@ namespace Phantom.Graphics
             }
         }
 
-        public readonly float Width;
-        public readonly float Height;
-
         public float LineWidth;
-        public Color StrokeStyle;
-        public Color FillStyle;
+        public Color StrokeColor;
+        public Color FillColor;
 
         private RenderInfo info;
         private GraphicsDevice device;
@@ -38,7 +35,7 @@ namespace Phantom.Graphics
         private List<CanvasAction> stack;
 
         // Buffers:
-        private VertexPositionColor[] line;
+        private VertexPositionColor[] pixel;
         private Dictionary<int, VertexPositionColor[]> circles;
         private Dictionary<int, short[]> circleIndices;
 
@@ -46,23 +43,25 @@ namespace Phantom.Graphics
         {
             this.device = graphicsDevice;
             this.effect = new BasicEffect(this.device);
-            this.Width = this.device.Viewport.Width;
-            this.Height = this.device.Viewport.Height;
 
             this.stack = new List<CanvasAction>();
 
             // Canvas Attributes Defaults:
             this.LineWidth = 1;
-            this.StrokeStyle = Color.Black;
-            this.FillStyle = Color.White;
-
+            this.StrokeColor = Color.Black;
+            this.FillColor = Color.White;
 
             this.SetupGraphics();
         }
 
+        internal void SetRenderInfo(RenderInfo info)
+        {
+            this.info = info;
+        }
+
         private void SetupGraphics()
         {
-            this.line = new VertexPositionColor[] {
+            this.pixel = new VertexPositionColor[] {
                 new VertexPositionColor(new Vector3(-.5f,-.5f,0),Color.White),
                 new VertexPositionColor(new Vector3(.5f,-.5f,0),Color.White),
                 new VertexPositionColor(new Vector3(-.5f,.5f,0),Color.White),
@@ -71,10 +70,11 @@ namespace Phantom.Graphics
                 new VertexPositionColor(new Vector3(.5f,.5f,0),Color.White)
             };
 
+
+            // Build multiple cirlce buffers for multiple number of segments:
             short[] segments = new short[] { 12, 16, 24, 32, 48 };
             this.circles = new Dictionary<int, VertexPositionColor[]>();
             this.circleIndices = new Dictionary<int, short[]>();
-
             for (int i = 0; i < segments.Length; i++)
             {
                 int sc = segments[i];
@@ -97,61 +97,29 @@ namespace Phantom.Graphics
                 this.circleIndices[sc][c++] = (short)sc;
                 this.circleIndices[sc][c++] = 1;
             }
+
         }
 
-        public void Begin()
+        private void FillRect(Vector2 position, Vector2 halfSize, float angle, Color color)
         {
-            this.stack.Clear();
+            Matrix scale = Matrix.CreateScale(new Vector3(halfSize*2, 0));
+            Matrix rotation = Matrix.CreateRotationZ(angle);
+            Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
+
+            //Debug.WriteLine(this.info.World);
+
+            this.effect.World = scale * rotation * translation * this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = color.ToVector3();
+            this.effect.Alpha = color.A / 255f;
+
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.pixel, 0, 2);
         }
 
-        public void MoveTo(Vector2 position)
+        private void FillCircle(Vector2 position, float radius, Color color)
         {
-            this.stack.Add(new CanvasAction(0, position));
-        }
-        public void MoveTo(float x, float y)
-        {
-            this.MoveTo(new Vector2(x, y));
-        }
-
-        public void LineTo(Vector2 position)
-        {
-            this.stack.Add(new CanvasAction(1, position));
-        }
-        public void LineTo(float x, float y)
-        {
-            this.LineTo(new Vector2(x, y));
-        }
-
-        public void Stroke()
-        {
-            float halfWidth = this.LineWidth * .5f;
-
-            Vector2 prev = Vector2.Zero;
-            Vector2 pointer = Vector2.Zero;
-            for( int i = 0; i < this.stack.Count; i++ )
-            {
-                CanvasAction ca = this.stack[i];
-                switch (ca.Action)
-                {
-                    case 0:
-                        pointer = ca.Position;
-                        break;
-                    case 1:
-                        this.StrokeLine(pointer, ca.Position);
-                        if (i > 1 && i < this.stack.Count)
-                            this.FillCircle(pointer, halfWidth, this.StrokeStyle);
-                        prev = pointer;
-                        pointer = ca.Position;
-                        break;
-                }
-            }
-            if (this.stack[0].Position == this.stack[this.stack.Count - 1].Position)
-                this.FillCircle(pointer, halfWidth, this.StrokeStyle);
-        }
-
-        public void FillCircle(Vector2 position, float radius, Color color)
-        {
-            int segments = (int)Math.Max(12,Math.Log(radius) * (Math.Log(radius) * .75) * 12);
+            int segments = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
             int last = 12;
             foreach (int key in this.circles.Keys)
             {
@@ -174,30 +142,14 @@ namespace Phantom.Graphics
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.circles[segments], 0, segments + 1, this.circleIndices[segments], 0, segments);
         }
 
-        public void FillCircle(Vector2 position, float radius)
-        {
-            this.FillCircle(position, radius, this.FillStyle);
-        }
-
-
-        public void FillRect(Vector2 position, Vector2 halfSize, float angle, Color color)
-        {
-            Matrix scale = Matrix.CreateScale(new Vector3(halfSize,0));
-            Matrix rotation = Matrix.CreateRotationZ(angle);
-            Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
-
-            this.effect.World = scale * rotation * translation * this.info.World;
-            this.effect.Projection = this.info.Projection;
-            this.effect.DiffuseColor = color.ToVector3();
-            this.effect.Alpha = color.A / 255f;
-
-            this.effect.CurrentTechnique.Passes[0].Apply();
-            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.line, 0, 2);
-        }
-
         public void FillRect(Vector2 position, Vector2 halfSize, float angle)
         {
-            this.FillRect(position, halfSize, angle, this.FillStyle);
+            this.FillRect(position, halfSize, angle, this.FillColor);
+        }
+
+        public void FillCircle(Vector2 position, float radius)
+        {
+            this.FillCircle(position, radius, this.FillColor);
         }
 
         public void StrokeLine(Vector2 a, Vector2 b)
@@ -212,30 +164,139 @@ namespace Phantom.Graphics
 
             this.effect.World = scale * rotation * translation * this.info.World;
             this.effect.Projection = this.info.Projection;
-            this.effect.DiffuseColor = this.StrokeStyle.ToVector3();
-            this.effect.Alpha = this.StrokeStyle.A / 255f;
+            this.effect.DiffuseColor = this.StrokeColor.ToVector3();
+            this.effect.Alpha = this.StrokeColor.A / 255f;
 
             this.effect.CurrentTechnique.Passes[0].Apply();
-            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.line, 0, 2);
+            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.pixel, 0, 2);
 
         }
 
-        internal void SetRenderInfo(RenderInfo info)
+        public void StrokeRect(Vector2 position, Vector2 halfSize, float angle)
         {
-            this.info = info;
-        }
-
-        private void debugline(Vector2 a, Vector2 b, Color c)
-        {
-            Color t = this.StrokeStyle;
-            float w = this.LineWidth;
-            this.StrokeStyle = c;
-            this.LineWidth = 2;
+            Matrix rotation = Matrix.CreateRotationZ(angle);
+            Matrix quarter = Matrix.CreateRotationZ(MathHelper.PiOver2);
+            Matrix half = Matrix.CreateRotationZ(MathHelper.Pi);
+            Matrix three = Matrix.CreateRotationZ(MathHelper.PiOver2+MathHelper.Pi);
+            Vector2 a = position - Vector2.Transform(halfSize, rotation);
+            Vector2 b = position - Vector2.Transform(halfSize, rotation * quarter);
+            Vector2 c = position - Vector2.Transform(halfSize, rotation * half);
+            Vector2 d = position - Vector2.Transform(halfSize, rotation * three);
             this.StrokeLine(a, b);
-            this.StrokeStyle = t;
-            this.LineWidth = w;
+            this.StrokeLine(b, c);
+            this.StrokeLine(c, d);
+            this.StrokeLine(d, a);
+            float halfWidth = this.LineWidth * .5f;
+            this.FillCircle(a, halfWidth, this.StrokeColor);
+            this.FillCircle(b, halfWidth, this.StrokeColor);
+            this.FillCircle(c, halfWidth, this.StrokeColor);
+            this.FillCircle(d, halfWidth, this.StrokeColor);
+        }
+
+        public void StrokeCircle(Vector2 position, float radius)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Stroke()
+        {
+            float halfWidth = this.LineWidth * .5f;
+
+            this.stack.Insert(0, new CanvasAction(0, Vector2.Zero));
+
+            for (int i = 1; i < this.stack.Count; i++)
+            {
+                CanvasAction prev = this.stack[i-1];
+                CanvasAction curr = this.stack[i];
+                switch (curr.Action)
+                {
+                    case 0:
+                        if (prev.Action == 1)
+                            this.FillCircle(prev.Position, halfWidth, this.StrokeColor);
+                        break;
+                    case 1:
+                        this.StrokeLine(prev.Position, curr.Position);
+                        //if (i > 1 && i < this.stack.Count) // TODO: not if 90 angle
+                        this.FillCircle(prev.Position, halfWidth, this.StrokeColor);
+                        break;
+                }
+            }
+            this.stack.RemoveAt(0);
+
+            Vector2 last = this.stack[this.stack.Count - 1].Position;
+            if (this.stack[0].Position != last)
+                this.FillCircle(last, halfWidth, this.StrokeColor);
+        }
+
+        public void Fill()
+        {
+            List<Vector2> poly = new List<Vector2>();
+
+            this.stack.Insert(0, new CanvasAction(0, Vector2.Zero));
+
+            for (int i = 1; i < this.stack.Count; i++)
+            {
+                CanvasAction prev = this.stack[i-1];
+                CanvasAction curr = this.stack[i];
+                switch (curr.Action)
+                {
+                    case 0:
+                        if (poly.Count != 0)
+                            FillPolygon(poly, this.FillColor);
+                        poly.Clear();
+                        break;
+                    case 1:
+                        if (prev.Action == 0)
+                            poly.Add(prev.Position);
+                        poly.Add(curr.Position);
+                        break;
+                }
+            }
+            if (poly.Count != 0)
+                FillPolygon(poly, this.FillColor);
+
+            this.stack.RemoveAt(0);
+        }
+
+        private void FillPolygon(List<Vector2> poly, Color color)
+        {
+            if (poly[0] != poly[poly.Count - 1])
+                poly.Add(poly[0]);
+            VertexPositionColor[] vertices = new VertexPositionColor[poly.Count];
+            for (int i = 0; i < poly.Count; i++)
+                vertices[i] = new VertexPositionColor(new Vector3(poly[i],0), Color.White);
+            short[] indices = Triangulator.Triangulate(poly.ToArray());
+
+            this.effect.World = this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = color.ToVector3();
+            this.effect.Alpha = color.A / 255f;
+
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3);
 
         }
 
+        public void Begin()
+        {
+            this.stack.Clear();
+        }
+
+        public void MoveTo(Vector2 position)
+        {
+            this.stack.Add(new CanvasAction(0, position));
+        }
+        public void MoveTo(float x, float y)
+        {
+            this.MoveTo(new Vector2(x, y));
+        }
+        public void LineTo(Vector2 position)
+        {
+            this.stack.Add(new CanvasAction(1, position));
+        }
+        public void LineTo(float x, float y)
+        {
+            this.LineTo(new Vector2(x, y));
+        }
     }
 }

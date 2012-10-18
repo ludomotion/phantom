@@ -14,10 +14,13 @@ namespace Phantom.Graphics
     {
         public enum ViewportPolicy
         {
-            AutoScaled,
-            Centered,
-            Full,
-            Default = AutoScaled
+            Fit,
+            Aligned,
+            // Centered
+            // Stretch
+            // Fill
+            None,
+            Default = Fit
         }
 
         private int passes;
@@ -63,6 +66,8 @@ namespace Phantom.Graphics
 
             info = this.BuildRenderInfo();
 
+            info.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+
             this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
             for (int pass = 0; pass < this.passes; pass++)
             {
@@ -91,21 +96,33 @@ namespace Phantom.Graphics
 
             Vector2 designSize = PhantomGame.Game.Size;
             Viewport resolution = PhantomGame.Game.Resolution;
-            Viewport viewport = PhantomGame.Game.Viewport;
+            Viewport viewport;
+            if (resolution.Width > resolution.Height)
+            {
+                float width = resolution.Height * (designSize.X / designSize.Y);
+                float padding = (resolution.Width - width) * .5f;
+                viewport = new Viewport((int)padding, 0, (int)width, resolution.Height);
+            }
+            else
+            {
+                float height = resolution.Width * (designSize.Y / designSize.X);
+                float padding = (resolution.Height - height) * .5f;
+                viewport = new Viewport(0, (int)padding, resolution.Width, (int)height);
+            }
             float left = (resolution.Width - viewport.Width) * .5f;
             float top = (resolution.Height - viewport.Height) * .5f;
 
             switch (this.policy)
             {
-                case ViewportPolicy.Full:
+                case ViewportPolicy.None:
                     info.Width = resolution.Width;
                     info.Height = resolution.Height;
                     break;
-                case ViewportPolicy.Centered:
+                case ViewportPolicy.Aligned:
                     info.Width = viewport.Width;
                     info.Height = viewport.Height;
                     break;
-                case ViewportPolicy.AutoScaled:
+                case ViewportPolicy.Fit:
                     info.Width = designSize.X;
                     info.Height = designSize.Y;
                     break;
@@ -118,23 +135,18 @@ namespace Phantom.Graphics
                 world *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
             }
 
+            info.Projection = Matrix.CreateOrthographicOffCenter(
+                0, resolution.Width, resolution.Height, 0,
+                0, 1);
+
             switch (this.policy)
             {
-                case ViewportPolicy.Full:
-                    info.Projection = Matrix.CreateOrthographicOffCenter(
-                        0, info.Width, info.Height, 0,
-                        0, 1);
+                case ViewportPolicy.None:
                     break;
-                case ViewportPolicy.Centered:
-                    info.Projection = Matrix.CreateOrthographicOffCenter(
-                        left, left + info.Width, top + info.Height, top,
-                        0, 1);
+                case ViewportPolicy.Aligned:
                     world *= Matrix.CreateTranslation(left, top, 0);
                     break;
-                case ViewportPolicy.AutoScaled:
-                    info.Projection = Matrix.CreateOrthographicOffCenter(
-                        left, left + info.Width, top + info.Height, top,
-                        0, 1);
+                case ViewportPolicy.Fit:
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
                     {
                         Matrix scale = Matrix.CreateScale(

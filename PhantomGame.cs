@@ -34,7 +34,6 @@ namespace Phantom
         public readonly Vector2 Size;
 
         public Viewport Resolution { get; private set; }
-        public Viewport Viewport { get; private set; }
 
         protected readonly Microsoft.Xna.Framework.Game XnaGame;
         
@@ -82,7 +81,7 @@ namespace Phantom
 
             this.SetupGraphics();
             this.graphics.ApplyChanges();
-            this.UpdateViewports(this.graphics.PreferredBackBufferWidth, this.graphics.PreferredBackBufferHeight);
+            this.Resolution = new Viewport(0, 0, this.graphics.PreferredBackBufferWidth, this.graphics.PreferredBackBufferHeight);
 
             this.states = new List<GameState>();
         }
@@ -195,24 +194,6 @@ namespace Phantom
             });
         }
 
-        private void UpdateViewports(int resolutionWidth, int resolutionHeight)
-        {
-            this.Resolution = new Viewport(0, 0, resolutionWidth, resolutionHeight);
-
-            if (resolutionWidth > resolutionHeight)
-            {
-                float width = resolutionHeight * (this.Width / this.Height);
-                float padding = (resolutionWidth - width) * .5f;
-                this.Viewport = new Viewport((int)padding, 0, (int)width, resolutionHeight);
-            }
-            else
-            {
-                float height = resolutionWidth * (this.Height / this.Width);
-                float padding = (resolutionHeight - height) * .5f;
-                this.Viewport = new Viewport(0, (int)padding, resolutionWidth, (int)height);
-            }
-        }
-
         public void SetResolution(int width, int height, bool fullscreen)
         {
             if (width <= 0)
@@ -223,7 +204,7 @@ namespace Phantom
             this.graphics.PreferredBackBufferHeight = height;
             this.graphics.IsFullScreen = fullscreen;
             this.graphics.ApplyChanges();
-            this.UpdateViewports(width, height);
+            this.Resolution = new Viewport(0, 0, width, height);
         }
 
         public void PushState( GameState state )
