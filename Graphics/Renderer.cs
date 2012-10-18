@@ -23,6 +23,21 @@ namespace Phantom.Graphics
             Default = Fit
         }
 
+        public bool HasCanvas
+        {
+            get
+            {
+                return this.canvas != null;
+            }
+            set
+            {
+                if (value && this.canvas == null)
+                    this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
+                else if (!value && this.canvas != null)
+                    this.canvas = null;
+            }
+        }
+
         private int passes;
         private ViewportPolicy policy;
 
@@ -40,7 +55,7 @@ namespace Phantom.Graphics
             this.passes = passes;
             this.policy = viewportPolicy;
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
-            this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
+            //this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
@@ -66,11 +81,11 @@ namespace Phantom.Graphics
 
             info = this.BuildRenderInfo();
 
-            info.GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            info.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
             for (int pass = 0; pass < this.passes; pass++)
             {
+                this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
                 info.Pass = pass;
                 IList<Component> components = this.Parent.Components;
                 int count = components.Count;
@@ -80,9 +95,9 @@ namespace Phantom.Graphics
                         continue;
                     components[i].Render(info);
                 }
+                this.batch.End();
             }
 
-            this.batch.End();
 
             base.Render(info);
         }
@@ -161,8 +176,11 @@ namespace Phantom.Graphics
 
             info.World = world;
 
-            this.canvas.SetRenderInfo(info);
-            info.Canvas = this.canvas;
+            if (this.canvas != null)
+            {
+                this.canvas.SetRenderInfo(info);
+                info.Canvas = this.canvas;
+            }
 
             return info;
         }

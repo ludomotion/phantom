@@ -72,7 +72,12 @@ namespace Phantom.Physics.Components
 #if DEBUG
         public override void Render(Graphics.RenderInfo info)
         {
-            info.Batch.DrawLine(this.Entity.Position, this.Entity.Position + this.last, 1, Color.Yellow);
+            if( info.Canvas != null )
+            {
+                info.Canvas.StrokeColor = Color.Yellow;
+                info.Canvas.LineWidth = 1f;
+                info.Canvas.StrokeLine(this.Entity.Position, this.Entity.Position + this.last);
+            }
             base.Render(info);
         }
 #endif

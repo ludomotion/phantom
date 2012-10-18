@@ -12,25 +12,42 @@ namespace Phantom.Graphics
     public class ShapeRenderer : EntityComponent, ShapeVisitor<object, RenderInfo>
     {
         private float thickness;
-        private Color color;
+        private Color fill;
+        private Color stroke;
 
-        public ShapeRenderer(float thickness, Color color)
+        public ShapeRenderer(float thickness, Color fill, Color stroke )
         {
             this.thickness = thickness;
-            this.color = color;
+            this.fill = fill;
+            this.stroke = stroke;
+        }
+        public ShapeRenderer(float thickness, Color color)
+            :this(thickness, color, color.Lerp(Color.Black, .8f))
+        {
         }
 
         public override void Render(RenderInfo info)
         {
-            this.Entity.Shape.Accept(this, info);
+            if( info.Canvas != null )
+                this.Entity.Shape.Accept(this, info);
             base.Render(info);
         }
 
         public object Visit(Circle shape, RenderInfo info)
         {
             Vector2 position = shape.Entity.Position;
-            info.Batch.DrawLine(position, position + this.Entity.Direction * shape.Radius, thickness, color);
-            info.Batch.DrawCircle(position, shape.Radius, thickness, color);
+            if (this.fill.A > 0)
+            {
+                info.Canvas.FillColor = this.fill;
+                info.Canvas.FillCircle(position, shape.Radius);
+            }
+            if (this.stroke.A > 0)
+            {
+                info.Canvas.StrokeColor = this.stroke;
+                info.Canvas.LineWidth = this.thickness;
+                info.Canvas.StrokeCircle(position, shape.Radius);
+                info.Canvas.StrokeLine(position, position + this.Entity.Direction * shape.Radius);
+            }
             return null;
         }
 

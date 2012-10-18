@@ -169,6 +169,10 @@ namespace Phantom.Misc
             {
                 PhantomGame.Game.Exit();
             });
+            this.Register("close", "hides this console.", delegate(string[] argv)
+            {
+                this.Visible = false;
+            });
             this.Register("echo", "output arguments.", delegate(string[] argv)
             {
                 StringBuilder sb = new StringBuilder();
