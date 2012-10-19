@@ -23,15 +23,91 @@ namespace Phantom.Physics
             }
             return CollisionData.Empty;
         }
-        
-        public static CollisionData AABBAABB(AABB a, AABB b)
-        {
-            return CollisionData.Empty;
-        }
 
-        public static CollisionData CircleAABB(Circle a, AABB b)
+        public static CollisionData CirclePolygon(Circle a, Polygon b)
         {
-            return CollisionData.Empty;
+
+            Matrix rotation = Matrix.CreateRotationZ(b.Entity.Orientation);
+            Matrix inverseRotation = Matrix.CreateTranslation(new Vector3(-b.Entity.Position, 0)) * Matrix.CreateRotationZ(-b.Entity.Orientation) * Matrix.CreateTranslation(new Vector3(b.Entity.Position, 0));
+            Vector2 circlePosition = Vector2.Transform(a.Entity.Position, inverseRotation);
+
+            Vector2 delta = b.Entity.Position - circlePosition;
+
+            Polygon.Projection proj;
+            CollisionData result = new CollisionData(float.MaxValue);
+
+            float inter1 = 0, inter2 = 0;
+            for (int i = 0; i < b.normals.Length; i++)
+            {
+                proj = a.Project(b.normals[i], -delta);
+                inter1 = b.projections[i].Max - proj.Min;
+                inter2 = -(b.projections[i].Min - proj.Max);
+
+#if DEBUG
+                Vector2 p = b.Entity.Position;
+                Integrater.line(p + Vector2.TransformNormal(b.normals[i], rotation) * proj.Min, p + Vector2.TransformNormal(b.normals[i], rotation) * proj.Max, Color.LimeGreen);
+#endif
+
+                if (inter1 < 0 || inter2 < 0)
+                    return CollisionData.Empty;
+
+                if (inter1 < inter2 && inter1 < result.Interpenetration)
+                {
+                    result.Interpenetration = inter1;
+                    result.Normal = -Vector2.TransformNormal(b.normals[i], rotation);
+                }
+                else if (inter2 < result.Interpenetration)
+                {
+                    result.Interpenetration = inter2;
+                    result.Normal = Vector2.TransformNormal(b.normals[i], rotation);
+                }
+            }
+
+            Vector2 closest = Vector2.UnitX;
+            float maxDist = float.MaxValue;
+            for (int i = 0; i < b.Vertices.Length; i++)
+            {
+                Vector2 v = b.Vertices[i] + b.Entity.Position;
+                Vector2 d = v - circlePosition;
+
+                if (d.LengthSquared() < maxDist)
+                {
+                    closest = d;
+                    maxDist = d.LengthSquared();
+                }
+            }
+            Vector2 normal = closest.Normalized();
+
+            proj = b.Project(normal, delta);
+            Polygon.Projection self = a.Project(normal, Vector2.Zero);
+            inter1 = self.Max - proj.Min;
+            inter2 = -(self.Min - proj.Max);
+
+#if DEBUG
+            Vector2 p2 = a.Entity.Position;
+            Integrater.line(p2 + Vector2.TransformNormal(normal, rotation) * proj.Min, p2 + Vector2.TransformNormal(normal, rotation) * proj.Max, Color.LimeGreen);
+#endif
+
+            if (inter1 < 0 || inter2 < 0)
+                return CollisionData.Empty;
+
+            if (inter1 < inter2 && inter1 < result.Interpenetration)
+            {
+                result.Interpenetration = inter1;
+                result.Normal = Vector2.TransformNormal(normal, rotation);
+            }
+            else if (inter2 < result.Interpenetration)
+            {
+                result.Interpenetration = inter2;
+                result.Normal = -Vector2.TransformNormal(normal, rotation);
+            }
+
+#if DEBUG
+            Vector2 pos = a.Entity.Position;
+            Integrater.line(pos, pos + result.Normal * result.Interpenetration, Color.White);
+#endif
+
+            return result;
         }
 
         public static CollisionData PolygonPolygon(Polygon a, Polygon b)
@@ -75,7 +151,6 @@ namespace Phantom.Physics
                 }
                 
             }
-
 
             delta = b.Entity.Position - a.Entity.Position;
             delta = Vector2.Transform(delta, Matrix.CreateRotationZ(-a.Entity.Orientation));
@@ -136,7 +211,6 @@ namespace Phantom.Physics
             Vector2 pos = result.Position;
             Integrater.line(pos, pos + result.Normal * result.Interpenetration * 10, Color.White);
 #endif
-
 
             return result;
         }

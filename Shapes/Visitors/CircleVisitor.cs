@@ -4,19 +4,19 @@ namespace Phantom.Shapes.Visitors
 {
     public class CircleVisitor : ShapeVisitor<CollisionData, Circle>
     {
-        public CollisionData Visit(Circle shape, Circle self)
+        public CollisionData Visit(Circle other, Circle self)
         {
-            return CollisionChecks.CircleCircle(self, shape);
+            return CollisionChecks.CircleCircle(self, other);
         }
 
-        public CollisionData Visit(AABB shape, Circle self)
+        public CollisionData Visit(OABB other, Circle self)
         {
-            return CollisionChecks.CircleAABB(self, shape);
+            return CollisionChecks.CirclePolygon(self, other);
         }
 
         public CollisionData Visit(Polygon other, Circle self)
         {
-            return CollisionData.Empty;
+            return CollisionChecks.CirclePolygon(self, other);
         }
     }
 }

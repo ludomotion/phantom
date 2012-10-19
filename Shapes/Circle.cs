@@ -20,13 +20,19 @@ namespace Phantom.Shapes
                 return this.Radius;
             }
         }
-            
+
 
         public float Radius { get; protected set; }
 
         public Circle(float radius)
         {
             this.Radius = radius;
+        }
+
+        internal Polygon.Projection Project(Vector2 normal, Vector2 delta)
+        {
+            float dot = Vector2.Dot(normal, delta);
+            return new Polygon.Projection(dot - this.Radius, dot + this.Radius);
         }
 
         public override CollisionData Collide(Shape other)

@@ -51,7 +51,7 @@ namespace Phantom.Graphics
             return null;
         }
 
-        public object Visit(AABB shape, RenderInfo info)
+        public object Visit(OABB shape, RenderInfo info)
         {
             Vector2 position = shape.Entity.Position;
             if (this.fill.A > 0)

@@ -10,12 +10,14 @@ namespace Phantom.Shapes.Visitors
     {
         public CollisionData Visit(Circle other, Polygon self)
         {
-            throw new NotImplementedException();
+            CollisionData r = CollisionChecks.CirclePolygon(other, self);
+            r.Invert();
+            return r;
         }
 
-        public CollisionData Visit(AABB other, Polygon self)
+        public CollisionData Visit(OABB other, Polygon self)
         {
-            throw new NotImplementedException();
+            return CollisionChecks.PolygonPolygon(self, other);
         }
 
         public CollisionData Visit(Polygon other, Polygon self)

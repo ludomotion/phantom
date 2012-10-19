@@ -8,26 +8,24 @@ using Phantom.Physics;
 
 namespace Phantom.Shapes
 {
-    public class AABB : Shape
+    public class OABB : Polygon
     {
-        private static AABBVisitor visitor = new AABBVisitor();
-
         public override float RoughRadius
         {
-            get { return this.HalfSize.Length(); }
+            get
+            {
+                return this.HalfSize.Length();
+            }
         }
 
         public Vector2 HalfSize { get; protected set; }
 
-        public AABB( Vector2 halfSize )
+        public OABB( Vector2 halfSize )
+            :base(new Vector2(-halfSize.X, -halfSize.Y), new Vector2(halfSize.X, -halfSize.Y), new Vector2(halfSize.X, halfSize.Y), new Vector2(-halfSize.X, halfSize.Y))
         {
             this.HalfSize = halfSize;
         }
 
-        public override CollisionData Collide(Shape other)
-        {
-            return other.Accept<CollisionData, AABB>(visitor, this);
-        }
         public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
         {
             return visitor.Visit(this, data);

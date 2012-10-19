@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Phantom.Shapes;
 using Phantom.Shapes.Visitors;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
 using Phantom.Physics;
+using System.Diagnostics;
 
 namespace Phantom.Shapes
 {
@@ -49,15 +49,36 @@ namespace Phantom.Shapes
             this.roughRadius = (float)Math.Sqrt(this.roughRadius);
             this.RotationCache = new Vector2[this.Vertices.Length];
 
-            // TODO: remove duplicates:
             this.normals = new Vector2[this.Vertices.Length];
-            this.projections = new Projection[this.Vertices.Length];
             for (int i = 0; i < this.Vertices.Length; i++)
             {
                 Vector2 delta = this.Vertices[(i + 1) % this.Vertices.Length] - this.Vertices[i];
                 this.normals[i] = delta.LeftPerproduct().Normalized();
             }
 
+            // Remove duplicates:
+            int removed = 0;
+            for (int i = this.normals.Length-1; i >= 0; i--)
+            {
+                for (int j = 0; j < i; j++)
+                {
+                    if (Math.Abs(Vector2.Dot(this.normals[i], this.normals[j])) == 1)
+                    {
+                        this.normals[i] = Vector2.Zero;
+                        removed += 1;
+                        break;
+                    }
+                }
+            }
+            Vector2[] n = new Vector2[this.normals.Length - removed];
+            int c = 0;
+            for (int i = 0; i < this.normals.Length; i++)
+                if (this.normals[i].LengthSquared() != 0)
+                    n[c++] = this.normals[i];
+            this.normals = n;
+
+
+            this.projections = new Projection[this.normals.Length];
             for (int i = 0; i < this.normals.Length; i++)
                 this.projections[i] = this.Project(this.normals[i], Vector2.Zero);
         }
