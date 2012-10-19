@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Phantom.Physics.Visitors
+﻿
+using Phantom.Physics;
+namespace Phantom.Shapes.Visitors
 {
     public class AABBVisitor : ShapeVisitor<CollisionData, AABB>
     {
@@ -18,6 +15,11 @@ namespace Phantom.Physics.Visitors
         public CollisionData Visit(AABB other, AABB self)
         {
             return CollisionChecks.AABBAABB(self, other);
+        }
+
+        public CollisionData Visit(Polygon other, AABB self)
+        {
+            return CollisionData.Empty;
         }
     }
 }

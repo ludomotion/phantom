@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Phantom.Physics
+namespace Phantom.Shapes
 {
     public interface ShapeVisitor<OUT, IN>
     {
         OUT Visit(Circle shape, IN data);
         OUT Visit(AABB shape, IN data);
+        OUT Visit(Polygon shape, IN data);
     }
 }

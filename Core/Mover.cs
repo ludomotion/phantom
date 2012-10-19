@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Phantom.Shapes;
 using Phantom.Physics;
 
 namespace Phantom.Core

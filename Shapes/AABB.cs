@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Phantom.Physics.Visitors;
+using Phantom.Shapes.Visitors;
 using Microsoft.Xna.Framework;
+using Phantom.Physics;
 
-namespace Phantom.Physics
+namespace Phantom.Shapes
 {
     public class AABB : Shape
     {
@@ -13,7 +14,14 @@ namespace Phantom.Physics
 
         public override float RoughRadius
         {
-            get { return 0; }
+            get { return this.HalfSize.Length(); }
+        }
+
+        public Vector2 HalfSize { get; protected set; }
+
+        public AABB( Vector2 halfSize )
+        {
+            this.HalfSize = halfSize;
         }
 
         public override CollisionData Collide(Shape other)

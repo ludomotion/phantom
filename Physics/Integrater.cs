@@ -1,14 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Phantom.Core;
-using Phantom.Physics;
+using Phantom.Graphics;
+using Phantom.Misc;
 
 namespace Phantom.Physics
 {
     public class Integrater : Component
     {
+#if DEBUG
+        static List<VertexPositionColor> debug = new List<VertexPositionColor>();
+        public static void line(Vector2 a, Vector2 b, Color c)
+        {
+            debug.Add(new VertexPositionColor(new Vector3(a, 0), c));
+            debug.Add(new VertexPositionColor(new Vector3(b, 0), c));
+        }
+#endif
+
         private int physicsExecutionCount;
         private List<Entity> entities;
 
@@ -77,6 +86,25 @@ namespace Phantom.Physics
                 }
             }
         }
+
+#if DEBUG
+        public override void Render(Graphics.RenderInfo info)
+        {
+            Canvas c = info.Canvas;
+            for (int i = 0; i < debug.Count; i += 2)
+            {
+                c.Begin();
+                c.MoveTo( debug[i].Position.Flatten() );
+                c.LineTo( debug[i+1].Position.Flatten() );
+                c.StrokeColor = debug[i].Color;
+                c.LineWidth=3;
+                c.Stroke();
+            }
+            debug.Clear();
+
+            base.Render(info);
+        }
+#endif
 
         internal void OnComponentAddedToLayer(Component component)
         {

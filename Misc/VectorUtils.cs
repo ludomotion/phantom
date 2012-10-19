@@ -37,6 +37,15 @@ namespace Phantom.Misc
             return result;
         }
 
+        public static Vector2 LeftPerproduct(this Vector2 self)
+        {
+            return new Vector2(self.Y, -self.X);
+        }
+        public static Vector2 RightPerproduct(this Vector2 self)
+        {
+            return new Vector2(-self.Y, self.X);
+        }
+
         public static float Angle(this Vector2 v)
         {
             return (float)Math.Atan2(v.Y, v.X);

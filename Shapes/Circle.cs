@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Phantom.Physics.Visitors;
+using Phantom.Shapes.Visitors;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
+using Phantom.Physics;
 
-namespace Phantom.Physics
+namespace Phantom.Shapes
 {
     public class Circle : Shape
     {

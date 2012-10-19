@@ -85,14 +85,9 @@ namespace Phantom.Graphics
 
         private void FillCircle(Vector2 position, float radius, Color color)
         {
-            int guess = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
-            int segments = (int)Math.Pow(2, Math.Ceiling(Math.Log(guess) / Math.Log(2)));
-            if (!Canvas.circles.ContainsKey(segments))
-            {
-                Canvas.circles[segments] = new CircleBuffer(segments);
-                Debug.WriteLine("new CircleBuffer created for {0} segments.", segments);
-            }
-            CircleBuffer circle = Canvas.circles[segments];
+            int segments;
+            CircleBuffer circle;
+            GetCircleBufferByRadius(radius, out segments, out circle);
 
             Matrix scale = Matrix.CreateScale(radius);
             Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
@@ -158,14 +153,9 @@ namespace Phantom.Graphics
 
         public void StrokeCircle(Vector2 position, float radius)
         {
-            int guess = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
-            int segments = (int)Math.Pow(2, Math.Ceiling(Math.Log(guess) / Math.Log(2)));
-            if (!Canvas.circles.ContainsKey(segments))
-            {
-                Canvas.circles[segments] = new CircleBuffer(segments);
-                Debug.WriteLine("new CircleBuffer created for {0} segments.", segments);
-            }
-            CircleBuffer circle = Canvas.circles[segments];
+            int segments;
+            CircleBuffer circle;
+            GetCircleBufferByRadius(radius, out segments, out circle);
 
             float strokeScale = .5f / radius * this.LineWidth;
             VertexPositionColor[] vertices = new VertexPositionColor[segments * 2];
@@ -295,6 +285,18 @@ namespace Phantom.Graphics
             this.LineTo(new Vector2(x, y));
         }
 
+
+        private static void GetCircleBufferByRadius(float radius, out int segments, out CircleBuffer circle)
+        {
+            int guess = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
+            segments = (int)Math.Pow(2, Math.Ceiling(Math.Log(guess) / Math.Log(2)));
+            if (!Canvas.circles.ContainsKey(segments))
+            {
+                Canvas.circles[segments] = new CircleBuffer(segments);
+                Debug.WriteLine("new CircleBuffer created for {0} segments.", segments);
+            }
+            circle = Canvas.circles[segments];
+        }
 
         private class CircleBuffer
         {

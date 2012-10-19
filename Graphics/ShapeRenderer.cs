@@ -5,7 +5,7 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
-using Phantom.Physics;
+using Phantom.Shapes;
 
 namespace Phantom.Graphics
 {
@@ -53,7 +53,67 @@ namespace Phantom.Graphics
 
         public object Visit(AABB shape, RenderInfo info)
         {
-            // TODO: Implement shit
+            Vector2 position = shape.Entity.Position;
+            if (this.fill.A > 0)
+            {
+                info.Canvas.FillColor = this.fill;
+                info.Canvas.FillRect(position, shape.HalfSize, shape.Entity.Orientation);
+            }
+            if (this.stroke.A > 0)
+            {
+                info.Canvas.StrokeColor = this.stroke;
+                info.Canvas.LineWidth = this.thickness;
+                info.Canvas.StrokeRect(position, shape.HalfSize, shape.Entity.Orientation);
+            }
+            return null;
+        }
+
+        public object Visit(Polygon shape, RenderInfo info)
+        {
+            Canvas c = info.Canvas;
+            Vector2 pos = this.Entity.Position;
+            Vector2[] verts = shape.RotatedVertices(this.Entity.Orientation);
+            c.Begin();
+            c.MoveTo(pos + verts[verts.Length - 1]);
+            for (int i = 0; i < verts.Length; i++)
+                c.LineTo(pos + verts[i]);
+            if (this.fill.A > 0)
+            {
+                c.FillColor = this.fill;
+                c.Fill();
+            }
+            if (this.stroke.A > 0)
+            {
+                c.StrokeColor = this.stroke;
+                c.LineWidth = this.thickness;
+                c.Stroke();
+            }
+
+#if DEBUG
+            Matrix rot = Matrix.CreateRotationZ(this.Entity.Orientation);
+            for (int i = 0; i < shape.normals.Length; i++)
+            {
+                c.Begin();
+                c.MoveTo(pos);
+                c.LineTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.RoughRadius*1.5f);
+                c.StrokeColor = Color.Green;
+                c.LineWidth = this.thickness;
+                c.Stroke();
+            }
+
+            for (int i = 0; i < shape.projections.Length; i++)
+            {
+                c.Begin();
+                c.MoveTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.projections[i].Max);
+                c.LineTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.projections[i].Min);
+                c.StrokeColor = Color.Blue;
+                c.LineWidth = this.thickness;
+                c.Stroke();
+            }
+
+#endif
+
+
             return null;
         }
     }

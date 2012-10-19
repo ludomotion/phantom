@@ -123,10 +123,12 @@
     <Compile Include="Shapes\Circle.cs" />
     <Compile Include="Physics\CollisionChecks.cs" />
     <Compile Include="Physics\CollisionData.cs" />
+    <Compile Include="Shapes\Polygon.cs" />
     <Compile Include="Shapes\Shape.cs" />
     <Compile Include="Shapes\ShapeVisitor.cs" />
     <Compile Include="Shapes\Visitors\AABBVisitor.cs" />
     <Compile Include="Shapes\Visitors\CircleVisitor.cs" />
+    <Compile Include="Shapes\Visitors\PolygonVisitor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
