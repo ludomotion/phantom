@@ -112,8 +112,11 @@ namespace Phantom.Graphics
             }
 
 #endif
+            return null;
+        }
 
-
+        public object Visit(CompoundShape shape, RenderInfo info)
+        {
             return null;
         }
     }

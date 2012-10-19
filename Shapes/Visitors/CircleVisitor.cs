@@ -18,5 +18,10 @@ namespace Phantom.Shapes.Visitors
         {
             return CollisionChecks.CirclePolygon(self, other);
         }
+
+        public CollisionData Visit(CompoundShape shape, Circle data)
+        {
+            return CollisionData.Empty;
+        }
     }
 }

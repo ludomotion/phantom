@@ -16,5 +16,10 @@ namespace Phantom.Shapes
 
         public abstract CollisionData Collide(Shape other);
         public abstract OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data);
+
+        internal void SetStubEntity(Entity stub)
+        {
+            this.Entity = stub;
+        }
     }
 }

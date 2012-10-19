@@ -7,7 +7,7 @@ namespace Phantom.Core
 {
     public class EntityComponent : Component
     {
-        public Entity Entity { get; private set; }
+        public Entity Entity { get; protected set; }
 
         public override void OnAncestryChanged()
         {

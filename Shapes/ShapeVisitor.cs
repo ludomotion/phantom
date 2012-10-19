@@ -10,5 +10,6 @@ namespace Phantom.Shapes
         OUT Visit(Circle shape, IN data);
         OUT Visit(OABB shape, IN data);
         OUT Visit(Polygon shape, IN data);
+        OUT Visit(CompoundShape shape, IN data);
     }
 }
