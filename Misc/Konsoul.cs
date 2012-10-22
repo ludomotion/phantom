@@ -626,7 +626,8 @@ namespace Phantom.Misc
                 message = nolineBuffer + message;
                 nolineBuffer = "";
             }
-            this.lines.Add(message);
+            
+            this.lines.AddRange(message.Split(new char[] {'\n'}));
         }
 
         private void Write(string message)
@@ -634,9 +635,12 @@ namespace Phantom.Misc
             this.nolineBuffer += message;
             while (this.nolineBuffer.Contains("\n"))
             {
-                string[] split = this.nolineBuffer.Split(new char[] { '\n' }, 1);
+                string[] split = this.nolineBuffer.Split(new char[] { '\n' }, 2);
                 this.lines.Add(split[0]);
-                this.nolineBuffer = split[1];
+                if (split.Length > 1)
+                    this.nolineBuffer = split[1];
+                else
+                    this.nolineBuffer = "";
             }
         }
 
