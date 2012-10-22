@@ -364,7 +364,7 @@ namespace Phantom.Misc
             }
 
             // Cycle through history:
-            if (current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
+            if (!ctrl && !shift && current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
             {
                 if (this.historyIndex == 0 && this.input.Length > 0)
                 {
@@ -377,7 +377,7 @@ namespace Phantom.Misc
                     this.cursor = this.input.Length;
                 }
             }
-            if (current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down) && this.historyIndex > 0)
+            if (!ctrl && !shift && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down) && this.historyIndex > 0)
             {
                 this.historyIndex -= 1;
                 if (this.historyIndex == 0)
