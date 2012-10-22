@@ -37,7 +37,7 @@ namespace Phantom
 
         protected readonly Microsoft.Xna.Framework.Game XnaGame;
         
-        private GraphicsDeviceManager graphics;
+        protected GraphicsDeviceManager graphics;
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public Konsoul Console { get; private set; }
@@ -137,23 +137,13 @@ namespace Phantom
             for (int i = this.states.Count - 1; i >= 0; i--)
             {
                 bool propagate = this.states[i].Propagate;
-                this.states[i].Integrate(elapsed);
-                if (!propagate)
-                    break;
-                if (this.Paused)
-                    return;
-            }
-
-            this.Integrate(elapsed);
-            for (int i = this.states.Count - 1; i >= 0; i--)
-            {
-                bool propagate = this.states[i].Propagate;
                 this.states[i].Update(elapsed);
                 if (!propagate)
                     break;
                 if (this.Paused)
                     return;
             }
+
         }
 
         internal void XnaRender(GameTime gameTime)

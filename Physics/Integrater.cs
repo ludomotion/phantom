@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Phantom.Core;
 using Phantom.Graphics;
 using Phantom.Misc;
+using System.Diagnostics;
 
 namespace Phantom.Physics
 {
@@ -19,7 +20,7 @@ namespace Phantom.Physics
 #endif
 
         private int physicsExecutionCount;
-        private List<Entity> entities;
+        protected List<Entity> entities;
 
         public Integrater(int physicsExecutionCount)
         {
@@ -27,9 +28,11 @@ namespace Phantom.Physics
             this.entities = new List<Entity>();
         }
 
-        public override void Integrate(float elapsed)
+        public override void Update(float elapsed)
         {
             float devidedElapsed = elapsed / this.physicsExecutionCount;
+
+            this.Integrate(elapsed);
 
             for (int t = 0; t < physicsExecutionCount; ++t )
             {
@@ -44,10 +47,10 @@ namespace Phantom.Physics
                 }
             }
 
-            base.Integrate(elapsed);
+            base.Update(elapsed);
         }
 
-        private void CheckEntityCollision(int index)
+        protected virtual void CheckEntityCollision(int index)
         {
             Entity e = this.entities[index];
             if (e.Shape == null)
@@ -61,7 +64,7 @@ namespace Phantom.Physics
 
         }
 
-        private void CheckCollisionBetween(Entity a, Entity b)
+        protected void CheckCollisionBetween(Entity a, Entity b)
         {
             if (!a.CanCollideWith(b) || !b.CanCollideWith(a))
                 return;
@@ -106,13 +109,13 @@ namespace Phantom.Physics
         }
 #endif
 
-        internal void OnComponentAddedToLayer(Component component)
+        internal virtual void OnComponentAddedToLayer(Component component)
         {
             if (component is Entity)
                 this.entities.Add(component as Entity);
         }
 
-        internal void OnComponentRemovedToLayer(Component component)
+        internal virtual void OnComponentRemovedToLayer(Component component)
         {
             this.entities.Remove(component as Entity);
         }

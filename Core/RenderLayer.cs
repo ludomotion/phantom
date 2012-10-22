@@ -10,10 +10,16 @@ namespace Phantom.Core
     {
         private Renderer renderer;
 
-        public RenderLayer(Renderer renderer)
+        public RenderLayer(float width, float height, Renderer renderer)
+            :base(width, height)
         {
             this.renderer = renderer;
             this.AddComponent(this.renderer);
+        }
+
+        public RenderLayer(Renderer renderer)
+            :this(PhantomGame.Game.Width, PhantomGame.Game.Height, renderer)
+        {
         }
 
         public override void Render(RenderInfo info)

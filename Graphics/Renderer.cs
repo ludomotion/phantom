@@ -48,23 +48,24 @@ namespace Phantom.Graphics
 
         private Canvas canvas;
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy, SpriteSortMode sortMode, BlendState blendState)
+        public Renderer(int passes, ViewportPolicy viewportPolicy, bool hasCanvas, SpriteSortMode sortMode, BlendState blendState)
         {
             this.sortMode = sortMode;
             this.blendState = blendState;
             this.passes = passes;
             this.policy = viewportPolicy;
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
+            this.HasCanvas = hasCanvas;
             //this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
         }
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy)
-            : this(passes, viewportPolicy, SpriteSortMode.Deferred, BlendState.AlphaBlend)
+        public Renderer(int passes, ViewportPolicy viewportPolicy, bool hasCanvas)
+            : this(passes, viewportPolicy, hasCanvas, SpriteSortMode.Deferred, BlendState.AlphaBlend)
         {
         }
 
         public Renderer(int passes)
-            :this(passes, ViewportPolicy.Default)
+            :this(passes, ViewportPolicy.Default, false)
         {
         }
 

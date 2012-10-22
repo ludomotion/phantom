@@ -13,12 +13,18 @@ namespace Phantom.Core
         private Renderer renderer;
         private Integrater integrater;
 
-        public EntityLayer(Renderer renderer, Integrater integrater)
+        public EntityLayer(float width, float height, Renderer renderer, Integrater integrater)
+            :base(width, height)
         {
             this.renderer = renderer;
             this.integrater = integrater;
             this.AddComponent(this.renderer);
             this.AddComponent(this.integrater);
+        }
+
+        public EntityLayer(Renderer renderer, Integrater integrater)
+            :this(PhantomGame.Game.Width, PhantomGame.Game.Height, renderer, integrater)
+        {
         }
 
         protected override void OnComponentAdded(Component component)
@@ -31,12 +37,6 @@ namespace Phantom.Core
         {
             this.integrater.OnComponentRemovedToLayer(component);
             base.OnComponentRemoved(component);
-        }
-
-        public override void Integrate(float elapsed)
-        {
-            this.integrater.Integrate(elapsed);
-            //!base.Integrate(elapsed);
         }
 
         public override void Render( RenderInfo info )
