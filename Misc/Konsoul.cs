@@ -20,6 +20,7 @@ namespace Phantom.Misc
         public float Padding = 4;
         public string Prompt = "] ";
         public Keys OpenKey = Keys.OemTilde;
+        public float TransitionTime = .25f;
     }
 
     public class Konsoul : Component
@@ -70,6 +71,7 @@ namespace Phantom.Misc
         private SpriteBatch batch;
         private BasicEffect effect;
 
+        private float transition;
         private int scrollOffset;
         private string input;
         private float controlDelay;
@@ -292,10 +294,14 @@ namespace Phantom.Misc
             KeyboardState previous = this.previousKeyboardState;
 
             // Open and close logics:
+            this.transition -= elapsed;
             if (!this.Visible)
             {
                 if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
+                {
+                    this.transition = this.settings.TransitionTime;
                     this.Visible = true;
+                }
                 this.previousKeyboardState = current;
                 base.Update(elapsed);
                 return;
@@ -303,6 +309,7 @@ namespace Phantom.Misc
             else if ((current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey)) ||
                     (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape)))
             {
+                this.transition = this.settings.TransitionTime;
                 this.Visible = false;
                 this.historySavedInput = null;
                 this.input = "";
@@ -495,8 +502,12 @@ namespace Phantom.Misc
 
         public override void Render(Graphics.RenderInfo info)
         {
-            if (!this.Visible)
+            if (!this.Visible && this.transition <= 0)
                 return;
+
+            float transitionScale = Math.Max(0, this.transition / this.settings.TransitionTime);
+            if (this.Visible) transitionScale = 1 - transitionScale;
+
             GraphicsDevice graphicsDevice = PhantomGame.Game.GraphicsDevice;
             Viewport resolution = PhantomGame.Game.Resolution;
             float padding = this.settings.Padding;
@@ -506,7 +517,7 @@ namespace Phantom.Misc
 
             this.effect.World = Matrix.Identity;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
-                0, 1, 1f / (height / resolution.Height), 0,
+                0, 1, 1f / (height / resolution.Height * transitionScale), 0,
                 0, 1);
             this.effect.DiffuseColor = this.settings.BackgroundColor.ToVector3();
             this.effect.Alpha = this.settings.Alpha;
@@ -517,7 +528,7 @@ namespace Phantom.Misc
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
 
             this.batch.Begin();
-            float y = height - padding - lineSpace;
+            float y = height * transitionScale - padding - lineSpace;
             this.batch.DrawString(this.font, this.settings.Prompt + this.input, new Vector2(padding, y), color);
             if (this.input.Length == 0)
                 this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
