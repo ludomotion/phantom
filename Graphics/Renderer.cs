@@ -23,19 +23,22 @@ namespace Phantom.Graphics
             Default = Fit
         }
 
-        public bool HasCanvas
+        [Flags]
+        public enum RenderOptions : int
         {
-            get
-            {
-                return this.canvas != null;
-            }
-            set
-            {
-                if (value && this.canvas == null)
-                    this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
-                else if (!value && this.canvas != null)
-                    this.canvas = null;
-            }
+            None = 0,
+            Canvas = 1 << 0,
+
+            BackToFront = 1 << 10,
+            Deferred = 1 << 11, // default
+            FrontToBack = 1 << 12,
+            Immediate = 1 << 13,
+            Texture = 1 << 14,
+                
+            Additive = 1 << 20,
+            AlphaBlend = 1 << 21, // default
+            NonPremultiplied = 1 << 22,
+            Opaque = 1 << 23
         }
 
         private int passes;
@@ -48,24 +51,24 @@ namespace Phantom.Graphics
 
         private Canvas canvas;
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy, bool hasCanvas, SpriteSortMode sortMode, BlendState blendState)
+        public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
         {
-            this.sortMode = sortMode;
-            this.blendState = blendState;
             this.passes = passes;
             this.policy = viewportPolicy;
+            this.sortMode = Renderer.ToSortMode(renderOptions);
+            this.blendState = Renderer.ToBlendState(renderOptions);
+            if ((renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas)
+                this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
-            this.HasCanvas = hasCanvas;
-            //this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
         }
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy, bool hasCanvas)
-            : this(passes, viewportPolicy, hasCanvas, SpriteSortMode.Deferred, BlendState.AlphaBlend)
+        public Renderer(int passes, ViewportPolicy viewportPolicy)
+            : this(passes, viewportPolicy, RenderOptions.None)
         {
         }
 
         public Renderer(int passes)
-            :this(passes, ViewportPolicy.Default, false)
+            :this(passes, ViewportPolicy.Default)
         {
         }
 
@@ -184,6 +187,35 @@ namespace Phantom.Graphics
             }
 
             return info;
+        }
+
+
+        public static SpriteSortMode ToSortMode(RenderOptions options)
+        {
+            if ((options & RenderOptions.BackToFront) == RenderOptions.BackToFront)
+                return SpriteSortMode.BackToFront;
+            if ((options & RenderOptions.Deferred) == RenderOptions.Deferred)
+                return SpriteSortMode.Deferred;
+            if ((options & RenderOptions.FrontToBack) == RenderOptions.FrontToBack)
+                return SpriteSortMode.FrontToBack;
+            if ((options & RenderOptions.Immediate) == RenderOptions.Immediate)
+                return SpriteSortMode.Immediate;
+            if ((options & RenderOptions.Texture) == RenderOptions.Texture)
+                return SpriteSortMode.Texture;
+            return SpriteSortMode.Deferred;
+        }
+
+        public static BlendState ToBlendState(RenderOptions options)
+        {
+            if ((options & RenderOptions.Additive) == RenderOptions.Additive)
+                return BlendState.Additive;
+            if ((options & RenderOptions.AlphaBlend) == RenderOptions.AlphaBlend)
+                return BlendState.AlphaBlend;
+            if ((options & RenderOptions.NonPremultiplied) == RenderOptions.NonPremultiplied)
+                return BlendState.NonPremultiplied;
+            if ((options & RenderOptions.Opaque) == RenderOptions.Opaque)
+                return BlendState.Opaque;
+            return BlendState.AlphaBlend;
         }
     }
 }

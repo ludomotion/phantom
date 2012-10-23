@@ -289,12 +289,13 @@ namespace Phantom.Misc
         public override void Update(float elapsed)
         {
             this.blinkTimer += elapsed;
+            if( this.transition >= 0 )
+                this.transition -= elapsed;
 
             KeyboardState current = Keyboard.GetState();
             KeyboardState previous = this.previousKeyboardState;
 
             // Open and close logics:
-            this.transition -= elapsed;
             if (!this.Visible)
             {
                 if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
@@ -562,7 +563,7 @@ namespace Phantom.Misc
             if (this.blinkTimer % 2 < 1)
             {
                 Vector2 cursorPosition = this.font.MeasureString(this.input.Substring(0, this.cursor)) + new Vector2(this.settings.Padding + this.promptWidth, 0);
-                cursorPosition.Y = height - lineSpace - padding;
+                cursorPosition.Y = height * transitionScale - lineSpace - padding;
 
                 this.effect.World = Matrix.CreateTranslation(cursorPosition.X, cursorPosition.Y, 0);
                 this.effect.Projection = Matrix.CreateOrthographicOffCenter(
