@@ -195,6 +195,7 @@ namespace Phantom
             this.graphics.IsFullScreen = fullscreen;
             this.graphics.ApplyChanges();
             this.Resolution = new Viewport(0, 0, width, height);
+            Trace.WriteLine(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
         }
 
         public void PushState( GameState state )

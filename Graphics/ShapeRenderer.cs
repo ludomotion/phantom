@@ -22,7 +22,7 @@ namespace Phantom.Graphics
             this.stroke = stroke;
         }
         public ShapeRenderer(float thickness, Color color)
-            :this(thickness, color, color.Lerp(Color.Black, .8f))
+            :this(thickness, color, Color.Lerp(color, Color.Black, .8f))
         {
         }
 

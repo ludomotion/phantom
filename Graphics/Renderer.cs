@@ -19,8 +19,7 @@ namespace Phantom.Graphics
             // Centered
             // Stretch
             // Fill
-            None,
-            Default = Fit
+            None
         }
 
         [Flags]
@@ -41,8 +40,10 @@ namespace Phantom.Graphics
             Opaque = 1 << 23
         }
 
-        private int passes;
-        private ViewportPolicy policy;
+        public int Passes { get; protected set; }
+        public ViewportPolicy Policy { get; protected set; }
+        public RenderOptions Options { get; protected set; }
+
 
         private Layer layer;
         private SpriteBatch batch;
@@ -53,8 +54,9 @@ namespace Phantom.Graphics
 
         public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
         {
-            this.passes = passes;
-            this.policy = viewportPolicy;
+            this.Passes = passes;
+            this.Policy = viewportPolicy;
+            this.Options = renderOptions;
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
             if ((renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas)
@@ -68,14 +70,14 @@ namespace Phantom.Graphics
         }
 
         public Renderer(int passes)
-            :this(passes, ViewportPolicy.Default)
+            :this(passes, default(ViewportPolicy))
         {
         }
 
         public override void OnAncestryChanged()
         {
             base.OnAncestryChanged();
-            this.layer = GetAncestor<Layer>();
+            this.layer = this.GetAncestor<Layer>();
         }
 
         public override void Render( RenderInfo info )
@@ -87,7 +89,7 @@ namespace Phantom.Graphics
 
             info.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            for (int pass = 0; pass < this.passes; pass++)
+            for (int pass = 0; pass < this.Passes; pass++)
             {
                 this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
                 info.Pass = pass;
@@ -102,13 +104,13 @@ namespace Phantom.Graphics
                 this.batch.End();
             }
 
-
             base.Render(info);
         }
 
         private RenderInfo BuildRenderInfo()
         {
             RenderInfo info = new RenderInfo();
+            info.Renderer = this;
             info.Pass = 0;
             info.Batch = this.batch;
             info.GraphicsDevice = PhantomGame.Game.GraphicsDevice;
@@ -131,7 +133,7 @@ namespace Phantom.Graphics
             float left = (resolution.Width - viewport.Width) * .5f;
             float top = (resolution.Height - viewport.Height) * .5f;
 
-            switch (this.policy)
+            switch (this.Policy)
             {
                 case ViewportPolicy.None:
                     info.Width = resolution.Width;
@@ -147,23 +149,25 @@ namespace Phantom.Graphics
                     break;
             }
 
-            Matrix world = Matrix.Identity;
-            if (this.layer != null && this.layer.Camera != null)
-            {
-                info.Camera = this.layer.Camera;
-                world *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
-            }
 
             info.Projection = Matrix.CreateOrthographicOffCenter(
                 0, resolution.Width, resolution.Height, 0,
                 0, 1);
 
-            switch (this.policy)
+            info.World = Matrix.Identity;
+            if (this.layer != null && this.layer.Camera != null)
+            {
+                info.Camera = this.layer.Camera;
+                info.World *= Matrix.CreateTranslation(info.Width * .5f - info.Camera.Position.X, info.Height * .5f - info.Camera.Position.Y, 0);
+            }
+
+
+            switch (this.Policy)
             {
                 case ViewportPolicy.None:
                     break;
                 case ViewportPolicy.Aligned:
-                    world *= Matrix.CreateTranslation(left, top, 0);
+                    info.World *= Matrix.CreateTranslation(left, top, 0);
                     break;
                 case ViewportPolicy.Fit:
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
@@ -173,12 +177,10 @@ namespace Phantom.Graphics
                             viewport.Height / designSize.Y,
                             1);
                         Matrix translate = Matrix.CreateTranslation(left, top, 0);
-                        world *= scale * translate;
+                        info.World *= scale * translate;
                     }
                     break;
             }
-
-            info.World = world;
 
             if (this.canvas != null)
             {
@@ -187,6 +189,21 @@ namespace Phantom.Graphics
             }
 
             return info;
+        }
+
+        public void ChangeOptions(ViewportPolicy viewportPolicy, RenderOptions renderOptions)
+        {
+            this.Policy = viewportPolicy;
+
+            this.Options = renderOptions;
+            bool wantCanvas = (renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas;
+            if (this.canvas == null && wantCanvas)
+                this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
+            else if (this.canvas != null && !wantCanvas)
+                this.canvas = null;
+
+            this.sortMode = Renderer.ToSortMode(renderOptions);
+            this.blendState = Renderer.ToBlendState(renderOptions);
         }
 
 

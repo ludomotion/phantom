@@ -18,6 +18,7 @@ namespace Phantom.Graphics
             }
         }
 
+        public Renderer Renderer;
         public int Pass;
         public float Width;
         public float Height;

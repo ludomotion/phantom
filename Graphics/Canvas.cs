@@ -85,6 +85,8 @@ namespace Phantom.Graphics
 
         private void FillCircle(Vector2 position, float radius, Color color)
         {
+            if (radius <= 0)
+                return;
             int segments;
             CircleBuffer circle;
             GetCircleBufferByRadius(radius, out segments, out circle);
@@ -133,13 +135,12 @@ namespace Phantom.Graphics
         public void StrokeRect(Vector2 position, Vector2 halfSize, float angle)
         {
             Matrix rotation = Matrix.CreateRotationZ(angle);
-            Matrix quarter = Matrix.CreateRotationZ(MathHelper.PiOver2);
-            Matrix half = Matrix.CreateRotationZ(MathHelper.Pi);
-            Matrix three = Matrix.CreateRotationZ(MathHelper.PiOver2+MathHelper.Pi);
-            Vector2 a = position - Vector2.Transform(halfSize, rotation);
-            Vector2 b = position - Vector2.Transform(halfSize, rotation * quarter);
-            Vector2 c = position - Vector2.Transform(halfSize, rotation * half);
-            Vector2 d = position - Vector2.Transform(halfSize, rotation * three);
+            Matrix mirrorX = Matrix.CreateScale(new Vector3(-1,  1, 0));
+            Matrix mirrorY = Matrix.CreateScale(new Vector3( 1, -1, 0));
+            Vector2 a = position + Vector2.Transform(halfSize, rotation);
+            Vector2 b = position + Vector2.Transform(halfSize, mirrorX * rotation);
+            Vector2 c = position + Vector2.Transform(halfSize, mirrorX * mirrorY * rotation);
+            Vector2 d = position + Vector2.Transform(halfSize, mirrorY * rotation);
             this.StrokeLine(a, b);
             this.StrokeLine(b, c);
             this.StrokeLine(c, d);
@@ -153,6 +154,8 @@ namespace Phantom.Graphics
 
         public void StrokeCircle(Vector2 position, float radius)
         {
+            if (radius <= 0)
+                return;
             int segments;
             CircleBuffer circle;
             GetCircleBufferByRadius(radius, out segments, out circle);
@@ -288,6 +291,10 @@ namespace Phantom.Graphics
 
         private static void GetCircleBufferByRadius(float radius, out int segments, out CircleBuffer circle)
         {
+#if DEBUG
+            if (radius <= 0)
+                throw new Exception("Radius must be greater then zero.");
+#endif
             int guess = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
             segments = (int)Math.Pow(2, Math.Ceiling(Math.Log(guess) / Math.Log(2)));
             if (!Canvas.circles.ContainsKey(segments))
