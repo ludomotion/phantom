@@ -11,31 +11,31 @@ namespace Phantom.Core
     public class EntityLayer : Layer
     {
         private Renderer renderer;
-        private Integrater integrater;
+        private Integrator integrator;
 
-        public EntityLayer(float width, float height, Renderer renderer, Integrater integrater)
+        public EntityLayer(float width, float height, Renderer renderer, Integrator integrator)
             :base(width, height)
         {
             this.renderer = renderer;
-            this.integrater = integrater;
+            this.integrator = integrator;
             this.AddComponent(this.renderer);
-            this.AddComponent(this.integrater);
+            this.AddComponent(this.integrator);
         }
 
-        public EntityLayer(Renderer renderer, Integrater integrater)
-            :this(PhantomGame.Game.Width, PhantomGame.Game.Height, renderer, integrater)
+        public EntityLayer(Renderer renderer, Integrator integrator)
+            :this(PhantomGame.Game.Width, PhantomGame.Game.Height, renderer, integrator)
         {
         }
 
         protected override void OnComponentAdded(Component component)
         {
-            this.integrater.OnComponentAddedToLayer(component);
+            this.integrator.OnComponentAddedToLayer(component);
             base.OnComponentAdded(component);
         }
 
         protected override void OnComponentRemoved(Component component)
         {
-            this.integrater.OnComponentRemovedToLayer(component);
+            this.integrator.OnComponentRemovedToLayer(component);
             base.OnComponentRemoved(component);
         }
 
@@ -43,6 +43,16 @@ namespace Phantom.Core
         {
             this.renderer.Render( info );
  	        //!base.Render();
+        }
+
+        public override void ClearComponents()
+        {
+            base.ClearComponents();
+            this.integrator.ClearComponents();
+            this.integrator.ClearEntities();
+            this.renderer.ClearComponents();
+            this.AddComponent(this.renderer);
+            this.AddComponent(this.integrator);
         }
     }
 }

@@ -92,7 +92,7 @@ namespace Phantom.Core
 
         }
 
-        public void ClearComponents()
+        public virtual void ClearComponents()
         {
             for (int i = this.components.Count - 1; i >= 0; i--)
             {

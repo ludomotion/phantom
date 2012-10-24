@@ -118,8 +118,8 @@
     <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
     <Compile Include="Physics\Components\Gravity.cs" />
     <Compile Include="Physics\Components\Rotator.cs" />
-    <Compile Include="Physics\Integrater.cs" />
-    <Compile Include="Physics\TiledIntegrater.cs" />
+    <Compile Include="Physics\Integrator.cs" />
+    <Compile Include="Physics\TiledIntegrator.cs" />
     <Compile Include="Physics\TilePosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shapes\CompoundShape.cs" />

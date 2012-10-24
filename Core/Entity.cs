@@ -70,5 +70,14 @@ namespace Phantom.Core
             }
         }
 
+        protected override void OnComponentRemoved(Component component)
+        {
+            if (component == this.mover)
+                this.mover = null;
+            if (component == this.shape)
+                this.shape = null;
+            base.OnComponentRemoved(component);
+        }
+
     }
 }
