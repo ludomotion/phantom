@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace Phantom.Physics
 {
-    public class Integrater : Component
+    public class Integrator : Component
     {
 #if DEBUG
         static List<VertexPositionColor> debug = new List<VertexPositionColor>();
@@ -22,7 +22,7 @@ namespace Phantom.Physics
         private int physicsExecutionCount;
         protected List<Entity> entities;
 
-        public Integrater(int physicsExecutionCount)
+        public Integrator(int physicsExecutionCount)
         {
             this.physicsExecutionCount = physicsExecutionCount;
             this.entities = new List<Entity>();

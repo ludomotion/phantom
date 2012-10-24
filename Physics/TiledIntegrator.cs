@@ -8,7 +8,7 @@ using Phantom.Graphics;
 
 namespace Phantom.Physics
 {
-    public class TiledIntegrater : Integrater
+    public class TiledIntegrator : Integrator
     {
         internal class Tile
         {
@@ -45,7 +45,7 @@ namespace Phantom.Physics
         private int tilesY;
         private int tileCount;
 
-        public TiledIntegrater(int physicsExecutionCount, int tileSize)
+        public TiledIntegrator(int physicsExecutionCount, int tileSize)
             :base(physicsExecutionCount)
         {
             this.tileSize = tileSize;

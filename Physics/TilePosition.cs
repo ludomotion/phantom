@@ -8,26 +8,26 @@ namespace Phantom.Physics
 {
     internal class TilePosition : EntityComponent
     {
-        private TiledIntegrater integrater;
-        public TiledIntegrater.Tile Tile;
+        private TiledIntegrator integrator;
+        public TiledIntegrator.Tile Tile;
 
-        public TilePosition(TiledIntegrater integrater)
+        public TilePosition(TiledIntegrator integrator)
         {
-            this.SetIntegrater(integrater);
+            this.SetIntegrater(integrator);
         }
 
-        public void SetIntegrater(TiledIntegrater integrater)
+        public void SetIntegrater(TiledIntegrator integrator)
         {
-            this.integrater = integrater;
+            this.integrator = integrator;
         }
 
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            this.SetTile(this.integrater.GetTile(this.Entity.Position));
+            this.SetTile(this.integrator.GetTile(this.Entity.Position));
         }
 
-        public void SetTile(TiledIntegrater.Tile tile)
+        public void SetTile(TiledIntegrator.Tile tile)
         {
             if (this.Tile == tile)
                 return;
@@ -40,7 +40,7 @@ namespace Phantom.Physics
 
         public override void Integrate(float elapsed)
         {
-            this.SetTile(this.integrater.GetTile(this.Entity.Position));
+            this.SetTile(this.integrator.GetTile(this.Entity.Position));
             base.Integrate(elapsed);
         }
 
