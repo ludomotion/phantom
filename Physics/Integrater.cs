@@ -30,18 +30,20 @@ namespace Phantom.Physics
 
         public override void Update(float elapsed)
         {
+
             float devidedElapsed = elapsed / this.physicsExecutionCount;
 
-            this.Integrate(elapsed);
 
             for (int t = 0; t < physicsExecutionCount; ++t )
             {
+                this.Integrate(devidedElapsed); 
+
                 for (int i = this.entities.Count - 1; i >= 0; --i)
                 {
                     Entity e = this.entities[i];
                     if (!e.Destroyed)
                     {
-                        e.Integrate(devidedElapsed);
+                        e.Integrate(devidedElapsed); 
                         CheckEntityCollision(i);
                     }
                 }
@@ -118,6 +120,11 @@ namespace Phantom.Physics
         internal virtual void OnComponentRemovedToLayer(Component component)
         {
             this.entities.Remove(component as Entity);
+        }
+
+        public virtual void ClearEntities()
+        {
+            this.entities.Clear();
         }
     }
 }
