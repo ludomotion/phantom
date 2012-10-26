@@ -174,6 +174,9 @@ namespace Phantom
 
         private void RegisterPhantomCommands()
         {
+#if DEBUG
+            Debug.WriteLine("DayOfYear: " + DateTime.Now.DayOfYear);
+#endif
             this.Console.Register("multiplier", "change the games update speed.", delegate(string[] argv)
             {
                 if (argv.Length > 1)

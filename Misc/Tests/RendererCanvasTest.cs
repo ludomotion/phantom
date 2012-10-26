@@ -17,17 +17,17 @@ namespace Phantom.Misc.Tests
                                                         
                                                         // 4:3:
                                                         new Vector2(800, 600),
-                                                        new Vector2(1024, 768),
+                                                        new Vector2(1024, 768), // 05.53%
                                                         new Vector2(1280, 960),
 
                                                         // 16:10
                                                         new Vector2(1280, 800),
-                                                        new Vector2(1680, 1050),
+                                                        new Vector2(1680, 1050), // 10.26%
 
                                                         // Steam Users: (2012-10-23, http://en.wikipedia.org/wiki/Display_resolution)
-                                                        new Vector2(1280, 1024),
-                                                        new Vector2(1366, 768),
-                                                        new Vector2(1920, 1080),
+                                                        new Vector2(1280/1.5f, 1024/1.5f), // 10.66%
+                                                        new Vector2(1366, 768), // 17.19%
+                                                        new Vector2(1920, 1080), // 25.04%
 
                                                         // Portrait (mobile):
                                                         new Vector2( 320, 480 ),
@@ -111,18 +111,6 @@ namespace Phantom.Misc.Tests
                 c.FillRect(center, center, 0);
                 c.FillColor.A = 0x10;
                 c.FillCircle(center, Math.Min(center.X, center.Y));
-
-                // Info text and rect:
-                this.UpdateInfoText();
-                float infoTextAngle = .05f * (float)Math.Sin(this.timer * .5f);
-                c.FillColor = Color.Black;
-                c.FillColor.A = 0x80;
-                c.FillRect(this.infoHalfSize + Vector2.One * padding * 2, this.infoHalfSize + Vector2.One * padding, infoTextAngle);
-                c.LineWidth = 1;
-                c.StrokeColor = Color.White;
-                c.StrokeColor.A = 0x80;
-                c.StrokeRect(this.infoHalfSize + Vector2.One * padding * 2, this.infoHalfSize + Vector2.One * padding, infoTextAngle);
-                batch.DrawString(this.font, this.info, Vector2.One * padding * 2, Color.White);
 
                 // The circle:
                 float sin75 = (float)Math.Sin(this.timer * .75f);
@@ -208,6 +196,18 @@ namespace Phantom.Misc.Tests
                 c.StrokeColor = Color.Lerp(this.six, Color.White, .75f);
                 c.LineWidth = 1;
                 c.Stroke();
+
+                // Info text and rect:
+                this.UpdateInfoText();
+                float infoTextAngle = .05f * (float)Math.Sin(this.timer * .5f);
+                c.FillColor = Color.Black;
+                c.FillColor.A = 0x80;
+                c.FillRect(this.infoHalfSize + Vector2.One * padding * 2, this.infoHalfSize + Vector2.One * padding, infoTextAngle);
+                c.LineWidth = 1;
+                c.StrokeColor = Color.White;
+                c.StrokeColor.A = 0x80;
+                c.StrokeRect(this.infoHalfSize + Vector2.One * padding * 2, this.infoHalfSize + Vector2.One * padding, infoTextAngle);
+                batch.DrawString(this.font, this.info, Vector2.One * padding * 2, Color.White);
             }
 
             // Passes:
@@ -225,12 +225,12 @@ namespace Phantom.Misc.Tests
 
             Vector2 resolution = RendererCanvasTest.Resolutions[this.resolutionIndex];
             b.AppendFormat("Resolution:\n");
-            b.AppendFormat("  Design : {0}x{1}\n", PhantomGame.Game.Width, PhantomGame.Game.Height);
-            b.AppendFormat("  Render : {0}x{1}\n", this.lastRenderInfo.Width, this.lastRenderInfo.Height);
+            b.AppendFormat("  Design : {0}x{1} {2}\n", PhantomGame.Game.Width, PhantomGame.Game.Height, Math.Round(PhantomGame.Game.Width / PhantomGame.Game.Height,1));
+            b.AppendFormat("  Render : {0}x{1} {2}\n", this.lastRenderInfo.Width, this.lastRenderInfo.Height,  Math.Round(this.lastRenderInfo.Width / this.lastRenderInfo.Height,1));
             if (resolution == Vector2.Zero)
                 b.AppendFormat("  Current: design size\n");
             else
-                b.AppendFormat("  Current: {0}x{1}\n", resolution.X, resolution.Y);
+                b.AppendFormat("  Current: {0}x{1} {2}\n", (int)resolution.X, (int)resolution.Y,  Math.Round(resolution.X/resolution.Y,1));
 
             b.AppendFormat("ViewportPolicy: {0}\n", this.policy);
 
@@ -252,7 +252,6 @@ namespace Phantom.Misc.Tests
             if (resolution == Vector2.Zero)
                 resolution = PhantomGame.Game.Size;
 
-            /*/
             float nativeWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             float nativeHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
 
@@ -261,7 +260,6 @@ namespace Phantom.Misc.Tests
                 NextResolution();
                 return;
             }
-            //*/
 
             PhantomGame.Game.SetResolution((int)resolution.X, (int)resolution.Y, false);
         }

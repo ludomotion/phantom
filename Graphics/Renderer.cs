@@ -16,9 +16,9 @@ namespace Phantom.Graphics
         {
             Fit,
             Aligned,
-            // Centered
-            // Stretch
-            // Fill
+            Centered,
+            Stretch,
+            Fill,
             None
         }
 
@@ -115,23 +115,26 @@ namespace Phantom.Graphics
             info.Batch = this.batch;
             info.GraphicsDevice = PhantomGame.Game.GraphicsDevice;
 
-            Vector2 designSize = PhantomGame.Game.Size;
             Viewport resolution = PhantomGame.Game.Resolution;
-            Viewport viewport;
-            if (resolution.Width > resolution.Height)
+            Vector2 designSize = PhantomGame.Game.Size;
+            float designRatio = designSize.X / designSize.Y;
+
+            float width = resolution.Height * designRatio;
+            float height = resolution.Width * (designSize.Y / designSize.X);
+            float paddingX = (resolution.Width - width) * .5f;
+            float paddingY = (resolution.Height - height) * .5f;
+
+            Viewport fit, fill;
+            if (resolution.AspectRatio > designRatio)
             {
-                float width = resolution.Height * (designSize.X / designSize.Y);
-                float padding = (resolution.Width - width) * .5f;
-                viewport = new Viewport((int)padding, 0, (int)width, resolution.Height);
+                fit = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
+                fill = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
             }
             else
             {
-                float height = resolution.Width * (designSize.Y / designSize.X);
-                float padding = (resolution.Height - height) * .5f;
-                viewport = new Viewport(0, (int)padding, resolution.Width, (int)height);
+                fit = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
+                fill = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
             }
-            float left = (resolution.Width - viewport.Width) * .5f;
-            float top = (resolution.Height - viewport.Height) * .5f;
 
             switch (this.Policy)
             {
@@ -140,10 +143,13 @@ namespace Phantom.Graphics
                     info.Height = resolution.Height;
                     break;
                 case ViewportPolicy.Aligned:
-                    info.Width = viewport.Width;
-                    info.Height = viewport.Height;
+                    info.Width = fit.Width;
+                    info.Height = fit.Height;
                     break;
                 case ViewportPolicy.Fit:
+                case ViewportPolicy.Fill:
+                case ViewportPolicy.Stretch:
+                case ViewportPolicy.Centered:
                     info.Width = designSize.X;
                     info.Height = designSize.Y;
                     break;
@@ -167,16 +173,36 @@ namespace Phantom.Graphics
                 case ViewportPolicy.None:
                     break;
                 case ViewportPolicy.Aligned:
-                    info.World *= Matrix.CreateTranslation(left, top, 0);
+                    info.World *= Matrix.CreateTranslation(fit.X, fit.Y, 0);
+                    break;
+                case ViewportPolicy.Centered:
+                    info.World = Matrix.CreateTranslation((resolution.Width - designSize.X) * .5f, (resolution.Height - designSize.Y) * .5f, 0);
+                    break;
+                case ViewportPolicy.Stretch:
+                    info.World = Matrix.CreateScale(
+                            resolution.Width / designSize.X,
+                            resolution.Height / designSize.Y,
+                            1);
+                    break;
+                case ViewportPolicy.Fill:
+                    if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
+                    {
+                        Matrix scale = Matrix.CreateScale(
+                            fill.Width / designSize.X,
+                            fill.Height / designSize.Y,
+                            1);
+                        Matrix translate = Matrix.CreateTranslation(fill.X, fill.Y, 0);
+                        info.World *= scale * translate;
+                    }
                     break;
                 case ViewportPolicy.Fit:
                     if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
                     {
                         Matrix scale = Matrix.CreateScale(
-                            viewport.Width / designSize.X,
-                            viewport.Height / designSize.Y,
+                            fit.Width / designSize.X,
+                            fit.Height / designSize.Y,
                             1);
-                        Matrix translate = Matrix.CreateTranslation(left, top, 0);
+                        Matrix translate = Matrix.CreateTranslation(fit.X, fit.Y, 0);
                         info.World *= scale * translate;
                     }
                     break;
