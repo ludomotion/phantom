@@ -82,7 +82,7 @@ namespace Phantom.Graphics
 
         public override void Render( RenderInfo info )
         {
-            if (this.Parent == null)
+            if (this.Parent == null || info != null)
                 return;
 
             info = this.BuildRenderInfo();
@@ -98,7 +98,7 @@ namespace Phantom.Graphics
                 for (int i = 0; i < count; i++)
                 {
                     if (this == components[i])
-                        continue;
+                        this.Parent.Render(info); // TODO: Document and test this!
                     components[i].Render(info);
                 }
                 this.batch.End();

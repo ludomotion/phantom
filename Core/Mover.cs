@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Physics;
+using Phantom.Misc;
+using System.Diagnostics;
 
 namespace Phantom.Core
 {
@@ -42,8 +44,13 @@ namespace Phantom.Core
             switch (message)
             {
                 case Messages.MoverImpulse:
-                    this.Velocity += (Vector2)data;
-                    return MessageResult.CONSUMED;
+                    if (data is Vector2)
+                        this.Velocity += (Vector2)data;
+                    else if (data is float && this.Entity != null)
+                        this.Velocity += this.Entity.Direction * (float)data;
+                    else if (data is int && this.Entity != null)
+                        this.Velocity += this.Entity.Direction * (int)data;
+                    return MessageResult.HANDLED;
             }
             return base.HandleMessage(message, data);
         }

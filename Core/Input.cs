@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
+
+namespace Phantom.Core
+{
+    public class Input : Component
+    {
+        internal KeyboardState PreviousKeyboardState;
+        internal KeyboardState CurrentKeyboardState;
+
+        internal MouseState PreviousMouseState;
+        internal MouseState CurrentMouseState;
+
+        internal GamePadState[] PreviousGamePadStates;
+        internal GamePadState[] CurrentGamePadStates;
+
+        public override void  OnAdd(Component parent)
+        {
+ 	        base.OnAdd(parent);
+
+            this.CurrentGamePadStates = new GamePadState[4];
+            this.PreviousGamePadStates = new GamePadState[4];
+        }
+
+        public override void Update(float elapsed)
+        {
+            if (PhantomGame.Game.Console != null && PhantomGame.Game.Console.Visible)
+                return;
+
+            this.PreviousKeyboardState = this.CurrentKeyboardState;
+            this.PreviousMouseState = this.CurrentMouseState;
+            for (int i = 0; i < 4; i++)
+                this.PreviousGamePadStates[i] = this.CurrentGamePadStates[i];
+
+            this.CurrentKeyboardState = Keyboard.GetState();
+            this.CurrentMouseState = Mouse.GetState();
+            for (int i = 0; i < 4; i++)
+                this.CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
+
+            base.Update(elapsed);
+        }
+
+        public bool IsButtonJustDown(Buttons button, out PlayerIndex index)
+        {
+            index = PlayerIndex.One;
+            for (int i = 0; i < 4; i++)
+            {
+                if (this.CurrentGamePadStates[i].IsButtonDown(button) && this.PreviousGamePadStates[i].IsButtonUp(button))
+                {
+                    index = (PlayerIndex)i;
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool IsButtonJustUp(Buttons button, out PlayerIndex index)
+        {
+            index = PlayerIndex.One;
+            for (int i = 0; i < 4; i++)
+            {
+                if (this.CurrentGamePadStates[i].IsButtonUp(button) && this.PreviousGamePadStates[i].IsButtonDown(button))
+                {
+                    index = (PlayerIndex)i;
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}

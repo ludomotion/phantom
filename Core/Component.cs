@@ -49,6 +49,8 @@ namespace Phantom.Core
 
         public virtual void OnAncestryChanged()
         {
+            for (int i = 0; i < this.components.Count; i++)
+                this.components[i].OnAncestryChanged();
         }
 
         public virtual void OnRemove()
@@ -200,8 +202,11 @@ namespace Phantom.Core
         {
             Component iter = this.Parent;
             while (iter != null)
+            {
                 if (iter is T)
                     return iter as T;
+                iter = iter.Parent;
+            }
             return null;
         }
     }

@@ -203,8 +203,11 @@ namespace Phantom
 
         public void PushState( GameState state )
         {
-            this.states.Add(state);
-            state.OnAdd(this);
+            if (state != null)
+            {
+                this.states.Add(state);
+                state.OnAdd(this);
+            }
         }
 
         public void PopState()
@@ -224,6 +227,27 @@ namespace Phantom
             this.states.Add(state);
             state.OnAdd(this);
             removed.OnRemove();
+        }
+
+        public void ClearAndPushState(GameState state)
+        {
+            for (int i = this.states.Count - 1; i >= 0; i--)
+            {
+                this.states[i].OnRemove();
+                this.states.RemoveAt(i);
+            }
+            this.PushState(state);
+        }
+
+        public void PopStateUntil<T>()
+        {
+            for (int i = this.states.Count - 1; i >= 0; i--)
+            {
+                if (this.states[i] is T)
+                    break;
+                this.states[i].OnRemove();
+                this.states.RemoveAt(i);
+            }
         }
 
         protected virtual void OnExit(object sender, EventArgs e)

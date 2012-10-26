@@ -73,6 +73,8 @@ namespace Phantom.Physics
             CollisionData collision = a.Shape.Collide(b.Shape);
             if (collision.IsValid)
             {
+                a.AfterCollisionWith(b);
+                b.AfterCollisionWith(a);
                 if (a.Mover != null && b.Mover != null && b.Mass < a.Mass * 100 && a.Mass < b.Mass * 100)
                 {
                     b.Mover.RespondToCollision(collision, a, -.5f);

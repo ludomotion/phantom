@@ -9,5 +9,11 @@ namespace Phantom.Core
     {
         public bool Transparent { get; protected set; }
         public bool Propagate { get; protected set; }
+        public Input Input { get; protected set; }
+
+        public GameState()
+        {
+            this.AddComponent(this.Input = new Input());
+        }
     }
 }

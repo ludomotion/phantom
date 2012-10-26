@@ -89,6 +89,8 @@
     <Compile Include="Cameras\Components\CameraEase.cs" />
     <Compile Include="Cameras\Components\DeadZone.cs" />
     <Compile Include="Cameras\Components\FollowEntity.cs" />
+    <Compile Include="Core\Input.cs" />
+    <Compile Include="Core\InputComponent.cs" />
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="Misc\MiscUtils.cs" />

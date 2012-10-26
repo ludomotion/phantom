@@ -41,7 +41,8 @@ namespace Phantom.Core
 
         public override void Render( RenderInfo info )
         {
-            this.renderer.Render( info );
+            if( info == null )
+                this.renderer.Render( info );
  	        //!base.Render();
         }
 
