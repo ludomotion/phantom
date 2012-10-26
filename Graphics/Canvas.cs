@@ -89,7 +89,7 @@ namespace Phantom.Graphics
                 return;
             int segments;
             CircleBuffer circle;
-            GetCircleBufferByRadius(radius, out segments, out circle);
+            GetCircleBufferByRadius(info.Camera != null ? radius * info.Camera.Zoom : radius, out segments, out circle);
 
             Matrix scale = Matrix.CreateScale(radius);
             Matrix translation = Matrix.CreateTranslation(new Vector3(position, 0));
@@ -158,7 +158,7 @@ namespace Phantom.Graphics
                 return;
             int segments;
             CircleBuffer circle;
-            GetCircleBufferByRadius(radius, out segments, out circle);
+            GetCircleBufferByRadius(info.Camera != null ? radius * info.Camera.Zoom : radius, out segments, out circle);
 
             float strokeScale = .5f / radius * this.LineWidth;
             VertexPositionColor[] vertices = new VertexPositionColor[segments * 2];

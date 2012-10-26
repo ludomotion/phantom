@@ -17,6 +17,8 @@ namespace Phantom.Cameras
         public Vector2 Target;
         public Vector2 NextTarget;
 
+        public float Zoom;
+
         public float Top { get; private set; }
         public float Right { get; private set; }
         public float Bottom { get; private set; }
@@ -26,6 +28,7 @@ namespace Phantom.Cameras
         {
             base.OnAdd(parent);
             this.layer = parent as Layer;
+            this.Zoom = 1;
         }
 
         public override void Update(float elapsed)
