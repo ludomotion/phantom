@@ -17,6 +17,7 @@ namespace Phantom.Core
 
         internal GamePadState[] PreviousGamePadStates;
         internal GamePadState[] CurrentGamePadStates;
+        internal bool JustBack;
 
         public override void  OnAdd(Component parent)
         {
@@ -29,7 +30,18 @@ namespace Phantom.Core
         public override void Update(float elapsed)
         {
             if (PhantomGame.Game.Console != null && PhantomGame.Game.Console.Visible)
+            {
+                this.JustBack = true;
                 return;
+            }
+            if (this.JustBack)
+            {
+                this.CurrentKeyboardState = Keyboard.GetState();
+                this.CurrentMouseState = Mouse.GetState();
+                for (int i = 0; i < 4; i++)
+                    this.CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
+                this.JustBack = false;
+            }
 
             this.PreviousKeyboardState = this.CurrentKeyboardState;
             this.PreviousMouseState = this.CurrentMouseState;
@@ -69,6 +81,15 @@ namespace Phantom.Core
                 }
             }
             return false;
+        }
+
+        public bool IsKeyJustDown(Keys key)
+        {
+            return this.CurrentKeyboardState.IsKeyDown(key) && this.PreviousKeyboardState.IsKeyUp(key);
+        }
+        public bool IsKeyJustUp(Keys key)
+        {
+            return this.CurrentKeyboardState.IsKeyUp(key) && this.PreviousKeyboardState.IsKeyDown(key);
         }
     }
 }

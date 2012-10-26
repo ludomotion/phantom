@@ -42,10 +42,7 @@ namespace Phantom
 
         public Konsoul Console { get; private set; }
 
-        public ContentManager Content
-        {
-            get { return this.XnaGame.Content; }
-        }
+        public Content Content { get; private set; }
 
         private float multiplier;
 
@@ -76,8 +73,10 @@ namespace Phantom
             this.XnaGame = new Microsoft.Xna.Framework.Game();
             this.XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
             this.XnaGame.Window.Title = this.Name;
-            this.XnaGame.Components.Add(new XnaPhantomComponent(this));
             this.XnaGame.Content.RootDirectory = "Content";
+            this.XnaGame.Components.Add(new XnaPhantomComponent(this));
+
+            this.Content = new Content(this.XnaGame.Content);
 
             this.SetupGraphics();
             this.graphics.ApplyChanges();
@@ -114,21 +113,31 @@ namespace Phantom
             this.graphics.PreferMultiSampling = true;
         }
 
+        protected virtual void LoadContent(Content content)
+        {
+        }
+
         protected virtual void Initialize()
         {
         }
+
 
         internal void XnaInitialize()
         {
             this.GraphicsDevice = this.XnaGame.GraphicsDevice;
             this.TotalTime = 0;
+
+            this.LoadContent(this.Content);
+            this.Content.AllowRegister = false;
+            this.Content.SwitchContext(Content.DefaultContext);
+
             this.Initialize();
+
             Trace.WriteLine("PhantomGame Initialized: " + Assembly.GetEntryAssembly().FullName);
         }
 
         internal void XnaUpdate(GameTime gameTime)
         {
-
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             elapsed *= this.multiplier;
             this.TotalTime += elapsed;
@@ -143,7 +152,6 @@ namespace Phantom
                 if (this.Paused)
                     return;
             }
-
         }
 
         internal void XnaRender(GameTime gameTime)
@@ -207,6 +215,7 @@ namespace Phantom
             {
                 this.states.Add(state);
                 state.OnAdd(this);
+                state.BackOnTop();
             }
         }
 
@@ -227,6 +236,7 @@ namespace Phantom
             this.states.Add(state);
             state.OnAdd(this);
             removed.OnRemove();
+            state.BackOnTop();
         }
 
         public void ClearAndPushState(GameState state)
@@ -237,6 +247,8 @@ namespace Phantom
                 this.states.RemoveAt(i);
             }
             this.PushState(state);
+            state.OnAdd(this);
+            state.BackOnTop();
         }
 
         public void PopStateUntil<T>()

@@ -15,5 +15,10 @@ namespace Phantom.Core
         {
             this.AddComponent(this.Input = new Input());
         }
+
+        public virtual void BackOnTop()
+        {
+            this.Input.JustBack = true;
+        }
     }
 }
