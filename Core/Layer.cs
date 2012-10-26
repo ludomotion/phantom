@@ -24,15 +24,10 @@ namespace Phantom.Core
         {
         }
 
-        protected override void OnComponentAdded(Component component)
+        public override void OnAncestryChanged()
         {
-            base.OnComponentAdded(component);
-            if (component is Camera)
-            {
-                if (this.Camera != null)
-                    this.RemoveComponent(this.Camera);
-                this.Camera = component as Camera;
-            }
+            base.OnAncestryChanged();
+            this.Camera = this.GetAncestor<GameState>().GetComponentByType<Camera>();
         }
     }
 }

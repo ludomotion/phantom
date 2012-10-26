@@ -93,6 +93,8 @@
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\InputComponent.cs" />
     <Compile Include="Graphics\Canvas.cs" />
+    <Compile Include="Graphics\Particles\Particle.cs" />
+    <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />

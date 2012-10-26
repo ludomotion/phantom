@@ -48,7 +48,7 @@ namespace Phantom.Graphics
         {
         }
 
-        public void RenderFrame(RenderInfo info, Vector2 position, int frame, float angle, float scale, Color color, float alpha)
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color, float alpha)
         {
             alpha = MathHelper.Clamp(alpha, 0, 1);
             color.A = (byte)(alpha * 255);

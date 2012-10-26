@@ -15,5 +15,10 @@ namespace Phantom
                 i += 1;
             return a.Substring(0, i);
         }
+
+        public static float NextFloat(this Random random)
+        {
+            return (float)random.NextDouble();
+        }
     }
 }
