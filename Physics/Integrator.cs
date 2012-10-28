@@ -60,7 +60,7 @@ namespace Phantom.Physics
             for (int j = 0; j < index; ++j)
             {
                 Entity o = this.entities[j];
-                if( !o.Destroyed || o.Shape != null )
+                if( !o.Destroyed && o.Shape != null )
                     CheckCollisionBetween(e, o);
             }
 

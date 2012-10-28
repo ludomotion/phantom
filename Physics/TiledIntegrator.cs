@@ -95,6 +95,9 @@ namespace Phantom.Physics
         protected override void CheckEntityCollision(int index)
         {
             Entity e = this.entities[index];
+            if (e.Shape == null)
+                return;
+
             TilePosition tp = this.positions[e];
             Tile t = tp.Tile;
             int minX = Math.Max(t.X - 1, 0);
@@ -112,7 +115,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (e != o)
+                        if (e != o &&  !o.Destroyed && o.Shape != null )
                             this.CheckCollisionBetween(e, o);
                     }
                 }
