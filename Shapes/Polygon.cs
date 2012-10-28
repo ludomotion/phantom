@@ -133,10 +133,14 @@ namespace Phantom.Shapes
         {
             //TODO: Needs to take orientation into account
             Vector2 delta = position - this.Entity.Position;
-            Vector2 normal = delta;
-            normal.Normalize();
-            Projection proj = this.Project(normal, Vector2.Zero);
-            return (delta.LengthSquared() < proj.Max * proj.Max);
+
+            for (int i = 0; i < this.normals.Length; i++)
+            {
+                float dot = Vector2.Dot(this.normals[i], delta);
+                if (dot < this.projections[i].Min || dot > this.projections[i].Max)
+                    return false;
+            }
+            return true;
         }
 
     }
