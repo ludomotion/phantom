@@ -154,14 +154,43 @@ namespace Phantom.Core
                 this.components[i].Render(info);
         }
 
-        public virtual bool GetProperty<T>(string name, ref T result )
+        public virtual bool GetProperty(string name, ref object result )
         {
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
-                if (this.components[i].GetProperty<T>(name, ref result))
+                if (this.components[i].GetProperty(name, ref result))
                     return true;
             return false;
         }
+
+        public virtual bool GetBoolean(string name, ref bool result)
+        {
+            int count = this.components.Count;
+            for (int i = 0; i < count; i++)
+                if (this.components[i].GetBoolean(name, ref result))
+                    return true;
+            return false;
+        }
+
+        public virtual bool GetFloat(string name, ref float result)
+        {
+            int count = this.components.Count;
+            for (int i = 0; i < count; i++)
+                if (this.components[i].GetFloat(name, ref result))
+                    return true;
+            return false;
+        }
+
+        public virtual bool GetString(string name, ref string result)
+        {
+            int count = this.components.Count;
+            for (int i = 0; i < count; i++)
+                if (this.components[i].GetString(name, ref result))
+                    return true;
+            return false;
+        }
+        
+
 
         public IList<T> GetAllComponentsByType<T>() where T : Component
         {
