@@ -53,6 +53,12 @@ namespace Phantom.Shapes
             return this.Entity.Position + delta;
         }
 
+        public override bool PositionInShape(Vector2 position)
+        {
+            Vector2 delta = position - this.Entity.Position;
+            return (delta.LengthSquared() < this.Radius * this.Radius);
+        }
+
 
     }
 }

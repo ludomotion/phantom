@@ -5,6 +5,7 @@ using System.Text;
 using Phantom.Graphics;
 using Phantom.Shapes;
 using Phantom.Physics;
+using Microsoft.Xna.Framework;
 
 namespace Phantom.Core
 {
@@ -54,6 +55,11 @@ namespace Phantom.Core
             this.renderer.ClearComponents();
             this.AddComponent(this.renderer);
             this.AddComponent(this.integrator);
+        }
+
+        public Entity GetEntityAt(Vector2 position)
+        {
+            return integrator.GetEntityAt(position);
         }
     }
 }

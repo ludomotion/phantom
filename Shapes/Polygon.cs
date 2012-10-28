@@ -121,11 +121,23 @@ namespace Phantom.Shapes
 
         public override Vector2 ClosestPointTo(Vector2 point)
         {
+            //TODO: Needs to take orientation into account
             Vector2 delta = point - this.Entity.Position;
             delta.Normalize();
             Projection proj = this.Project(delta, Vector2.Zero);
             delta *= proj.Max;
             return this.Entity.Position + delta;
         }
+
+        public override bool PositionInShape(Vector2 position)
+        {
+            //TODO: Needs to take orientation into account
+            Vector2 delta = position - this.Entity.Position;
+            Vector2 normal = delta;
+            normal.Normalize();
+            Projection proj = this.Project(normal, Vector2.Zero);
+            return (delta.LengthSquared() < proj.Max * proj.Max);
+        }
+
     }
 }

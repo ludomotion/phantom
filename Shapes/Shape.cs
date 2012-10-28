@@ -26,5 +26,10 @@ namespace Phantom.Shapes
         {
             throw new NotImplementedException();
         }
+
+        public virtual bool PositionInShape(Vector2 position)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

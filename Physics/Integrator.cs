@@ -128,5 +128,13 @@ namespace Phantom.Physics
         {
             this.entities.Clear();
         }
+
+        public virtual Entity GetEntityAt(Vector2 position)
+        {
+            for (int i = 0; i < entities.Count; i++)
+                if (entities[i].Shape != null && entities[i].Shape.PositionInShape(position))
+                    return entities[i];
+            return null;
+        }
     }
 }
