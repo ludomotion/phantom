@@ -39,9 +39,20 @@ namespace Phantom.Shapes
         {
             return other.Accept<CollisionData, Circle>(visitor, this);
         }
+
         public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
         {
             return visitor.Visit(this, data);
         }
+
+        public override Vector2 ClosestPointTo(Vector2 point)
+        {
+            Vector2 delta = point - this.Entity.Position;
+            delta.Normalize();
+            delta *= this.Radius;
+            return this.Entity.Position + delta;
+        }
+
+
     }
 }

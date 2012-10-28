@@ -118,5 +118,14 @@ namespace Phantom.Shapes
         {
             return visitor.Visit(this, data);
         }
+
+        public override Vector2 ClosestPointTo(Vector2 point)
+        {
+            Vector2 delta = point - this.Entity.Position;
+            delta.Normalize();
+            Projection proj = this.Project(delta, Vector2.Zero);
+            delta *= proj.Max;
+            return this.Entity.Position + delta;
+        }
     }
 }

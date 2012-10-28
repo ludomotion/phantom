@@ -21,5 +21,10 @@ namespace Phantom.Shapes
         {
             this.Entity = stub;
         }
+
+        public virtual Vector2 ClosestPointTo(Vector2 point)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
