@@ -46,6 +46,9 @@ namespace Phantom.Graphics.Components
             vertex.SetData<VertexPositionColor>(this.vertices);
         }
 
+        public Background(Color color)
+            : this(color, color, color) { }
+
         public override void Render(RenderInfo info)
         {
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
