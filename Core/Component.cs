@@ -140,11 +140,17 @@ namespace Phantom.Core
 
         public virtual bool CanCollideWith( Component other )
         {
+            for (int i = 0; i < this.components.Count; i++ )
+                if (!this.components[i].CanCollideWith(other))
+                    return false;
             return true;
         }
 
         public virtual void AfterCollisionWith(Component other)
         {
+            for (int i = 0; i < this.components.Count; i++)
+                this.components[i].AfterCollisionWith(other);
+                
         }
 
         public virtual void Render( RenderInfo info )
