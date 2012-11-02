@@ -29,10 +29,29 @@ namespace Phantom.Shapes
             this.Radius = radius;
         }
 
+        public override void Scale(float scalar)
+        {
+            this.Radius *= scalar;
+        }
+
         internal Polygon.Projection Project(Vector2 normal, Vector2 delta)
         {
             float dot = Vector2.Dot(normal, delta);
             return new Polygon.Projection(dot - this.Radius, dot + this.Radius);
+        }
+
+        public override Vector2 ClosestPointTo(Vector2 point)
+        {
+            Vector2 delta = point - this.Entity.Position;
+            delta.Normalize();
+            delta *= this.Radius;
+            return this.Entity.Position + delta;
+        }
+
+        public override bool InShape(Vector2 position)
+        {
+            Vector2 delta = position - this.Entity.Position;
+            return (delta.LengthSquared() < this.Radius * this.Radius);
         }
 
         public override CollisionData Collide(Shape other)
@@ -44,21 +63,6 @@ namespace Phantom.Shapes
         {
             return visitor.Visit(this, data);
         }
-
-        public override Vector2 ClosestPointTo(Vector2 point)
-        {
-            Vector2 delta = point - this.Entity.Position;
-            delta.Normalize();
-            delta *= this.Radius;
-            return this.Entity.Position + delta;
-        }
-
-        public override bool PositionInShape(Vector2 position)
-        {
-            Vector2 delta = position - this.Entity.Position;
-            return (delta.LengthSquared() < this.Radius * this.Radius);
-        }
-
 
     }
 }

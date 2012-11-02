@@ -22,14 +22,10 @@ namespace Phantom.Shapes
             this.Entity = stub;
         }
 
-        public virtual Vector2 ClosestPointTo(Vector2 point)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void Scale(float scalar);
 
-        public virtual bool PositionInShape(Vector2 position)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Vector2 ClosestPointTo(Vector2 point);
+
+        public abstract bool InShape(Vector2 position);
     }
 }

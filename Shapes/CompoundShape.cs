@@ -11,9 +11,9 @@ namespace Phantom.Shapes
 {
     public class CompoundShape : Shape
     {
-        private struct Container
+        private class Container
         {
-            public readonly Vector2 Offset;
+            public Vector2 Offset;
             public readonly Shape Shape;
             public Container(Vector2 offset, Shape shape)
             {
@@ -61,6 +61,42 @@ namespace Phantom.Shapes
             roughRadius = 0;
             for (int i = 0; i < this.shapes.Count; i++)
                 roughRadius = Math.Max(roughRadius, (this.shapes[i].Offset.Length() + this.shapes[i].Shape.RoughRadius));
+        }
+
+        public override void Scale(float scalar)
+        {
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                this.shapes[i].Offset *= scalar;
+                this.shapes[i].Shape.Scale(scalar);
+            }
+        }
+
+        public override Vector2 ClosestPointTo(Vector2 point)
+        {
+            Vector2 closest = Vector2.Zero;
+            float dist = float.MaxValue;
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                Vector2 p = this.shapes[i].Shape.ClosestPointTo(point + this.shapes[i].Offset);
+                float d = p.LengthSquared();
+                if (d < dist)
+                {
+                    closest = p;
+                    dist = d;
+                }
+            }
+            return closest;
+        }
+
+        public override bool InShape(Vector2 position)
+        {
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                if (this.shapes[i].Shape.InShape(position + this.shapes[i].Offset))
+                    return true;
+            }
+            return false;
         }
 
         public override CollisionData Collide(Shape other)

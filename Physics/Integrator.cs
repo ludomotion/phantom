@@ -132,7 +132,7 @@ namespace Phantom.Physics
         public virtual Entity GetEntityAt(Vector2 position)
         {
             for (int i = 0; i < entities.Count; i++)
-                if (entities[i].Shape != null && entities[i].Shape.PositionInShape(position))
+                if (entities[i].Shape != null && entities[i].Shape.InShape(position))
                     return entities[i];
             return null;
         }

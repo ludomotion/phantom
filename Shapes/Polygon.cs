@@ -50,6 +50,7 @@ namespace Phantom.Shapes
             this.RotationCache = new Vector2[this.Vertices.Length];
 
             this.normals = new Vector2[this.Vertices.Length];
+
             for (int i = 0; i < this.Vertices.Length; i++)
             {
                 Vector2 delta = this.Vertices[(i + 1) % this.Vertices.Length] - this.Vertices[i];
@@ -58,7 +59,7 @@ namespace Phantom.Shapes
 
             // Remove duplicates:
             int removed = 0;
-            for (int i = this.normals.Length-1; i >= 0; i--)
+            for (int i = this.normals.Length - 1; i >= 0; i--)
             {
                 for (int j = 0; j < i; j++)
                 {
@@ -109,14 +110,16 @@ namespace Phantom.Shapes
             return new Projection(min, max);
         }
 
-        public override CollisionData Collide(Shape other)
+        public override void Scale(float scalar)
         {
-            return other.Accept<CollisionData, Polygon>(visitor, this);
-        }
-
-        public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
-        {
-            return visitor.Visit(this, data);
+            this.cachedAngle = 0;
+            for (int j = 0; j < this.Vertices.Length; j++)
+                this.Vertices[j] *= scalar;
+            for (int j = 0; j < this.projections.Length; j++)
+            {
+                this.projections[j].Max *= scalar;
+                this.projections[j].Min *= scalar;
+            }
         }
 
         public override Vector2 ClosestPointTo(Vector2 point)
@@ -129,7 +132,7 @@ namespace Phantom.Shapes
             return this.Entity.Position + delta;
         }
 
-        public override bool PositionInShape(Vector2 position)
+        public override bool InShape(Vector2 position)
         {
             //TODO: Needs to take orientation into account
             Vector2 delta = position - this.Entity.Position;
@@ -143,5 +146,14 @@ namespace Phantom.Shapes
             return true;
         }
 
+        public override CollisionData Collide(Shape other)
+        {
+            return other.Accept<CollisionData, Polygon>(visitor, this);
+        }
+
+        public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
+        {
+            return visitor.Visit(this, data);
+        }
     }
 }
