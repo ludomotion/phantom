@@ -25,8 +25,8 @@ namespace Phantom
 
         public string Name { get; protected set; }
         public Color BackgroundColor { get; protected set; }
-        public bool Paused { get; set; }
 
+        public bool Paused { get; set; }
         public float TotalTime { get; private set; }
 
         public readonly float Width;
@@ -47,6 +47,15 @@ namespace Phantom
         private float multiplier;
 
         private IList<GameState> states;
+        public GameState CurrentState
+        {
+            get
+            {
+                if (this.states.Count < 1)
+                    return null;
+                return this.states[this.states.Count - 1];
+            }
+        }
 
         public PhantomGame( float width, float height )
         {
@@ -66,7 +75,9 @@ namespace Phantom
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
+#if !XBOX
             this.Name = Assembly.GetEntryAssembly().FullName;
+#endif
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
 

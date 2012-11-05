@@ -28,6 +28,7 @@ namespace Phantom.Misc
         private static string WELCOME = " enter command here - type `help' for information";
         private static string HELP = @"no help yet, survive by your self for now...";
 
+#if !XBOX
         /**
          * Needed to receive debug output. (from `Debug.WriteLine' etc)
          */
@@ -48,6 +49,7 @@ namespace Phantom.Misc
                 this.console.WriteLine(message);
             }
         }
+#endif // !XBOX
 
         public bool Visible;
 
@@ -66,7 +68,9 @@ namespace Phantom.Misc
         private KeyboardState previousKeyboardState;
         private KeyMap keyMap;
 
+#if !XBOX
         private readonly KonsoulTraceListener listener;
+#endif
         private SpriteFont font;
         private SpriteBatch batch;
         private BasicEffect effect;
@@ -136,7 +140,9 @@ namespace Phantom.Misc
             }
 #endif // WINDOWS || LINUX || MONOMAC
 
+#if !XBOX
             Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
+#endif // !XBOX
             this.SetupVertices();
             this.SetupDefaultCommands();
             this.lines.Add("] Konsoul Initialized");
@@ -149,7 +155,10 @@ namespace Phantom.Misc
 
         public override void Dispose()
         {
-            Debug.Listeners.Remove(this.listener);
+#if !XBOX
+            Trace.Listeners.Remove(this.listener);
+#endif // !XBOX
+
 #if WINDOWS || LINUX || MONOMAC
             while (this.history.Count > 0 && this.history[this.history.Count - 1].Trim().ToLower() == "quit")
                 this.history.RemoveAt(this.history.Count - 1);
@@ -212,7 +221,11 @@ namespace Phantom.Misc
                     maxWidth = Math.Max(k.Length, maxWidth);
                 foreach (string k in this.commands.Keys)
                 {
+#if XBOX
+                    builder.Remove(0, builder.Length);
+#else
                     builder.Clear();
+#endif
                     builder.Append("  " + k);
                     for (int i = 0; i < maxWidth - k.Length; i++)
                         builder.Append(" ");
@@ -626,7 +639,11 @@ namespace Phantom.Misc
                     trimmed.RemoveAt(trimmed.Count - 1);
                 while (trimmed.Count > 0 && trimmed[0].Length == 0)
                     trimmed.RemoveAt(0);
+#if XBOX
+                documentation = string.Join("\n", trimmed.ToArray());
+#else
                 documentation = string.Join("\n", trimmed);
+#endif
                 this.documentation[name] = documentation;
             }
         }
@@ -647,12 +664,19 @@ namespace Phantom.Misc
             this.nolineBuffer += message;
             while (this.nolineBuffer.Contains("\n"))
             {
+#if XBOX
+                // TODO: Not tested.
+                int ix = this.nolineBuffer.IndexOf('\n');
+                this.lines.Add(this.nolineBuffer.Substring(0, ix));
+                this.nolineBuffer = this.nolineBuffer.Substring(ix);
+#else
                 string[] split = this.nolineBuffer.Split(new char[] { '\n' }, 2);
                 this.lines.Add(split[0]);
                 if (split.Length > 1)
                     this.nolineBuffer = split[1];
                 else
                     this.nolineBuffer = "";
+#endif
             }
         }
 

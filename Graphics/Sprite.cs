@@ -17,29 +17,29 @@ namespace Phantom.Graphics
         public readonly int Width;
         public readonly int Height;
         public readonly Vector2 Size;
+        public readonly Texture2D Texture;
         private readonly Vector2 halfSize;
-        private readonly Texture2D tex;
 
         private int horizontalFramesCount;
         private int verticalFramesCount;
 
-        public Sprite(Texture2D tex, int width, int height)
+        public Sprite(Texture2D texture, int width, int height)
         {
             this.Flipped = false;
 
-            this.tex = tex;
+            this.Texture = texture;
             if (width <= 0 || height <= 0)
             {
-                width = tex.Width;
-                height = tex.Height;
+                width = texture.Width;
+                height = texture.Height;
             }
             this.Width = width;
             this.Height = height;
             this.Size = new Vector2(width, height);
             this.halfSize = this.Size * .5f;
 
-            this.horizontalFramesCount = tex.Width / width;
-            this.verticalFramesCount = tex.Height / height;
+            this.horizontalFramesCount = texture.Width / width;
+            this.verticalFramesCount = texture.Height / height;
 
             this.FrameCount = this.horizontalFramesCount * this.verticalFramesCount;
         }
@@ -63,7 +63,7 @@ namespace Phantom.Graphics
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = GetRectByFrame(frame);
-            info.Batch.Draw(this.tex, position, source, color, angle, halfSize, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            info.Batch.Draw(this.Texture, position, source, color, angle, halfSize, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
