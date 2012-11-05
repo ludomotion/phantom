@@ -122,6 +122,7 @@
     <Compile Include="PhantomGame.cs" />
     <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
     <Compile Include="Physics\Components\Gravity.cs" />
+    <Compile Include="Physics\Components\PushAwayFromBoundaries.cs" />
     <Compile Include="Physics\Components\Rotator.cs" />
     <Compile Include="Physics\Integrator.cs" />
     <Compile Include="Physics\TiledIntegrator.cs" />

@@ -55,7 +55,7 @@ namespace Phantom
 #if DEBUG
             if (width <= 0 || height <= 0)
             {
-                throw new Exception("Please create a PhantomGame with a sensable size (width >= 10 || height >= 10).");
+                throw new Exception("Please create a PhantomGame with a sensable size (width >= 0 || height >= 0).");
             }
 #endif
             this.Width = (float)Math.Floor(width);

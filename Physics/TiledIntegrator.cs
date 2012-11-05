@@ -39,13 +39,13 @@ namespace Phantom.Physics
 
         private Dictionary<Entity, TilePosition> positions;
 
-        private int tileSize;
+        private float tileSize;
         private Tile[] tiles;
         private int tilesX;
         private int tilesY;
         private int tileCount;
 
-        public TiledIntegrator(int physicsExecutionCount, int tileSize)
+        public TiledIntegrator(int physicsExecutionCount, float tileSize)
             :base(physicsExecutionCount)
         {
             this.tileSize = tileSize;

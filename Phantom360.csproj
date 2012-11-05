@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{8a9e8bba-423d-4ff0-b131-f3a2353fd631}</ProjectGuid>
+    <ProjectGuid>{8A9E8BBA-423D-4FF0-B131-F3A2353FD631}</ProjectGuid>
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">Xbox 360</Platform>
@@ -79,6 +79,7 @@
     <Compile Include="PhantomGame.cs" />
     <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
     <Compile Include="Physics\Components\Gravity.cs" />
+    <Compile Include="Physics\Components\PushAwayFromBoundaries.cs" />
     <Compile Include="Physics\Components\Rotator.cs" />
     <Compile Include="Physics\Integrator.cs" />
     <Compile Include="Physics\TiledIntegrator.cs" />
