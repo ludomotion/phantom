@@ -40,6 +40,7 @@ namespace Phantom.Physics
         private Dictionary<Entity, TilePosition> positions;
 
         private float tileSize;
+        public float TileSize { get { return tileSize; } set { } }
         private Tile[] tiles;
         private int tilesX;
         private int tilesY;

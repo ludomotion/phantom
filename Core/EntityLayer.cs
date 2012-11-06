@@ -11,8 +11,8 @@ namespace Phantom.Core
 {
     public class EntityLayer : Layer
     {
-        private Renderer renderer;
-        private Integrator integrator;
+        protected Renderer renderer;
+        protected Integrator integrator;
 
         public EntityLayer(float width, float height, Renderer renderer, Integrator integrator)
             :base(width, height)
