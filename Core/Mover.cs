@@ -74,7 +74,8 @@ namespace Phantom.Core
             if (other.Mover == null)
                 return;
             Vector2 n = this.Entity.Position - other.Position;
-            n.Normalize();
+            if( n.LengthSquared() > 0 )
+                n.Normalize();
             float a1 = Vector2.Dot(this.Velocity, n);
             float a2 = Vector2.Dot(other.Mover.Velocity, n);
             float optimusP = (2f * (a1 - a2)) / (this.Entity.Mass + other.Mass);
