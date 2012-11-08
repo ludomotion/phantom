@@ -91,5 +91,15 @@ namespace Phantom.Core
         {
             return this.CurrentKeyboardState.IsKeyUp(key) && this.PreviousKeyboardState.IsKeyDown(key);
         }
+
+        public GamePadState GetCurrentState(PlayerIndex index)
+        {
+            return this.CurrentGamePadStates[(int)index];
+        }
+
+        public KeyboardState GetCurrentState()
+        {
+            return this.CurrentKeyboardState;
+        }
     }
 }
