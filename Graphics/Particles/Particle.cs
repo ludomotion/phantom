@@ -34,7 +34,7 @@ namespace Phantom.Graphics.Particles
         public virtual void Deactivate()
         {
             this.Active = false;
-            this.Life = this.Living = 0;
+            this.Life = this.Living = -1;
         }
 
         public virtual void Integrate(float elapsed)
@@ -50,11 +50,12 @@ namespace Phantom.Graphics.Particles
 
         public virtual void Render(RenderInfo info, Sprite sprite)
         {
-            this.Scale = .1f * Math.Min(1, this.Life * 5);
-            this.Alpha = 1.0f * Math.Min(1, this.Life * 5);
+            //this.Scale = .1f * Math.Min(1, this.Life * 5);
+            //this.Alpha = 1.0f * Math.Min(1, this.Life * 5);
+            
             this.PreRender();
 
-            sprite.RenderFrame(info, this.Frame, this.Position, 0, this.Scale, this.Color, this.Alpha);
+            sprite.RenderFrame(info, this.Frame, this.Position, 0, this.Scale / sprite.Width, this.Color, this.Alpha);
         }
     }
 }
