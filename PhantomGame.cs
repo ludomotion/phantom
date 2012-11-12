@@ -220,6 +220,26 @@ namespace Phantom
             Trace.WriteLine(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
         }
 
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            MessageResult result;
+            MessageResult finalResult = MessageResult.IGNORED;
+            for (int i = 0; i < this.states.Count; i++)
+            {
+                result = this.states[i].HandleMessage(message, data);
+                if (result == MessageResult.CONSUMED)
+                    return result;
+                if (result == MessageResult.HANDLED)
+                    finalResult = result;
+            }
+            result = base.HandleMessage(message, data);
+            if (result == MessageResult.CONSUMED)
+                return result;
+            if (result == MessageResult.HANDLED)
+                finalResult = result;
+            return finalResult;
+        }
+
         public void PushState( GameState state )
         {
             if (state != null)
@@ -238,6 +258,8 @@ namespace Phantom
                 this.states.RemoveAt(this.states.Count - 1);
                 removed.OnRemove();
             }
+            if (this.states.Count > 0)
+                this.CurrentState.BackOnTop();
         }
 
         public void PopAndPushState( GameState state )
