@@ -35,7 +35,7 @@ namespace Phantom.Graphics.Particles
         public override void Update(float elapsed)
         {
             LinkedListNode<Particle> node = this.particles.First;
-            while( node != null )
+            while (node != null)
             {
                 LinkedListNode<Particle> next = node.Next;
                 Particle p = node.Value;
@@ -46,7 +46,6 @@ namespace Phantom.Graphics.Particles
                     {
                         this.Bury(p);
                         this.particles.Remove(node);
-                        continue;
                     }
                 }
                 node = next;
