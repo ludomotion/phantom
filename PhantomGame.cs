@@ -56,6 +56,13 @@ namespace Phantom
                 return this.states[this.states.Count - 1];
             }
         }
+        public int StateCount
+        {
+            get
+            {
+                return this.states.Count;
+            }
+        }
 
         public PhantomGame( float width, float height )
         {
