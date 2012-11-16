@@ -30,5 +30,10 @@ namespace Phantom.Shapes
         {
             return visitor.Visit(this, data);
         }
+
+        public override string ToString()
+        {
+            return "OABB(" + this.HalfSize + ")";
+        }
     }
 }

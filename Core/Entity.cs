@@ -79,5 +79,11 @@ namespace Phantom.Core
             base.OnComponentRemoved(component);
         }
 
+        public override string ToString()
+        {
+            if (this.shape != null)
+                return base.ToString() + " " + this.shape.ToString();
+            return base.ToString();
+        }
     }
 }

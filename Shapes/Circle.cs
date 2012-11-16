@@ -70,5 +70,9 @@ namespace Phantom.Shapes
             return visitor.Visit(this, data);
         }
 
+        public override string ToString()
+        {
+            return "Circle("+this.Radius+")";
+        }
     }
 }

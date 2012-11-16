@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Graphics;
+using Phantom.Physics;
 
 namespace Phantom.Core
 {
@@ -146,10 +147,10 @@ namespace Phantom.Core
             return true;
         }
 
-        public virtual void AfterCollisionWith(Component other)
+        public virtual void AfterCollisionWith(Component other, CollisionData collision)
         {
             for (int i = 0; i < this.components.Count; i++)
-                this.components[i].AfterCollisionWith(other);
+                this.components[i].AfterCollisionWith(other, collision);
                 
         }
 
