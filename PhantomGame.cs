@@ -18,7 +18,7 @@ namespace Phantom
         public static PhantomGame Game { get; private set; }
 
 #if DEBUG
-        public readonly static Random Randy  = new Random(DateTime.Now.DayOfYear);
+        public static Random Randy  = new Random(DateTime.Now.DayOfYear);
 #else
         public readonly static Random Randy = new Random();
 #endif
@@ -165,10 +165,8 @@ namespace Phantom
             {
                 bool propagate = this.states[i].Propagate;
                 this.states[i].Update(elapsed);
-                if (!propagate)
+                if (!propagate || this.Paused)
                     break;
-                if (this.Paused)
-                    return;
             }
         }
 
