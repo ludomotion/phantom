@@ -161,7 +161,7 @@ namespace Phantom
             this.TotalTime += elapsed;
 
             this.Update(elapsed);
-            for (int i = this.states.Count - 1; i >= 0; i--)
+            for (int i = this.states.Count - 1; i >= 0 && i < this.states.Count; i--)
             {
                 bool propagate = this.states[i].Propagate;
                 this.states[i].Update(elapsed);
