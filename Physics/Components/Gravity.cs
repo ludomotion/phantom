@@ -23,7 +23,7 @@ namespace Phantom.Physics.Components
 
         public override void Integrate(float elapsed)
         {
-            this.Entity.Mover.Acceleration += this.force * elapsed;
+            this.Entity.Mover.Velocity += this.force * elapsed;
             base.Integrate(elapsed);
         }
     }
