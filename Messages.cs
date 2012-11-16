@@ -10,6 +10,7 @@ namespace Phantom
         public const int Action = 1;
 
         public const int MoverImpulse = 10;
+        public const int MoverForce = 11;
 
         public const int InputKeyJustDown = 20;
         public const int InputButtonJustDown = 21;

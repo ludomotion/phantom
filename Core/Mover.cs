@@ -51,6 +51,14 @@ namespace Phantom.Core
                     else if (data is int && this.Entity != null)
                         this.Velocity += this.Entity.Direction * (int)data;
                     return MessageResult.HANDLED;
+                case Messages.MoverForce:
+                    if (data is Vector2)
+                        this.Acceleration += (Vector2)data;
+                    else if (data is float && this.Entity != null)
+                        this.Acceleration += this.Entity.Direction * (float)data;
+                    else if (data is int && this.Entity != null)
+                        this.Acceleration += this.Entity.Direction * (int)data;
+                    return MessageResult.HANDLED;
             }
             return base.HandleMessage(message, data);
         }
