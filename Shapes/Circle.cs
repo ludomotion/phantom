@@ -20,7 +20,13 @@ namespace Phantom.Shapes
                 return this.Radius;
             }
         }
-
+        public override float RoughWidth
+        {
+            get
+            {
+                return this.Radius * 2;
+            }
+        }
 
         public float Radius { get; protected set; }
 

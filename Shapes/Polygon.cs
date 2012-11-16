@@ -30,8 +30,14 @@ namespace Phantom.Shapes
             get { return this.roughRadius; }
         }
 
+        public override float RoughWidth
+        {
+            get { return this.roughWidth; }
+        }
+
         public readonly Vector2[] Vertices;
-        private float roughRadius;
+        protected float roughRadius;
+        protected float roughWidth;
 
         private Vector2[] RotationCache;
         private float cachedAngle;
@@ -43,9 +49,17 @@ namespace Phantom.Shapes
         {
             this.Vertices = vertices;
             this.roughRadius = 0;
+            float xmin = float.MaxValue, xmax = float.MinValue;
             for (int i = 0; i < this.Vertices.Length; i++)
+            {
                 if (this.Vertices[i].LengthSquared() > this.roughRadius)
+                {
                     this.roughRadius = this.Vertices[i].LengthSquared();
+                }
+                xmin = Math.Min(this.Vertices[i].X, xmin);
+                xmax = Math.Max(this.Vertices[i].X, xmax);
+            }
+            this.roughWidth = Math.Abs(xmin - xmax);
             this.roughRadius = (float)Math.Sqrt(this.roughRadius);
             this.RotationCache = new Vector2[this.Vertices.Length];
 

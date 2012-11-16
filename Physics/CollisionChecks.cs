@@ -43,7 +43,7 @@ namespace Phantom.Physics
                 inter1 = b.projections[i].Max - proj.Min;
                 inter2 = -(b.projections[i].Min - proj.Max);
 
-#if DEBUG
+#if DEBUG && SATDEBUG
                 Vector2 p = b.Entity.Position;
                 Integrator.line(p + Vector2.TransformNormal(b.normals[i], rotation) * proj.Min, p + Vector2.TransformNormal(b.normals[i], rotation) * proj.Max, Color.LimeGreen);
 #endif
@@ -83,7 +83,7 @@ namespace Phantom.Physics
             inter1 = self.Max - proj.Min;
             inter2 = -(self.Min - proj.Max);
 
-#if DEBUG
+#if DEBUG && SATDEBUG
             Vector2 p2 = a.Entity.Position;
             Integrator.line(p2 + Vector2.TransformNormal(normal, rotation) * proj.Min, p2 + Vector2.TransformNormal(normal, rotation) * proj.Max, Color.LimeGreen);
 #endif
@@ -102,7 +102,7 @@ namespace Phantom.Physics
                 result.Normal = -Vector2.TransformNormal(normal, rotation);
             }
 
-#if DEBUG
+#if DEBUG && SATDEBUG
             Vector2 pos = a.Entity.Position;
             Integrator.line(pos, pos + result.Normal * result.Interpenetration, Color.White);
 #endif
@@ -128,7 +128,7 @@ namespace Phantom.Physics
                 inter1 = a.projections[i].Max - proj.Min;
                 inter2 = -(a.projections[i].Min - proj.Max);
 
-#if DEBUG
+#if DEBUG && SATDEBUG
                 Vector2 p = a.Entity.Position;
                 Matrix r = Matrix.CreateRotationZ(a.Entity.Orientation);
                 Integrator.line(p + Vector2.TransformNormal(a.normals[i], r) * proj.Min, p + Vector2.TransformNormal(a.normals[i], r) * proj.Max, Color.HotPink);
@@ -162,7 +162,7 @@ namespace Phantom.Physics
                 inter1 = b.projections[i].Max - proj.Min;
                 inter2 = -(b.projections[i].Min - proj.Max);
 
-#if DEBUG
+#if DEBUG && SATDEBUG
                 Vector2 p = b.Entity.Position;
                 Matrix r = Matrix.CreateRotationZ(b.Entity.Orientation);
                 Integrator.line(p + Vector2.TransformNormal(b.normals[i], r) * proj.Min, p + Vector2.TransformNormal(b.normals[i], r) * proj.Max, Color.LimeGreen);
@@ -207,7 +207,7 @@ namespace Phantom.Physics
             }
             result.Position = lookingAt.Entity.Position + guess;
 
-#if DEBUG
+#if DEBUG && SATDEBUG
             Vector2 pos = result.Position;
             Integrator.line(pos, pos + result.Normal * result.Interpenetration * 10, Color.White);
 #endif

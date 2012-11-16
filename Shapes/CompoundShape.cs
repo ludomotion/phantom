@@ -25,8 +25,13 @@ namespace Phantom.Shapes
         {
             get { return this.roughRadius; }
         }
+        public override float RoughWidth
+        {
+            get { return this.roughWidth; }
+        }
 
         private float roughRadius;
+        private float roughWidth;
 
         private List<Container> shapes;
         private List<CollisionData> results;
@@ -59,8 +64,12 @@ namespace Phantom.Shapes
         private void UpdateRoughRadius()
         {
             roughRadius = 0;
+            roughWidth = 0;
             for (int i = 0; i < this.shapes.Count; i++)
+            {
                 roughRadius = Math.Max(roughRadius, (this.shapes[i].Offset.Length() + this.shapes[i].Shape.RoughRadius));
+                roughWidth = Math.Max(roughWidth, this.shapes[i].Shape.RoughWidth);
+            }
         }
 
         public override void Scale(float scalar)

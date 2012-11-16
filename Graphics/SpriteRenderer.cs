@@ -71,7 +71,7 @@ namespace Phantom.Graphics
                 float scale = this.scale;
                 if (this.Entity.Shape != null)
                 {
-                    scale = (this.Entity.Shape.RoughRadius * 2) / Math.Min(this.sprite.Width, this.sprite.Height) * this.scale;
+                    scale = this.Entity.Shape.RoughWidth / Math.Min(this.sprite.Width, this.sprite.Height) * this.scale;
                 }
                 this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position, this.Entity.Orientation, scale);
             }

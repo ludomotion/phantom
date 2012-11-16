@@ -10,7 +10,7 @@ namespace Phantom.Physics
 {
     public class Integrator : Component
     {
-#if DEBUG
+#if DEBUG && SATDEBUG
         static List<VertexPositionColor> debug = new List<VertexPositionColor>();
         public static void line(Vector2 a, Vector2 b, Color c)
         {
@@ -94,7 +94,7 @@ namespace Phantom.Physics
             }
         }
 
-#if DEBUG
+#if DEBUG && SATDEBUG
         public override void Render(Graphics.RenderInfo info)
         {
             Canvas c = info.Canvas;
