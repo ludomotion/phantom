@@ -138,12 +138,15 @@ namespace Phantom.Shapes
 
         public override Vector2 ClosestPointTo(Vector2 point)
         {
-            //TODO: Needs to take orientation into account
-            Vector2 delta = point - this.Entity.Position;
-            delta.Normalize();
-            Projection proj = this.Project(delta, Vector2.Zero);
-            delta *= proj.Max;
-            return this.Entity.Position + delta;
+            //TODO: Needs to take orientation into account, and it doesn't work properly
+            Vector2 intersection = new Vector2();
+            for (int i = 0; i < this.Vertices.Length; i++)
+            {
+                if (MathUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point - this.Entity.Position, Vector2.Zero, ref intersection))
+                    return intersection + this.Entity.Position;
+            }
+
+            return this.Entity.Position;
         }
 
         public override bool InShape(Vector2 position)
