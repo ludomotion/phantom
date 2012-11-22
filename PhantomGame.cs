@@ -253,10 +253,12 @@ namespace Phantom
                 state.OnAdd(this);
                 state.BackOnTop();
             }
+            Debug.WriteLine("Pushed state: " + this.CurrentState + " (StateCount: " + this.StateCount + ")");
         }
 
         public void PopState()
         {
+            Debug.WriteLine("Popping state: " + this.CurrentState + " (StateCount: " + this.StateCount + ")");
             if (this.states.Count > 0)
             {
                 GameState removed = this.states[this.states.Count - 1];
@@ -264,11 +266,15 @@ namespace Phantom
                 removed.OnRemove();
             }
             if (this.states.Count > 0)
+            {
                 this.CurrentState.BackOnTop();
+                Debug.WriteLine(this.CurrentState + " is now on-top. (StateCount: " + this.StateCount + ")");
+            }
         }
 
         public void PopAndPushState( GameState state )
         {
+            Debug.WriteLine("Popping state: " + this.CurrentState + " and directly pushing " + state + " (StateCount: " + this.StateCount + ")");
             GameState removed = this.states[this.states.Count - 1];
             this.states.RemoveAt(this.states.Count - 1);
             this.states.Add(state);
@@ -279,6 +285,7 @@ namespace Phantom
 
         public void ClearAndPushState(GameState state)
         {
+            Debug.WriteLine("Clearing states and pushing " + state);
             for (int i = this.states.Count - 1; i >= 0; i--)
             {
                 this.states[i].OnRemove();

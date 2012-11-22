@@ -41,7 +41,7 @@ namespace Phantom.Graphics
                 info.Canvas.FillColor = this.fill;
                 info.Canvas.FillCircle(position, shape.Radius);
             }
-            if (this.stroke.A > 0)
+            if (this.stroke.A > 0 && this.thickness > 0)
             {
                 info.Canvas.StrokeColor = this.stroke;
                 info.Canvas.LineWidth = this.thickness;

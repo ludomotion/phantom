@@ -116,7 +116,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (e != o &&  !o.Destroyed && o.Shape != null )
+                        if (e != o &&  !o.Destroyed && o.Shape != null && e.GetHashCode() > o.GetHashCode())
                             this.CheckCollisionBetween(e, o);
                     }
                 }
