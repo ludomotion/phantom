@@ -51,6 +51,14 @@ namespace Phantom.Misc
             return (float)Math.Atan2(v.Y, v.X);
         }
 
+        public static Vector2 RotateBy(this Vector2 v, float angle)
+        {
+            Vector2 r = new Vector2();
+            r.X = (float)(Math.Cos(angle) * v.X - Math.Sin(angle) * v.Y);
+            r.Y = (float)(Math.Sin(angle) * v.X + Math.Cos(angle) * v.Y);
+            return r;
+        }
+
         public static Vector2 Flatten(this Vector3 self)
         {
             return new Vector2(self.X, self.Y);
