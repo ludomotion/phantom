@@ -291,9 +291,12 @@ namespace Phantom
                 this.states[i].OnRemove();
                 this.states.RemoveAt(i);
             }
-            this.PushState(state);
-            state.OnAdd(this);
-            state.BackOnTop();
+            if (state != null)
+            {
+                this.states.Add(state);
+                state.OnAdd(this);
+                state.BackOnTop();
+            }
         }
 
         public void PopStateUntil<T>()

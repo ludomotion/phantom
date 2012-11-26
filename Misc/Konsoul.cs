@@ -21,6 +21,8 @@ namespace Phantom.Misc
         public string Prompt = "] ";
         public Keys OpenKey = Keys.OemTilde;
         public float TransitionTime = .25f;
+        public int EchoLines = 4;
+        public TimeSpan EchoDuration = TimeSpan.FromSeconds(5);
     }
 
     public class Konsoul : Component
@@ -96,6 +98,8 @@ namespace Phantom.Misc
         private VertexBuffer cursorBuffer;
         private IndexBuffer backgroundIndex;
 
+        private Queue<Tuple<string, DateTime>> echoQueue;
+
         public Konsoul(SpriteFont font, KonsoulSettings settings)
         {
             this.Visible = false;
@@ -121,6 +125,8 @@ namespace Phantom.Misc
             this.commands = new Dictionary<string, ConsoleCommand>();
             this.documentation = new Dictionary<string, string>();
 
+            this.echoQueue = new Queue<Tuple<string, DateTime>>(this.settings.EchoLines);
+
 #if WINDOWS || LINUX || MONOMAC
             try
             {
@@ -136,7 +142,7 @@ namespace Phantom.Misc
             }
             catch (System.IO.IOException e)
             {
-                this.lines.Add("failed to load history: " + e.Message);
+                this.AddLines("failed to load history: " + e.Message);
             }
 #endif // WINDOWS || LINUX || MONOMAC
 
@@ -193,7 +199,7 @@ namespace Phantom.Misc
                     if (i != argv.Length - 1)
                         sb.Append(" ");
                 }
-                this.lines.Add(sb.ToString());
+                this.AddLines(sb.ToString());
             });
             this.Register("clear", "clear the scrollback of this terminal.", delegate(string[] argv)
             {
@@ -307,6 +313,10 @@ namespace Phantom.Misc
 
             KeyboardState current = Keyboard.GetState();
             KeyboardState previous = this.previousKeyboardState;
+
+            DateTime now = DateTime.Now;
+            while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Item2 > this.settings.EchoDuration)
+                this.echoQueue.Dequeue();
 
             // Open and close logics:
             if (!this.Visible)
@@ -517,29 +527,44 @@ namespace Phantom.Misc
                     }
                     catch (Exception e)
                     {
-                        this.lines.Add("error executing `" + command + "': " + e.Message);
+                        this.AddLines("error executing `" + command + "': " + e.Message);
                     }
 #endif // DEBUG
                 }
                 else
-                    this.lines.Add(command + ": command not found");
+                    this.AddLines(command + ": command not found");
             }
         }
 
         public override void Render(Graphics.RenderInfo info)
         {
+            float padding = this.settings.Padding;
+            Color color = this.settings.Color;
+            float lineSpace = this.font.LineSpacing;
+
             if (!this.Visible && this.transition <= 0)
+            {
+                if (this.echoQueue.Count > 0)
+                {
+                    float ey = padding;
+                    this.batch.Begin();
+                    foreach (Tuple<string, DateTime> echo in this.echoQueue)
+                    {
+                        this.batch.DrawString(this.font, echo.Item1, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
+                        this.batch.DrawString(this.font, echo.Item1, new Vector2(padding, ey), color);
+                        ey += lineSpace;
+                    }
+                    this.batch.End();
+                }
                 return;
+            }
 
             float transitionScale = Math.Max(0, this.transition / this.settings.TransitionTime);
             if (this.Visible) transitionScale = 1 - transitionScale;
 
             GraphicsDevice graphicsDevice = PhantomGame.Game.GraphicsDevice;
             Viewport resolution = PhantomGame.Game.Resolution;
-            float padding = this.settings.Padding;
-            float lineSpace = this.font.LineSpacing;
             float height = padding * 2 + lineSpace * (this.settings.LineCount + 1);
-            Color color = this.settings.Color;
 
             this.effect.World = Matrix.Identity;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
@@ -660,6 +685,20 @@ namespace Phantom.Misc
             }
         }
 
+        public void AddLines(params string[] lines)
+        {
+            this.lines.AddRange(lines);
+            for (int j = 0; j < lines.Length; ++j)
+            {
+                IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.settings.Padding * 2);
+                for (int i = 0; i < chunks.Count; i++)
+                    if( chunks[i].Trim().Length > 0 )
+                        this.echoQueue.Enqueue(Tuple.Create<string, DateTime>(chunks[i], DateTime.Now));
+            }
+            while (this.echoQueue.Count > this.settings.EchoLines)
+                this.echoQueue.Dequeue();
+        }
+
         private void WriteLine(string message)
         {
             if (this.nolineBuffer.Length > 0)
@@ -667,8 +706,7 @@ namespace Phantom.Misc
                 message = nolineBuffer + message;
                 nolineBuffer = "";
             }
-            
-            this.lines.AddRange(message.Split(new char[] {'\n'}));
+            this.AddLines(message.Split(new char[] { '\n' }));
         }
 
         private void Write(string message)
@@ -679,11 +717,11 @@ namespace Phantom.Misc
 #if XBOX
                 // TODO: Not tested.
                 int ix = this.nolineBuffer.IndexOf('\n');
-                this.lines.Add(this.nolineBuffer.Substring(0, ix));
+                this.AddLines(this.nolineBuffer.Substring(0, ix));
                 this.nolineBuffer = this.nolineBuffer.Substring(ix);
 #else
                 string[] split = this.nolineBuffer.Split(new char[] { '\n' }, 2);
-                this.lines.Add(split[0]);
+                this.AddLines(split[0]);
                 if (split.Length > 1)
                     this.nolineBuffer = split[1];
                 else
