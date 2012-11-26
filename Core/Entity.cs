@@ -9,9 +9,13 @@ namespace Phantom.Core
 {
     public class Entity : Component
     {
-        public Vector2 Position;
+        private static long nextID = 0;
 
+        public readonly long ID;
+        public Vector2 Position;
         public float Orientation;
+        public float Mass { get; protected set; }
+        public bool InitiateCollision;
 
         public Vector2 Direction
         {
@@ -36,16 +40,17 @@ namespace Phantom.Core
             }
         }
 
-        public float Mass { get; protected set; }
-
         private Mover mover;
         private Shape shape;
 
 
         public Entity(Vector2 position, float mass)
         {
+            this.ID = Entity.nextID++;
             this.Position = position;
+            this.Orientation = 0;
             this.Mass = mass;
+            this.InitiateCollision = true;
         }
 
         public Entity(Vector2 position)

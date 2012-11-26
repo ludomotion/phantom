@@ -10,6 +10,8 @@ namespace Phantom.Misc
     {
         /// <summary>
         /// Normalize a vector only if the length isn't zero. This makes sure a division by zero doesn't occure.
+        /// 
+        /// FIXME: This doens't seem to work...
         /// </summary>
         /// <param name="v">The vector to normalize.</param>
         public static Vector2 SafeNormalize(this Vector2 v)

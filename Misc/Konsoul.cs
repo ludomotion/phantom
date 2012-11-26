@@ -313,8 +313,15 @@ namespace Phantom.Misc
             {
                 if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
                 {
-                    this.transition = this.settings.TransitionTime;
-                    this.Visible = true;
+                    if (current.IsKeyDown(Keys.LeftShift))
+                    {
+                        this.Execute(this.history[this.history.Count-1]);
+                    }
+                    else
+                    {
+                        this.transition = this.settings.TransitionTime;
+                        this.Visible = true;
+                    }
                 }
                 this.previousKeyboardState = current;
                 base.Update(elapsed);
@@ -454,7 +461,7 @@ namespace Phantom.Misc
                     if (common == null)
                         common = command + ' ';
                     else
-                        common = MiscUtils.findOverlap(common, command);
+                        common = MiscUtils.FindOverlap(common, command);
                 }
 
                 // Found a common text:
@@ -479,29 +486,7 @@ namespace Phantom.Misc
                     if (!this.input.StartsWith(" "))
                         this.history.Add(line);
 
-                    string[] commands = line.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                    for (int i = 0; i < commands.Length; i++)
-                    {
-                        string[] argv = commands[i].Trim().Split();
-                        string command = argv[0].ToLower();
-                        if (this.commands.ContainsKey(command))
-                        {
-#if DEBUG
-                            this.commands[command](argv);
-#else
-                            try
-                            {
-                                this.commands[command](argv);
-                            }
-                            catch (Exception e)
-                            {
-                                this.lines.Add("error executing `"+command+"': " + e.Message);
-                            }
-#endif // DEBUG
-                        }
-                        else
-                            this.lines.Add(command + ": command not found");
-                    }
+                    this.Execute(line);
                 }
                 this.input = "";
                 this.cursor = 0;
@@ -512,6 +497,33 @@ namespace Phantom.Misc
                 this.blinkTimer = 0;
             this.previousKeyboardState = current;
             base.Update(elapsed);
+        }
+
+        private void Execute(string line)
+        {
+            string[] commands = line.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < commands.Length; i++)
+            {
+                string[] argv = commands[i].Trim().Split();
+                string command = argv[0].ToLower();
+                if (this.commands.ContainsKey(command))
+                {
+#if DEBUG
+                            this.commands[command](argv);
+#else
+                    try
+                    {
+                        this.commands[command](argv);
+                    }
+                    catch (Exception e)
+                    {
+                        this.lines.Add("error executing `" + command + "': " + e.Message);
+                    }
+#endif // DEBUG
+                }
+                else
+                    this.lines.Add(command + ": command not found");
+            }
         }
 
         public override void Render(Graphics.RenderInfo info)

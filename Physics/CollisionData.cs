@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Phantom.Core;
 
 namespace Phantom.Physics
 {
@@ -21,12 +22,16 @@ namespace Phantom.Physics
         public Vector2 Position;
         public Vector2 Normal;
         public float Interpenetration;
+        public Entity A;
+        public Entity B;
 
         public CollisionData(float interpenetration)
         {
             this.Position = Vector2.Zero;
             this.Normal = Vector2.Zero;
             this.Interpenetration = interpenetration;
+            this.A = null;
+            this.B = null;
         }
 
         public void Clear()
@@ -34,6 +39,8 @@ namespace Phantom.Physics
             this.Position = Vector2.Zero;
             this.Normal = Vector2.Zero;
             this.Interpenetration = float.NaN;
+            this.A = null;
+            this.B = null;
         }
 
         public void Invert()

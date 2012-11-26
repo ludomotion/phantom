@@ -68,11 +68,15 @@ namespace Phantom.Physics
 
         protected void CheckCollisionBetween(Entity a, Entity b)
         {
+            if (!a.InitiateCollision && !b.InitiateCollision)
+                return;
             if (!a.CanCollideWith(b) || !b.CanCollideWith(a))
                 return;
             CollisionData collision = a.Shape.Collide(b.Shape);
             if (collision.IsValid)
             {
+                collision.A = a;
+                collision.B = b;
                 a.AfterCollisionWith(b, collision);
                 b.AfterCollisionWith(a, collision);
                 if (a.Mover != null && b.Mover != null && b.Mass < a.Mass * 100 && a.Mass < b.Mass * 100)

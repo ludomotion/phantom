@@ -199,17 +199,15 @@ namespace Phantom.Core
         
 
 
-        public IList<T> GetAllComponentsByType<T>() where T : Component
+        public IEnumerable<T> GetAllComponentsByType<T>() where T : Component
         {
-            List<T> result = new List<T>();
             int count = this.Components.Count;
             for (int i = 0; i < count; i++)
             {
                 Component component = this.Components[i];
                 if (component is T)
-                    result.Add(component as T);
+                    yield return component as T;
             }
-            return result;
         }
 
         public T GetComponentByType<T>(int nth) where T : Component

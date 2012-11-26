@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\x86\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoStdLib>true</NoStdLib>
@@ -96,6 +96,7 @@
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="Messages.cs" />
+    <Compile Include="Misc\DebugLayer.cs" />
     <Compile Include="Misc\MathUtils.cs" />
     <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
