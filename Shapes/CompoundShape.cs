@@ -145,7 +145,12 @@ namespace Phantom.Shapes
                     results.Add(((CollisionData)(object)o));
             }
             if (results.Count == 0)
+            {
+                // TODO: Ugly codez...
+                if (default(OUT) is CollisionData)
+                    return (OUT)(object)CollisionData.Empty;
                 return default(OUT);
+            }
             CollisionData largest = new CollisionData(float.MinValue);
             for (int i = 0; i < results.Count; i++)
                 if (results[i].Interpenetration > largest.Interpenetration)

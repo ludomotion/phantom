@@ -124,7 +124,7 @@ namespace Phantom.Physics
             }
         }
         
-        /*
+        /*/
         public override void Render(Graphics.RenderInfo info)
         {
             base.Render(info);
@@ -151,7 +151,7 @@ namespace Phantom.Physics
                 }
             }
         }
-        */
+        //*/
 
         internal Tile GetTile(Vector2 position)
         {

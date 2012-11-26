@@ -16,6 +16,7 @@ namespace Phantom.Core
         public float Orientation;
         public float Mass { get; protected set; }
         public bool InitiateCollision;
+        public bool Collidable;
 
         public Vector2 Direction
         {
@@ -51,6 +52,7 @@ namespace Phantom.Core
             this.Orientation = 0;
             this.Mass = mass;
             this.InitiateCollision = true;
+            this.Collidable = true;
         }
 
         public Entity(Vector2 position)
@@ -84,10 +86,20 @@ namespace Phantom.Core
             base.OnComponentRemoved(component);
         }
 
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            if (message == Messages.SetPosition && data is Vector2)
+            {
+                this.Position = (Vector2)data;
+                return MessageResult.CONSUMED;
+            }
+            return base.HandleMessage(message, data);
+        }
+
         public override string ToString()
         {
             if (this.shape != null)
-                return base.ToString() + " " + this.shape.ToString();
+                return base.ToString() + "#" + this.ID + " (shape:" + this.shape.ToString() + ")";
             return base.ToString();
         }
     }

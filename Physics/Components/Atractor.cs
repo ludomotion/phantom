@@ -23,10 +23,6 @@ namespace Phantom.Physics.Components
         private Entity origin;
         private float scale;
 
-#if DEBUG
-        private Vector2 last;
-#endif
-
         public Atractor(FalloffType type, Entity origin, float scale)
         {
             this.type = type;
@@ -59,27 +55,12 @@ namespace Phantom.Physics.Components
                     break;
             }
 
-            
-#if DEBUG
-            this.last = delta.Normalized() * this.origin.Shape.RoughRadius * this.origin.Mass * factor * this.scale;
-            this.Entity.Mover.Acceleration += this.last;
-#else
-            this.Entity.Mover.Acceleration += delta.Normalized() * this.origin.Shape.RoughRadius * this.origin.Mass * factor * this.scale;
-#endif
+            Vector2 force = delta.Normalized() * this.origin.Shape.RoughRadius * this.origin.Mass * factor * this.scale;
+            this.DebugVector("atractor", force);
+            this.Entity.Mover.Acceleration += force;
+
             base.Integrate(elapsed);
         }
 
-#if DEBUG
-        public override void Render(Graphics.RenderInfo info)
-        {
-            if( info.Canvas != null )
-            {
-                info.Canvas.StrokeColor = Color.Yellow;
-                info.Canvas.LineWidth = 1f;
-                info.Canvas.StrokeLine(this.Entity.Position, this.Entity.Position + this.last);
-            }
-            base.Render(info);
-        }
-#endif
     }
 }

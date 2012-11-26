@@ -63,12 +63,12 @@ namespace Phantom.Core
             return base.HandleMessage(message, data);
         }
 
-        public void RespondToCollision(CollisionData collision, Entity other, float factor)
+        public virtual void RespondToCollision(CollisionData collision, Entity other, float factor)
         {
             this.Entity.Position -= factor * collision.Normal * collision.Interpenetration;
         }
 
-        public void Bounce(CollisionData collision, float factor)
+        public virtual void Bounce(CollisionData collision, float factor)
         {
             float dot = Vector2.Dot(collision.Normal, this.Velocity);
             if (dot < 0)
@@ -77,7 +77,7 @@ namespace Phantom.Core
             this.Velocity -= factor * dot * collision.Normal;
         }
 
-        public void TransferEnergy(Entity other)
+        public virtual void TransferEnergy(Entity other)
         {
             if (other.Mover == null)
                 return;

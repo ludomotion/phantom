@@ -79,21 +79,24 @@ namespace Phantom.Physics
                 collision.B = b;
                 a.AfterCollisionWith(b, collision);
                 b.AfterCollisionWith(a, collision);
-                if (a.Mover != null && b.Mover != null && b.Mass < a.Mass * 100 && a.Mass < b.Mass * 100)
+                if (a.Collidable && b.Collidable)
                 {
-                    b.Mover.RespondToCollision(collision, a, -.5f);
-                    a.Mover.RespondToCollision(collision, b, .5f);
-                    a.Mover.TransferEnergy(b);
-                }
-                else if (a.Mover != null && (b.Mover == null || a.Mass < b.Mass * 100))
-                {
-                    a.Mover.RespondToCollision(collision, b, 1f);
-                    a.Mover.Bounce(collision, 1);
-                }
-                else if (b.Mover != null && (a.Mover == null || b.Mass < a.Mass * 100))
-                {
-                    b.Mover.RespondToCollision(collision, a, -1f);
-                    b.Mover.Bounce(collision, -1);
+                    if (a.Mover != null && b.Mover != null && b.Mass < a.Mass * 100 && a.Mass < b.Mass * 100)
+                    {
+                        b.Mover.RespondToCollision(collision, a, -.5f);
+                        a.Mover.RespondToCollision(collision, b, .5f);
+                        a.Mover.TransferEnergy(b);
+                    }
+                    else if (a.Mover != null && (b.Mover == null || a.Mass < b.Mass * 100))
+                    {
+                        a.Mover.RespondToCollision(collision, b, 1f);
+                        a.Mover.Bounce(collision, 1);
+                    }
+                    else if (b.Mover != null && (a.Mover == null || b.Mass < a.Mass * 100))
+                    {
+                        b.Mover.RespondToCollision(collision, a, -1f);
+                        b.Mover.Bounce(collision, -1);
+                    }
                 }
             }
         }

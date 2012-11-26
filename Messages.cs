@@ -21,6 +21,8 @@ namespace Phantom
         public const int CameraFollowEntity = 32;
         public const int CameraStopFollowing = 33;
 
+        public const int SetPosition = 100;
+
         public const int Unknown = -1;
     }
 }
