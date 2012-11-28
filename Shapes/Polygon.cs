@@ -136,7 +136,7 @@ namespace Phantom.Shapes
             }
         }
 
-        public override Vector2 ClosestPointTo(Vector2 point)
+        public override Vector2 EdgeIntersection(Vector2 point)
         {
             //TODO: Needs to take orientation into account, and it doesn't work properly
             Vector2 intersection = new Vector2();
@@ -147,6 +147,26 @@ namespace Phantom.Shapes
             }
 
             return this.Entity.Position;
+        }
+
+        public override Vector2 ClosestPoint(Vector2 point)
+        {
+            //TODO: Needs to take orientation into account, and it doesn't work properly
+            point -= this.Entity.Position;
+            Vector2 closest = new Vector2();
+            float dist = float.MaxValue;
+            for (int i = 0; i < this.Vertices.Length; i++)
+            {
+                Vector2 v = MathUtils.ClosestPointOnLine(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point);
+                float d = (v-point).LengthSquared();
+                if (d < dist)
+                {
+                    closest = v;
+                    dist = d;
+                }
+            }
+
+            return closest + this.Entity.Position;
         }
 
         public override bool InShape(Vector2 position)
@@ -172,5 +192,23 @@ namespace Phantom.Shapes
         {
             return visitor.Visit(this, data);
         }
+
+        public override Vector2 ClosestVertice(Vector2 point)
+        {
+            if (this.Vertices.Length == 0) return this.Entity.Position;
+            Vector2 result = this.Vertices[0] + this.Entity.Position;
+            float dist = (this.Vertices[0] + this.Entity.Position - point).LengthSquared(); 
+            for (int i = 0; i < this.Vertices.Length; i++)
+            {
+                float d = (this.Vertices[i] + this.Entity.Position - point).LengthSquared();
+                if (d < dist)
+                {
+                    result = this.Vertices[i] + this.Entity.Position;
+                    dist = d;
+                }
+            }
+            return result;
+        }
+
     }
 }

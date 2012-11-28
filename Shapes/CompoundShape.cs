@@ -81,13 +81,30 @@ namespace Phantom.Shapes
             }
         }
 
-        public override Vector2 ClosestPointTo(Vector2 point)
+        public override Vector2 EdgeIntersection(Vector2 point)
+        {
+            Vector2 intersection = Vector2.Zero;
+            float dist = float.MaxValue;
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                Vector2 p = this.shapes[i].Shape.EdgeIntersection(point + this.shapes[i].Offset);
+                float d = p.LengthSquared();
+                if (d < dist)
+                {
+                    intersection = p;
+                    dist = d;
+                }
+            }
+            return intersection;
+        }
+
+        public override Vector2 ClosestPoint(Vector2 point)
         {
             Vector2 closest = Vector2.Zero;
             float dist = float.MaxValue;
             for (int i = 0; i < this.shapes.Count; i++)
             {
-                Vector2 p = this.shapes[i].Shape.ClosestPointTo(point + this.shapes[i].Offset);
+                Vector2 p = this.shapes[i].Shape.ClosestPoint(point + this.shapes[i].Offset);
                 float d = p.LengthSquared();
                 if (d < dist)
                 {
@@ -96,6 +113,23 @@ namespace Phantom.Shapes
                 }
             }
             return closest;
+        }
+
+        public override Vector2 ClosestVertice(Vector2 point)
+        {
+            Vector2 result = Vector2.Zero;
+            float dist = float.MaxValue;
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                Vector2 r = this.shapes[1].Shape.ClosestVertice(point + this.shapes[i].Offset);
+                float d = (point - r).LengthSquared();
+                if (d < dist)
+                {
+                    dist = d;
+                    result = r;
+                }
+            }
+            return result;
         }
 
         public override bool InShape(Vector2 position)
@@ -157,5 +191,7 @@ namespace Phantom.Shapes
                     largest = results[i];
             return (OUT)(object)largest;
         }
+
+        
     }
 }

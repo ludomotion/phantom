@@ -62,5 +62,19 @@ namespace Phantom.Misc
             }
             return false;
         }
+
+        public static Vector2 ClosestPointOnLine(Vector2 lineStart, Vector2 lineEnd, Vector2 point) {
+            Vector2 lineUnit = lineEnd - lineStart;
+            float lineLength = lineUnit.Length();
+            if (lineLength > 0)
+                lineUnit /= lineLength;
+			float v3bx = point.X - lineStart.X;
+			float v3by = point.Y - lineStart.Y;
+			float p = v3bx * lineUnit.X + v3by * lineUnit.Y;
+			if (p < 0) p = 0;
+			if (p > lineLength) p = lineLength;
+			return lineStart + p*lineUnit;
+		}	
+
     }
 }

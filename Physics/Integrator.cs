@@ -143,5 +143,13 @@ namespace Phantom.Physics
                     return entities[i];
             return null;
         }
+
+        public virtual Entity GetEntityCloseTo(Vector2 position, float distance)
+        {
+            for (int i = 0; i < entities.Count; i++)
+                if (entities[i].Shape != null && entities[i].Shape.DistanceTo(position).LengthSquared()<distance*distance)
+                    return entities[i];
+            return null;
+        }
     }
 }

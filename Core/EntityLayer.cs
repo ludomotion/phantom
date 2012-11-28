@@ -61,5 +61,10 @@ namespace Phantom.Core
         {
             return integrator.GetEntityAt(position);
         }
+
+        public Entity GetEntityCloseTo(Vector2 position, float distance)
+        {
+            return integrator.GetEntityCloseTo(position, distance);
+        }
     }
 }

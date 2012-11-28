@@ -46,8 +46,17 @@ namespace Phantom.Shapes
             return new Polygon.Projection(dot - this.Radius, dot + this.Radius);
         }
 
-        public override Vector2 ClosestPointTo(Vector2 point)
+        public override Vector2 EdgeIntersection(Vector2 point)
         {
+            Vector2 delta = point - this.Entity.Position;
+            delta.Normalize();
+            delta *= this.Radius;
+            return this.Entity.Position + delta;
+        }
+
+        public override Vector2 ClosestPoint(Vector2 point)
+        {
+            //same as EdgeIntersection
             Vector2 delta = point - this.Entity.Position;
             delta.Normalize();
             delta *= this.Radius;
@@ -73,6 +82,11 @@ namespace Phantom.Shapes
         public override string ToString()
         {
             return "Circle("+this.Radius+")";
+        }
+
+        public override Vector2 ClosestVertice(Vector2 point)
+        {
+            return this.Entity.Position;
         }
     }
 }
