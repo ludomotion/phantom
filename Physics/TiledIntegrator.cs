@@ -155,6 +155,10 @@ namespace Phantom.Physics
 
         internal Tile GetTile(Vector2 position)
         {
+            //TODO: escape is for debug purposes. Needs to be removed 
+            if (float.IsNaN(position.X) || float.IsNaN(position.Y))
+                return this.tiles[0];
+            
             int x = (int)MathHelper.Clamp(position.X / this.tileSize, 0, this.tilesX - 1);
             int y = (int)MathHelper.Clamp(position.Y / this.tileSize, 0, this.tilesY - 1);
             return this.tiles[y * this.tilesX + x];
