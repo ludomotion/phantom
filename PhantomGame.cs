@@ -151,7 +151,9 @@ namespace Phantom
 
             this.Initialize();
 
+#if !XBOX
             Trace.WriteLine("PhantomGame Initialized: " + Assembly.GetEntryAssembly().FullName);
+#endif
         }
 
         internal void XnaUpdate(GameTime gameTime)
@@ -207,7 +209,7 @@ namespace Phantom
                 {
                     float.TryParse(argv[1], out this.multiplier);
                 }
-                Trace.WriteLine("Multiplier is " + this.multiplier);
+                this.Console.AddLines("Multiplier is " + this.multiplier);
             });
         }
 
@@ -222,7 +224,8 @@ namespace Phantom
             this.graphics.IsFullScreen = fullscreen;
             this.graphics.ApplyChanges();
             this.Resolution = new Viewport(0, 0, width, height);
-            Trace.WriteLine(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
+            if( this.Console != null )
+                this.Console.AddLines(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)

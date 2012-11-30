@@ -21,8 +21,24 @@ namespace Phantom.Misc
         public string Prompt = "] ";
         public Keys OpenKey = Keys.OemTilde;
         public float TransitionTime = .25f;
+#if DEBUG
         public int EchoLines = 4;
+#else
+        public int EchoLines = 0;
+#endif
         public TimeSpan EchoDuration = TimeSpan.FromSeconds(5);
+    }
+
+    struct EchoLine
+    {
+        public string Line;
+        public DateTime Time;
+
+        public EchoLine(string line, DateTime time)
+        {
+            this.Line = line;
+            this.Time = time;
+        }
     }
 
     public class Konsoul : Component
@@ -45,7 +61,6 @@ namespace Phantom.Misc
             {
                 this.console.Write(message);
             }
-
             public override void WriteLine(string message)
             {
                 this.console.WriteLine(message);
@@ -98,7 +113,7 @@ namespace Phantom.Misc
         private VertexBuffer cursorBuffer;
         private IndexBuffer backgroundIndex;
 
-        private Queue<Tuple<string, DateTime>> echoQueue;
+        private Queue<EchoLine> echoQueue;
 
         public Konsoul(SpriteFont font, KonsoulSettings settings)
         {
@@ -125,7 +140,7 @@ namespace Phantom.Misc
             this.commands = new Dictionary<string, ConsoleCommand>();
             this.documentation = new Dictionary<string, string>();
 
-            this.echoQueue = new Queue<Tuple<string, DateTime>>(this.settings.EchoLines);
+            this.echoQueue = new Queue<EchoLine>(this.settings.EchoLines);
 
 #if WINDOWS || LINUX || MONOMAC
             try
@@ -248,6 +263,14 @@ namespace Phantom.Misc
                 }
             });
 
+            this.Register("lines", "", delegate(string[] argv)
+            {
+                if (argv.Length == 1)
+                    this.settings.EchoLines = this.settings.EchoLines > 0 ? 0 : 4;
+                else
+                    int.TryParse(argv[1], out this.settings.EchoLines);
+            });
+
             this.Register("history", "show command history.\n\nuse the -c option to clear the history.", delegate(string[] argv)
             {
                 if (argv.Length > 1 && argv[1].Trim().ToLower() == "-c")
@@ -315,7 +338,7 @@ namespace Phantom.Misc
             KeyboardState previous = this.previousKeyboardState;
 
             DateTime now = DateTime.Now;
-            while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Item2 > this.settings.EchoDuration)
+            while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Time > this.settings.EchoDuration)
                 this.echoQueue.Dequeue();
 
             // Open and close logics:
@@ -548,10 +571,10 @@ namespace Phantom.Misc
                 {
                     float ey = padding;
                     this.batch.Begin();
-                    foreach (Tuple<string, DateTime> echo in this.echoQueue)
+                    foreach (EchoLine echo in this.echoQueue)
                     {
-                        this.batch.DrawString(this.font, echo.Item1, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
-                        this.batch.DrawString(this.font, echo.Item1, new Vector2(padding, ey), color);
+                        this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
+                        this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey), color);
                         ey += lineSpace;
                     }
                     this.batch.End();
@@ -693,7 +716,7 @@ namespace Phantom.Misc
                 IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.settings.Padding * 2);
                 for (int i = 0; i < chunks.Count; i++)
                     if( chunks[i].Trim().Length > 0 )
-                        this.echoQueue.Enqueue(Tuple.Create<string, DateTime>(chunks[i], DateTime.Now));
+                        this.echoQueue.Enqueue(new EchoLine(chunks[i], DateTime.Now));
             }
             while (this.echoQueue.Count > this.settings.EchoLines)
                 this.echoQueue.Dequeue();
