@@ -37,7 +37,9 @@ namespace Phantom.Graphics
             Additive = 1 << 20,
             AlphaBlend = 1 << 21, // default
             NonPremultiplied = 1 << 22,
-            Opaque = 1 << 23
+            Opaque = 1 << 23,
+
+            IgnoreCamera = 1 << 30
         }
 
         public int Passes { get; protected set; }
@@ -161,7 +163,7 @@ namespace Phantom.Graphics
                 0, 1);
 
             info.World = Matrix.Identity;
-            if (this.layer != null && this.layer.Camera != null)
+            if (this.layer != null && this.layer.Camera != null && (this.Options & RenderOptions.IgnoreCamera) == 0)
             {
                 Camera c = this.layer.Camera;
                 if (c.Zoom != 1)
