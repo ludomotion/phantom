@@ -46,6 +46,8 @@
     <Compile Include="Cameras\Components\CameraEase.cs" />
     <Compile Include="Cameras\Components\DeadZone.cs" />
     <Compile Include="Cameras\Components\FollowEntity.cs" />
+    <Compile Include="Cameras\Components\LinearLerp.cs" />
+    <Compile Include="Cameras\Components\LinearZoom.cs" />
     <Compile Include="Core\Content.cs" />
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\InputComponent.cs" />

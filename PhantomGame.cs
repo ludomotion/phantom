@@ -275,6 +275,27 @@ namespace Phantom
             }
         }
 
+        public bool PopState(GameState state)
+        {
+            Debug.WriteLine("Popping state: " + state + " (current is: " + this.CurrentState + " (StateCount: " + this.StateCount + "))");
+            if( this.CurrentState == state )
+            {
+                // If the state given is the current state call the PopState() method to correctly handle BackOnTop().
+                this.PopState();
+                return true;
+            }
+            for (int i = this.states.Count - 1; i >= 0; --i)
+            {
+                if (this.states[i] == state)
+                {
+                    this.states.RemoveAt(i);
+                    state.OnRemove();
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void PopAndPushState( GameState state )
         {
             Debug.WriteLine("Popping state: " + this.CurrentState + " and directly pushing " + state + " (StateCount: " + this.StateCount + ")");
@@ -313,6 +334,19 @@ namespace Phantom
             }
         }
 
+        public bool PushBefore(GameState before, GameState state)
+        {
+            for (int i = this.states.Count - 1; i >= 0; --i)
+            {
+                if (this.states[i] == before)
+                {
+                    this.states.Insert(i, state);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected virtual void OnExit(object sender, EventArgs e)
         {
             if (this.Console != null)
@@ -323,5 +357,6 @@ namespace Phantom
         {
             this.XnaGame.Exit();
         }
+
     }
 }
