@@ -166,7 +166,8 @@ namespace Phantom
             for (int i = this.states.Count - 1; i >= 0 && i < this.states.Count; i--)
             {
                 bool propagate = this.states[i].Propagate;
-                this.states[i].Update(elapsed);
+                if (!this.states[i].OnlyOntop || i == this.states.Count - 1)
+                    this.states[i].Update(elapsed);
                 if (!propagate || this.Paused)
                     break;
             }
@@ -180,7 +181,8 @@ namespace Phantom
 
             for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--);
             for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
-                this.states[i].Render(null);
+                if (!this.states[i].OnlyOntop || i == this.states.Count - 1)
+                    this.states[i].Render(null);
             this.Render(null);
         }
 
