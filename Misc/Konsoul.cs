@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System.Collections;
 
 namespace Phantom.Misc
 {
@@ -571,11 +572,14 @@ namespace Phantom.Misc
                 {
                     float ey = padding;
                     this.batch.Begin();
-                    foreach (EchoLine echo in this.echoQueue)
+                    lock (this.echoQueue)
                     {
-                        this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
-                        this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey), color);
-                        ey += lineSpace;
+                        foreach (EchoLine echo in this.echoQueue)
+                        {
+                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
+                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey), color);
+                            ey += lineSpace;
+                        }
                     }
                     this.batch.End();
                 }
@@ -711,15 +715,18 @@ namespace Phantom.Misc
         public void AddLines(params string[] lines)
         {
             this.lines.AddRange(lines);
-            for (int j = 0; j < lines.Length; ++j)
+            lock (this.echoQueue)
             {
-                IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.settings.Padding * 2);
-                for (int i = 0; i < chunks.Count; i++)
-                    if( chunks[i].Trim().Length > 0 )
-                        this.echoQueue.Enqueue(new EchoLine(chunks[i], DateTime.Now));
+                for (int j = 0; j < lines.Length; ++j)
+                {
+                    IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.settings.Padding * 2);
+                    for (int i = 0; i < chunks.Count; i++)
+                        if (chunks[i].Trim().Length > 0)
+                            this.echoQueue.Enqueue(new EchoLine(chunks[i], DateTime.Now));
+                }
+                while (this.echoQueue.Count > this.settings.EchoLines)
+                    this.echoQueue.Dequeue();
             }
-            while (this.echoQueue.Count > this.settings.EchoLines)
-                this.echoQueue.Dequeue();
         }
 
         private void WriteLine(string message)
