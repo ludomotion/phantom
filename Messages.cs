@@ -23,6 +23,9 @@ namespace Phantom
 
         public const int SetPosition = 100;
 
+        public const int PhysicsPause = 200;
+        public const int PhysicsResume = 201;
+
         public const int Unknown = -1;
     }
 }

@@ -19,6 +19,7 @@ namespace Phantom.Physics
         }
 #endif
 
+        private bool physicsPaused;
         private int physicsExecutionCount;
         protected List<Entity> entities;
 
@@ -26,29 +27,44 @@ namespace Phantom.Physics
         {
             this.physicsExecutionCount = physicsExecutionCount;
             this.entities = new List<Entity>();
+            this.physicsPaused = false;
+        }
+
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case Messages.PhysicsPause:
+                    this.physicsPaused = true;
+                    return MessageResult.HANDLED;
+                case Messages.PhysicsResume:
+                    this.physicsPaused = false;
+                    return MessageResult.HANDLED;
+            }
+            return base.HandleMessage(message, data);
         }
 
         public override void Update(float elapsed)
         {
-
-            float devidedElapsed = elapsed / this.physicsExecutionCount;
-
-
-            for (int t = 0; t < physicsExecutionCount; ++t )
+            if (!this.physicsPaused)
             {
-                this.Integrate(devidedElapsed); 
+                float devidedElapsed = elapsed / this.physicsExecutionCount;
 
-                for (int i = this.entities.Count - 1; i >= 0; --i)
+                for (int t = 0; t < physicsExecutionCount; ++t)
                 {
-                    Entity e = this.entities[i];
-                    if (!e.Destroyed)
+                    this.Integrate(devidedElapsed);
+
+                    for (int i = this.entities.Count - 1; i >= 0; --i)
                     {
-                        e.Integrate(devidedElapsed); 
-                        CheckEntityCollision(i);
+                        Entity e = this.entities[i];
+                        if (!e.Destroyed)
+                        {
+                            e.Integrate(devidedElapsed);
+                            CheckEntityCollision(i);
+                        }
                     }
                 }
             }
-
             base.Update(elapsed);
         }
 
