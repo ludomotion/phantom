@@ -22,7 +22,7 @@ namespace Phantom.Cameras.Components
 
         public override void Update(float elapsed)
         {
-            if (this.Camera.Target != this.Camera.Position)
+            if (!this.lerping && this.Camera.Target != this.Camera.Position)
             {
                 this.start = this.Camera.Position;
                 this.target = this.Camera.Target;

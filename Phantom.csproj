@@ -102,6 +102,7 @@
     <Compile Include="Messages.cs" />
     <Compile Include="Misc\Components\DelayedMessage.cs" />
     <Compile Include="Misc\Components\MessageDelay.cs" />
+    <Compile Include="Misc\Components\MessageDelegate.cs" />
     <Compile Include="Misc\DebugLayer.cs" />
     <Compile Include="Misc\MathUtils.cs" />
     <Compile Include="Misc\MiscUtils.cs" />
