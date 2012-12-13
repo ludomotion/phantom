@@ -14,7 +14,20 @@ namespace Phantom.Core
         public readonly long ID;
         public Vector2 Position;
         public float Orientation;
-        public float Mass { get; protected set; }
+        private float mass;
+        internal float inverseMass;
+        public float Mass
+        {
+            get
+            {
+                return this.mass;
+            }
+            protected set
+            {
+                this.mass = value;
+                this.inverseMass = 1f / value;
+            }
+        }
         public bool InitiateCollision;
         public bool Collidable;
 

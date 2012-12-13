@@ -66,10 +66,12 @@ namespace Phantom.Misc
                         canvas.LineWidth = this.defaultLineWidth * 3;
                         canvas.StrokeColor = DebugLayer.Shadow;
                         canvas.Stroke();
+                        if (e.Mover.Force.LengthSquared() > 0)
+                            DrawVector(canvas, e.Position + e.Mover.Velocity + e.Mover.Acceleration, e.Position + e.Mover.Velocity + e.Mover.Acceleration + e.Mover.Force, "force");
+                        if (e.Mover.Acceleration.LengthSquared() > 0)
+                            DrawVector(canvas, e.Position + e.Mover.Velocity, e.Position + e.Mover.Velocity + e.Mover.Acceleration, "acceleration");
                         if (e.Mover.Velocity.LengthSquared() > 0)
                             DrawVector(canvas, e.Position, e.Position + e.Mover.Velocity, "velocity");
-                        if (e.Mover.Acceleration.LengthSquared() > 0)
-                            DrawVector(canvas, e.Position, e.Position + e.Mover.Acceleration, "acceleration");
                     }
                 }
             }
@@ -109,7 +111,7 @@ namespace Phantom.Misc
         {
             if (this.Color.ContainsKey(name))
                 return this.Color[name];
-            Color c = DrawUtils.Colors[Math.Abs(name.GetHashCode()) % DrawUtils.Colors.Count];
+            Color c = DrawUtils.Colors[Math.Abs(name.GetHashCode()*2) % DrawUtils.Colors.Count];
             c.A = 255;
             return c;
         }

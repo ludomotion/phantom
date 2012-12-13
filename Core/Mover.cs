@@ -14,28 +14,28 @@ namespace Phantom.Core
     {
         public Vector2 Velocity;
         public Vector2 Acceleration;
+        public Vector2 Force;
 
-        public Vector2 Friction;
+        public float Damping;
         public float Restitution;
 
-        public Mover(Vector2 velocity, Vector2 friction, float restitution)
+        public Mover(Vector2 velocity, float damping, float restitution)
         {
             this.Velocity = velocity;
-            this.Friction = friction;
+            this.Damping = damping;
             this.Restitution = restitution;
-        }
-        public Mover(Vector2 velocity, float friction, float restitution)
-            : this(velocity, Vector2.One * friction, restitution)
-        {
         }
 
         public override void Integrate(float elapsed)
         {
-            this.Velocity += this.Acceleration * elapsed;
             this.Entity.Position += this.Velocity * elapsed;
-            this.Acceleration = Vector2.Zero;
+            this.Entity.Position += this.Acceleration * elapsed * elapsed * .5f;
 
-            this.Velocity *= Vector2.One - 2 * this.Friction * this.Friction * elapsed;
+            Vector2 acc = this.Acceleration + this.Force * this.Entity.inverseMass;
+            this.Velocity += acc * elapsed;
+            this.Force = Vector2.Zero;
+
+            this.Velocity *= (float)Math.Pow(this.Damping, elapsed);
             base.Integrate(elapsed);
         }
 
@@ -53,11 +53,11 @@ namespace Phantom.Core
                     return MessageResult.HANDLED;
                 case Messages.MoverForce:
                     if (data is Vector2)
-                        this.Acceleration += (Vector2)data;
+                        this.Force += (Vector2)data;
                     else if (data is float && this.Entity != null)
-                        this.Acceleration += this.Entity.Direction * (float)data;
+                        this.Force += this.Entity.Direction * (float)data;
                     else if (data is int && this.Entity != null)
-                        this.Acceleration += this.Entity.Direction * (int)data;
+                        this.Force += this.Entity.Direction * (int)data;
                     return MessageResult.HANDLED;
             }
             return base.HandleMessage(message, data);
