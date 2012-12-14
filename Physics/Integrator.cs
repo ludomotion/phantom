@@ -101,17 +101,17 @@ namespace Phantom.Physics
                     {
                         b.Mover.RespondToCollision(collision, a, -.5f);
                         a.Mover.RespondToCollision(collision, b, .5f);
-                        a.Mover.TransferEnergy(b);
+						a.Mover.TransferEnergy(collision, b);
                     }
-                    else if (a.Mover != null && (b.Mover == null || a.Mass < b.Mass * 100))
+                    else if (a.Mover != null && (b.Mover == null || a.Mass * 100 < b.Mass ))
                     {
                         a.Mover.RespondToCollision(collision, b, 1f);
-                        a.Mover.Bounce(collision, 1);
+                        a.Mover.BounceEnergy(collision, b, 1);
                     }
-                    else if (b.Mover != null && (a.Mover == null || b.Mass < a.Mass * 100))
+                    else if (b.Mover != null && (a.Mover == null || b.Mass * 100 < a.Mass ))
                     {
                         b.Mover.RespondToCollision(collision, a, -1f);
-                        b.Mover.Bounce(collision, -1);
+                        b.Mover.BounceEnergy(collision, a, -1);
                     }
                 }
             }

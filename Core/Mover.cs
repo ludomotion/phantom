@@ -16,14 +16,16 @@ namespace Phantom.Core
         public Vector2 Acceleration;
         public Vector2 Force;
 
-        public float Damping;
-        public float Restitution;
+		public float Damping;
+		public float Friction;
+        public float Bounce;
 
-        public Mover(Vector2 velocity, float damping, float restitution)
+        public Mover(Vector2 velocity, float damping, float friction, float bounce)
         {
             this.Velocity = velocity;
-            this.Damping = damping;
-            this.Restitution = restitution;
+			this.Damping = damping;
+			this.Friction = friction;
+			this.Bounce = bounce;
         }
 
         public override void Integrate(float elapsed)
@@ -68,16 +70,24 @@ namespace Phantom.Core
             this.Entity.Position -= factor * collision.Normal * collision.Interpenetration;
         }
 
-        public virtual void Bounce(CollisionData collision, float factor)
+        public virtual void BounceEnergy(CollisionData collision, Entity other, float factor)
         {
             float dot = Vector2.Dot(collision.Normal, this.Velocity);
             if (dot < 0)
                 return;
-            factor *= (1 + this.Restitution);
-            this.Velocity -= factor * dot * collision.Normal;
+            this.Velocity -= 2 * factor * dot * collision.Normal;
+
+			float friction = this.Friction;
+			float bounce = this.Bounce;
+			if (other.Mover != null)
+			{
+				friction = (this.Friction + other.Mover.Friction) * .5f;
+				bounce = (this.Bounce + other.Mover.Bounce) * .5f;
+			}
+			this.ApplyFrictionBounce(collision.Normal, friction, bounce);
         }
 
-        public virtual void TransferEnergy(Entity other)
+		public virtual void TransferEnergy(CollisionData collision, Entity other)
         {
             if (other.Mover == null)
                 return;
@@ -91,5 +101,21 @@ namespace Phantom.Core
             this.Velocity -= n * optimusP * other.Mass;
             other.Mover.Velocity += n * optimusP * this.Entity.Mass;
         }
+
+		/// <summary>
+		/// Apply bounce and friction (see http://www.metanetsoftware.com/technique/tutorialA.html section --= Bounce and Friction =-- ).
+		/// </summary>
+		/// <param name="friction"></param>
+		/// <param name="bounce"></param>
+		protected void ApplyFrictionBounce(Vector2 normal, float friction, float bounce)
+		{
+			if (friction != 0 || bounce != 1)
+			{
+				Vector2 right = normal.RightPerproduct();
+				Vector2 f = right * Vector2.Dot(this.Velocity, right);
+				Vector2 b = normal * Vector2.Dot(this.Velocity, normal);
+				this.Velocity = f * (1 - friction) + b * bounce;
+			}
+		}
     }
 }
