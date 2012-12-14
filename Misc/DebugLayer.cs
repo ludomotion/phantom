@@ -5,24 +5,45 @@ using Phantom.Core;
 using Phantom.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Phantom.Misc
 {
     public class DebugLayer : RenderLayer
     {
-        public static readonly Color Shadow = new Color(0, 0, 0, 128);
+		private struct EntityLabel
+		{
+			public Entity Entity;
+			public string Name;
+			public string Label;
+			public Vector2 Offset;
+			public EntityLabel(Entity e, string n, string l, Vector2 o)
+			{
+				Entity = e;
+				Name = n;
+				Label = l;
+				Offset = o;
+			}
+		}
+		
+		public static readonly Color Shadow = new Color(0, 0, 0, 128);
 
+		private float defaultLineWidth;
+		private SpriteFont font;
 
-        private float defaultLineWidth;
-        private Dictionary<Entity, Dictionary<string, Vector2>> entityVectors;
+		private Dictionary<Entity, Dictionary<string, Vector2>> entityVectors;
+		private Dictionary<Entity, Dictionary<string, EntityLabel>> entityLabels;
+
         public Dictionary<string, Color> Color { get; private set; }
 
-        public DebugLayer(float defaultLineWidth, Renderer.ViewportPolicy viewportPolicy)
+        public DebugLayer(float defaultLineWidth, Renderer.ViewportPolicy viewportPolicy, SpriteFont font)
             :base(new Renderer(1, viewportPolicy, Renderer.RenderOptions.Canvas))
         {
             this.defaultLineWidth = defaultLineWidth;
-            this.Color = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
-            this.entityVectors = new Dictionary<Entity, Dictionary<string, Vector2>>();
+			this.font = font;
+			this.Color = new Dictionary<string, Color>(StringComparer.OrdinalIgnoreCase);
+			this.entityVectors = new Dictionary<Entity, Dictionary<string, Vector2>>();
+			this.entityLabels = new Dictionary<Entity, Dictionary<string, EntityLabel>>();
         }
 
         [Conditional("DEBUG")] 
@@ -32,6 +53,23 @@ namespace Phantom.Misc
                 this.entityVectors[entity] = new Dictionary<string, Vector2>(StringComparer.OrdinalIgnoreCase);
             this.entityVectors[entity][name] = vector;
         }
+
+		[Conditional("DEBUG")]
+		public void UpdateEntityLabel(Entity entity, string name, string label, Vector2 offset)
+		{
+			if (!this.entityLabels.ContainsKey(entity))
+				this.entityLabels[entity] = new Dictionary<string, EntityLabel>(StringComparer.OrdinalIgnoreCase);
+			this.entityLabels[entity][name] = new EntityLabel(entity, name, label, offset);
+		}
+
+		[Conditional("DEBUG")]
+		public void UpdateEntityLabel(Entity entity, string name, string label)
+		{
+			Vector2 offset = Vector2.Zero;
+			if (entity.Shape != null)
+				offset = Vector2.One * entity.Shape.RoughRadius;
+			this.UpdateEntityLabel(entity, name, label, offset);
+		}
 
         public override void Render(RenderInfo info)
         {
@@ -74,15 +112,23 @@ namespace Phantom.Misc
                             DrawVector(canvas, e.Position, e.Position + e.Mover.Velocity, "velocity");
                     }
                 }
-            }
-            foreach (KeyValuePair<Entity, Dictionary<string, Vector2>> e in this.entityVectors)
-            {
-                Vector2 pos = e.Key.Position;
-                foreach (KeyValuePair<string, Vector2> v in e.Value)
-                {
-                    DrawVector(canvas, pos, pos + v.Value, v.Key);
-                }
-            }
+			}
+			foreach (KeyValuePair<Entity, Dictionary<string, Vector2>> e in this.entityVectors)
+			{
+				Vector2 pos = e.Key.Position;
+				foreach (KeyValuePair<string, Vector2> v in e.Value)
+				{
+					DrawVector(canvas, pos, pos + v.Value, v.Key);
+				}
+			}
+			foreach (KeyValuePair<Entity, Dictionary<string, EntityLabel>> e in this.entityLabels)
+			{
+				Vector2 pos = e.Key.Position;
+				foreach (KeyValuePair<string, EntityLabel> v in e.Value)
+				{
+					info.Batch.DrawString(this.font, v.Value.Label, pos + v.Value.Offset, GetColor(v.Value.Name), 0, Vector2.Zero, 1/info.Camera.Zoom, SpriteEffects.None, 0);
+				}
+			}
         }
 
         private void DrawVector(Canvas canvas, Vector2 start, Vector2 end, string name)
@@ -107,6 +153,12 @@ namespace Phantom.Misc
             }
         }
 
+		private void DrawText(SpriteBatch batch, Vector2 position, string text, Color color)
+		{
+			batch.DrawString(this.font, text, position, color);
+		}
+
+
         private Microsoft.Xna.Framework.Color GetColor(string name)
         {
             if (this.Color.ContainsKey(name))
@@ -118,32 +170,71 @@ namespace Phantom.Misc
     }
 
     public static class DebugLayerExtensions
-    {
-        [Conditional("DEBUG")] 
-        public static void DebugVector(this Component self, string name, Vector2 vector)
-        {
-            Entity e = null;
-            if (self is Entity)
-                e = (Entity)self;
-            else
-                e = self.GetAncestor<Entity>();
-            if (e != null)
-            {
-                GameState state = self.GetAncestor<GameState>();
-                if (state != null)
-                {
-                    DebugLayer layer = state.GetComponentByType<DebugLayer>();
-                    if (layer != null)
-                        layer.UpdateEntityVector(e, name, vector);
-                }
-            }
-        }
+	{
+		[Conditional("DEBUG")]
+		public static void DebugVector(this Component self, string name, Vector2 vector)
+		{
+			Entity e = null;
+			if (self is Entity)
+				e = (Entity)self;
+			else
+				e = self.GetAncestor<Entity>();
+			if (e != null)
+			{
+				GameState state = self.GetAncestor<GameState>();
+				if (state != null)
+				{
+					DebugLayer layer = state.GetComponentByType<DebugLayer>();
+					if (layer != null)
+						layer.UpdateEntityVector(e, name, vector);
+				}
+			}
+		}
 
+		[Conditional("DEBUG")]
+		public static void DebugLabel(this Component self, string name, string label, Vector2 offset)
+		{
+			Entity e = null;
+			if (self is Entity)
+				e = (Entity)self;
+			else
+				e = self.GetAncestor<Entity>();
+			if (e != null)
+			{
+				GameState state = self.GetAncestor<GameState>();
+				if (state != null)
+				{
+					DebugLayer layer = state.GetComponentByType<DebugLayer>();
+					if (layer != null)
+						layer.UpdateEntityLabel(e, name, label, offset);
+				}
+			}
+		}
+
+		[Conditional("DEBUG")]
+		public static void DebugLabel(this Component self, string name, string label)
+		{
+			Entity e = null;
+			if (self is Entity)
+				e = (Entity)self;
+			else
+				e = self.GetAncestor<Entity>();
+			if (e != null)
+			{
+				GameState state = self.GetAncestor<GameState>();
+				if (state != null)
+				{
+					DebugLayer layer = state.GetComponentByType<DebugLayer>();
+					if (layer != null)
+						layer.UpdateEntityLabel(e, name, label);
+				}
+			}
+		}
 
         [Conditional("DEBUG")]
-        public static void AddDebugLayer(this GameState state, float defaultLineWidth, Renderer.ViewportPolicy viewportPolicy)
+        public static void AddDebugLayer(this GameState state, float defaultLineWidth, Renderer.ViewportPolicy viewportPolicy, SpriteFont font)
         {
-            state.AddComponent(new DebugLayer(defaultLineWidth, viewportPolicy));
+            state.AddComponent(new DebugLayer(defaultLineWidth, viewportPolicy, font));
         }
     }
 }
