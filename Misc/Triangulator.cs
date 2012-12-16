@@ -28,7 +28,10 @@ namespace Phantom.Misc
             {
                 //create a list of the reflex points
                 List<int> reflexPoints = new List<int>();
-                for (short i = 0; i < points.Count; i++)
+                //JORIS: Disabled the reflexPoint calculation as it leads to a bug with voronoi cells.
+                //All points were somehow marked as reflex points which caused the triangulator never to get out of this do while loop
+                //This fix seems to work as long as you are sure the vertices define a convex polygon.
+                /*for (short i = 0; i < points.Count; i++)
                 {
                     //get the vertex indices
                     short pim1, pi, pip1;
@@ -47,7 +50,32 @@ namespace Phantom.Misc
                     //if angle is more than PiOverTwo, it's a reflex point
                     if (angle > MathHelper.PiOver2)
                         reflexPoints.Add(i);
-                }
+                }*/
+
+                //The discussion on the source's wike suggest the following fix: but that doesn't solve the problem
+                /*
+                for (short i = 0; i < points.Count; i++)
+                {
+                    //get the vertex indices
+                    short pim1, pi, pip1;
+                    GetPoints(points, i, out pim1, out pi, out pip1);
+
+                    //get the actual vertices
+                    Vector2 vim1 = vertices[pim1];
+                    Vector2 vi = vertices[pi];
+                    Vector2 vip1 = vertices[pip1];
+                    float x1 = vim1.X, y1 = vim1.Y;
+                    float x2 = vi.X, y2 = vi.Y;
+                    float x3 = vip1.X, y3 = vip1.Y;
+
+                    float crossProductZ = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1);
+
+                    // if the Z component of the cross product is negative, it's a reflex angle (i.e. the vertex points
+                    //   inwards.  If it equals zero, the point lies directly between the other two points.  If it's
+                    //   positive, the vertex points outwards.
+
+                    if (crossProductZ < 0) reflexPoints.Add(i);
+                }*/
 
                 for (short i = 0; i < points.Count; i++)
                 {
