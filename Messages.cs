@@ -8,6 +8,7 @@ namespace Phantom
     public static class Messages
     {
         public const int Action = 1;
+        public const int GameExit = 5;
 
         public const int MoverImpulse = 10;
         public const int MoverForce = 11;

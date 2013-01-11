@@ -351,6 +351,7 @@ namespace Phantom
 
         protected virtual void OnExit(object sender, EventArgs e)
         {
+            this.HandleMessage(Messages.GameExit, this);
             if (this.Console != null)
                 this.Console.Dispose();
         }
