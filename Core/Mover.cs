@@ -72,10 +72,11 @@ namespace Phantom.Core
 
         public virtual void BounceEnergy(CollisionData collision, Entity other, float factor)
         {
-            float dot = Vector2.Dot(collision.Normal, this.Velocity);
+            Vector2 normal = collision.Normal * factor;
+            float dot = Vector2.Dot(normal, this.Velocity);
             if (dot < 0)
                 return;
-            this.Velocity -= 2 * factor * dot * collision.Normal;
+            this.Velocity -= 2 * dot * normal;
 
 			float friction = this.Friction;
 			float bounce = this.Bounce;
@@ -84,7 +85,7 @@ namespace Phantom.Core
 				friction = (this.Friction + other.Mover.Friction) * .5f;
 				bounce = (this.Bounce + other.Mover.Bounce) * .5f;
 			}
-			this.ApplyFrictionBounce(collision.Normal, friction, bounce);
+			this.ApplyFrictionBounce(normal, friction, bounce);
         }
 
 		public virtual void TransferEnergy(CollisionData collision, Entity other)
