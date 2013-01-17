@@ -18,12 +18,22 @@ namespace Phantom.Shapes
             }
         }
 
-        public Vector2 HalfSize { get; protected set; }
+        private Vector2 halfSize;
+
+        public Vector2 HalfSize
+        {
+            get { return halfSize; }
+            set
+            {
+                this.halfSize = value;
+                this.SetPolygon(new Vector2(-halfSize.X, -halfSize.Y), new Vector2(halfSize.X, -halfSize.Y), new Vector2(halfSize.X, halfSize.Y), new Vector2(-halfSize.X, halfSize.Y));
+            }
+        }
 
         public OABB( Vector2 halfSize )
             :base(new Vector2(-halfSize.X, -halfSize.Y), new Vector2(halfSize.X, -halfSize.Y), new Vector2(halfSize.X, halfSize.Y), new Vector2(-halfSize.X, halfSize.Y))
         {
-            this.HalfSize = halfSize;
+            this.halfSize = halfSize;
         }
 
         public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)

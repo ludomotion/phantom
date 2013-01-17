@@ -48,6 +48,18 @@ namespace Phantom.Shapes
         public Polygon(params Vector2[] vertices)
         {
             this.Vertices = vertices;
+            ParsePolygon();
+        }
+
+        protected void SetPolygon(params Vector2[] vertices)
+        {
+            for (int i = 0; i < this.Vertices.Length && i < vertices.Length; i++)
+                this.Vertices[i] = vertices[i];
+
+            ParsePolygon();
+        }
+
+        protected void ParsePolygon() {
             this.roughRadius = 0;
             float xmin = float.MaxValue, xmax = float.MinValue;
             for (int i = 0; i < this.Vertices.Length; i++)

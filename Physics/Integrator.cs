@@ -54,14 +54,19 @@ namespace Phantom.Physics
                 {
                     this.Integrate(devidedElapsed);
 
-                    for (int i = this.entities.Count - 1; i >= 0; --i)
+                    int i = this.entities.Count - 1;
+                    while (i>=0) 
                     {
+                        if (i>=this.entities.Count) //This might happen if a collision or another update removes two items at once the end of the stack
+                            i = this.entities.Count - 1;
+
                         Entity e = this.entities[i];
                         if (!e.Destroyed)
                         {
                             e.Integrate(devidedElapsed);
                             CheckEntityCollision(i);
                         }
+                        i--;
                     }
                 }
             }
