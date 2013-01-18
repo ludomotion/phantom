@@ -339,8 +339,11 @@ namespace Phantom.Misc
             KeyboardState previous = this.previousKeyboardState;
 
             DateTime now = DateTime.Now;
-            while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Time > this.settings.EchoDuration)
-                this.echoQueue.Dequeue();
+			lock (this.echoQueue)
+			{
+				while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Time > this.settings.EchoDuration)
+					this.echoQueue.Dequeue();
+			}
 
             // Open and close logics:
             if (!this.Visible)
