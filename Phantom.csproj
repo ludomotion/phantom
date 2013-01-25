@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="Cameras\CameraComponent.cs" />
     <Compile Include="Cameras\Components\CameraEase.cs" />
+    <Compile Include="Cameras\Components\CameraOffset.cs" />
     <Compile Include="Cameras\Components\SinoidZoom.cs" />
     <Compile Include="Cameras\Components\LinearLerp.cs" />
     <Compile Include="Cameras\Components\DeadZone.cs" />
