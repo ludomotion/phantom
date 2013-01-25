@@ -101,5 +101,17 @@ namespace Phantom.Core
         {
             return this.CurrentKeyboardState;
         }
+
+        public MouseState GetCurrentMouseState()
+        {
+            return this.CurrentMouseState;
+        }
+
+        public MouseState GetPreviousMouseState()
+        {
+            return this.PreviousMouseState;
+        }
+
+
     }
 }
