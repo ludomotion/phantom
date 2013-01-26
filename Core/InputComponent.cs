@@ -122,6 +122,21 @@ namespace Phantom.Core
                     continue;
                 this.Parent.HandleMessage(Messages.InputKeyJustDown, curr[i]);
             }
+			for (int i = 0; i < last.Length; i++)
+			{
+				bool found = false;
+				for (int j = 0; j < curr.Length; j++)
+				{
+					if (last[i] == curr[j])
+					{
+						found = true;
+						break;
+					}
+				}
+				if (found)
+					continue;
+				this.Parent.HandleMessage(Messages.InputKeyJustUp, last[i]);
+			}
 
             for (int i = 0; i < AllGamePadButtons.Length; i++)
                 if (this.IsButtonJustDown(AllGamePadButtons[i]))
