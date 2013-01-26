@@ -171,6 +171,14 @@ namespace Phantom.Core
                 if (this.IsButtonJustDown(button))
                     this.Parent.HandleMessage(this.buttonbinds[button].Message, this.buttonbinds[button].Data);
 
+			foreach (Keys key in this.keybinds.Keys)
+				if (this.IsKeyJustUp(key))
+					this.Parent.HandleMessage(this.keybinds[key].Message, this.keybinds[key].Data);
+
+			foreach (Buttons button in this.buttonbinds.Keys)
+				if (this.IsButtonJustUp(button))
+					this.Parent.HandleMessage(this.buttonbinds[button].Message, this.buttonbinds[button].Data);
+
             MouseState prevMouse = this.input.PreviousMouseState;
             MouseState currMouse = this.input.CurrentMouseState;
             if (this.mousebinds.ContainsKey(LeftButton) && currMouse.LeftButton == ButtonState.Pressed && prevMouse.LeftButton == ButtonState.Released)
