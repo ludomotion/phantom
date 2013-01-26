@@ -168,9 +168,9 @@ namespace Phantom.Graphics
                 Camera c = this.layer.Camera;
                 if (c.Zoom != 1)
                 {
-                    info.World *= Matrix.CreateTranslation(-new Vector3(c.Position, 0));
+                    info.World *= Matrix.CreateTranslation(-new Vector3(c.Position + c.Focus, 0));
                     info.World *= Matrix.CreateScale(c.Zoom, c.Zoom, 1);
-                    info.World *= Matrix.CreateTranslation(new Vector3(c.Position, 0));
+					info.World *= Matrix.CreateTranslation(new Vector3(c.Position + c.Focus, 0));
 
                 }
                 info.World *= Matrix.CreateTranslation(info.Width * .5f - c.Position.X, info.Height * .5f - c.Position.Y, 0);

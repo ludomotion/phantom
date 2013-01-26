@@ -20,6 +20,7 @@ namespace Phantom.Cameras.Components
 			base.Update(elapsed);
 			if (this.Camera != null )
 			{
+				this.Camera.Focus = -this.offset;
 				this.Camera.Target += this.offset;
 			}
 		}

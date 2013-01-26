@@ -13,6 +13,7 @@ namespace Phantom.Cameras
     {
         protected Layer layer;
 
+		public Vector2 Focus;
         public Vector2 Position;
         public Vector2 Target;
         public Vector2 NextTarget;
