@@ -170,6 +170,7 @@ namespace Phantom.Graphics
                 {
                     info.World *= Matrix.CreateTranslation(-new Vector3(c.Position + c.Focus, 0));
                     info.World *= Matrix.CreateScale(c.Zoom, c.Zoom, 1);
+					info.World *= Matrix.CreateRotationZ(c.Orientation);
 					info.World *= Matrix.CreateTranslation(new Vector3(c.Position + c.Focus, 0));
 
                 }

@@ -20,8 +20,9 @@ namespace Phantom.Cameras.Components
 			base.Update(elapsed);
 			if (this.Camera != null )
 			{
-				this.Camera.Focus = -this.offset;
-				this.Camera.Target += this.offset;
+				Vector2 o = this.offset / this.Camera.Zoom;
+				//this.Camera.Focus = -o;
+				this.Camera.Target += o;
 			}
 		}
 	}

@@ -18,6 +18,7 @@ namespace Phantom.Cameras
         public Vector2 Target;
         public Vector2 NextTarget;
 
+		public float Orientation;
         public float Zoom;
 
         public float Top { get; private set; }
