@@ -165,19 +165,19 @@ namespace Phantom.Core
         {
             foreach (Keys key in this.keybinds.Keys)
                 if (this.IsKeyJustDown(key))
-                    this.Parent.HandleMessage(this.keybinds[key].Message, this.keybinds[key].Data);
+                    this.Parent.HandleMessage(this.keybinds[key].Message, false);
 
             foreach (Buttons button in this.buttonbinds.Keys)
                 if (this.IsButtonJustDown(button))
-                    this.Parent.HandleMessage(this.buttonbinds[button].Message, this.buttonbinds[button].Data);
+                    this.Parent.HandleMessage(this.buttonbinds[button].Message, false);
 
 			foreach (Keys key in this.keybinds.Keys)
 				if (this.IsKeyJustUp(key))
-					this.Parent.HandleMessage(this.keybinds[key].Message, this.keybinds[key].Data);
+					this.Parent.HandleMessage(this.keybinds[key].Message, true);
 
 			foreach (Buttons button in this.buttonbinds.Keys)
 				if (this.IsButtonJustUp(button))
-					this.Parent.HandleMessage(this.buttonbinds[button].Message, this.buttonbinds[button].Data);
+					this.Parent.HandleMessage(this.buttonbinds[button].Message, true);
 
             MouseState prevMouse = this.input.PreviousMouseState;
             MouseState currMouse = this.input.CurrentMouseState;
