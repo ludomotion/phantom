@@ -127,6 +127,10 @@ namespace Phantom.Core
                 if (this.IsButtonJustDown(AllGamePadButtons[i]))
                     this.Parent.HandleMessage(Messages.InputButtonJustDown, AllGamePadButtons[i]);
 
+			for (int i = 0; i < AllGamePadButtons.Length; i++)
+				if (this.IsButtonJustUp(AllGamePadButtons[i]))
+					this.Parent.HandleMessage(Messages.InputButtonJustUp, AllGamePadButtons[i]);
+
             MouseState prevMouse = this.input.PreviousMouseState;
             MouseState currMouse = this.input.CurrentMouseState;
             if (currMouse.LeftButton == ButtonState.Pressed && prevMouse.LeftButton == ButtonState.Released)
