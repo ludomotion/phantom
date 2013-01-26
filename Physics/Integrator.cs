@@ -87,8 +87,10 @@ namespace Phantom.Physics
 
         }
 
-        protected void CheckCollisionBetween(Entity a, Entity b)
+        protected virtual void CheckCollisionBetween(Entity a, Entity b)
         {
+			if (a.Ghost || b.Ghost)
+				return;
             if (!a.InitiateCollision && !b.InitiateCollision)
                 return;
             if (!a.CanCollideWith(b) || !b.CanCollideWith(a))

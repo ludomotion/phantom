@@ -12,6 +12,7 @@ namespace Phantom.Core
         private static long nextID = 0;
 
         public readonly long ID;
+		public bool Ghost;
         public Vector2 Position;
         public float Orientation;
         private float mass;
@@ -115,5 +116,26 @@ namespace Phantom.Core
                 return base.ToString() + "#" + this.ID + " (shape:" + this.shape.ToString() + ")";
             return base.ToString();
         }
+
+		public override void Update(float elapsed)
+		{
+			if (Ghost)
+				return;
+			base.Update(elapsed);
+		}
+
+		public override void Integrate(float elapsed)
+		{
+			if (Ghost)
+				return;
+			base.Integrate(elapsed);
+		}
+
+		public override void Render(Graphics.RenderInfo info)
+		{
+			if (Ghost)
+				return;
+			base.Render(info);
+		}
     }
 }
