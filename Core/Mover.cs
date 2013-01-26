@@ -99,8 +99,17 @@ namespace Phantom.Core
             float a2 = Vector2.Dot(other.Mover.Velocity, n);
             float optimusP = (2f * (a1 - a2)) / (this.Entity.Mass + other.Mass);
 
-            this.Velocity -= n * optimusP * other.Mass;
-            other.Mover.Velocity += n * optimusP * this.Entity.Mass;
+            this.TransferImpuls(-n * optimusP * other.Mass);
+            other.Mover.TransferImpuls(n * optimusP * this.Entity.Mass);
+        }
+
+        /// <summary>
+        /// Created an extra function to override particular behavior (such as ignore in a certainn directon)
+        /// </summary>
+        /// <param name="impuls"></param>
+        protected virtual void TransferImpuls(Vector2 impuls)
+        {
+            this.Velocity += impuls;
         }
 
 		/// <summary>
@@ -108,7 +117,7 @@ namespace Phantom.Core
 		/// </summary>
 		/// <param name="friction"></param>
 		/// <param name="bounce"></param>
-		protected void ApplyFrictionBounce(Vector2 normal, float friction, float bounce)
+		protected virtual void ApplyFrictionBounce(Vector2 normal, float friction, float bounce)
 		{
 			if (friction != 0 || bounce != 1)
 			{
