@@ -56,8 +56,10 @@ namespace Phantom.Misc
         public static Vector2 RotateBy(this Vector2 v, float angle)
         {
             Vector2 r = new Vector2();
-            r.X = (float)(Math.Cos(angle) * v.X - Math.Sin(angle) * v.Y);
-            r.Y = (float)(Math.Sin(angle) * v.X + Math.Cos(angle) * v.Y);
+            float cos = (float)Math.Cos(angle);
+            float sin = (float)Math.Sin(angle);
+            r.X = cos * v.X - sin * v.Y;
+            r.Y = sin * v.X + cos * v.Y;
             return r;
         }
 
