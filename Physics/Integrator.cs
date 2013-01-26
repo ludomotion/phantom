@@ -98,8 +98,6 @@ namespace Phantom.Physics
             {
                 collision.A = a;
                 collision.B = b;
-                a.AfterCollisionWith(b, collision);
-                b.AfterCollisionWith(a, collision);
                 if (a.Collidable && b.Collidable)
                 {
                     if (a.Mover != null && b.Mover != null && b.Mass < a.Mass * 100 && a.Mass < b.Mass * 100)
@@ -119,6 +117,8 @@ namespace Phantom.Physics
                         b.Mover.BounceEnergy(collision, a, -1);
                     }
                 }
+                a.AfterCollisionWith(b, collision);
+                b.AfterCollisionWith(a, collision);
             }
         }
 
