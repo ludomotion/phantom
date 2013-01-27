@@ -99,9 +99,12 @@ namespace Phantom.Graphics
                 int count = components.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    if (this == components[i])
-                        this.Parent.Render(info); // TODO: Document and test this!
-                    components[i].Render(info);
+                    if (!components[i].Ghost)
+                    {
+                        if (this == components[i])
+                            this.Parent.Render(info); // TODO: Document and test this!
+                        components[i].Render(info);
+                    }
                 }
                 this.batch.End();
             }

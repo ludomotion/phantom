@@ -18,6 +18,7 @@ namespace Phantom.Core
 
         public uint Flags { get; set; }
         public bool Destroyed { get; set; }
+        public bool Ghost;
 
         public IList<Component> Components
         {
@@ -122,9 +123,12 @@ namespace Phantom.Core
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
                 Component component = this.components[i];
-                component.Update(elapsed);
-                if (component.Destroyed)
-                    this.RemoveComponent(component);
+                if (!component.Ghost)
+                {
+                    component.Update(elapsed);
+                    if (component.Destroyed)
+                        this.RemoveComponent(component);
+                }
             }
         }
 
@@ -158,7 +162,8 @@ namespace Phantom.Core
         {
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
-                this.components[i].Render(info);
+                if (!this.components[i].Ghost)
+                    this.components[i].Render(info);
         }
 
         public virtual bool GetProperty(string name, ref object result )

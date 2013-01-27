@@ -66,5 +66,14 @@ namespace Phantom.Core
         {
             return integrator.GetEntityCloseTo(position, distance);
         }
+
+        public void RemoveGhosts()
+        {
+            for (int i = Components.Count - 1; i >= 0; i--)
+            {
+                if (Components[i].Ghost)
+                    this.RemoveComponent(Components[i]);
+            }
+        }
     }
 }

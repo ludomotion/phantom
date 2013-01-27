@@ -12,7 +12,6 @@ namespace Phantom.Core
         private static long nextID = 0;
 
         public readonly long ID;
-		public bool Ghost;
         public Vector2 Position;
         public float Orientation;
         private float mass;
