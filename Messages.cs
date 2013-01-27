@@ -22,8 +22,10 @@ namespace Phantom
         public const int CameraMoveTo = 30;
         public const int CameraJumpTo = 31;
         public const int CameraFollowEntity = 32;
-        public const int CameraStopFollowing = 33;
+		public const int CameraStopFollowing = 33;
 		public const int CameraShake = 34;
+
+		public const int RenderSetEffect = 40;
 
         public const int SetPosition = 100;
 

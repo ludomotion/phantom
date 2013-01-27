@@ -39,13 +39,14 @@ namespace Phantom.Graphics
             NonPremultiplied = 1 << 22,
             Opaque = 1 << 23,
 
-            IgnoreCamera = 1 << 30
+			IgnoreCamera = 1 << 30,
+			
+            ApplyEffect = 1 << 40
         }
 
         public int Passes { get; protected set; }
         public ViewportPolicy Policy { get; protected set; }
         public RenderOptions Options { get; protected set; }
-
 
         private Layer layer;
         private SpriteBatch batch;
@@ -53,6 +54,7 @@ namespace Phantom.Graphics
         private BlendState blendState;
 
         private Canvas canvas;
+		private Effect fx;
 
         public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
         {
@@ -82,6 +84,17 @@ namespace Phantom.Graphics
             this.layer = this.GetAncestor<Layer>();
         }
 
+		public override Component.MessageResult HandleMessage(int message, object data)
+		{
+			if (this.Options.HasFlag(RenderOptions.ApplyEffect) && message == Messages.RenderSetEffect)
+			{
+				Effect fx = data as Effect;
+				this.fx = fx;
+			}
+
+			return base.HandleMessage(message, data);
+		}
+
         public override void Render( RenderInfo info )
         {
             if (this.Parent == null || info != null)
@@ -93,7 +106,7 @@ namespace Phantom.Graphics
 
             for (int pass = 0; pass < this.Passes; pass++)
             {
-                this.batch.Begin(this.sortMode, this.blendState, null, null, null, null, info.World);
+				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
                 info.Pass = pass;
                 IList<Component> components = this.Parent.Components;
                 int count = components.Count;
@@ -241,6 +254,9 @@ namespace Phantom.Graphics
                 this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
             else if (this.canvas != null && !wantCanvas)
                 this.canvas = null;
+
+			if (!renderOptions.HasFlag(RenderOptions.ApplyEffect))
+				this.fx = null;
 
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
