@@ -118,22 +118,19 @@ namespace Phantom.Core
 
 		public override void Update(float elapsed)
 		{
-			if (Ghost)
-				return;
+			
 			base.Update(elapsed);
 		}
 
 		public override void Integrate(float elapsed)
 		{
-			if (Ghost)
-				return;
+			
 			base.Integrate(elapsed);
 		}
 
 		public override void Render(Graphics.RenderInfo info)
 		{
-			if (Ghost)
-				return;
+			
 			base.Render(info);
 		}
     }
