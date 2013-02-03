@@ -59,12 +59,31 @@ namespace Phantom.Graphics
             this.RenderFrame(info, frame, position, angle, scale, color);
         }
 
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, Vector2 scale, Color color, float alpha, bool flipHorizontal)
+        {
+            alpha = MathHelper.Clamp(alpha, 0, 1);
+            color.A = (byte)(alpha * 255);
+            color.R = (byte)(color.R * alpha);
+            color.G = (byte)(color.G * alpha);
+            color.B = (byte)(color.B * alpha);
+            Rectangle source = GetRectByFrame(frame);
+            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+        }
+
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color)
         {
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+        }
+
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color, bool flipHorizontal)
+        {
+            if (frame < 0 || frame >= this.FrameCount)
+                return;
+            Rectangle source = GetRectByFrame(frame);
+            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
