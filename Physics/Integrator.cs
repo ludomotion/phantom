@@ -120,6 +120,7 @@ namespace Phantom.Physics
                     }
                 }
                 a.AfterCollisionWith(b, collision);
+                collision.Normal *= -1;
                 b.AfterCollisionWith(a, collision);
             }
         }
