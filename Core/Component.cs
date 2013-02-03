@@ -143,7 +143,8 @@ namespace Phantom.Core
             }
         }
 
-        public virtual bool CanCollideWith( Component other )
+        //TODO: Refactor first paramater should be of tupe entity
+        public virtual bool CanCollideWith(Component other)
         {
             for (int i = 0; i < this.components.Count; i++ )
                 if (!this.components[i].CanCollideWith(other))
@@ -151,6 +152,7 @@ namespace Phantom.Core
             return true;
         }
 
+        //TODO: Refactor first paramater should be of tupe entity
         public virtual void AfterCollisionWith(Component other, CollisionData collision)
         {
             for (int i = 0; i < this.components.Count; i++)

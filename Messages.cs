@@ -26,6 +26,8 @@ namespace Phantom
 		public const int CameraShake = 34;
 
 		public const int RenderSetEffect = 40;
+        public const int FillColor = 41;
+        public const int StrokeColor = 42;
 
         public const int SetPosition = 100;
 

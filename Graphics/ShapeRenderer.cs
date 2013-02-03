@@ -119,5 +119,19 @@ namespace Phantom.Graphics
         {
             return null;
         }
+
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case Messages.FillColor:
+                    this.fill = (Color)data;
+                    return MessageResult.HANDLED;
+                case Messages.StrokeColor:
+                    this.stroke = (Color)data;
+                    return MessageResult.HANDLED;
+            }
+            return base.HandleMessage(message, data);
+        }
     }
 }
