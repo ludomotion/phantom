@@ -40,10 +40,10 @@ namespace Phantom.Cameras
             this.Position = this.Target;
 
             Viewport res = PhantomGame.Game.Resolution;
-            this.Top = this.Position.Y - res.Height * .5f;
-            this.Right = this.Position.X + res.Width * .5f;
-            this.Bottom = this.Position.Y + res.Height * .5f;
-            this.Left = this.Position.X - res.Width * .5f;
+            this.Top = this.Position.Y - res.Height * .5f / Zoom;
+            this.Right = this.Position.X + res.Width * .5f / Zoom;
+            this.Bottom = this.Position.Y + res.Height * .5f / Zoom;
+            this.Left = this.Position.X - res.Width * .5f / Zoom;
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
