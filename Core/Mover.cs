@@ -80,7 +80,7 @@ namespace Phantom.Core
 
 			float friction = this.Friction;
 			float bounce = this.Bounce;
-			if (other.Mover != null)
+			if (other.Mover != null && other.Mass < Entity.Mass * 100)
 			{
 				friction = (this.Friction + other.Mover.Friction) * .5f;
 				bounce = (this.Bounce + other.Mover.Bounce) * .5f;
