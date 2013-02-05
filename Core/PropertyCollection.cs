@@ -42,21 +42,21 @@ namespace Phantom.Core
 
         public int GetInt(string name, int defaultValue)
         {
-            if (ints.ContainsKey(name))
+            if (ints != null && ints.ContainsKey(name))
                 return ints[name];
             return defaultValue;
         }
 
         public float GetFloat(string name, float defaultValue)
         {
-            if (floats.ContainsKey(name))
+            if (floats != null && floats.ContainsKey(name))
                 return floats[name];
             return defaultValue;
         }
 
         public object GetObject(string name, object defaultValue)
         {
-            if (objects.ContainsKey(name))
+            if (objects != null && objects.ContainsKey(name))
                 return objects[name];
             return defaultValue;
         }
