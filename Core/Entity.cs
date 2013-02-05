@@ -16,6 +16,8 @@ namespace Phantom.Core
         public float Orientation;
         private float mass;
         internal float inverseMass;
+        public readonly PropertyCollection Properties;
+
         public float Mass
         {
             get
@@ -66,6 +68,7 @@ namespace Phantom.Core
             this.Mass = mass;
             this.InitiateCollision = true;
             this.Collidable = true;
+            this.Properties = new PropertyCollection();
         }
 
         public Entity(Vector2 position)
