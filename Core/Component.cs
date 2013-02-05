@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Phantom.Graphics;
 using Phantom.Physics;
+using System.Diagnostics;
 
 namespace Phantom.Core
 {
@@ -143,8 +144,7 @@ namespace Phantom.Core
             }
         }
 
-        //TODO: Refactor first paramater should be of tupe entity
-        public virtual bool CanCollideWith(Component other)
+        public virtual bool CanCollideWith(Entity other)
         {
             for (int i = 0; i < this.components.Count; i++ )
                 if (!this.components[i].CanCollideWith(other))
@@ -152,8 +152,7 @@ namespace Phantom.Core
             return true;
         }
 
-        //TODO: Refactor first paramater should be of tupe entity
-        public virtual void AfterCollisionWith(Component other, CollisionData collision)
+        public virtual void AfterCollisionWith(Entity other, CollisionData collision)
         {
             for (int i = 0; i < this.components.Count; i++)
                 this.components[i].AfterCollisionWith(other, collision);
@@ -168,8 +167,17 @@ namespace Phantom.Core
                     this.components[i].Render(info);
         }
 
+
+        /// <summary>
+        /// DEPRICATED
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public virtual bool GetProperty(string name, ref object result )
         {
+            Debug.WriteLine("USING DEPRICATED METHOD: GetProperty!");
+            
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetProperty(name, ref result))
@@ -177,8 +185,15 @@ namespace Phantom.Core
             return false;
         }
 
+        /// <summary>
+        /// DEPRICATED
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public virtual bool GetBoolean(string name, ref bool result)
         {
+            Debug.WriteLine("USING DEPRICATED METHOD: GetBoolean!");
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetBoolean(name, ref result))
@@ -186,8 +201,15 @@ namespace Phantom.Core
             return false;
         }
 
+        /// <summary>
+        /// DEPRICATED
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public virtual bool GetFloat(string name, ref float result)
         {
+            Debug.WriteLine("USING DEPRICATED METHOD: GetFloat!");
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetFloat(name, ref result))
@@ -195,8 +217,15 @@ namespace Phantom.Core
             return false;
         }
 
+        /// <summary>
+        /// DEPRICATED
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public virtual bool GetString(string name, ref string result)
         {
+            Debug.WriteLine("USING DEPRICATED METHOD: GetString!");
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetString(name, ref result))
