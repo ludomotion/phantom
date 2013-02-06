@@ -24,7 +24,8 @@ namespace Phantom
         public const int CameraFollowEntity = 32;
 		public const int CameraStopFollowing = 33;
 		public const int CameraShake = 34;
-
+        public const int CameraMoveBy = 35;
+        
 		public const int RenderSetEffect = 40;
         public const int FillColor = 41;
         public const int StrokeColor = 42;
@@ -33,6 +34,9 @@ namespace Phantom
 
         public const int PhysicsPause = 200;
         public const int PhysicsResume = 201;
+
+        public const int MapLoaded = 210;
+        public const int MapReset = 211;
 
         public const int Unknown = -1;
     }
