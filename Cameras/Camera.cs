@@ -16,7 +16,6 @@ namespace Phantom.Cameras
 		public Vector2 Focus;
         public Vector2 Position;
         public Vector2 Target;
-        public Vector2 NextTarget;
 
 		public float Orientation;
         public float Zoom;
@@ -35,7 +34,6 @@ namespace Phantom.Cameras
 
         public override void Update(float elapsed)
         {
-            this.Target = this.NextTarget;
             base.Update(elapsed);
             this.Position = this.Target;
 
@@ -51,11 +49,16 @@ namespace Phantom.Cameras
             switch (message)
             {
                 case Messages.CameraJumpTo:
-                    this.Position = this.Target = this.NextTarget = (Vector2)data;
+                    this.Position = this.Target = (Vector2)data;
                     this.HandleMessage(Messages.CameraStopFollowing, null);
                     return MessageResult.CONSUMED;
                 case Messages.CameraMoveTo:
-                    this.Target = this.NextTarget = (Vector2)data;
+                    this.Target = (Vector2)data;
+                    this.HandleMessage(Messages.CameraStopFollowing, null);
+                    return MessageResult.CONSUMED;
+                case Messages.CameraMoveBy:
+                    this.Target += (Vector2)data;
+                    this.Position += (Vector2)data;
                     this.HandleMessage(Messages.CameraStopFollowing, null);
                     return MessageResult.CONSUMED;
             }

@@ -39,7 +39,11 @@ namespace Phantom.Cameras.Components
                     this.subject = data as Entity;
                     return MessageResult.CONSUMED;
                 case Messages.CameraStopFollowing:
-                    this.subject = null;
+                    if (this.subject != null)
+                    {
+                        this.subject = null;
+                        this.Camera.Target = this.Camera.Position;
+                    }
                     return MessageResult.CONSUMED;
             }
             return base.HandleMessage(message, data);
