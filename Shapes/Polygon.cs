@@ -51,8 +51,9 @@ namespace Phantom.Shapes
             ParsePolygon();
         }
 
-        protected void SetPolygon(params Vector2[] vertices)
+        public void SetPolygon(params Vector2[] vertices)
         {
+            cachedAngle = float.NaN;
             for (int i = 0; i < this.Vertices.Length && i < vertices.Length; i++)
                 this.Vertices[i] = vertices[i];
 
