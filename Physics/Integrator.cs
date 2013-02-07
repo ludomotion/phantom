@@ -168,6 +168,15 @@ namespace Phantom.Physics
             return null;
         }
 
+        public virtual List<Entity> GetEntitiesAt(Vector2 position)
+        {
+            List<Entity> result = new List<Entity>();
+            for (int i = 0; i < entities.Count; i++)
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InShape(position))
+                    result.Add(entities[i]);
+            return result;
+        }
+
         public virtual Entity GetEntityCloseTo(Vector2 position, float distance)
         {
             for (int i = 0; i < entities.Count; i++)

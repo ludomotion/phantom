@@ -192,6 +192,35 @@ namespace Phantom.Physics
             return null;
         }
 
+        public override List<Entity> GetEntitiesAt(Vector2 position)
+        {
+            List<Entity> result = new List<Entity>();
+            int tX = (int)(position.X / this.tileSize);
+            int tY = (int)(position.Y / this.tileSize);
+            int minX = Math.Max(tX - 1, 0);
+            int maxX = Math.Min(tX + 1, this.tilesX - 1);
+            int minY = Math.Max(tY - 1, 0);
+            int maxY = Math.Min(tY + 1, this.tilesY - 1);
+
+            for (int i = 0; i < neighbors.Length; i += 2)
+            {
+                int x = tX + neighbors[i];
+                int y = tY + neighbors[i + 1];
+                if (x >= minX && x <= maxX && y >= minY && y <= maxY)
+                {
+                    Tile tt = this.tiles[y * this.tilesX + x];
+                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+                    {
+                        Entity o = tt.Entities[j];
+                        if (o.Shape != null && o.Shape.InShape(position))
+                            result.Add(o);
+                    }
+                }
+
+            }
+            return result;
+        }
+
         public override Entity GetEntityCloseTo(Vector2 position, float distance)
         {
             int tX = (int)(position.X / this.tileSize);
