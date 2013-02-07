@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Phantom.Core
 {
@@ -58,6 +59,20 @@ namespace Phantom.Core
         {
             if (objects != null && objects.ContainsKey(name))
                 return objects[name];
+            return defaultValue;
+        }
+
+        public string GetString(string name, string defaultValue)
+        {
+            if (objects != null && objects.ContainsKey(name) && objects[name] is string)
+                return (string)objects[name];
+            return defaultValue;
+        }
+
+        public Color GetColor(string name, Color defaultValue)
+        {
+            if (objects != null && objects.ContainsKey(name) && objects[name] is Color)
+                return (Color)objects[name];
             return defaultValue;
         }
         

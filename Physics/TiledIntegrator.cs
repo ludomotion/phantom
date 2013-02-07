@@ -77,6 +77,27 @@ namespace Phantom.Physics
             base.OnAdd(parent);
         }
 
+        internal override void ChangeSize(Vector2 bounds, bool destroyEntities)
+        {
+            base.ChangeSize(bounds, destroyEntities);
+            float w = bounds.X;
+            float h = bounds.Y;
+
+            this.tilesX = (int)Math.Ceiling(w / this.tileSize);
+            this.tilesY = (int)Math.Ceiling(h / this.tileSize);
+            this.tileCount = this.tilesX * this.tilesY;
+
+            this.tiles = new Tile[this.tileCount];
+            for (int i = 0; i < this.tileCount; i++)
+                this.tiles[i] = new Tile(i % this.tilesX, i / this.tilesX);
+
+            for (int i = 0; i < entities.Count; i++)
+            {
+                entities[i].Integrate(0);
+            }
+        }
+
+
         internal override void OnComponentAddedToLayer(Component component)
         {
             base.OnComponentAddedToLayer(component);
@@ -248,5 +269,6 @@ namespace Phantom.Physics
             }
             return null;
         }
+
     }
 }

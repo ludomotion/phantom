@@ -184,5 +184,17 @@ namespace Phantom.Physics
                     return entities[i];
             return null;
         }
+
+        internal virtual void ChangeSize(Vector2 bounds, bool destroyEntities)
+        {
+            for (int i = entities.Count -1; i >= 0; i--)
+            {
+                if (entities[i].Position.X < 0 || entities[i].Position.Y < 0 || entities[i].Position.X > bounds.X || entities[i].Position.Y > bounds.Y)
+                {
+                    entities[i].Destroyed = true;
+                    Parent.RemoveComponent(entities[i]);
+                }
+            }
+        }
     }
 }

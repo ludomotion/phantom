@@ -21,6 +21,10 @@ namespace Phantom.Core
             this.integrator = integrator;
             this.AddComponent(this.renderer);
             this.AddComponent(this.integrator);
+            this.Properties = new PropertyCollection();
+            this.Properties.Objects["editable"] = "EntityLayer";
+            this.Properties.Floats["Width"] = width;
+            this.Properties.Floats["Height"] = height;
         }
 
         public EntityLayer(Renderer renderer, Integrator integrator)
@@ -79,6 +83,23 @@ namespace Phantom.Core
                 if (Components[i].Ghost)
                     this.RemoveComponent(Components[i]);
             }
+        }
+
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case Messages.PropertiesChanged:
+                    ChangeSize(Properties.GetFloat("Width", this.Bounds.X), Properties.GetFloat("Height", this.Bounds.Y));
+                    return MessageResult.HANDLED;
+            }
+            return base.HandleMessage(message, data);
+        }
+
+        private void ChangeSize(float width, float height)
+        {
+            this.Bounds = new Vector2(width, height);
+            integrator.ChangeSize(this.Bounds, true);
         }
     }
 }

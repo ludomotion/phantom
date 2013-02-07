@@ -20,6 +20,7 @@ namespace Phantom.Core
         public uint Flags { get; set; }
         public bool Destroyed { get; set; }
         public bool Ghost;
+        public PropertyCollection Properties;
 
         public IList<Component> Components
         {

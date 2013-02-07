@@ -16,7 +16,7 @@ namespace Phantom.Core
         public float Orientation;
         private float mass;
         internal float inverseMass;
-        public readonly PropertyCollection Properties;
+        
 
         public float Mass
         {
