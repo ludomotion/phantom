@@ -38,6 +38,8 @@ namespace Phantom
         public const int MapLoaded = 210;
         public const int MapReset = 211;
 
+        public const int PropertiesChanged = 999;
+
         public const int Unknown = -1;
     }
 }
