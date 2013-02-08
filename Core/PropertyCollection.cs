@@ -48,11 +48,34 @@ namespace Phantom.Core
             return defaultValue;
         }
 
+        public void SetInt(string name, int value)
+        {
+            Ints[name] = value;
+        }
+
+        public bool GetBoolean(string name, bool defaultValue)
+        {
+            if (ints != null && ints.ContainsKey(name))
+                return (ints[name]>0);
+            return defaultValue;
+        }
+
+        public void SetBoolean(string name, bool value)
+        {
+            Ints[name] = value ? 1 : 0;
+        }
+
+
         public float GetFloat(string name, float defaultValue)
         {
             if (floats != null && floats.ContainsKey(name))
                 return floats[name];
             return defaultValue;
+        }
+
+        public void SetFloat(string name, float value)
+        {
+            Floats[name] = value;
         }
 
         public object GetObject(string name, object defaultValue)
@@ -62,11 +85,21 @@ namespace Phantom.Core
             return defaultValue;
         }
 
+        public void SetObject(string name, object value)
+        {
+            Objects[name] = value;
+        }
+
         public string GetString(string name, string defaultValue)
         {
             if (objects != null && objects.ContainsKey(name) && objects[name] is string)
                 return (string)objects[name];
             return defaultValue;
+        }
+
+        public void SetString(string name, string value)
+        {
+            Objects[name] = value;
         }
 
         public Color GetColor(string name, Color defaultValue)
@@ -75,6 +108,11 @@ namespace Phantom.Core
                 return (Color)objects[name];
             return defaultValue;
         }
-        
+
+        public void SetColor(string name, Color value)
+        {
+            Objects[name] = value;
+        }
+
     }
 }

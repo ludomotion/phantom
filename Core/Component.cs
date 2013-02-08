@@ -168,7 +168,7 @@ namespace Phantom.Core
                     this.components[i].Render(info);
         }
 
-
+        //*/
         /// <summary>
         /// DEPRICATED
         /// </summary>
@@ -234,7 +234,7 @@ namespace Phantom.Core
             return false;
         }
         
-
+        //*/
 
         public IEnumerable<T> GetAllComponentsByType<T>() where T : Component
         {
