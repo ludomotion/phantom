@@ -204,7 +204,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (o.Shape != null && o.Shape.InShape(position))
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
                             return o;
                     }
                 }
@@ -233,7 +233,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (o.Shape != null && o.Shape.InShape(position))
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
                             result.Add(o);
                     }
                 }
@@ -261,7 +261,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
                             return o;
                     }
                 }
