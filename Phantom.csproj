@@ -151,7 +151,17 @@
     <Compile Include="Shapes\ShapeVisitor.cs" />
     <Compile Include="Shapes\Visitors\CircleVisitor.cs" />
     <Compile Include="Shapes\Visitors\PolygonVisitor.cs" />
+    <Compile Include="UI\GUISettings.cs" />
+    <Compile Include="UI\PhButton.cs" />
+    <Compile Include="UI\PhControl.cs" />
+    <Compile Include="UI\PhInputDialog.cs" />
+    <Compile Include="UI\PhTextEdit.cs" />
+    <Compile Include="UI\PhWindow.cs" />
+    <Compile Include="Utils\Editor.cs" />
+    <Compile Include="Utils\EntityMap.cs" />
+    <Compile Include="Utils\MapLoader.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

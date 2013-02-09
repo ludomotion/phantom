@@ -63,6 +63,11 @@ namespace Phantom.Misc
             return r;
         }
 
+        public static Vector2 FromAngle(float angle)
+        {
+            return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
+        }
+
         public static Vector2 Flatten(this Vector3 self)
         {
             return new Vector2(self.X, self.Y);

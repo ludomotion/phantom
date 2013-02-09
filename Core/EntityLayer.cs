@@ -23,6 +23,8 @@ namespace Phantom.Core
             this.AddComponent(this.integrator);
             this.Properties = new PropertyCollection();
             this.Properties.Objects["editable"] = "EntityLayer";
+            this.Properties.Ints["tiles"] = 1;
+            this.Properties.Ints["entities"] = 1;
             this.Properties.Floats["Width"] = width;
             this.Properties.Floats["Height"] = height;
         }
