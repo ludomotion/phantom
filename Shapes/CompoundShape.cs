@@ -61,6 +61,11 @@ namespace Phantom.Shapes
             this.UpdateRoughRadius();
         }
 
+        public void SetOffset(Vector2 offset, int index)
+        {
+            this.shapes[index].Offset = offset;
+        }
+
         private void UpdateRoughRadius()
         {
             roughRadius = 0;
