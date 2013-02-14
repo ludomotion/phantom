@@ -361,5 +361,15 @@ namespace Phantom
             this.XnaGame.Exit();
         }
 
+
+        public T GetState<T>() where T : GameState
+        {
+            for (int i = this.states.Count - 1; i >= 0; i--)
+            {
+                if (this.states[i] is T)
+                    return (T)this.states[i];
+            }
+            return null;
+        }
     }
 }
