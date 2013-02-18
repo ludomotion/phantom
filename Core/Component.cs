@@ -247,6 +247,20 @@ namespace Phantom.Core
             }
         }
 
+        //TODO Temp function as the function above leads to weird behavior
+        public List<T> GetAllComponentsByTypeAsList<T>() where T : Component
+        {
+            int count = this.Components.Count;
+            List<T> result = new List<T>();
+            for (int i = 0; i < count; i++)
+            {
+                Component component = this.Components[i];
+                if (component is T)
+                    result.Add(component as T);
+            }
+            return result;
+        }
+        
         public T GetComponentByType<T>(int nth) where T : Component
         {
             int count = this.Components.Count;
