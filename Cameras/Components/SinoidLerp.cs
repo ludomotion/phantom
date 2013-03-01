@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Phantom.Cameras.Components
 {
@@ -13,25 +14,22 @@ namespace Phantom.Cameras.Components
         private Vector2 start;
         private Vector2 target;
         private bool lerping;
-        private bool started;
 
-        public SinoidLerp(float duration)
+        public SinoidLerp(Vector2 target, float duration)
         {
             this.duration = duration;
-            this.lerping = false;
-            this.started = false;
+			this.target = target;
+            this.lerping = true;
         }
+
+		public override void OnAdd(Core.Component parent)
+		{
+			this.start = (parent as Camera).Position;
+			base.OnAdd(parent);
+		}
 
         public override void Update(float elapsed)
         {
-            if (this.Camera.Target != this.Camera.Position && !started)
-            {
-                this.start = this.Camera.Position;
-                this.target = this.Camera.Target;
-                this.lerping = true;
-                this.timer = 0;
-                this.started = true;
-            }
             if (this.lerping)
             {
                 this.timer += elapsed;
@@ -41,7 +39,9 @@ namespace Phantom.Cameras.Components
                 if (this.timer >= this.duration)
                 {
                     this.lerping = false;
+					Debug.WriteLine("Settings target and position to: " + this.target);
                     this.Camera.Target = this.Camera.Position = this.target;
+					this.Destroyed = true;
                 }
             }
             base.Update(elapsed);

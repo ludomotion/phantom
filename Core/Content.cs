@@ -85,9 +85,12 @@ namespace Phantom.Core
                     assets = this.contexts[this.activeContexts[j]];
                     for (int i = 0; i < assets.Count; i++)
                     {
-                        object o = this.manager.Load<object>(assets[i]);
-                        if (o is IDisposable)
-                            (o as IDisposable).Dispose();
+						lock (PhantomGame.Game.GlobalRenderLock)
+						{
+							object o = this.manager.Load<object>(assets[i]);
+							if (o is IDisposable)
+								(o as IDisposable).Dispose();
+						}
 #if DEBUG
                         this.loaded.Remove(assets[i]);
 #endif
@@ -97,7 +100,10 @@ namespace Phantom.Core
             assets = this.contexts[contextName];
             for (int i = 0; i < assets.Count; i++)
             {
-                this.manager.Load<object>(assets[i]);
+				lock (PhantomGame.Game.GlobalRenderLock)
+				{
+					this.manager.Load<object>(assets[i]);
+				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
 #endif
