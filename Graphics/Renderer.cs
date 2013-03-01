@@ -106,20 +106,23 @@ namespace Phantom.Graphics
 
             for (int pass = 0; pass < this.Passes; pass++)
             {
-				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-                info.Pass = pass;
-                IList<Component> components = this.Parent.Components;
-                int count = components.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    if (!components[i].Ghost)
-                    {
-                        if (this == components[i])
-                            this.Parent.Render(info); // TODO: Document and test this!
-                        components[i].Render(info);
-                    }
-                }
-                this.batch.End();
+				lock (PhantomGame.Game.GlobalRenderLock)
+				{
+					this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
+					info.Pass = pass;
+					IList<Component> components = this.Parent.Components;
+					int count = components.Count;
+					for (int i = 0; i < count; i++)
+					{
+						if (!components[i].Ghost)
+						{
+							if (this == components[i])
+								this.Parent.Render(info); // TODO: Document and test this!
+							components[i].Render(info);
+						}
+					}
+					this.batch.End();
+				}
             }
 
             base.Render(info);

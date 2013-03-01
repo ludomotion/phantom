@@ -36,6 +36,7 @@ namespace Phantom
         public Viewport Resolution { get; private set; }
 
         protected readonly Microsoft.Xna.Framework.Game XnaGame;
+		public readonly object GlobalRenderLock = new object();
         
         protected GraphicsDeviceManager graphics;
         public GraphicsDevice GraphicsDevice { get; private set; }

@@ -140,7 +140,10 @@ namespace Phantom.Core
                 Debug.WriteLine("WARNING: Asset '" + assetName + "' is not loaded in the current context!!!");
             }
 #endif
-            return this.manager.Load<T>(assetName);
+			lock (PhantomGame.Game.GlobalRenderLock)
+			{
+				return this.manager.Load<T>(assetName);
+			}
         }
 
     }
