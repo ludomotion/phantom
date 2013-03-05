@@ -343,7 +343,8 @@ namespace Phantom
             {
                 if (this.states[i] == before)
                 {
-                    this.states.Insert(i, state);
+					this.states.Insert(i, state);
+					state.OnAdd(this);
                     return true;
                 }
             }

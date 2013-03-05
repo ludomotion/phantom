@@ -63,9 +63,14 @@ namespace Phantom.Graphics
             this.Options = renderOptions;
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
-            if ((renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas)
-                this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
-            this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
+
+			// Doing a renderlock because renderers might be constructed in different threads.
+			lock (PhantomGame.Game.GlobalRenderLock)
+			{
+				if ((renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas)
+					this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
+				this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
+			}
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
