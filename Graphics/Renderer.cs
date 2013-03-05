@@ -53,6 +53,8 @@ namespace Phantom.Graphics
         private SpriteSortMode sortMode;
         private BlendState blendState;
 
+        private Action<RenderInfo> activeRenderPass;
+
         private Canvas canvas;
 		private Effect fx;
 
@@ -64,13 +66,18 @@ namespace Phantom.Graphics
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
 
-			// Doing a renderlock because renderers might be constructed in different threads.
+            // Doing a GlobalRenderLock because Renderer objects might be constructed in different threads.
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 				if ((renderOptions & RenderOptions.Canvas) == RenderOptions.Canvas)
 					this.canvas = new Canvas(PhantomGame.Game.GraphicsDevice);
 				this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
 			}
+
+            if (this.sortMode == SpriteSortMode.Immediate)
+                this.activeRenderPass = this.RenderPassFullLock;
+            else
+                this.activeRenderPass = this.RenderPassEndLock;
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
@@ -111,26 +118,51 @@ namespace Phantom.Graphics
 
             for (int pass = 0; pass < this.Passes; pass++)
             {
-				lock (PhantomGame.Game.GlobalRenderLock)
-				{
-					this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-					info.Pass = pass;
-					IList<Component> components = this.Parent.Components;
-					int count = components.Count;
-					for (int i = 0; i < count; i++)
-					{
-						if (!components[i].Ghost)
-						{
-							if (this == components[i])
-								this.Parent.Render(info); // TODO: Document and test this!
-							components[i].Render(info);
-						}
-					}
-					this.batch.End();
-				}
+                info.Pass = pass;
+                this.activeRenderPass(info);
             }
 
             base.Render(info);
+        }
+
+        private void RenderPassFullLock(RenderInfo info)
+        {
+            lock (PhantomGame.Game.GlobalRenderLock)
+            {
+                this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
+                IList<Component> components = this.Parent.Components;
+                int count = components.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    if (!components[i].Ghost)
+                    {
+                        if (this == components[i])
+                            this.Parent.Render(info); // TODO: Document and test this!
+                        components[i].Render(info);
+                    }
+                }
+                this.batch.End();
+            }
+        }
+
+        private void RenderPassEndLock(RenderInfo info)
+        {
+            this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
+            IList<Component> components = this.Parent.Components;
+            int count = components.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (!components[i].Ghost)
+                {
+                    if (this == components[i])
+                        this.Parent.Render(info); // TODO: Document and test this!
+                    components[i].Render(info);
+                }
+            }
+            lock (PhantomGame.Game.GlobalRenderLock)
+            {
+                this.batch.End();
+            }
         }
 
         private RenderInfo BuildRenderInfo()
@@ -263,11 +295,16 @@ namespace Phantom.Graphics
             else if (this.canvas != null && !wantCanvas)
                 this.canvas = null;
 
-			if (!renderOptions.HasFlag(RenderOptions.ApplyEffect))
-				this.fx = null;
+            if (!renderOptions.HasFlag(RenderOptions.ApplyEffect))
+                this.fx = null;
 
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
+
+            if (this.sortMode == SpriteSortMode.Immediate)
+                this.activeRenderPass = this.RenderPassFullLock;
+            else
+                this.activeRenderPass = this.RenderPassEndLock;
         }
 
 
