@@ -10,7 +10,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Phantom</RootNamespace>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
-    <AssemblyName>Phantom</AssemblyName>
     <LastXamMacNagTime>1-2-2013 13:53:41</LastXamMacNagTime>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
   </PropertyGroup>
@@ -26,6 +25,7 @@
     <DefineConstants>MACOS</DefineConstants>
     <UseSGen>False</UseSGen>
     <StartupObject>Bezircle.Program</StartupObject>
+    <AssemblyName>Phantom</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Mac' ">
     <DebugType>full</DebugType>
@@ -42,6 +42,19 @@
     <CodeSigningKey>Mac Developer</CodeSigningKey>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <StartupObject>Bezircle.Program</StartupObject>
+    <AssemblyName>Phantom</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AppStore|Mac' ">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Mac\AppStore</OutputPath>
+    <WarningLevel>4</WarningLevel>
+    <IncludeMonoRuntime>False</IncludeMonoRuntime>
+    <UseSGen>False</UseSGen>
+    <EnableCodeSigning>False</EnableCodeSigning>
+    <AssemblyName>Phantom.MacOS</AssemblyName>
+    <EnablePackageSigning>False</EnablePackageSigning>
+    <CreatePackage>False</CreatePackage>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MonoMac" />
@@ -145,5 +158,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Cameras\" />
+    <Folder Include="Core\" />
+    <Folder Include="Graphics\" />
+    <Folder Include="Misc\" />
+    <Folder Include="Physics\" />
+    <Folder Include="Shapes\" />
+    <Folder Include="UI\" />
+    <Folder Include="Utils\" />
   </ItemGroup>
 </Project>
