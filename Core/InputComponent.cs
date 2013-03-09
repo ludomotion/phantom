@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
+#if TOUCH
+using Microsoft.Xna.Framework.Input.Touch;
+#endif
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
@@ -62,6 +65,18 @@ namespace Phantom.Core
                     return Microsoft.Xna.Framework.Input.GamePad.GetState(this.index);
             }
         }
+#if TOUCH
+		public TouchCollection Touch
+		{
+			get
+			{
+				if (this.input != null)
+					return this.input.CurrentTouchState;
+				else
+					return Microsoft.Xna.Framework.Input.Touch.TouchPanel.GetState();
+			}
+		}
+#endif
 
         private PlayerIndex index;
         private bool messages;
@@ -159,6 +174,10 @@ namespace Phantom.Core
             if (currMouse.XButton2 == ButtonState.Pressed && prevMouse.XButton2 == ButtonState.Released)
                 this.Parent.HandleMessage(Messages.InputMouseJustDown, XButton2);
 
+#if TOUCH
+			if(this.input.IsTouchJustDown())
+				this.Parent.HandleMessage(Messages.InputTouchJustDown, this.input.GetTouchCount());
+#endif
         }
 
         private void MessageBoundActions()
@@ -241,24 +260,48 @@ namespace Phantom.Core
         {
             return this.input.CurrentGamePadStates[(int)this.index].IsButtonUp(button);
         }
-        public bool IsKeyJustDown(Keys key)
-        {
-            return this.input.CurrentKeyboardState.IsKeyDown(key) && this.input.PreviousKeyboardState.IsKeyUp(key);
-        }
-        public bool IsKeyJustUp(Keys key)
+		public bool IsKeyJustDown(Keys key)
+		{
+			return this.input.CurrentKeyboardState.IsKeyDown(key) && this.input.PreviousKeyboardState.IsKeyUp(key);
+		}
+		public bool IsKeyJustUp(Keys key)
         {
             return this.input.CurrentKeyboardState.IsKeyUp(key) && this.input.PreviousKeyboardState.IsKeyDown(key);
         }
-        public bool IsButtonJustDown(Buttons button)
-        {
-            int i = (int)this.index;
-            return this.input.CurrentGamePadStates[i].IsButtonDown(button) && this.input.PreviousGamePadStates[i].IsButtonUp(button);
-        }
-        public bool IsButtonJustUp(Buttons button)
+		public bool IsButtonJustDown(Buttons button)
+		{
+			int i = (int)this.index;
+			return this.input.CurrentGamePadStates[i].IsButtonDown(button) && this.input.PreviousGamePadStates[i].IsButtonUp(button);
+		}
+		public bool IsButtonJustUp(Buttons button)
         {
             int i = (int)this.index;
             return this.input.CurrentGamePadStates[i].IsButtonUp(button) && this.input.PreviousGamePadStates[i].IsButtonDown(button);
         }
+		public int GetTouchCount()
+		{
+			return this.input.GetTouchCount();
+		}
+		public bool IsTouchJustDown()
+		{
+			return this.input.IsTouchJustDown();
+		}
+		public bool IsTouchJustUp()
+		{
+			return this.input.IsTouchJustUp();
+		}
+		public Vector2 GetTouchJustDown()
+		{
+			return this.input.GetTouchJustDown();
+		}
+		public Vector2 GetTouchJustUp()
+		{
+			return this.input.GetTouchJustUp();
+		}
+		public Vector2 GetMovedTouch()
+		{
+			return this.input.GetMovedTouch();
+		}
 
 
         private struct BindAction

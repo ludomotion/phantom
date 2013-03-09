@@ -18,6 +18,8 @@ namespace Phantom
         public const int InputMouseJustDown = 22;
 		public const int InputKeyJustUp = 23;
 		public const int InputButtonJustUp = 24;
+		public const int InputTouchJustDown = 25;
+		public const int InputTouchJustUp = 26;
 
         public const int CameraMoveTo = 30;
         public const int CameraJumpTo = 31;
