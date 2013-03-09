@@ -69,10 +69,24 @@ namespace Phantom.Shapes
             return (delta.LengthSquared() < this.Radius * this.Radius);
         }
 
-        public override CollisionData Collide(Shape other)
-        {
-            return other.Accept<CollisionData, Circle>(visitor, this);
-        }
+		public override CollisionData Collide(Shape other)
+		{
+			#if IOS
+			// Generic Virtual Methods cannot be called in iOS, due to iOS not allowing JIT-compiling
+			if(other is Circle)
+				return CollisionChecks.CircleCircle(this, (Circle)other);
+			else if(other is OABB)
+				return CollisionChecks.CirclePolygon(this, (OABB)other);
+			else if(other is Polygon)
+				return CollisionChecks.CirclePolygon(this, (Polygon)other);
+			else if(other is CompoundShape)
+				return CollisionData.Empty;
+			else
+				return CollisionData.Empty;
+			#else
+			return other.Accept<CollisionData, Circle>(visitor, this);
+			#endif
+		}
 
         public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
         {
