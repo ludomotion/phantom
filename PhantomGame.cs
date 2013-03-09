@@ -264,10 +264,10 @@ namespace Phantom
         public void SetResolution(int width, int height, bool fullscreen)
         {
             if (width <= 0)
-                width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+				width = Math.Max (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
             if (height <= 0)
-                height = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            this.graphics.PreferredBackBufferWidth = width;
+				height = Math.Min (GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+			this.graphics.PreferredBackBufferWidth = width;
             this.graphics.PreferredBackBufferHeight = height;
             this.graphics.IsFullScreen = fullscreen;
             this.graphics.ApplyChanges();
