@@ -7,6 +7,10 @@ using System.Diagnostics;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Core
 {
     /// <summary>

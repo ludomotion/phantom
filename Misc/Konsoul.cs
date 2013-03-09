@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Misc
 {
     public delegate void ConsoleCommand(string[] argv);
@@ -162,8 +166,8 @@ namespace Phantom.Misc
             }
 #endif // WINDOWS || LINUX || MONOMAC
 
-#if !XBOX
-            Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
+#if WINDOWS || LINUX || MONOMAC
+			Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
 #endif // !XBOX
             this.SetupVertices();
             this.SetupDefaultCommands();
@@ -177,8 +181,8 @@ namespace Phantom.Misc
 
         public override void Dispose()
         {
-#if !XBOX
-            Trace.Listeners.Remove(this.listener);
+#if WINDOWS || LINUX || MONOMAC
+			Trace.Listeners.Remove(this.listener);
 #endif // !XBOX
 
 #if WINDOWS || LINUX || MONOMAC

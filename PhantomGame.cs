@@ -13,6 +13,10 @@ using System.Diagnostics;
 using Phantom.Graphics;
 using Phantom.Utils.Performance;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom
 {
     public class PhantomGame : Component, IDisposable

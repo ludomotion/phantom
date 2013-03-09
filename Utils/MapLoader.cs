@@ -11,6 +11,10 @@ using System.Text.RegularExpressions;
 using Phantom.Misc;
 using System.Globalization;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Utils
 {
     public class MapLoader

@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Misc.Tests
 {
     public class RendererCanvasTest : Component
