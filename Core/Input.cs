@@ -154,6 +154,8 @@ namespace Phantom.Core
 #if TOUCH
 			if(!this.CurrentTouchState.IsConnected) return Vector2.Zero;
 
+			if(CurrentTouchState.Count == 1 && PreviousTouchState.Count == 0) return CurrentTouchState[0].Position;
+
 			for(int i = 0; i < this.CurrentTouchState.Count; i++)
 			{
 				if(CurrentTouchState[i].State == TouchLocationState.Pressed) return CurrentTouchState[i].Position;
@@ -168,6 +170,8 @@ namespace Phantom.Core
 #if TOUCH
 			if(!this.CurrentTouchState.IsConnected) return Vector2.Zero;
 			
+			if(CurrentTouchState.Count == 0 && PreviousTouchState.Count == 1) return PreviousTouchState[0].Position;
+
 			for(int i = 0; i < this.CurrentTouchState.Count; i++)
 			{
 				if(CurrentTouchState[i].State == TouchLocationState.Released) return CurrentTouchState[i].Position;
