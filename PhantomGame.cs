@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Phantom.Core;
@@ -41,7 +41,7 @@ namespace Phantom
 
         public Viewport Resolution { get; private set; }
 
-        protected readonly Microsoft.Xna.Framework.Game XnaGame;
+		public static Microsoft.Xna.Framework.Game XnaGame { get; private set; }
 		public readonly object GlobalRenderLock = new object();
         
         protected GraphicsDeviceManager graphics;
@@ -99,13 +99,13 @@ namespace Phantom
 			Profiler.Initialize(this, 16);
 #endif
 
-            this.XnaGame = new Microsoft.Xna.Framework.Game();
-            this.XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
-            this.XnaGame.Window.Title = this.Name;
-            this.XnaGame.Content.RootDirectory = "Content";
-            this.XnaGame.Components.Add(new XnaPhantomComponent(this));
+            XnaGame = new Microsoft.Xna.Framework.Game();
+            XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
+            XnaGame.Window.Title = this.Name;
+            XnaGame.Content.RootDirectory = "Content";
+            XnaGame.Components.Add(new XnaPhantomComponent(this));
 
-            this.Content = new Content(this.XnaGame.Content);
+            this.Content = new Content(XnaGame.Content);
 
             this.SetupGraphics();
             this.graphics.ApplyChanges();
@@ -116,19 +116,19 @@ namespace Phantom
 
         public override void Dispose()
         {
-            this.XnaGame.Dispose();
+            XnaGame.Dispose();
         }
 
         public void Run()
         {
-            this.XnaGame.Run();
+            XnaGame.Run();
         }
 
         public virtual void SetupGraphics()
         {
-            this.graphics = new GraphicsDeviceManager(this.XnaGame);
+            this.graphics = new GraphicsDeviceManager(XnaGame);
 #if DEBUG
-            this.XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
+            XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
             this.graphics.PreferredBackBufferWidth = (int)this.Width;
             this.graphics.PreferredBackBufferHeight = (int)this.Height;
             this.graphics.IsFullScreen = false;
@@ -153,7 +153,7 @@ namespace Phantom
 
         internal void XnaInitialize()
         {
-            this.GraphicsDevice = this.XnaGame.GraphicsDevice;
+            this.GraphicsDevice = XnaGame.GraphicsDevice;
             this.TotalTime = 0;
 
             this.LoadContent(this.Content);
@@ -405,7 +405,7 @@ namespace Phantom
 
         public void Exit()
         {
-            this.XnaGame.Exit();
+            XnaGame.Exit();
         }
 
 
