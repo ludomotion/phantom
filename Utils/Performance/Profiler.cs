@@ -190,10 +190,13 @@ namespace Phantom.Utils.Performance
 
 	public static class ProfilerHelpers
 	{
+		[Conditional("DEBUG")]
 		public static void BeginProfiling(this Component component, string name)
 		{
 			Profiler.Instance.Begin(name);
 		}
+
+		[Conditional("DEBUG")]
 		public static void EndProfiling(this Component component, string name)
 		{
 			Profiler.Instance.End(name);

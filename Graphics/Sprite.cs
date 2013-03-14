@@ -45,6 +45,11 @@ namespace Phantom.Graphics
             renderCalls = new List<RenderCallInfo>();
         }
 
+		public static void BeginPass(int pass)
+		{
+			renderCalls.Add(new RenderCallInfo("pass #" + pass));
+		}
+
         public static void ReportRenderCalls()
         {
             int t = 0;
@@ -108,9 +113,6 @@ namespace Phantom.Graphics
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
             this.RenderFrame(info, frame, position, angle, scale, color);
-#if DEBUG
-            AddCall(Texture, scale);
-#endif
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, Vector2 scale, Color color, float alpha, bool flipHorizontal)

@@ -118,6 +118,9 @@ namespace Phantom.Graphics
 
             for (int pass = 0; pass < this.Passes; pass++)
             {
+#if DEBUG
+				Sprite.BeginPass(pass);
+#endif
                 info.Pass = pass;
                 this.activeRenderPass(info);
             }
