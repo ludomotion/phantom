@@ -249,6 +249,10 @@ namespace Phantom
             {
                 Sprite.ReportRenderCalls();
             });
+            this.Console.Register("profiler", "Toggles profiler's visibility", delegate(string[] argv)
+            {
+                Profiler.Instance.Visible = !Profiler.Instance.Visible;
+            });
 #endif
 
         }

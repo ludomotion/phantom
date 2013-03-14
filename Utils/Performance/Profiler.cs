@@ -40,6 +40,8 @@ namespace Phantom.Utils.Performance
         private int top = 0;
         private Color background;
 
+        public bool Visible = false;
+
 		private Profiler(int frameFrequency)
 		{
 			this.frameFrequency = frameFrequency;
@@ -96,7 +98,7 @@ namespace Phantom.Utils.Performance
 
 		internal void EndRender()
 		{
-			if (font != null)
+			if (font != null && this.Visible)
 			{
                 if (batch == null)
                 {
@@ -104,7 +106,7 @@ namespace Phantom.Utils.Performance
                     pixel = new Texture2D(PhantomGame.Game.GraphicsDevice, 1, 1);
                     pixel.SetData(new [] { Color.White });
                     background = Color.Black;
-                    background.A = 128;
+                    background.A = 64;
                 }
 
                 this.batch.Begin();
