@@ -8,7 +8,7 @@ namespace Phantom.Utils.Performance
 	public struct ProfilerStats
 	{
 		public int Calls;
-		public long TotalTime;
+		public int TotalTime;
 		public float Percentage;
 		public float Min;
 		public float Max;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
 
@@ -20,6 +21,8 @@ namespace Phantom.Utils.Performance
 			Profiler.Instance = new Profiler(frequency);
 			game.InsertComponent(0, Profiler.Instance);
 		}
+
+		public bool ReportOnNextReady = false;
 
 		private ProfilerNode rootNode;
 		private ProfilerNode currNode;
@@ -44,8 +47,9 @@ namespace Phantom.Utils.Performance
 
 			this.nodes = new List<ProfilerNode>();
 
-			this.rootNode = this.currNode = new ProfilerNode(0, 0);
+			this.rootNode = new ProfilerNode(0);
 			this.rootNode.Name = "root";
+			this.currNode = this.rootNode;
 			this.nodes.Add(this.currNode);
 
 		}
@@ -70,6 +74,12 @@ namespace Phantom.Utils.Performance
 					this.nodes[i].Compute();
 				for (int i = 0; i < count; i++)
 					this.nodes[i].Reset();
+
+				if( this.ReportOnNextReady )
+				{
+					this.ReportOnNextReady = false;
+					this.OutputReport(rootNode);
+				}
 			}
 		}
 
@@ -123,7 +133,7 @@ namespace Phantom.Utils.Performance
 				ProfilerNode n = currNode.GetChildByName(name);
 				if (n == null)
 				{
-					n = new ProfilerNode(currNode.Depth + 1, this.nodes.Count);
+					n = new ProfilerNode(currNode.Depth + 1);
 					this.nodes.Add(n);
 					currNode.Childern.Add(n);
 					n.Parent = currNode;
@@ -148,6 +158,33 @@ namespace Phantom.Utils.Performance
 			{
 				currNode = n;
 			}
+		}
+
+		private void OutputReport(ProfilerNode node)
+		{
+			if (node == rootNode)
+			{
+				Debug.WriteLine("PROFILED TREE - CALLS - TIME SPENT - PERCENTAGE");
+			}
+			StringBuilder output = new StringBuilder();
+			string sign = "";
+			for (int i = 0; i < node.Depth; i++)
+				sign += " ";
+			sign += node.Childern.Count > 0 ? "+" : "-";
+			output.Append(sign);
+			output.Append(" ");
+			output.Append(node.Name);
+			output.Append(" - ");
+			int calls = node.Stats.Calls;
+			output.Append(calls);
+			output.Append(" - ");
+			output.Append( node.Stats.TotalTime );
+			output.Append(" - ");
+			output.Append(node.Stats.Percentage);
+			Debug.WriteLine(output.ToString());
+
+			for (int i = 0; i < node.Childern.Count; i++)
+				this.OutputReport(node.Childern[i]);
 		}
 	}
 

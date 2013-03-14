@@ -13,24 +13,26 @@ namespace Phantom.Utils.Performance
 		public ProfilerNode Parent { get; set; }
 		public List<ProfilerNode> Childern { get; private set; }
 		public readonly int Depth;
-		public readonly int ID;
 
 		public string Name { get; set; }
 
 		public int OpenProfiles { get; private set; }
 		private Stopwatch watch;
 		private int profileInstances;
-		private long accumulator;
+		public int accumulator;
 
-		private long maxTime;
-		private long minTime;
+		private int maxTime;
+		private int minTime;
 
-		private ProfilerStats Stats;
+		public ProfilerStats Stats
+		{
+			get { return stats; }
+		}
+		private ProfilerStats stats;
 
-		public ProfilerNode( int depth, int id )
+		public ProfilerNode( int depth )
 		{
 			this.Depth = depth;
-			this.ID = id;
 
 			this.Parent = null;
 			this.Childern = new List<ProfilerNode>();
@@ -49,7 +51,8 @@ namespace Phantom.Utils.Performance
 		public void End()
 		{
 			this.watch.Stop();
-			long delta = this.watch.ElapsedMilliseconds;
+			int delta = (int)this.watch.ElapsedMilliseconds;
+			this.watch.Reset();
 			this.accumulator += delta;
 
 			this.maxTime = Math.Max(this.maxTime, delta);
@@ -62,48 +65,48 @@ namespace Phantom.Utils.Performance
 		{
 			profileInstances = 0;
 			accumulator = 0;
-			maxTime = long.MinValue;
-			minTime = long.MaxValue;
+			maxTime = 0;
+			minTime = 1;
 		}
 
 
 		public void Compute()
 		{
-			Stats = new ProfilerStats();
-			Stats.Calls = profileInstances;
-			Stats.TotalTime = accumulator;
+			this.stats = new ProfilerStats();
+			this.stats.Calls = this.profileInstances;
+			this.stats.TotalTime = this.accumulator;
 
-			if (Parent != null)
+			if (this.Parent != null)
 			{
-				if (Parent.accumulator > 0)
-					Stats.Percentage = accumulator * 100f / (float)Parent.accumulator;
+				if (this.Parent.accumulator > 0)
+					this.stats.Percentage = (this.accumulator * 100f / (float)this.Parent.accumulator);
 				else
-					Stats.Percentage = 0f;
+					this.stats.Percentage = 0f;
 			}
 			else
 			{
-				Stats.Percentage = 100f;
+				this.stats.Percentage = 100f;
 			}
-			Stats.Percentage = MathHelper.Clamp(Stats.Percentage, 0, 100);
+			this.stats.Percentage = MathHelper.Clamp(this.stats.Percentage, 0, 100);
 
-			Stats.MinPercentage = Math.Min(Stats.MinPercentage, Stats.Percentage);
-			Stats.MaxPercentage = Math.Max(Stats.MaxPercentage, Stats.Percentage);
+			this.stats.MinPercentage = Math.Min(this.stats.MinPercentage, this.stats.Percentage);
+			this.stats.MaxPercentage = Math.Max(this.stats.MaxPercentage, this.stats.Percentage);
 
 			float av = 0;
-			if (profileInstances == 0)
-				av = accumulator;
+			if (this.profileInstances == 0)
+				av = this.accumulator;
 			else
-				av = accumulator / (float)profileInstances;
+				av = this.accumulator / (float)this.profileInstances;
 
-			if (minTime == 0)
-				Stats.Min = 1;
+			if (this.minTime == 0)
+				this.stats.Min = 1;
 			else
-				Stats.Min = av / (float)minTime;
+				this.stats.Min = av / (float)this.minTime;
 
 			if (av == 0)
-				Stats.Max = 1;
+				this.stats.Max = 1;
 			else
-				Stats.Max = (float)maxTime / av;
+				this.stats.Max = (float)this.maxTime / av;
 		}
 
 		public ProfilerNode GetChildByName(string name)

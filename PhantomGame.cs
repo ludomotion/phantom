@@ -237,6 +237,10 @@ namespace Phantom
             });
 
 #if DEBUG
+			this.Console.Register("report_profiler_stats", "Output profilers stats to console.", delegate(string[] argv)
+			{
+				Profiler.Instance.ReportOnNextReady = true;
+			});
             this.Console.Register("report_sprite_usage", "Returns sprite usage debug info", delegate(string[] argv)
             {
                 this.Content.TraceDebugData();
