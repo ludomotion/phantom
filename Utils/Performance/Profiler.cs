@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Core;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Phantom.Misc;
 
 namespace Phantom.Utils.Performance
 {
 	public class Profiler : Component
 	{
-		public  static Profiler Instance { get; private set; }
+		public static Profiler Instance { get; private set; }
+
+        public static SpriteFont font = null;
 
 		public static void Initialize(PhantomGame game, int frequency)
 		{
@@ -24,6 +29,14 @@ namespace Phantom.Utils.Performance
 		private int frameCounter;
 		private bool dataReady;
 
+        private SpriteBatch batch;
+        private Texture2D pixel;
+        private int width = 400;
+        private int height = 0;
+        private int left = 1280 - 400;
+        private int top = 0;
+        private Color background;
+
 		private Profiler(int frameFrequency)
 		{
 			this.frameFrequency = frameFrequency;
@@ -34,6 +47,7 @@ namespace Phantom.Utils.Performance
 			this.rootNode = this.currNode = new ProfilerNode(0, 0);
 			this.rootNode.Name = "root";
 			this.nodes.Add(this.currNode);
+
 		}
 
 		public override void Update(float elapsed)
@@ -68,14 +82,37 @@ namespace Phantom.Utils.Performance
 		{
 			this.Begin("render");
 
-			if (this.dataReady)
-			{
-				// TODO: Render previous stats
-			}
 		}
 
 		internal void EndRender()
 		{
+			if (font != null)
+			{
+                if (batch == null)
+                {
+                    this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
+                    pixel = new Texture2D(PhantomGame.Game.GraphicsDevice, 1, 1);
+                    pixel.SetData(new [] { Color.White });
+                    background = Color.Black;
+                    background.A = 128;
+                }
+
+                this.batch.Begin();
+
+                Vector2 position = new Vector2(left, top);
+
+
+                this.batch.Draw(pixel, new Microsoft.Xna.Framework.Rectangle(left, top, width, height), background);
+
+                rootNode.Render(batch, font, ref position, left + width-240);
+                height = (int)Math.Max(height, position.Y - top);
+
+                lock (PhantomGame.Game.GlobalRenderLock)
+                {
+                    this.batch.End();
+                }
+
+			}
 			this.End("render");
 		}
 

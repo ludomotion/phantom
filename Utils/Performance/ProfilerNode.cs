@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Phantom.Utils.Performance
 {
@@ -112,5 +113,24 @@ namespace Phantom.Utils.Performance
 					return this.Childern[i];
 			return null;
 		}
-	}
+
+        internal void Render(SpriteBatch batch, SpriteFont font, ref Vector2 position, float infoX)
+        {
+            batch.DrawString(font, this.Name, position, Color.White);
+            Vector2 info = new Vector2(infoX, position.Y);
+            batch.DrawString(font, this.Stats.Calls.ToString(), info, Color.White);
+            info.X += 30;
+            batch.DrawString(font, this.Stats.TotalTime.ToString("0.0")+"ms", info, Color.White);
+            info.X += 100;
+            batch.DrawString(font, this.Stats.Percentage.ToString("0.0") + "%", info, Color.White);
+            //info.X += 40;
+            position.Y += 16;
+            position.X += 8;
+            for (int i = 0; i<this.Childern.Count; i++) 
+            {
+                this.Childern[i].Render(batch, font, ref position, infoX);
+            }
+            position.X -= 8;
+        }
+    }
 }
