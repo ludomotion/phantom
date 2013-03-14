@@ -7,6 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Graphics
 {
     public class Sprite

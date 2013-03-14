@@ -138,6 +138,9 @@
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityMap.cs" />
     <Compile Include="Utils\MapLoader.cs" />
+    <Compile Include="Utils\Performance\Profiler.cs" />
+    <Compile Include="Utils\Performance\ProfilerNode.cs" />
+    <Compile Include="Utils\Performance\ProfilerStats.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -168,5 +171,6 @@
     <Folder Include="Shapes\" />
     <Folder Include="UI\" />
     <Folder Include="Utils\" />
+    <Folder Include="Utils\Performance\" />
   </ItemGroup>
 </Project>

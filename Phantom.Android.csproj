@@ -118,6 +118,9 @@
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityMap.cs" />
     <Compile Include="Utils\MapLoader.cs" />
+    <Compile Include="Utils\Performance\Profiler.cs" />
+    <Compile Include="Utils\Performance\ProfilerNode.cs" />
+    <Compile Include="Utils\Performance\ProfilerStats.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
@@ -130,6 +133,7 @@
     <Folder Include="Shapes\" />
     <Folder Include="UI\" />
     <Folder Include="Utils\" />
+    <Folder Include="Utils\Performance\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />

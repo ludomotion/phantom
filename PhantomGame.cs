@@ -89,19 +89,22 @@ namespace Phantom
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-#if !XBOX
-            this.Name = Assembly.GetEntryAssembly().FullName;
+#if !XBOX && !ANDROID
+			this.Name = Assembly.GetEntryAssembly().FullName;
 #endif
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
 
-#if DEBUG // Setup Profiler:
+#if DEBUG
+			// Setup Profiler:
 			Profiler.Initialize(this, 16);
 #endif
 
             XnaGame = new Microsoft.Xna.Framework.Game();
             XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
+#if !ANDROID
             XnaGame.Window.Title = this.Name;
+#endif
             XnaGame.Content.RootDirectory = "Content";
             XnaGame.Components.Add(new XnaPhantomComponent(this));
 
