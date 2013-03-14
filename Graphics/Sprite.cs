@@ -5,6 +5,7 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Phantom.Graphics
 {
@@ -22,6 +23,56 @@ namespace Phantom.Graphics
 
         private int horizontalFramesCount;
         private int verticalFramesCount;
+
+#if DEBUG
+        private class RenderCallInfo 
+        {
+            public string Asset;
+            public int Calls;
+            public RenderCallInfo(string asset)
+            {
+                this.Asset = asset;
+                Calls = 1;
+            }
+        }
+
+        private static List<RenderCallInfo> renderCalls = new List<RenderCallInfo>();
+        private static List<RenderCallInfo> previousCalls;
+
+        public static void BeginFrame()
+        {
+            previousCalls = renderCalls;
+            renderCalls = new List<RenderCallInfo>();
+        }
+
+        public static void ReportRenderCalls()
+        {
+            int t = 0;
+            foreach (RenderCallInfo info in previousCalls)
+            {
+                Trace.WriteLine(info.Asset + " x" + info.Calls);
+                t += info.Calls;
+            }
+            Trace.WriteLine("Total render calls " + t);
+        }
+
+        private static void AddCall(Texture2D texture, float scale)
+        {
+            string name = PhantomGame.Game.Content.ReportDebugData(texture, scale);
+            if (renderCalls.Count > 0)
+            {
+                if (renderCalls[renderCalls.Count - 1].Asset == name)
+                    renderCalls[renderCalls.Count - 1].Calls++;
+                else
+                    renderCalls.Add(new RenderCallInfo(name));
+            }
+            else
+            {
+                renderCalls.Add(new RenderCallInfo(name));
+            }
+        }
+        
+#endif
 
 
         public Sprite(Texture2D texture, int width, int height)
@@ -58,7 +109,7 @@ namespace Phantom.Graphics
             color.B = (byte)(color.B * alpha);
             this.RenderFrame(info, frame, position, angle, scale, color);
 #if DEBUG
-            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+            AddCall(Texture, scale);
 #endif
         }
 
@@ -73,7 +124,7 @@ namespace Phantom.Graphics
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 
 #if DEBUG
-            PhantomGame.Game.Content.ReportDebugData(Texture, scale.X *0.5f + scale.Y*0.5f);
+            AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
 #endif
         }
 
@@ -84,7 +135,7 @@ namespace Phantom.Graphics
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
-            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+            AddCall(Texture, scale);
 #endif
 
         }
@@ -96,7 +147,7 @@ namespace Phantom.Graphics
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
-            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+            AddCall(Texture, scale);
 #endif
         }
 

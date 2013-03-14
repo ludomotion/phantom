@@ -10,6 +10,7 @@ using System.Threading;
 using System.Globalization;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
+using Phantom.Graphics;
 
 namespace Phantom
 {
@@ -163,6 +164,10 @@ namespace Phantom
             elapsed *= this.multiplier;
             this.TotalTime += elapsed;
 
+#if DEBUG
+            Sprite.BeginFrame();
+#endif
+
             this.Update(elapsed);
             for (int i = this.states.Count - 1; i >= 0 && i < this.states.Count; i--)
             {
@@ -214,6 +219,18 @@ namespace Phantom
                 }
                 this.Console.AddLines("Multiplier is " + this.multiplier);
             });
+
+#if DEBUG
+            this.Console.Register("report_sprite_usage", "Returns sprite usage debug info", delegate(string[] argv)
+            {
+                this.Content.TraceDebugData();
+            });
+            this.Console.Register("report_render_calls", "Returns the render calls of the previous frame", delegate(string[] argv)
+            {
+                Sprite.ReportRenderCalls();
+            });
+#endif
+
         }
 
         public void SetResolution(int width, int height, bool fullscreen)
