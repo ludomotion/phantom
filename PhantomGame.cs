@@ -11,6 +11,7 @@ using System.Globalization;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using Phantom.Graphics;
+using Phantom.Utils.Performance;
 
 namespace Phantom
 {
@@ -89,6 +90,10 @@ namespace Phantom
 #endif
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
+
+#if DEBUG // Setup Profiler:
+			Profiler.Initialize(this, 16);
+#endif
 
             this.XnaGame = new Microsoft.Xna.Framework.Game();
             this.XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
@@ -177,11 +182,18 @@ namespace Phantom
                 if (!propagate || this.Paused)
                     break;
             }
+
+#if DEBUG // Update Profiler
+			Profiler.Instance.EndUpdate();
+#endif
         }
 
         internal void XnaRender(GameTime gameTime)
         {
-            int startIndex;
+			int startIndex;
+#if DEBUG // Update Profiler
+			Profiler.Instance.BeginRender();
+#endif
 
             this.GraphicsDevice.Clear(this.BackgroundColor);
 
@@ -190,6 +202,10 @@ namespace Phantom
                 if (!this.states[i].OnlyOntop || i == this.states.Count - 1)
                     this.states[i].Render(null);
             this.Render(null);
+
+#if DEBUG // Update Profiler
+			Profiler.Instance.EndRender();
+#endif
         }
 
         protected override void OnComponentAdded(Component component)
