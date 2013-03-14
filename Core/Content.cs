@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
+using Phantom.Misc;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Phantom.Core
 {
@@ -12,6 +14,44 @@ namespace Phantom.Core
     /// </summary>
     public class Content : Component
     {
+#if DEBUG
+        public class SpriteDebugData
+        {
+            public int Used;
+            public float MinSize;
+            public float MaxSize;
+            public float AvgSize;
+
+            public SpriteDebugData(int used)
+            {
+                Used = used;
+                MinSize = float.MaxValue;
+                MaxSize = float.MinValue;
+                AvgSize = 0;
+            }
+
+            public void Report(float scale)
+            {
+                Used++;
+                MinSize = Math.Min(scale, MinSize);
+                MaxSize = Math.Max(scale, MaxSize);
+                AvgSize = (AvgSize * (Used - 1) + scale) / Used;
+            }
+
+            public override string ToString()
+            {
+                string r = "Used: " + Used;
+                if (Used>0) {
+                    r += ", avgScale: " + AvgSize.ToString("0.00");
+                    r += ", minScale: " + MinSize.ToString("0.00");
+                    r += ", maxScale: " + MaxSize.ToString("0.00");
+                }
+                return r;
+            }
+        }
+#endif
+
+
         public const string DefaultContext = "<default>";
 
         internal bool AllowRegister;
@@ -21,6 +61,8 @@ namespace Phantom.Core
         private IList<string> activeContexts;
 #if DEBUG
         private List<string> loaded = new List<string>();
+        private Dictionary<string, SpriteDebugData> debugData = new Dictionary<string, SpriteDebugData>();
+        private Dictionary<Texture2D, string> textureNames = new Dictionary<Texture2D, string>();
 #endif
 
         internal Content(ContentManager contentManager)
@@ -30,6 +72,7 @@ namespace Phantom.Core
             this.contexts[DefaultContext] = new List<string>();
             this.activeContexts = new List<string>();
             this.AllowRegister = true;
+
         }
 
         /// <summary>
@@ -148,9 +191,36 @@ namespace Phantom.Core
 #endif
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
+#if DEBUG
+                T  asset = this.manager.Load<T>(assetName);
+                if (asset is Texture2D)
+                {
+                    this.textureNames[asset as Texture2D] = assetName;
+                    if (!debugData.ContainsKey(assetName))
+                        debugData[assetName] = new SpriteDebugData(0);
+                }
+
+#endif
+
 				return this.manager.Load<T>(assetName);
 			}
         }
+
+#if DEBUG
+        public void ReportDebugData(Texture2D texture, float scale)
+        {
+            string name = textureNames[texture];
+            if (!debugData.ContainsKey(name))
+                debugData[name] = new SpriteDebugData(0);
+            debugData[name].Report(scale);
+        }
+
+        public void TraceDebugData()
+        {
+            foreach (KeyValuePair<string, SpriteDebugData> pair in debugData)
+                Trace.WriteLine(pair.Key + " " + pair.Value.ToString());
+        }
+#endif
 
     }
 }

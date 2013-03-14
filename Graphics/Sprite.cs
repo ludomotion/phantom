@@ -57,6 +57,9 @@ namespace Phantom.Graphics
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
             this.RenderFrame(info, frame, position, angle, scale, color);
+#if DEBUG
+            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+#endif
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, Vector2 scale, Color color, float alpha, bool flipHorizontal)
@@ -68,6 +71,10 @@ namespace Phantom.Graphics
             color.B = (byte)(color.B * alpha);
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+
+#if DEBUG
+            PhantomGame.Game.Content.ReportDebugData(Texture, scale.X *0.5f + scale.Y*0.5f);
+#endif
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color)
@@ -76,6 +83,10 @@ namespace Phantom.Graphics
                 return;
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+#if DEBUG
+            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+#endif
+
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color, bool flipHorizontal)
@@ -84,6 +95,9 @@ namespace Phantom.Graphics
                 return;
             Rectangle source = GetRectByFrame(frame);
             info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+#if DEBUG
+            PhantomGame.Game.Content.ReportDebugData(Texture, scale);
+#endif
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
