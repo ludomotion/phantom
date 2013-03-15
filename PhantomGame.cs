@@ -399,6 +399,21 @@ namespace Phantom
             return false;
         }
 
+        public bool ReplaceState(GameState search, GameState replace)
+        {
+            for (int i = this.states.Count - 1; i >= 0; --i)
+            {
+                if (this.states[i] == search)
+                {
+                    this.states[i].OnRemove();
+                    this.states[i] = replace;
+                    replace.OnAdd(this);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         protected virtual void OnExit(object sender, EventArgs e)
         {
             this.HandleMessage(Messages.GameExit, this);
