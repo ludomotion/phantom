@@ -19,6 +19,8 @@ namespace Phantom.Graphics
         private int currentFrame;
         private string playing;
 
+		public int RenderInPass = -1;
+
         public SpriteRenderer(Sprite sprite, int frame, float scale, int fps)
         {
             this.sprite = sprite;
@@ -66,7 +68,7 @@ namespace Phantom.Graphics
 
         public override void Render(RenderInfo info)
         {
-            if (this.Entity != null)
+			if (this.Entity != null && (RenderInPass == -1 || info.Pass == RenderInPass))
             {
                 float scale = this.scale;
                 if (this.Entity.Shape != null)
