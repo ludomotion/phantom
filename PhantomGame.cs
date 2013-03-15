@@ -165,7 +165,7 @@ namespace Phantom
 
             this.Initialize();
 
-#if !XBOX
+#if !XBOX && !TOUCH
             Trace.WriteLine("PhantomGame Initialized: " + Assembly.GetEntryAssembly().FullName);
 #endif
         }
