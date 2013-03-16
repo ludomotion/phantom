@@ -21,6 +21,8 @@ namespace Phantom.Graphics
 
         public readonly int Width;
         public readonly int Height;
+        public readonly float InverseWidth;
+        public readonly float InverseHeight;
         public readonly Vector2 Size;
         public readonly Texture2D Texture;
         public Vector2 Origin;
@@ -83,7 +85,6 @@ namespace Phantom.Graphics
         
 #endif
 
-
         public Sprite(Texture2D texture, int width, int height)
         {
             this.Flipped = false;
@@ -96,6 +97,8 @@ namespace Phantom.Graphics
             }
             this.Width = width;
             this.Height = height;
+            this.InverseWidth = 1f / (float)width;
+            this.InverseHeight = 1f / (float)height;
             this.Size = new Vector2(width, height);
             this.Origin = this.Size * .5f;
 

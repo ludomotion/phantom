@@ -55,7 +55,7 @@ namespace Phantom.Graphics.Particles
             
             this.PreRender();
 
-            sprite.RenderFrame(info, this.Frame, this.Position, 0, this.Scale / sprite.Width, this.Color, this.Alpha);
+            sprite.RenderFrame(info, this.Frame, this.Position, 0, this.Scale * sprite.InverseWidth, this.Color, this.Alpha);
         }
     }
 }
