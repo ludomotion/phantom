@@ -197,22 +197,25 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
-			int startIndex;
+			if (XnaGame.IsActive) { // To prevent a MonoMac bug on exit
+				int startIndex;
 #if DEBUG // Update Profiler
-			Profiler.Instance.BeginRender();
+				Profiler.Instance.BeginRender ();
 #endif
 
-            this.GraphicsDevice.Clear(this.BackgroundColor);
+				this.GraphicsDevice.Clear (this.BackgroundColor);
 
-            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--);
-            for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
-                if (!this.states[i].OnlyOntop || i == this.states.Count - 1)
-                    this.states[i].Render(null);
-            this.Render(null);
+				for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
+					;
+				for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
+					if (!this.states [i].OnlyOntop || i == this.states.Count - 1)
+						this.states [i].Render (null);
+				this.Render (null);
 
 #if DEBUG // Update Profiler
-			Profiler.Instance.EndRender();
+				Profiler.Instance.EndRender ();
 #endif
+			}
         }
 
         protected override void OnComponentAdded(Component component)

@@ -147,7 +147,7 @@ namespace Phantom.Misc
 
             this.echoQueue = new Queue<EchoLine>(this.settings.EchoLines);
 
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MACOS
             try
             {
                 this.history = new List<string>(System.IO.File.ReadAllLines("konsoul.dat"));
@@ -164,9 +164,9 @@ namespace Phantom.Misc
             {
                 this.AddLines("failed to load history: " + e.Message);
             }
-#endif // WINDOWS || LINUX || MONOMAC
+#endif // WINDOWS || LINUX || MACOS
 
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MACOS
 			Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
 #endif // !XBOX
             this.SetupVertices();
@@ -181,11 +181,11 @@ namespace Phantom.Misc
 
         public override void Dispose()
         {
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MACOS
 			Trace.Listeners.Remove(this.listener);
 #endif // !XBOX
 
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MACOS
             while (this.history.Count > 0 && this.history[this.history.Count - 1].Trim().ToLower() == "quit")
                 this.history.RemoveAt(this.history.Count - 1);
             try
@@ -196,7 +196,7 @@ namespace Phantom.Misc
             catch (System.IO.IOException)
             {
             }
-#endif // WINDOWS || LINUX || MONOMAC
+#endif // WINDOWS || LINUX || MACOS
             base.Dispose();
         }
 
@@ -291,7 +291,7 @@ namespace Phantom.Misc
                 }
             });
 
-#if WINDOWS || LINUX || MONOMAC
+#if WINDOWS || LINUX || MACOS
             this.Register("dump", "write console scrollback to a file.", delegate(string[] argv)
             {
                 string filename = "dump-" + DateTime.Now.ToString("yyyyMMdd") + ".log";
@@ -307,7 +307,7 @@ namespace Phantom.Misc
                     this.lines.Add(argv[0] + ": failed to write file: " + e.Message);
                 }
             });
-#endif // WINDOWS || LINUX || MONOMAC
+#endif // WINDOWS || LINUX || MACOS
         }
 
         private void SetupVertices()
