@@ -126,6 +126,8 @@ namespace Phantom.Core
 #if TOUCH
 			if(!this.CurrentTouchState.IsConnected) return false;
 
+			if(CurrentTouchState.Count == 1 && PreviousTouchState.Count == 0) return true;
+
 			for(int i = 0; i < this.CurrentTouchState.Count; i++)
 			{
 				if(CurrentTouchState[i].State == TouchLocationState.Pressed) return true;
@@ -139,6 +141,8 @@ namespace Phantom.Core
 		{
 #if TOUCH
 			if(!this.CurrentTouchState.IsConnected) return false;
+
+			if(CurrentTouchState.Count == 0 && PreviousTouchState.Count == 1) return true;
 
 			for(int i = 0; i < this.CurrentTouchState.Count; i++)
 			{
