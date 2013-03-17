@@ -329,6 +329,18 @@ namespace Phantom
             }
         }
 
+        public void SwitchTopStates()
+        {
+            if (this.states.Count > 2)
+            {
+                GameState top = this.states[this.states.Count - 1];
+                this.states[this.states.Count - 1] = this.states[this.states.Count - 2];
+                this.states[this.states.Count - 2] = top;
+                this.CurrentState.BackOnTop();
+                Debug.WriteLine(this.CurrentState + " is now on-top. (StateCount: " + this.StateCount + ")");
+            }
+        }
+
         public bool PopState(GameState state)
         {
             Debug.WriteLine("Popping state: " + state + " (current is: " + this.CurrentState + " (StateCount: " + this.StateCount + "))");
