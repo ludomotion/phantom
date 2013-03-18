@@ -111,6 +111,8 @@ namespace Phantom
             this.Content = new Content(XnaGame.Content);
 
             this.SetupGraphics();
+            //TODO: Instruction caused an invalid operation exception indicating that memory might be corrupted. 
+            //Happened when running full screen with two monitors... I think this might be the problem for Hendrik too
             this.graphics.ApplyChanges();
             this.Resolution = new Viewport(0, 0, this.graphics.PreferredBackBufferWidth, this.graphics.PreferredBackBufferHeight);
 
