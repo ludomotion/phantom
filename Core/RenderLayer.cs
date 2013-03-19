@@ -22,6 +22,13 @@ namespace Phantom.Core
         {
         }
 
+		public override void ClearComponents()
+		{
+			base.ClearComponents();
+			this.renderer.ClearComponents();
+			this.AddComponent(this.renderer);
+		}
+
         public override void Render(RenderInfo info)
         {
             if( info == null )
