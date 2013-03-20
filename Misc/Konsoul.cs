@@ -354,7 +354,7 @@ namespace Phantom.Misc
             {
                 if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
                 {
-                    if (current.IsKeyDown(Keys.LeftShift))
+                    if (current.IsKeyDown(Keys.LeftShift) && this.history.Count > 0)
                     {
                         this.Execute(this.history[this.history.Count-1]);
                     }
