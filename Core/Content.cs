@@ -58,6 +58,11 @@ namespace Phantom.Core
 
         public const string DefaultContext = "<default>";
 
+		public string ContentSizeAffix { get; private set; }
+		private List<int> ContentSizes;
+		private int noAffixSize;
+		private Dictionary<string, bool> HaveAffixAsset;
+
         internal bool AllowRegister;
 
         private ContentManager manager;
@@ -77,13 +82,71 @@ namespace Phantom.Core
             this.activeContexts = new List<string>();
             this.AllowRegister = true;
 
+			this.ContentSizes = new List<int>();
+			this.HaveAffixAsset = new Dictionary<string, bool>();
+			this.noAffixSize = 0;
+
+			this.SelectMatchingSizeAffix();
         }
+
+		/// <summary>
+		/// Registers a content size affix present in the bundle.
+		/// The <c>ContentManager</c> will try to load all content with a matching affix, preceded by a dash (-).
+		/// Example: <c>RegisterSizeAffix(800);</c> will make <c>Load<Texture2D>("sprites/player") look for "sprites/player-800.xnb" before trying "sprites/player.xnb"</c>
+		/// </summary>
+		/// <param name="contentAffixScale">Affix to register.</param>
+		/// <param name="isNoAffixDefault">If set to <c>true</c>, content for this size will be loaded without any affix (this will be the default size).</param>
+		public void RegisterSizeAffix(int contentAffixScale, bool isNoAffixDefault)
+		{
+			if(!ContentSizes.Contains(contentAffixScale)) ContentSizes.Add(contentAffixScale);
+			if(isNoAffixDefault) noAffixSize = contentAffixScale;
+		}
+		public void RegisterSizeAffix(int contentAffixScale)
+		{
+			RegisterSizeAffix(contentAffixScale, false);
+		}
+
+		/// <summary>
+		/// Selects the content size affix best matching the running game's size.
+		/// This will apply to all contexts.
+		/// </summary>
+		private void SelectMatchingSizeAffix()
+		{
+			int best = 0;
+			int bestDiff = int.MaxValue;
+			int diff = 0;
+
+			if(ContentSizes.Count == 0) ContentSizeAffix = null;
+			else
+			{
+				int gameSize = (int)Math.Max(PhantomGame.Game.Width, PhantomGame.Game.Height);
+				if(ContentSizes.Contains(gameSize))
+				{
+					best = gameSize;
+				}
+				else
+				{
+					foreach (int size in ContentSizes) {
+						diff = Math.Abs(size - gameSize);
+						if(diff < bestDiff // a better match has been found
+						   && !(best > gameSize && size < gameSize)) // don't match a smaller-than-game size if a larger match was already found
+						{
+							best = size;
+							bestDiff = diff;
+						}
+					}
+				}
+			}
+
+			if(best == noAffixSize) ContentSizeAffix = null;
+			else ContentSizeAffix = best.ToString();
+		}
 
         /// <summary>
         /// Register an asset as content to be preloaded within a specific context.
         /// </summary>
         /// <param name="contextName">The context in which the asset should be loaded.</param>
-        /// <param name="assetName">The asset name, without the .nxb extension.</param>
+        /// <param name="assetName">The asset name, without the .xnb extension.</param>
         /// <returns>this</returns>
         public Content Register(string contextName, string assetName)
         {
@@ -104,7 +167,7 @@ namespace Phantom.Core
         /// <summary>
         /// Register an asset as content to be preloaded within the default context.
         /// </summary>
-        /// <param name="assetName">The asset name, without the .nxb extension.</param>
+        /// <param name="assetName">The asset name, without the .xnb extension.</param>
         /// <returns>this</returns>
         public Content Register(string assetName)
         {
@@ -134,7 +197,7 @@ namespace Phantom.Core
                     {
 						lock (PhantomGame.Game.GlobalRenderLock)
 						{
-							object o = this.manager.Load<object>(assets[i]);
+							object o = this.LoadAffixed<object>(assets[i]);
 							if (o is IDisposable)
 								(o as IDisposable).Dispose();
 						}
@@ -149,7 +212,7 @@ namespace Phantom.Core
             {
 				lock (PhantomGame.Game.GlobalRenderLock)
 				{
-					this.manager.Load<object>(assets[i]);
+					this.LoadAffixed<object>(assets[i]);
 				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
@@ -196,7 +259,7 @@ namespace Phantom.Core
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 #if DEBUG
-                T  asset = this.manager.Load<T>(assetName);
+				T asset = this.LoadAffixed<T>(assetName);
                 if (asset is Texture2D)
                 {
                     this.textureNames[asset as Texture2D] = assetName;
@@ -206,9 +269,40 @@ namespace Phantom.Core
 
 #endif
 
-				return this.manager.Load<T>(assetName);
+				return this.LoadAffixed<T>(assetName);
 			}
         }
+
+		/// <summary>
+		/// Handles the actual call to <c>ContentManager.Load</c>, adding a content size affix if set.
+		/// </summary>
+		/// <typeparam name="T">The type of asset to load. Model, Effect, SpriteFont, Texture, Texture2D, and TextureCube are all supported by default by the standard Content Pipeline processor, but additional types may be loaded by extending the processor.</typeparam>
+		/// <returns>The loaded asset. Repeated calls to load the same asset will return the same object instance.</returns>
+		/// <param name="assetName">Asset name, relative to the loader root directory, and not including size affixes or file extension.</param>
+		private T LoadAffixed<T>(string assetName)
+		{
+			if(this.ContentSizeAffix != null)
+			{
+				T asset = default(T);
+				bool found = false;
+
+				if(!this.HaveAffixAsset.ContainsKey(assetName))
+				{
+					try
+					{
+						asset = this.manager.Load<T>(assetName+"-"+this.ContentSizeAffix);
+						found = true;
+					}
+					finally
+					{
+						this.HaveAffixAsset.Add(assetName, found);
+					}
+					if(found) return asset;
+				}
+				else if(this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
+			}
+			return this.manager.Load<T>(assetName);
+		}
 
 #if DEBUG
         public string ReportDebugData(Texture2D texture, float scale)
