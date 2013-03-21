@@ -19,7 +19,7 @@ namespace Phantom.Core
 
         public GameState()
         {
-            this.AddComponent(this.Input = new Input());
+            this.AddComponent(new Input());
         }
 
         protected override void OnComponentAdded(Component component)
@@ -31,6 +31,12 @@ namespace Phantom.Core
                     this.RemoveComponent(this.Camera);
                 this.Camera = component as Camera;
             }
+			if (component is Input)
+			{
+				if (this.Input != null)
+					this.RemoveComponent(this.Input);
+				this.Input = component as Input;
+			}
         }
 
         public virtual void BackOnTop()

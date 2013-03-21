@@ -144,7 +144,7 @@ namespace Phantom
 #endif
             this.graphics.SynchronizeWithVerticalRetrace = false;
 
-            this.graphics.PreferMultiSampling = true;
+            this.graphics.PreferMultiSampling = false;
         }
 
         protected virtual void LoadContent(Content content)

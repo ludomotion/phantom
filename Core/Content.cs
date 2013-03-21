@@ -213,6 +213,8 @@ namespace Phantom.Core
 #if DEBUG
         public string ReportDebugData(Texture2D texture, float scale)
         {
+			if( !textureNames.ContainsKey(texture) )
+				return "";
             string name = textureNames[texture];
             if (!debugData.ContainsKey(name))
                 debugData[name] = new SpriteDebugData(0);

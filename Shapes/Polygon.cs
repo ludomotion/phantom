@@ -185,7 +185,10 @@ namespace Phantom.Shapes
         public override bool InShape(Vector2 position)
         {
             //TODO: Needs to take orientation into account
-            Vector2 delta = position - this.Entity.Position;
+			Vector2 origin = Vector2.Zero;
+			if( this.Entity != null )
+				origin = this.Entity.Position;
+			Vector2 delta = position - origin;
 
             for (int i = 0; i < this.normals.Length; i++)
             {
