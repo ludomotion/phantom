@@ -85,7 +85,7 @@ namespace Phantom.Graphics
         
 #endif
 
-        public Sprite(Texture2D texture, int width, int height)
+        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY)
         {
             this.Flipped = false;
 
@@ -94,19 +94,27 @@ namespace Phantom.Graphics
             {
                 width = texture.Width;
                 height = texture.Height;
+                centerX = width * 0.5f;
+                centerY = height * 0.5f;
             }
             this.Width = width;
             this.Height = height;
             this.InverseWidth = 1f / (float)width;
             this.InverseHeight = 1f / (float)height;
             this.Size = new Vector2(width, height);
-            this.Origin = this.Size * .5f;
+            this.Origin = new Vector2(centerX, centerY);
 
             this.horizontalFramesCount = texture.Width / width;
             this.verticalFramesCount = texture.Height / height;
 
             this.FrameCount = this.horizontalFramesCount * this.verticalFramesCount;
         }
+
+        public Sprite(Texture2D texture, int width, int height)
+            :this(texture, width, height, width*0.5f, height*0.5f)
+        {
+        }
+
         public Sprite(Texture2D tex)
             :this(tex,0,0)
         {
