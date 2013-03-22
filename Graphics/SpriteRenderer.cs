@@ -20,6 +20,7 @@ namespace Phantom.Graphics
         private string playing;
 
 		public int RenderInPass = -1;
+		public Color Color = Color.White;
 
         public SpriteRenderer(Sprite sprite, int frame, float scale, int fps)
         {
@@ -75,7 +76,7 @@ namespace Phantom.Graphics
                 {
                     scale = this.Entity.Shape.RoughWidth / Math.Min(this.sprite.Width, this.sprite.Height) * this.scale;
                 }
-                this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position, this.Entity.Orientation, scale);
+				this.sprite.RenderFrame(info, this.currentFrame, this.Entity.Position, this.Entity.Orientation, scale, this.Color);
             }
             base.Render(info);
         }
