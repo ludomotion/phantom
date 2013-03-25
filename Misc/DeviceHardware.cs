@@ -96,6 +96,13 @@ namespace Phantom
             RackMountChassis,
             SealedCasePC
         }
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+        public static extern int GetDeviceCaps(IntPtr hDC, int nIndex);
+        public enum DeviceCap
+        {
+          LOGPIXELSX = 88,
+          LOGPIXELSY = 90
+        }      
 #endif
 
 		private static DeviceOS deviceOS;
@@ -569,8 +576,8 @@ namespace Phantom
 			PPI = 96f;
 
 #elif WINDOWS
-            string pa = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-            int arch = ((String.IsNullOrEmpty(pa) || String.Compare(pa, 0, "x86", 0, 3, true) == 0) ? 32 : 64);
+            string arch = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+//            int arch = ((String.IsNullOrEmpty(pa) || String.Compare(pa, 0, "x86", 0, 3, true) == 0) ? 32 : 64);
 
             OperatingSystem os = Environment.OSVersion;
             Version vs = os.Version;
@@ -616,13 +623,13 @@ namespace Phantom
                     case 6:
                         if (vs.Minor == 0)
                             operatingSystem = "Vista";
-                        else
+                        else if (vs.Minor == 1)
                             operatingSystem = "7";
-                        break;
-                    case 7:
-                        operatingSystem = "8";
+                        else if (vs.Minor == 2)
+                            operatingSystem = "8";
                         break;
                     default:
+                        operatingSystem = "Unknown Version";
                         break;
                 }
             }
@@ -675,7 +682,7 @@ namespace Phantom
 
 			OS = DeviceOS.Windows;
             OSVersion = operatingSystem;
-			Identifier = System.Environment.OSVersion.VersionString + "("+arch+"-bit)";
+			Identifier = System.Environment.OSVersion.VersionString + " ("+arch+")";
             if (chassis == ChassisTypes.AllInOne || chassis == ChassisTypes.Desktop || chassis == ChassisTypes.LowProfileDesktop || chassis == ChassisTypes.LunchBox || chassis == ChassisTypes.MiniTower || chassis == ChassisTypes.PizzaBox || chassis == ChassisTypes.SealedCasePC || chassis == ChassisTypes.SpaceSaving || chassis == ChassisTypes.Tower)
                 Form = DeviceForm.Desktop;
             else if (chassis == ChassisTypes.DockingStation || chassis == ChassisTypes.Laptop || chassis == ChassisTypes.Notebook || chassis == ChassisTypes.Portable || chassis == ChassisTypes.SubNotebook)
@@ -684,7 +691,17 @@ namespace Phantom
                 Form = DeviceForm.Tablet;
             else
                 Form = DeviceForm.Computer;
-			PPI = 96f;
+
+            System.Drawing.Graphics g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero);
+            IntPtr desktop = g.GetHdc();
+
+            ScreenWidth = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
+            ScreenHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+
+            int Xdpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
+            int Ydpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY); 
+
+			PPI = ((float)(Xdpi + Ydpi)) / 2f;
 
 #elif WINDOWS_PHONE_8
 			OS = DeviceOS.WindowsPhone8;

@@ -109,12 +109,12 @@ namespace Phantom
 
 			Trace.WriteLine("Phantom Game Engine");
 			Trace.WriteLine("Starting " + this.Name + " build " + Assembly.GetExecutingAssembly().GetName().Version + " on " + DeviceHardware.Form + " device running " + DeviceHardware.OS + " " + DeviceHardware.OSVersion);
-			Trace.WriteLine("Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion);
+            Trace.WriteLine("Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion + " (" + DeviceHardware.Identifier + ")");
 			Trace.WriteLine("Screen dimensions: " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + " pixels at " + DeviceHardware.PPI + " pixels per inch");
 			Trace.WriteLine("Display size: " + DeviceHardware.DisplayRealWidth + "x" + DeviceHardware.DisplayRealHeight + " inches, " + DeviceHardware.DisplayDiagonal + "\" diagonal");
 
 #if TESTFLIGHT
-			TestFlight.Log("[Start " + this.Name + "] " + DeviceHardware.Form + "; " + DeviceHardware.Manufacturer + "; " + DeviceHardware.Model + "; " + DeviceHardware.ModelVersion + "; " + DeviceHardware.OS + "; " + DeviceHardware.OSVersion);
+			TestFlight.Log("[Start " + this.Name + "] " + DeviceHardware.Form + "; " + DeviceHardware.Manufacturer + "; " + DeviceHardware.Model + "; " + DeviceHardware.ModelVersion + "; " + DeviceHardware.Identifier + "; " + DeviceHardware.OS + "; " + DeviceHardware.OSVersion);
 			TestFlight.Log("[Screen] " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + "; " + DeviceHardware.PPI + " ppi; " + DeviceHardware.DisplayDiagonal + " inch");
 #endif
 
