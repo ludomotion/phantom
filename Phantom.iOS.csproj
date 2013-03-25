@@ -84,10 +84,24 @@
     <WarningLevel>4</WarningLevel>
     <AssemblyName>PhantomiOS</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TestFlight|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\AppStore</OutputPath>
+    <DefineConstants>IOS; TOUCH; TESTFLIGHT</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AssemblyName>Phantom</AssemblyName>
+    <CodesignKey>iPhone Distribution</CodesignKey>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="monotouch" />
     <Reference Include="System.Core" />
     <Reference Include="System" />
+    <Reference Include="TestFlight">
+      <HintPath>iOS\TestFlight.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\CameraComponent.cs" />
@@ -168,6 +182,7 @@
     <Compile Include="Utils\Performance\Profiler.cs" />
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
     <Compile Include="Utils\Performance\ProfilerStats.cs" />
+    <Compile Include="Misc\DeviceHardware.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

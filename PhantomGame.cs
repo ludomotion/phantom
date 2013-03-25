@@ -12,9 +12,17 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using Phantom.Graphics;
 using Phantom.Utils.Performance;
+#if IOS
+using MonoTouch.UIKit;
+#elif ANDROID
+#endif
 
 #if TOUCH
 using Trace = System.Console;
+#endif
+
+#if TESTFLIGHT
+using MonoTouch.TestFlight;
 #endif
 
 namespace Phantom
@@ -40,6 +48,8 @@ namespace Phantom
         public readonly Vector2 Size;
 
         public Viewport Resolution { get; private set; }
+
+		public float PPI { get; private set; }
 
 		public static Microsoft.Xna.Framework.Game XnaGame { get; private set; }
 		public readonly object GlobalRenderLock = new object();
@@ -89,11 +99,24 @@ namespace Phantom
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
-#if !XBOX && !ANDROID
+#if ANDROID
+			this.Name = Microsoft.Xna.Framework.Game.Activity.ApplicationInfo.Name;
+#elif !XBOX
 			this.Name = Assembly.GetEntryAssembly().FullName;
 #endif
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
+
+			Trace.WriteLine("Phantom Game Engine");
+			Trace.WriteLine("Starting " + this.Name + " build " + Assembly.GetExecutingAssembly().GetName().Version + " on " + DeviceHardware.Form + " device running " + DeviceHardware.OS + " " + DeviceHardware.OSVersion);
+			Trace.WriteLine("Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion);
+			Trace.WriteLine("Screen dimensions: " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + " pixels at " + DeviceHardware.PPI + " pixels per inch");
+			Trace.WriteLine("Display size: " + DeviceHardware.DisplayRealWidth + "x" + DeviceHardware.DisplayRealHeight + " inches, " + DeviceHardware.DisplayDiagonal + "\" diagonal");
+
+#if TESTFLIGHT
+			TestFlight.Log("[Start " + this.Name + "] " + DeviceHardware.Form + "; " + DeviceHardware.Manufacturer + "; " + DeviceHardware.Model + "; " + DeviceHardware.ModelVersion + "; " + DeviceHardware.OS + "; " + DeviceHardware.OSVersion);
+			TestFlight.Log("[Screen] " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + "; " + DeviceHardware.PPI + " ppi; " + DeviceHardware.DisplayDiagonal + " inch");
+#endif
 
 #if DEBUG
 			// Setup Profiler:
@@ -116,7 +139,7 @@ namespace Phantom
             this.graphics.ApplyChanges();
             this.Resolution = new Viewport(0, 0, this.graphics.PreferredBackBufferWidth, this.graphics.PreferredBackBufferHeight);
 
-            this.states = new List<GameState>();
+			this.states = new List<GameState>();
         }
 
         public override void Dispose()
@@ -134,10 +157,12 @@ namespace Phantom
             this.graphics = new GraphicsDeviceManager(XnaGame);
 #if DEBUG
             XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
+#endif
+#if DEBUG && !TOUCH
             this.graphics.PreferredBackBufferWidth = (int)this.Width;
             this.graphics.PreferredBackBufferHeight = (int)this.Height;
             this.graphics.IsFullScreen = false;
-#else // IF RELEASE
+#else
             this.graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             this.graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             this.graphics.IsFullScreen = true;

@@ -80,6 +80,7 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Management" />
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
@@ -108,6 +109,7 @@
     <Compile Include="Misc\Components\MessageDelay.cs" />
     <Compile Include="Misc\Components\MessageDelegate.cs" />
     <Compile Include="Misc\DebugLayer.cs" />
+    <Compile Include="Misc\DeviceHardware.cs" />
     <Compile Include="Misc\MathUtils.cs" />
     <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
