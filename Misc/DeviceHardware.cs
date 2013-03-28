@@ -112,7 +112,8 @@ namespace Phantom
 		private static string deviceIdentifier;
 		private static string deviceModel;
 		private static string deviceModelVersion;
-		private static float devicePPI;
+		private static float devicePPcm;
+		private static float devicePPI; // ye olde ways
 		private static int deviceScreenWidth;
 		private static int deviceScreenHeight;
 		private static float deviceDisplayRealWidth;
@@ -168,6 +169,13 @@ namespace Phantom
 			}
 			private set { deviceModelVersion = value; }
 		}
+		public static float PPcm {
+			get {
+				if(!deviceInfoInitialized) RetrieveInfo();
+				return devicePPcm;
+			}
+			private set { devicePPcm = value; }
+		}
 		public static float PPI {
 			get {
 				if(!deviceInfoInitialized) RetrieveInfo();
@@ -220,8 +228,8 @@ namespace Phantom
 			Game.Activity.WindowManager.DefaultDisplay.GetMetrics(metrics);
 			ScreenWidth = metrics.WidthPixels;
 			ScreenHeight = metrics.HeightPixels;
-			DisplayRealWidth = deviceScreenWidth / metrics.Xdpi;
-			DisplayRealHeight = deviceScreenHeight / metrics.Ydpi;
+			DisplayRealWidth = 2.54f * deviceScreenWidth / metrics.Xdpi;
+			DisplayRealHeight = 2.54f * deviceScreenHeight / metrics.Ydpi;
 			int shortSizeDp = (Math.Min(deviceScreenWidth, deviceScreenHeight) * (int)(DisplayMetricsDensity.Default)) / (int)metrics.DensityDpi;
 			
 			OS = DeviceOS.Android;
@@ -754,11 +762,12 @@ namespace Phantom
 			PPI = 96f;
 
 #endif
+			PPcm = devicePPI / 2.54f;
 
 			if(deviceDisplayRealWidth == 0f)
 			{
-				DisplayRealWidth = deviceScreenWidth / devicePPI;
-				DisplayRealHeight = deviceScreenHeight / devicePPI;
+				DisplayRealWidth = deviceScreenWidth / devicePPcm;
+				DisplayRealHeight = deviceScreenHeight / devicePPcm;
 			}
 			DisplayDiagonal = (float)Math.Sqrt(deviceDisplayRealWidth * deviceDisplayRealWidth + deviceDisplayRealHeight * deviceDisplayRealHeight);
 
