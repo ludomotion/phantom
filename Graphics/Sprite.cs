@@ -145,6 +145,22 @@ namespace Phantom.Graphics
 #endif
         }
 
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, Vector2 drawSize, float angle, Color color, float alpha, bool flipHorizontal)
+        {
+            alpha = MathHelper.Clamp(alpha, 0, 1);
+            color.A = (byte)(alpha * 255);
+            color.R = (byte)(color.R * alpha);
+            color.G = (byte)(color.G * alpha);
+            color.B = (byte)(color.B * alpha);
+            Rectangle source = GetRectByFrame(frame);
+			Vector2 scale = new Vector2(drawSize.X / this.Width, drawSize.Y / this.Height);
+            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+
+#if DEBUG
+            AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
+#endif
+        }
+
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color)
         {
             if (frame < 0 || frame >= this.FrameCount)
@@ -154,7 +170,18 @@ namespace Phantom.Graphics
 #if DEBUG
             AddCall(Texture, scale);
 #endif
+		}
 
+        public void RenderFrame(RenderInfo info, int frame, Vector2 position, Vector2 drawSize, float angle, Color color)
+        {
+            if (frame < 0 || frame >= this.FrameCount)
+                return;
+            Rectangle source = GetRectByFrame(frame);
+			Vector2 scale = new Vector2(drawSize.X / this.Width, drawSize.Y / this.Height);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+#if DEBUG
+			AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
+#endif
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale, Color color, bool flipHorizontal)
@@ -168,12 +195,17 @@ namespace Phantom.Graphics
 #endif
         }
 
-        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
-        {
-            this.RenderFrame(info, frame, position, angle, scale, Color.White);
-        }
-        
-        public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle)
+		public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, float scale)
+		{
+			this.RenderFrame(info, frame, position, angle, scale, Color.White);
+		}
+		
+		public void RenderFrame(RenderInfo info, int frame, Vector2 position, Vector2 drawSize, float angle)
+		{
+			this.RenderFrame(info, frame, position, drawSize, angle, Color.White);
+		}
+		
+		public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle)
         {
             this.RenderFrame(info, frame, position, angle, 1);
         }
