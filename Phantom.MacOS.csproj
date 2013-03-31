@@ -141,6 +141,7 @@
     <Compile Include="Utils\Performance\Profiler.cs" />
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
     <Compile Include="Utils\Performance\ProfilerStats.cs" />
+    <Compile Include="Misc\DeviceHardware.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
