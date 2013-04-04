@@ -74,7 +74,18 @@ namespace Phantom.Misc
 			if (p < 0) p = 0;
 			if (p > lineLength) p = lineLength;
 			return lineStart + p*lineUnit;
-		}	
+		}
+
+        public static float AngleDifference(float a, float b)
+        {
+            float r = b - a;
+            r %= MathHelper.TwoPi;
+            if (r > MathHelper.Pi)
+                r -= MathHelper.TwoPi;
+            if (r<= -MathHelper.Pi) 
+                r += MathHelper.TwoPi;
+            return r;
+        }
 
     }
 }
