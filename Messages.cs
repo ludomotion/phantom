@@ -32,6 +32,8 @@ namespace Phantom
         public const int FillColor = 41;
         public const int StrokeColor = 42;
 
+        public const int SetPlayer = 50;
+
         public const int SetPosition = 100;
 
         public const int PhysicsPause = 200;
