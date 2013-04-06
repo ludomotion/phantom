@@ -162,11 +162,13 @@
     <Compile Include="UI\PhTextEdit.cs" />
     <Compile Include="UI\PhWindow.cs" />
     <Compile Include="Utils\Editor.cs" />
+    <Compile Include="Utils\EntityFactory.cs" />
     <Compile Include="Utils\EntityMap.cs" />
     <Compile Include="Utils\MapLoader.cs" />
     <Compile Include="Utils\Performance\Profiler.cs" />
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
     <Compile Include="Utils\Performance\ProfilerStats.cs" />
+    <Compile Include="Utils\PhantomComponentNotation.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
