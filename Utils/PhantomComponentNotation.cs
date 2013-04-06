@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
 using Phantom.Core;
+using System.Reflection;
 
 namespace Phantom.Utils
 {
@@ -152,7 +153,61 @@ namespace Phantom.Utils
     {
         public static string ComponentToPCNString(Component component)
         {
-            throw new NotImplementedException();
+            string result = "";
+            result += component.GetType().Name;
+
+            if (component.Properties != null)
+            {
+                string members = PropertiesToPCNString(component.Properties);
+                if (members!="")
+                    result+="("+members+")";
+            }
+
+            if (component.Components.Count > 0)
+            {
+                result += "[";
+                for (int i = 0; i < component.Components.Count; i++)
+                {
+                    if (i > 0) 
+                        result += " ";
+                    result += ComponentToPCNString(component.Components[i]);
+                }
+                result += "]";
+            }
+            return result;
+        }
+
+        public static string PropertiesToPCNString(PropertyCollection properties)
+        {
+            string result = "";
+            foreach (KeyValuePair<string, int> property in properties.Ints)
+            {
+                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
+                {
+                    if (result != "")
+                        result += ",";
+                    result += property.Key + "=" + property.Value.ToString();
+                }
+            }
+            foreach (KeyValuePair<string, float> property in properties.Floats)
+            {
+                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
+                {
+                    if (result != "")
+                        result += ",";
+                    result += property.Key + "=" + property.Value.ToString() + "f";
+                }
+            }
+            foreach (KeyValuePair<string, object> property in properties.Objects)
+            {
+                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
+                {
+                    if (result != "")
+                        result += ",";
+                    result += property.Key + "=" + ValueToString(property.Value);
+                }
+            }
+            return result;
         }
 
         public static object StringToValue(string v)
@@ -224,7 +279,10 @@ namespace Phantom.Utils
         public static string ValueToString(object value)
         {
             if (value is string)
+            {
+                //TODO escape quotes and other characters
                 return "\"" + value + "\"";
+            }
             if (value is bool)
                 return ((bool)value).ToString();
             if (value is int)

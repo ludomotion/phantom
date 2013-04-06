@@ -59,7 +59,7 @@ namespace Phantom.Utils
         private int tilesY;
 
         private Entity drawingEntity;
-        private Type drawingType;
+        private PCNComponent drawingType;
         private Entity hoveringEntity;
         private Entity selectedEntity;
 
@@ -79,7 +79,7 @@ namespace Phantom.Utils
 
         public static void Initialize(SpriteFont font, float tileSize, Type[] tiles, Type[] entities)
         {
-            MapLoader.Initialize(tileSize, tiles, entities);
+            MapLoader.Initialize(tileSize);
             GUISettings.Initialize(font);
             PhantomGame.Game.Console.Register("editor", "Opens editor window.", delegate(string[] argv)
             {
@@ -168,9 +168,9 @@ namespace Phantom.Utils
             y = 30;
             tilesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
             y += 32;
-            for (int i = 0; i < MapLoader.TileList.Length; i++)
+            for (int i = 0; i < MapLoader.TileList.Count; i++)
             {
-                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.ShortTypeName(MapLoader.TileList[i]), SelectEntity));
+                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.TileList[i].Name, SelectEntity));
                 y += 32;
                 if (y > 500 - 32)
                 {
@@ -185,9 +185,9 @@ namespace Phantom.Utils
             entitiesWindow.Ghost = true;
             x = 10;
             y = 30;
-            for (int i = 0; i < MapLoader.EntityList.Length; i++)
+            foreach (KeyValuePair<string, PCNComponent> entityType in MapLoader.EntityList) 
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.ShortTypeName(MapLoader.EntityList[i]), SelectEntity));
+                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entityType.Key, SelectEntity));
                 y += 32;
                 if (y > 500 - 32)
                 {
@@ -266,12 +266,13 @@ namespace Phantom.Utils
             {
                 drawingType = null;
                 drawingEntity = null;
-                for (int i = 0; i < MapLoader.TileList.Length; i++)
+                for (int i = 0; i < MapLoader.TileList.Count; i++)
                 {
-                    if (MapLoader.ShortTypeName(MapLoader.TileList[i]) == button.Text)
+                    if (MapLoader.TileList[i].Name == button.Text)
                     {
                         drawingType = MapLoader.TileList[i];
-                        drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                        drawingEntity = EntityFactory.AssembleEntity(drawingType);
+                        drawingEntity.Position = mousePosition;
                         break;
                     }
                 }
@@ -279,15 +280,9 @@ namespace Phantom.Utils
             }
             else
             {
-                for (int i = 0; i < MapLoader.EntityList.Length; i++)
-                {
-                    if (MapLoader.ShortTypeName(MapLoader.EntityList[i]) == button.Text)
-                    {
-                        drawingType = MapLoader.EntityList[i];
-                        drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
-                        break;
-                    }
-                }
+                drawingType = MapLoader.EntityList[button.Text];
+                drawingEntity = EntityFactory.AssembleEntity(drawingType);
+                drawingEntity.Position = mousePosition;
                 entitiesWindow.Hide();
             }
 
@@ -502,8 +497,9 @@ namespace Phantom.Utils
             {
                 mouseOffset = hoveringEntity.Position - mousePosition;
                 selectedEntity = hoveringEntity;
-                drawingType = selectedEntity.GetType();
-                drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                drawingType = MapLoader.EntityList[selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "")];
+                drawingEntity = EntityFactory.AssembleEntity(drawingType);
+                drawingEntity.Position = mousePosition;
                 CopyProperties(selectedEntity, drawingEntity);
                 //Randomize the seed if there is any
                 if (drawingEntity.Properties.GetInt("Seed", -1) > 0)
@@ -515,7 +511,8 @@ namespace Phantom.Utils
             else if (drawingType != null) //Drawing
             {
                 EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
-                selectedEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                selectedEntity = EntityFactory.AssembleEntity(drawingType);
+                selectedEntity.Position = mousePosition;
                 entities.AddComponent(selectedEntity);
                 hoveringEntity = selectedEntity;
                 CopyProperties(drawingEntity, selectedEntity);
@@ -554,7 +551,7 @@ namespace Phantom.Utils
         private void MouseRightDownEntities()
         {
             if (selectedEntity!=null) {
-                CreatePropertiesWindow(MapLoader.ShortTypeName(selectedEntity.GetType()), selectedEntity);
+                CreatePropertiesWindow(selectedEntity.GetType().Name, selectedEntity);
             }
         }
 
@@ -732,7 +729,8 @@ namespace Phantom.Utils
 
                     if (tileMap[index] == null)
                     {
-                        Entity entity = (Entity)Activator.CreateInstance(drawingType, SnapPosition(mousePosition));
+                        Entity entity = EntityFactory.AssembleEntity(drawingType);
+                        entity.Position = SnapPosition(mousePosition);
                         entity.Properties.Ints["isTile"] = 1;
                         entities.AddComponent(entity);
                         tileMap[index] = entity;
@@ -763,12 +761,13 @@ namespace Phantom.Utils
                 Entity entity = tileMap[index];
                 if (entity != null)
                 {
-                    for (int i = 0; i < MapLoader.TileList.Length; i++)
+                    for (int i = 0; i < MapLoader.TileList.Count; i++)
                     {
-                        if (MapLoader.TileList[i] == entity.GetType())
+                        if (MapLoader.TileList[i].Name == entity.GetType().Name)
                         {
                             drawingType = MapLoader.TileList[i];
-                            drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                            drawingEntity = EntityFactory.AssembleEntity(drawingType);
+                            drawingEntity.Position = mousePosition;
                             return;
                         }
                     }
@@ -817,13 +816,13 @@ namespace Phantom.Utils
                     {
                         if (entity == selectedEntity)
                         {
-                            string name = MapLoader.ShortTypeName(selectedEntity.GetType());
+                            string name = selectedEntity.GetType().Name;
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Yellow);
                         }
                         else if (entity == hoveringEntity)
                         {
-                            string name = MapLoader.ShortTypeName(hoveringEntity.GetType());
+                            string name = hoveringEntity.GetType().Name;
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
                         }
@@ -838,7 +837,7 @@ namespace Phantom.Utils
                 if (drawingEntity != null && hoveringEntity == null)
                 {
                     DrawEntity(info, topLeft, drawingEntity);
-                    string name = MapLoader.ShortTypeName(drawingEntity.GetType());
+                    string name = drawingEntity.GetType().Name;
                     Vector2 size = font.MeasureString(name);
                     info.Batch.DrawString(font, name, drawingEntity.Position - topLeft - size * 0.5f, Color.Red);
                 }
