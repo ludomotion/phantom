@@ -40,11 +40,13 @@ namespace Phantom.Utils
             public Component Layer;
             public string Name;
             public LayerType Type;
-            public EditorLayer(Component layer, string name, LayerType type)
+            public Dictionary<string, PCNComponent> EntityList;
+            public EditorLayer(Component layer, string name, LayerType type, Dictionary<string, PCNComponent> entityList)
             {
                 this.Layer = layer;
                 this.Name = name;
                 this.Type = type;
+                this.EntityList = entityList;
             }
         }
 
@@ -77,7 +79,7 @@ namespace Phantom.Utils
         private Component propertiesWindowTarget;
 
 
-        public static void Initialize(SpriteFont font, float tileSize, Type[] tiles, Type[] entities)
+        public static void Initialize(SpriteFont font, float tileSize)
         {
             MapLoader.Initialize(tileSize);
             GUISettings.Initialize(font);
@@ -109,13 +111,13 @@ namespace Phantom.Utils
                 if (c.Properties != null && c.Properties.GetString("editable", null) != null)
                 {
                     string name = c.Properties.GetString("editable", null);
-                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties));
+                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties, null));
                     if (c is EntityLayer)
                     {
-                        if (MapLoader.TileList != null && c.Properties.GetBoolean("tiles", false))
-                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles));
-                        if (MapLoader.EntityList != null && c.Properties.GetBoolean("entities", false))
-                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities));
+                        if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("tileList", "")))
+                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles, MapLoader.EntityLists[c.Properties.GetString("tileList", "")]));
+                        if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("entityList", "")))
+                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities, MapLoader.EntityLists[c.Properties.GetString("entityList", "")]));
                     }
                 }
                 
@@ -168,9 +170,11 @@ namespace Phantom.Utils
             y = 30;
             tilesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
             y += 32;
-            for (int i = 0; i < MapLoader.TileList.Count; i++)
+
+            //TODO this should be dynamically build for each list
+            foreach(KeyValuePair<string, PCNComponent> tile in MapLoader.EntityLists["tiles"])
             {
-                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.TileList[i].Name, SelectEntity));
+                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, tile.Key, SelectEntity));
                 y += 32;
                 if (y > 500 - 32)
                 {
@@ -180,14 +184,14 @@ namespace Phantom.Utils
             }
             windows.AddComponent(tilesWindow);
 
-
+            //TODO this should be dynamically build for each list
             entitiesWindow = new PhWindow(100, 100, 500, 500, "Entities");
             entitiesWindow.Ghost = true;
             x = 10;
             y = 30;
-            foreach (KeyValuePair<string, PCNComponent> entityType in MapLoader.EntityList) 
+            foreach (KeyValuePair<string, PCNComponent> entity in MapLoader.EntityLists["entities"])
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entityType.Key, SelectEntity));
+                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entity.Key, SelectEntity));
                 y += 32;
                 if (y > 500 - 32)
                 {
@@ -262,30 +266,18 @@ namespace Phantom.Utils
         private void SelectEntity(PhControl sender)
         {
             PhButton button = sender as PhButton;
-            if (layers[currentLayer].Type == LayerType.Tiles)
+            if (layers[currentLayer].EntityList != null)
             {
                 drawingType = null;
                 drawingEntity = null;
-                for (int i = 0; i < MapLoader.TileList.Count; i++)
+                if (layers[currentLayer].EntityList.ContainsKey(button.Text))
                 {
-                    if (MapLoader.TileList[i].Name == button.Text)
-                    {
-                        drawingType = MapLoader.TileList[i];
-                        drawingEntity = EntityFactory.AssembleEntity(drawingType);
-                        drawingEntity.Position = mousePosition;
-                        break;
-                    }
+                    drawingType = layers[currentLayer].EntityList[button.Text];
+                    drawingEntity = EntityFactory.AssembleEntity(drawingType, button.Text);
+                    drawingEntity.Position = mousePosition;
                 }
-                tilesWindow.Hide();
             }
-            else
-            {
-                drawingType = MapLoader.EntityList[button.Text];
-                drawingEntity = EntityFactory.AssembleEntity(drawingType);
-                drawingEntity.Position = mousePosition;
-                entitiesWindow.Hide();
-            }
-
+            (button.Parent as PhWindow).Hide();
         }
 
         private void SelectLayer(PhControl sender)
@@ -497,8 +489,9 @@ namespace Phantom.Utils
             {
                 mouseOffset = hoveringEntity.Position - mousePosition;
                 selectedEntity = hoveringEntity;
-                drawingType = MapLoader.EntityList[selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "")];
-                drawingEntity = EntityFactory.AssembleEntity(drawingType);
+                string blueprintName = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                drawingType = layers[currentLayer].EntityList[blueprintName];
+                drawingEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
                 drawingEntity.Position = mousePosition;
                 CopyProperties(selectedEntity, drawingEntity);
                 //Randomize the seed if there is any
@@ -511,7 +504,8 @@ namespace Phantom.Utils
             else if (drawingType != null) //Drawing
             {
                 EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
-                selectedEntity = EntityFactory.AssembleEntity(drawingType);
+                string blueprintName = drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                selectedEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
                 selectedEntity.Position = mousePosition;
                 entities.AddComponent(selectedEntity);
                 hoveringEntity = selectedEntity;
@@ -729,7 +723,7 @@ namespace Phantom.Utils
 
                     if (tileMap[index] == null)
                     {
-                        Entity entity = EntityFactory.AssembleEntity(drawingType);
+                        Entity entity = EntityFactory.AssembleEntity(drawingType, drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, ""));
                         entity.Position = SnapPosition(mousePosition);
                         entity.Properties.Ints["isTile"] = 1;
                         entities.AddComponent(entity);
@@ -761,16 +755,11 @@ namespace Phantom.Utils
                 Entity entity = tileMap[index];
                 if (entity != null)
                 {
-                    for (int i = 0; i < MapLoader.TileList.Count; i++)
-                    {
-                        if (MapLoader.TileList[i].Name == entity.GetType().Name)
-                        {
-                            drawingType = MapLoader.TileList[i];
-                            drawingEntity = EntityFactory.AssembleEntity(drawingType);
-                            drawingEntity.Position = mousePosition;
-                            return;
-                        }
-                    }
+                    string blueprintName = entity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                    drawingType = layers[currentLayer].EntityList[blueprintName];
+                    drawingEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
+                    drawingEntity.Position = mousePosition;
+                    return;
                 }
                 drawingEntity = null;
                 drawingType = null;

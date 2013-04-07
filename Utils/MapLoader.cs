@@ -19,8 +19,7 @@ namespace Phantom.Utils
 {
     public static class MapLoader
     {
-        public static List<PCNComponent> TileList;
-        public static Dictionary<string, PCNComponent> EntityList;
+        public static Dictionary<string, Dictionary<string, PCNComponent>> EntityLists;
         public static float TileSize;
         //private static string filename;
 
@@ -30,8 +29,8 @@ namespace Phantom.Utils
         public static void Initialize(float tileSize)
         {
             TileSize = tileSize;
-            TileList = new List<PCNComponent>();
-            EntityList = new Dictionary<string, PCNComponent>();
+            EntityLists = new Dictionary<string, Dictionary<string, PCNComponent>>();
+
             EmbeddedFiles = new Dictionary<string,string>();
             PhantomGame.Game.Console.Register("savemap", "Saves the current map to file.", delegate(string[] argv)
             {
@@ -56,6 +55,30 @@ namespace Phantom.Utils
                 else
                     MapLoader.OpenMap(argv[1], argv[2]);
             });
+        }
+
+        public static void OpenEntityList(string listname, string filename)
+        {
+            string data = null;
+            if (System.IO.File.Exists(filename))
+                data = System.IO.File.ReadAllText(filename);
+            if (data != null)
+            {
+                Dictionary<string, PCNComponent> entities = new Dictionary<string, PCNComponent>();
+                string[] lines = data.Split('\n');
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    int p = lines[i].IndexOf(' ');
+                    if (p > 0)
+                    {
+                        string name = lines[i].Substring(0, p);
+                        entities[name] = new PCNComponent(lines[i].Substring(p + 1));
+                    }
+                }
+                EntityLists[listname] = entities;
+            }
+            else
+                Trace.WriteLine("WARNING List not found! "+filename);
         }
 
         public static void SaveMap(string filename)
@@ -133,13 +156,10 @@ namespace Phantom.Utils
             {
                 if (component.Properties != null && component.Properties.GetString("editable", null) != null)
                 {
-                    data += component.Properties.GetString("editable", "") + "("+PhantomComponentNotation.PropertiesToPCNString(component.Properties) + ")\n";
+                    data += "component "+component.Properties.GetString("editable", "") + "("+PhantomComponentNotation.PropertiesToPCNString(component.Properties) + ")\n";
 
                     if (component is EntityLayer)
                     {
-                        foreach (KeyValuePair<string, PCNComponent> entityType in EntityList)
-                            data += "entityType " + entityType.Key + " " + entityType.Value.ToString() + "\n";
-
                         data += GetEntityData((EntityLayer)component) + "\n";
                     }
                 }
@@ -174,16 +194,21 @@ namespace Phantom.Utils
         private static string GetEntityData(EntityLayer entityLayer)
         {
             string data = "";
-            if (entityLayer.Properties.GetBoolean("tiles", true))
+            string list = entityLayer.Properties.GetString("tiles", "");
+            if (list != "")
             {
                 int width = (int)Math.Ceiling(entityLayer.Bounds.X / TileSize);
                 int height = (int)Math.Ceiling(entityLayer.Bounds.Y / TileSize);
                 data += "tiles [";
-                for (int i = 0; i < TileList.Count; i++)
+                Dictionary<string, int> tileList = new Dictionary<string, int>();
+                int c = 0;
+                foreach(KeyValuePair<string, PCNComponent> tile in EntityLists[list])
                 {
-                    if (i > 0) 
+                    if (c > 0) 
                         data += " ";
-                    data += TileList[i].ToString();
+                    data += tile.Key;
+                    tileList[tile.Key] = c;
+                    c++;
                 }
                 data += "]\n";
 
@@ -197,15 +222,9 @@ namespace Phantom.Utils
                         int index = x + y * width;
                         if (tileMap[index] != null)
                         {
-                            for (int i = 0; i < TileList.Count; i++)
-                            {
-                                if (TileList[i].Name == tileMap[index].GetType().Name)
-                                {
-                                    tile = i;
-                                    break;
-                                }
-
-                            }
+                            string n = tileMap[index].Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                            if (tileList.ContainsKey(n))
+                                tile = tileList[n];
                         }
                         string t = tile.ToString();
                         while (t.Length < 3) t = " " + t;
@@ -264,11 +283,6 @@ namespace Phantom.Utils
                     ParseEntity(lines[i].Substring(7), entities);
                     i++;
                 }
-                else if (lines[i].StartsWith("entityType "))
-                {
-                    ParseEntityType(lines[i].Substring(11));
-                    i++;
-                }
                 else if (lines[i].StartsWith("component "))
                 {
                     PCNComponent component = new PCNComponent(lines[i].Substring(10));
@@ -285,7 +299,8 @@ namespace Phantom.Utils
                 }
                 else
                 {
-                    Trace.WriteLine("WARNING: MapLoader did not understand: " + lines[i]);
+                    if (lines[i].Length>0) 
+                        Trace.WriteLine("WARNING: MapLoader did not understand: " + lines[i]);
                     i++;
                 }
             }
@@ -293,11 +308,10 @@ namespace Phantom.Utils
 
         private static void ParseTiles(string[] lines, ref int index, EntityLayer entities)
         {
-            //string[] parameters = lines[index].Split(' ');
+            string tileListName = entities.Properties.GetString("tileList", "");
+            Dictionary<string, PCNComponent> tileList = EntityLists[tileListName];
             PCNComponent tileDefs = new PCNComponent(lines[index]);
             index++;
-
-            TileList = tileDefs.Components;
 
             int width = (int)Math.Ceiling(entities.Bounds.X / TileSize);
             int height = (int)Math.Ceiling(entities.Bounds.Y / TileSize);
@@ -309,17 +323,17 @@ namespace Phantom.Utils
                     while (lines[index].Length == 0) index++;
                     string tile = lines[index].Substring(x * 4, 3);
                     int t = -1;
-                    if (int.TryParse(tile, out t) && t>=0 && t<TileList.Count)
-                        AddTile(x, y, TileList[t], entities);
+                    if (int.TryParse(tile, out t) && t >= 0 && t < tileDefs.Components.Count)
+                        AddTile(x, y, tileList[tileDefs.Components[t].Name], entities, tileDefs.Components[t].Name);
                 }
                 index++;
             }
         }
 
-        private static void AddTile(int x, int y, PCNComponent blueprint, EntityLayer entities)
+        private static void AddTile(int x, int y, PCNComponent blueprint, EntityLayer entities, string blueprintName)
         {
             Vector2 position = new Vector2((x + 0.5f) * TileSize, (y + 0.5f) * TileSize);
-            Entity entity = EntityFactory.AssembleEntity(blueprint);
+            Entity entity = EntityFactory.AssembleEntity(blueprint, blueprintName);
             entity.Position = position;
             entity.Properties.Ints["isTile"] = 1;
             entities.AddComponent(entity);
@@ -327,29 +341,12 @@ namespace Phantom.Utils
 
         private static void ParseEntity(string description, EntityLayer entities)
         {
+            string listName = entities.Properties.GetString("entityList", "");
             PCNComponent instance = new PCNComponent(description);
-            PCNComponent blueprint = EntityList[instance.Name];
-            Entity entity = EntityFactory.BuildInstance(blueprint, instance);
+            PCNComponent blueprint = EntityLists[listName][instance.Name];
+            Entity entity = EntityFactory.BuildInstance(blueprint, instance, instance.Name);
             entities.AddComponent(entity);
         }
-
-        private static void ParseEntityType(string description)
-        {
-            int p = description.IndexOf(' ');
-            if (p < 0)
-            {
-                PCNComponent blueprint = new PCNComponent(description);
-                EntityList[blueprint.Name] = blueprint;
-            }
-            else
-            {
-                PCNComponent blueprint = new PCNComponent(description.Substring(p+1));
-                EntityList[description.Substring(0, p)] = blueprint;
-
-            }
-        }
-
-
 
         private static void ClearState()
         {

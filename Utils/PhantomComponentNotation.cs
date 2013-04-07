@@ -278,6 +278,11 @@ namespace Phantom.Utils
 
         public static string ValueToString(object value)
         {
+            return ValueToString(value, null);
+        }
+
+        public static string ValueToString(object value, string format)
+        {
             if (value is string)
             {
                 //TODO escape quotes and other characters
@@ -287,16 +292,30 @@ namespace Phantom.Utils
                 return ((bool)value).ToString();
             if (value is int)
                 return ((int)value).ToString();
-            if (value is float)
-                return ((float)value).ToString() + "f";
             if (value is Color)
                 return "#" + ((Color)value).R.ToString("X2") + ((Color)value).G.ToString("X2") + ((Color)value).B.ToString("X2");
-            if (value is Vector2)
-                return "(" + ((Vector2)value).X.ToString() + "," + ((Vector2)value).Y.ToString() + ")";
-            if (value is Vector3)
-                return "(" + ((Vector3)value).X.ToString() + "," + ((Vector3)value).Y.ToString() + "," + ((Vector3)value).Z.ToString() + ")";
-            if (value is Vector4)
-                return "(" + ((Vector4)value).X.ToString() + "," + ((Vector4)value).Y.ToString() + "," + ((Vector4)value).Z.ToString() + "," + ((Vector4)value).W.ToString() + ")";
+            if (format == null)
+            {
+                if (value is float)
+                    return ((float)value).ToString() + "f";
+                if (value is Vector2)
+                    return "(" + ((Vector2)value).X.ToString() + "," + ((Vector2)value).Y.ToString() + ")";
+                if (value is Vector3)
+                    return "(" + ((Vector3)value).X.ToString() + "," + ((Vector3)value).Y.ToString() + "," + ((Vector3)value).Z.ToString() + ")";
+                if (value is Vector4)
+                    return "(" + ((Vector4)value).X.ToString() + "," + ((Vector4)value).Y.ToString() + "," + ((Vector4)value).Z.ToString() + "," + ((Vector4)value).W.ToString() + ")";
+            }
+            else
+            {
+                if (value is float)
+                    return ((float)value).ToString(format) + "f";
+                if (value is Vector2)
+                    return "(" + ((Vector2)value).X.ToString(format) + "," + ((Vector2)value).Y.ToString(format) + ")";
+                if (value is Vector3)
+                    return "(" + ((Vector3)value).X.ToString(format) + "," + ((Vector3)value).Y.ToString(format) + "," + ((Vector3)value).Z.ToString(format) + ")";
+                if (value is Vector4)
+                    return "(" + ((Vector4)value).X.ToString(format) + "," + ((Vector4)value).Y.ToString(format) + "," + ((Vector4)value).Z.ToString(format) + "," + ((Vector4)value).W.ToString(format) + ")";
+            }
             return "null";
         }
 

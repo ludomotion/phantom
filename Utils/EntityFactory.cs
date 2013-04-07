@@ -67,10 +67,10 @@ namespace Phantom.Utils
         /// </summary>
         /// <param name="blueprint">A string describing the entity in PhantomComponentNotion format</param>
         /// <returns></returns>
-        static public Entity AssembleEntity(PCNComponent blueprint)
+        static public Entity AssembleEntity(PCNComponent blueprint, string blueprintName)
         {
             Entity entity = (Entity)AssembleComponent(blueprint);
-            entity.Properties.SetString(PROPERTY_NAME_BLUEPRINT, blueprint.Name);
+            entity.Properties.SetString(PROPERTY_NAME_BLUEPRINT, blueprintName);
             return entity;
         }
 
@@ -121,10 +121,10 @@ namespace Phantom.Utils
             }
         }
 
-        public static Entity BuildInstance(PCNComponent blueprint, PCNComponent description)
+        public static Entity BuildInstance(PCNComponent blueprint, PCNComponent description, string blueprintName)
         {
 
-            Entity entity = AssembleEntity(blueprint);
+            Entity entity = AssembleEntity(blueprint, blueprintName);
 
             for (int i = 0; i < description.Members.Count; i++)
             {
@@ -157,8 +157,8 @@ namespace Phantom.Utils
                 if (members != "")
                     members = "," + members;
                 if (entity.Orientation != 0)
-                    members = "," + PROPERTY_NAME_ORIENTATION + "=" + PhantomComponentNotation.ValueToString(MathHelper.ToDegrees(entity.Orientation)) + members;
-                members = PROPERTY_NAME_POSITION + "=" + PhantomComponentNotation.ValueToString(entity.Position)+members;
+                    members = "," + PROPERTY_NAME_ORIENTATION + "=" + PhantomComponentNotation.ValueToString(MathHelper.ToDegrees(entity.Orientation), "0.0") + members;
+                members = PROPERTY_NAME_POSITION + "=" + PhantomComponentNotation.ValueToString(entity.Position, "0")+members;
                 result += "(" + members + ")";
                 return result;
             }
