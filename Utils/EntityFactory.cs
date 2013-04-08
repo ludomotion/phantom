@@ -70,7 +70,8 @@ namespace Phantom.Utils
         static public Entity AssembleEntity(PCNComponent blueprint, string blueprintName)
         {
             Entity entity = (Entity)AssembleComponent(blueprint);
-            entity.Properties.SetString(PROPERTY_NAME_BLUEPRINT, blueprintName);
+            if (blueprintName != null)
+                entity.Properties.SetString(PROPERTY_NAME_BLUEPRINT, blueprintName);
             return entity;
         }
 
@@ -139,9 +140,6 @@ namespace Phantom.Utils
                 else 
                     entity.Properties.SetObject(description.Members[i].Name, description.Members[i].Value);
             }
-
-            entity.Properties.SetString(PROPERTY_NAME_BLUEPRINT, blueprint.Name);
-
             return entity;
         }
 

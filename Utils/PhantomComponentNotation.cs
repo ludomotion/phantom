@@ -48,8 +48,8 @@ namespace Phantom.Utils
             Members = new List<PCNMember>();
             Components = new List<PCNComponent>();
             description = description.Trim();
-            int depthB = 0;
-            int depthP = 0;
+            int depth = 0;
+            int type = 0;
             int doubleQuotes = 0;
             int singleQuotes = 0;
             Name = null;
@@ -64,50 +64,56 @@ namespace Phantom.Utils
                     singleQuotes = 1 - singleQuotes;
                 if (singleQuotes == 0 && doubleQuotes == 0)
                 {
-                    if (description[i] == '(' && depthB == 0)
+                    if (description[i] == '(' /*&& depthB == 0*/)
                     {
-                        if (depthP == 0 && Name == null && i > 0)
+                        if (depth == 0 && Name == null && i > 0)
                             Name = description.Substring(0, i);
-                        depthP++;
-                        if (depthP == 1)
+                        depth++;
+                        if (depth == 1)
+                        {
                             memberStart = i + 1;
+                            type = 1;
+                        }
                     }
-                    if (description[i] == '[' && depthP == 0)
+                    if (description[i] == '[')
                     {
-                        if (depthB == 0 && Name == null && i > 0)
+                        if (depth == 0 && Name == null && i > 0)
                             Name = description.Substring(0, i);
-                        depthB++;
-                        if (depthB == 1)
+                        depth++;
+                        if (depth == 1)
+                        {
+                            type = 2;
                             componentStart = i + 1;
+                        }
                     }
-                    if (description[i] == ')' && depthP > 0)
+                    if (description[i] == ')')
                     {
-                        depthP--;
-                        if (depthP == 0)
+                        depth--;
+                        if (depth == 0)
                         {
                             string member = description.Substring(memberStart, i - memberStart).Trim();
                             if (member != "")
                                 Members.Add(new PCNMember(member));
                         }
                     }
-                    if (description[i] == ',' && depthP == 1)
+                    if (description[i] == ',' && depth == 1 && type == 1)
                     {
                         string member = description.Substring(memberStart, i - memberStart).Trim();
                         if (member != "")
                             Members.Add(new PCNMember(member));
                         memberStart = i + 1;
                     }
-                    if (description[i] == ']' && depthB > 0)
+                    if (description[i] == ']')
                     {
-                        depthB--;
-                        if (depthB == 0)
+                        depth--;
+                        if (depth == 0)
                         {
                             string component = description.Substring(componentStart, i - componentStart).Trim();
                             if (component != "")
                                 Components.Add(new PCNComponent(component));
                         }
                     }
-                    if (description[i] == ' ' && depthB == 1)
+                    if (description[i] == ',' && depth == 1 && type == 2)
                     {
                         string component = description.Substring(componentStart, i - componentStart).Trim();
                         if (component != "")
@@ -169,7 +175,7 @@ namespace Phantom.Utils
                 for (int i = 0; i < component.Components.Count; i++)
                 {
                     if (i > 0) 
-                        result += " ";
+                        result += ", ";
                     result += ComponentToPCNString(component.Components[i]);
                 }
                 result += "]";
@@ -185,7 +191,7 @@ namespace Phantom.Utils
                 if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
                 {
                     if (result != "")
-                        result += ",";
+                        result += ", ";
                     result += property.Key + "=" + property.Value.ToString();
                 }
             }
