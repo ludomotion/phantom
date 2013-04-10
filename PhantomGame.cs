@@ -81,9 +81,11 @@ namespace Phantom
             }
         }
 
-        public PhantomGame( float width, float height )
+        public PhantomGame( float width, float height, string name )
         {
             PhantomGame.Game = this;
+
+			this.Name = name;
 
 #if DEBUG
             if (width < 10 || height < 10)
@@ -98,12 +100,6 @@ namespace Phantom
             this.multiplier = 1;
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-
-#if ANDROID
-			this.Name = Microsoft.Xna.Framework.Game.Activity.ApplicationInfo.Name;
-#elif !XBOX
-			this.Name = Assembly.GetEntryAssembly().FullName;
-#endif
             this.BackgroundColor = 0x123456.ToColor();
             this.Paused = false;
 
