@@ -10,6 +10,9 @@ using System.Diagnostics;
 
 namespace Phantom.Core
 {
+    /// <summary>
+    /// DEPRICATED!
+    /// </summary>
     public class InputComponent : Component
     {
         public static readonly int LeftButton = 0;

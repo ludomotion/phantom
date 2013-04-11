@@ -10,6 +10,9 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Core
 {
+    /// <summary>
+    /// DECRICATED!
+    /// </summary>
     public class Input : Component
     {
         internal KeyboardState PreviousKeyboardState;

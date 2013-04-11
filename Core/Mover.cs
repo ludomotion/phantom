@@ -10,14 +10,39 @@ using System.Diagnostics;
 
 namespace Phantom.Core
 {
+    /// <summary>
+    /// A mover component controls an Entity's movement. Adding a mover to an Entity means it will respond to
+    /// collisions.
+    /// </summary>
     public class Mover : EntityComponent
     {
+        /// <summary>
+        /// A vector representing the entity's velocity measured in pixels/second
+        /// </summary>
         public Vector2 Velocity;
+        /// <summary>
+        /// A vector representing the entity's accelartion measured in pixels/second^2
+        /// </summary>
         public Vector2 Acceleration;
+        /// <summary>
+        /// A vector representing a force which is applied to the velocity once. This vector is cleared after each integration
+        /// </summary>
         public Vector2 Force;
 
+        /// <summary>
+        /// Loss of energy every integration step (V = V * damping ^ elapsedTime)
+        /// TODO: Joris doesn't like this setting (its not intuitive enough: reevaluate)
+        /// </summary>
 		public float Damping;
+
+        /// <summary>
+        /// Bounce friction (0-1). 1 is maximal friction (0% reflection in the direction of the collision surface)
+        /// </summary>
 		public float Friction;
+
+        /// <summary>
+        /// Bounce restitution (0-1). 1 is maximal bounce (100% reflection in the direction of the collision normal)
+        /// </summary>
         public float Bounce;
 
         public Mover(Vector2 velocity, float damping, float friction, float bounce)
@@ -65,11 +90,24 @@ namespace Phantom.Core
             return base.HandleMessage(message, data);
         }
 
+        /// <summary>
+        /// Responds to the collision by resolving the interpenetration.
+        /// </summary>
+        /// <param name="collision"></param>
+        /// <param name="other"></param>
+        /// <param name="factor"></param>
         public virtual void RespondToCollision(CollisionData collision, Entity other, float factor)
         {
             this.Entity.Position -= factor * collision.Normal * collision.Interpenetration;
         }
 
+        /// <summary>
+        /// Simulates bouncing of static entities by reflecting the entity's velocity along the collision normal.
+        /// Applies bounce and and friction.
+        /// </summary>
+        /// <param name="collision"></param>
+        /// <param name="other"></param>
+        /// <param name="factor"></param>
         public virtual void BounceEnergy(CollisionData collision, Entity other, float factor)
         {
             Vector2 normal = collision.Normal * factor;
@@ -88,6 +126,11 @@ namespace Phantom.Core
 			this.ApplyFrictionBounce(normal, friction, bounce);
         }
 
+        /// <summary>
+        /// Simulates energy transfer between two moving entities, based on their respective mass
+        /// </summary>
+        /// <param name="collision"></param>
+        /// <param name="other"></param>
 		public virtual void TransferEnergy(CollisionData collision, Entity other)
         {
             if (other.Mover == null)
