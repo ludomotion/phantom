@@ -806,13 +806,13 @@ namespace Phantom.Utils
                     {
                         if (entity == selectedEntity)
                         {
-                            string name = selectedEntity.GetType().Name;
+                            string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, entity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Yellow);
                         }
                         else if (entity == hoveringEntity)
                         {
-                            string name = hoveringEntity.GetType().Name;
+                            string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, hoveringEntity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
                         }
@@ -827,7 +827,7 @@ namespace Phantom.Utils
                 if (drawingEntity != null && hoveringEntity == null)
                 {
                     DrawEntity(info, topLeft, drawingEntity);
-                    string name = drawingEntity.GetType().Name;
+                    string name = drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, drawingEntity.GetType().Name); ;
                     Vector2 size = font.MeasureString(name);
                     info.Batch.DrawString(font, name, drawingEntity.Position - topLeft - size * 0.5f, Color.Red);
                 }
