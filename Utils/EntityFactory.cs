@@ -122,6 +122,13 @@ namespace Phantom.Utils
             }
         }
 
+        /// <summary>
+        /// Build an instance of a blueprint and pass extra information to it through its properties
+        /// </summary>
+        /// <param name="blueprint">The blueprint describing how the instance should be build</param>
+        /// <param name="description">PCN components that represent additional parameters</param>
+        /// <param name="blueprintName">The blueprint name for future reference</param>
+        /// <returns></returns>
         public static Entity BuildInstance(PCNComponent blueprint, PCNComponent description, string blueprintName)
         {
 
@@ -143,6 +150,11 @@ namespace Phantom.Utils
             return entity;
         }
 
+        /// <summary>
+        /// Creates an instance description based from the blueprint name and the public properties of the entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public static string InstanceToPCNString(Entity entity)
         {
             string name = entity.Properties.GetString(PROPERTY_NAME_BLUEPRINT, null);

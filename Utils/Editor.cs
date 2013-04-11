@@ -71,9 +71,8 @@ namespace Phantom.Utils
         private KeyboardState previousKeyboard = Keyboard.GetState();
 
         private PhWindow layerWindow;
-        private PhWindow entitiesWindow;
-        private PhWindow tilesWindow;
         private PhWindow propertiesWindow;
+        private PhWindow entitiesWindow;
         private PhWindow main;
         private PhControl windows;
         private Component propertiesWindowTarget;
@@ -163,33 +162,21 @@ namespace Phantom.Utils
             for (int i = 0; i < layers.Count; i++)
                 layerWindow.AddComponent(new PhButton(10, 30+i*32, 480, 24, layers[i].Name, SelectLayer));
             windows.AddComponent(layerWindow);
+        }
 
-            tilesWindow = new PhWindow(100, 100, 500, 500, "Tiles");
-            tilesWindow.Ghost = true;
-            int x = 10;
-            y = 30;
-            tilesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
-            y += 32;
-
-            //TODO this should be dynamically build for each list
-            foreach(KeyValuePair<string, PCNComponent> tile in MapLoader.EntityLists["tiles"])
-            {
-                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, tile.Key, SelectEntity));
-                y += 32;
-                if (y > 500 - 32)
-                {
-                    x += 168;
-                    y = 30;
-                }
-            }
-            windows.AddComponent(tilesWindow);
-
-            //TODO this should be dynamically build for each list
-            entitiesWindow = new PhWindow(100, 100, 500, 500, "Entities");
+        private PhWindow BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, bool includeNone, string name)
+        {
+            entitiesWindow = new PhWindow(100, 100, 500, 500, name);
             entitiesWindow.Ghost = true;
-            x = 10;
-            y = 30;
-            foreach (KeyValuePair<string, PCNComponent> entity in MapLoader.EntityLists["entities"])
+            int x = 10;
+            int y = 30;
+            if (includeNone)
+            {
+                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
+                y += 32;
+            }
+
+            foreach (KeyValuePair<string, PCNComponent> entity in entityList)
             {
                 entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entity.Key, SelectEntity));
                 y += 32;
@@ -199,16 +186,34 @@ namespace Phantom.Utils
                     y = 30;
                 }
             }
-            windows.AddComponent(entitiesWindow);
 
+            entitiesWindow.OnClose = CloseEntityWindow;
+            return entitiesWindow;
+        }
+
+        private void CloseEntityWindow(PhControl sender)
+        {
+            if (entitiesWindow != null)
+            {
+                windows.RemoveComponent(entitiesWindow);
+                entitiesWindow = null;
+            }
         }
 
         private void StartSelectEntity(PhControl sender)
         {
             if (layers[currentLayer].Type == LayerType.Tiles)
-                tilesWindow.Show();
+            {
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, true, "Tiles");
+                windows.AddComponent(window);
+                window.Show();
+            }
             if (layers[currentLayer].Type == LayerType.Entities)
-                entitiesWindow.Show();
+            {
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, false, "Entities");
+                windows.AddComponent(window);
+                window.Show();
+            }
         }
 
         private void StartSelectLayer(PhControl sender)
@@ -412,20 +417,10 @@ namespace Phantom.Utils
                 }
                 if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
                 {
-                    if (layers[currentLayer].Type == LayerType.Entities)
-                    {
-                        if (entitiesWindow.Ghost)
-                            entitiesWindow.Show();
-                        else
-                            entitiesWindow.Hide();
-                    }
-                    if (layers[currentLayer].Type == LayerType.Tiles)
-                    {
-                        if (tilesWindow.Ghost)
-                            tilesWindow.Show();
-                        else
-                            tilesWindow.Hide();
-                    }
+                    if (entitiesWindow == null)
+                        StartSelectEntity(null);
+                    else
+                        entitiesWindow.Hide();
                 }
                 if (currentKeyboard.IsKeyDown(Keys.Escape) && previousKeyboard.IsKeyUp(Keys.Escape))
                 {
@@ -869,6 +864,7 @@ namespace Phantom.Utils
             }
             return topLeft;
         }
+
 
 
     }
