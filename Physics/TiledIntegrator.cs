@@ -8,6 +8,12 @@ using Phantom.Graphics;
 
 namespace Phantom.Physics
 {
+    /// <summary>
+    /// A TiledIntegrator class is responsible for updating the physics of its entities, and detecting and handling collisions between them.
+    /// It divides the world in a number of square tiles to optimize the speed of collision detection. The optimal tile size is the same as the average 
+    /// of the lareger game entities. For entities larger than twice the tile size or for two entities that are both larger than 1.5 times the tile size,
+    /// the checks become inaccurate.
+    /// </summary>
     public class TiledIntegrator : Integrator
     {
         internal class Tile
@@ -23,6 +29,10 @@ namespace Phantom.Physics
             }
         }
 
+        /// <summary>
+        /// This array indicates the order in which tiles are checked. For the best effects, the entities on the same tile are checked first
+        /// then the tile below, above, to the right and to the left. The diagonal neighbors are checked last.
+        /// </summary>
         private readonly int[] neighbors = {
                  0,  0,
                  0,  1,
@@ -40,18 +50,31 @@ namespace Phantom.Physics
         private Dictionary<Entity, TilePosition> positions;
 
         private float tileSize;
+
+        /// <summary>
+        /// The set tile size
+        /// </summary>
         public float TileSize { get { return tileSize; } set { } }
         private Tile[] tiles;
         private int tilesX;
         private int tilesY;
         private int tileCount;
 
+        /// <summary>
+        /// Creates a new tiledIntegrator
+        /// </summary>
+        /// <param name="physicsExecutionCount">The number of integration step each frame. For fast paced games with many physics, 4 is good value</param>
+        /// <param name="tileSize">The tile size (all tiles are squares), smaller tile perform better, but the collision checks become inaccurate if the entities grow larger than 150% of the tile size.</param>
         public TiledIntegrator(int physicsExecutionCount, float tileSize)
             :base(physicsExecutionCount)
         {
             this.tileSize = tileSize;
         }
 
+        /// <summary>
+        /// An array of tiles is created when the integrator is added to a layer.
+        /// </summary>
+        /// <param name="parent"></param>
         public override void OnAdd(Component parent)
         {
 #if DEBUG
@@ -146,6 +169,10 @@ namespace Phantom.Physics
         }
         
         /*/
+        /// <summary>
+        /// Renders the tile grid
+        /// </summary>
+        /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
             base.Render(info);
@@ -174,6 +201,11 @@ namespace Phantom.Physics
         }
         //*/
 
+        /// <summary>
+        /// Find and return the tile at the specified position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         internal Tile GetTile(Vector2 position)
         {
             //TODO: escape is for debug purposes. Needs to be removed 

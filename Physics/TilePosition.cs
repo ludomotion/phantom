@@ -6,16 +6,31 @@ using Phantom.Core;
 
 namespace Phantom.Physics
 {
+    /// <summary>
+    /// A special class that keeps track of the tile a game entity is on in a tileIntegrator.
+    /// </summary>
     internal class TilePosition : EntityComponent
     {
         private TiledIntegrator integrator;
+
+        /// <summary>
+        /// The current tile
+        /// </summary>
         public TiledIntegrator.Tile Tile;
 
+        /// <summary>
+        /// Create an instance for the TilePosition
+        /// </summary>
+        /// <param name="integrator"></param>
         public TilePosition(TiledIntegrator integrator)
         {
             this.SetIntegrater(integrator);
         }
 
+        /// <summary>
+        /// Changes the integrator
+        /// </summary>
+        /// <param name="integrator"></param>
         public void SetIntegrater(TiledIntegrator integrator)
         {
             this.integrator = integrator;
@@ -27,6 +42,10 @@ namespace Phantom.Physics
             this.SetTile(this.integrator.GetTile(this.Entity.Position));
         }
 
+        /// <summary>
+        /// Changes the tile and updates the new and old tiles' entity list
+        /// </summary>
+        /// <param name="tile"></param>
         public void SetTile(TiledIntegrator.Tile tile)
         {
             if (this.Tile == tile)

@@ -8,6 +8,9 @@ using System.Diagnostics;
 
 namespace Phantom.Physics
 {
+    /// <summary>
+    /// The Integrator class is responsible for updating the physics of its entities, and detecting and handling collisions between them.
+    /// </summary>
     public class Integrator : Component
     {
 #if DEBUG && SATDEBUG
@@ -21,8 +24,15 @@ namespace Phantom.Physics
 
         private bool physicsPaused;
         private int physicsExecutionCount;
+        /// <summary>
+        /// An internal list of entities contained by the integrator.
+        /// </summary>
         protected List<Entity> entities;
 
+        /// <summary>
+        /// Creates a new integrator instance.
+        /// </summary>
+        /// <param name="physicsExecutionCount">The number of integration step each frame. For fast paced games with many physics, 4 is good value</param>
         public Integrator(int physicsExecutionCount)
         {
             this.physicsExecutionCount = physicsExecutionCount;
@@ -44,6 +54,10 @@ namespace Phantom.Physics
             return base.HandleMessage(message, data);
         }
 
+        /// <summary>
+        /// The integrator integrate all its children before calling the regular update functions.
+        /// </summary>
+        /// <param name="elapsed"></param>
         public override void Update(float elapsed)
         {
             if (!this.physicsPaused)
@@ -73,6 +87,10 @@ namespace Phantom.Physics
             base.Update(elapsed);
         }
 
+        /// <summary>
+        /// Checks the collisions of an entity in the integrator's entity list
+        /// </summary>
+        /// <param name="index">Zero based index of the entity in the integrator's entity list.</param>
         protected virtual void CheckEntityCollision(int index)
         {
             Entity e = this.entities[index];
@@ -87,6 +105,20 @@ namespace Phantom.Physics
 
         }
 
+        /// <summary>
+        /// Checks and responds to the collision between two entities.
+        /// A collision can only occur if
+        /// - Both entities are not ghosts
+        /// - At least one entity initiates collisions
+        /// - both entities CanCollideWith(other) returns true
+        /// 
+        /// Entities on repsond to the collision if
+        /// - Both are collidable
+        /// - AT least one has a mover
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
         protected virtual void CheckCollisionBetween(Entity a, Entity b)
         {
 			if (a.Ghost || b.Ghost)
@@ -143,23 +175,39 @@ namespace Phantom.Physics
             base.Render(info);
         }
 #endif
-
+        /// <summary>
+        /// Method called when a component is added to the integrators parent layer. If the component is an Entity it is added to the entity list.
+        /// </summary>
+        /// <param name="component"></param>
         internal virtual void OnComponentAddedToLayer(Component component)
         {
             if (component is Entity)
                 this.entities.Add(component as Entity);
         }
 
+        /// <summary>
+        /// Method called when a component is removed from the integrators parent layer. If the component is an Entity it is also removed from the entity list.
+        /// </summary>
+        /// <param name="component"></param>
         internal virtual void OnComponentRemovedToLayer(Component component)
         {
             this.entities.Remove(component as Entity);
         }
 
+        /// <summary>
+        /// Clears the entity list
+        /// TODO: Needs to be internal?
+        /// </summary>
         public virtual void ClearEntities()
         {
             this.entities.Clear();
         }
 
+        /// <summary>
+        /// Returns the first entity at the indicated position.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public virtual Entity GetEntityAt(Vector2 position)
         {
             for (int i = 0; i < entities.Count; i++)
@@ -168,6 +216,11 @@ namespace Phantom.Physics
             return null;
         }
 
+        /// <summary>
+        /// Returns all entities at the indicated position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public virtual List<Entity> GetEntitiesAt(Vector2 position)
         {
             List<Entity> result = new List<Entity>();
@@ -177,6 +230,12 @@ namespace Phantom.Physics
             return result;
         }
 
+        /// <summary>
+        /// Returns the first entity that is on the indicated position or within the indicated distance.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         public virtual Entity GetEntityCloseTo(Vector2 position, float distance)
         {
             for (int i = 0; i < entities.Count; i++)
@@ -185,6 +244,11 @@ namespace Phantom.Physics
             return null;
         }
 
+        /// <summary>
+        /// Called by the parents layer when its size is changed, removes or destroys the entities that are outside the new bounds.
+        /// </summary>
+        /// <param name="bounds"></param>
+        /// <param name="destroyEntities"></param>
         internal virtual void ChangeSize(Vector2 bounds, bool destroyEntities)
         {
             for (int i = entities.Count -1; i >= 0; i--)

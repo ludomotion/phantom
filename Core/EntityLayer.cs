@@ -19,7 +19,7 @@ namespace Phantom.Core
         /// </summary>
         protected Renderer renderer;
         /// <summary>
-        /// The component that handles the layer's entities' physics. All components added to an EntityLayer are also automatically added to the integrator.
+        /// The component that handles the layer's entities' physics. All entity added to an EntityLayer are also automatically added to the integrator's entity list.
         /// </summary>
         protected Integrator integrator;
 

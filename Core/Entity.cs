@@ -73,7 +73,9 @@ namespace Phantom.Core
         public bool InitiateCollision;
 
         /// <summary>
-        /// Flag that indicates if the entity can collide with other entities at all. Defaults to true.
+        /// Flag that indicates if the entity responds physically to collisions. Defaults to true. If set to false collisions are
+        /// registered but the position and velocity of the entities are unaffected
+        /// TODO: Consider renaming
         /// </summary>
         public bool Collidable;
 

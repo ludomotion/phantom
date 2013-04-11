@@ -4,10 +4,19 @@ using Phantom.Shapes;
 
 namespace Phantom.Physics
 {
+    /// <summary>
+    /// Static class to handle all the collision checking between game entities
+    /// </summary>
     public static class CollisionChecks
     {
         private const float SATPositioningAngle = 2;
 
+        /// <summary>
+        /// Generates collision data for two circle shaped entities.
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static CollisionData CircleCircle(Circle a, Circle b)
         {
             Vector2 delta = b.Entity.Position - a.Entity.Position;
@@ -24,6 +33,12 @@ namespace Phantom.Physics
             return CollisionData.Empty;
         }
 
+        /// <summary>
+        /// Generates collision data for a circle shaped entity and a polygon
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static CollisionData CirclePolygon(Circle a, Polygon b)
         {
 
@@ -110,6 +125,13 @@ namespace Phantom.Physics
             return result;
         }
 
+
+        /// <summary>
+        /// Gneerates collision data for two polygon shaped entities
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         public static CollisionData PolygonPolygon(Polygon a, Polygon b)
         {
             Vector2 delta = b.Entity.Position - a.Entity.Position;
