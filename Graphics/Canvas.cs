@@ -8,11 +8,23 @@ using Phantom.Misc;
 
 namespace Phantom.Graphics
 {
+    /// <summary>
+    /// A Canvas class that can draw graphic premitives
+    /// </summary>
     public class Canvas
     {
-
+        /// <summary>
+        /// The stroke width (in pixels)
+        /// TODO: Rename to StrokeWidth
+        /// </summary>
         public float LineWidth;
+        /// <summary>
+        /// The current stroke color
+        /// </summary>
         public Color StrokeColor;
+        /// <summary>
+        /// Teh current fill color
+        /// </summary>
         public Color FillColor;
 
         private RenderInfo info;
@@ -102,16 +114,32 @@ namespace Phantom.Graphics
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, circle.Vertices, 0, segments + 1, circle.Indices, 0, segments);
         }
 
+        /// <summary>
+        /// Draws and fills a rectangle specified by its orgin, half-size and orientation angle
+        /// </summary>
+        /// <param name="position">World position in pixels</param>
+        /// <param name="halfSize">Half size in pixels</param>
+        /// <param name="angle">Angle in radials</param>
         public void FillRect(Vector2 position, Vector2 halfSize, float angle)
         {
             this.FillRect(position, halfSize, angle, this.FillColor);
         }
 
+        /// <summary>
+        /// Draws and fills a circle specified by its origin and radius
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="radius"></param>
         public void FillCircle(Vector2 position, float radius)
         {
             this.FillCircle(position, radius, this.FillColor);
         }
 
+        /// <summary>
+        /// Draw a line from position a to b
+        /// </summary>
+        /// <param name="a">A world position in pixels</param>
+        /// <param name="b">A world position in pixels</param>
         public void StrokeLine(Vector2 a, Vector2 b)
         {
             Vector2 d = b - a;
@@ -132,6 +160,12 @@ namespace Phantom.Graphics
 
         }
 
+        /// <summary>
+        /// Draws the outline of a rectangle specified by its orgin, half-size and orientation angle
+        /// </summary>
+        /// <param name="position">World position in pixels</param>
+        /// <param name="halfSize">Half size in pixels</param>
+        /// <param name="angle">Angle in radials</param>
         public void StrokeRect(Vector2 position, Vector2 halfSize, float angle)
         {
             Matrix rotation = Matrix.CreateRotationZ(angle);
@@ -152,6 +186,11 @@ namespace Phantom.Graphics
             this.FillCircle(d, halfWidth, this.StrokeColor);
         }
 
+        /// <summary>
+        /// Draws the outline of a circle specified by its origin and radius
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="radius"></param>
         public void StrokeCircle(Vector2 position, float radius)
         {
             if (radius <= 0)
