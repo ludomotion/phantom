@@ -8,6 +8,10 @@ using Phantom.Physics;
 
 namespace Phantom.Shapes
 {
+    /// <summary>
+    /// An Object Aligned Bounding Box: a rectangle that rotates with its Entity. Its origin is always in the center of the Rectangle
+    /// A better (but less familiar name shoud be EABR or EARectangle
+    /// </summary>
     public class OABB : Polygon
     {
         public override float RoughRadius
@@ -20,6 +24,9 @@ namespace Phantom.Shapes
 
         private Vector2 halfSize;
 
+        /// <summary>
+        /// The dimensions of the rectange measured as the number of pixels from its center to its edges.
+        /// </summary>
         public Vector2 HalfSize
         {
             get { return halfSize; }
@@ -30,6 +37,11 @@ namespace Phantom.Shapes
             }
         }
 
+        /// <summary>
+        /// Creates a new OABB.
+        /// TODO: pass a fullsize (not half size)?
+        /// </summary>
+        /// <param name="halfSize">The dimensions of the rectange measured as the number of pixels from its center to its edges</param>
         public OABB( Vector2 halfSize )
             :base(new Vector2(-halfSize.X, -halfSize.Y), new Vector2(halfSize.X, -halfSize.Y), new Vector2(halfSize.X, halfSize.Y), new Vector2(-halfSize.X, halfSize.Y))
         {

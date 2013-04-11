@@ -10,6 +10,10 @@ using System.Diagnostics;
 
 namespace Phantom.Shapes
 {
+    /// <summary>
+    /// A Polygon shape determined by a number of vertices. The collision treats the polygon as a convex polygon. The vertices are relative to the 
+    /// polygons orginin which is in (0, 0). 
+    /// </summary>
     public class Polygon : Shape
     {
         private static PolygonVisitor visitor = new PolygonVisitor();
@@ -35,6 +39,9 @@ namespace Phantom.Shapes
             get { return this.roughWidth; }
         }
 
+        /// <summary>
+        /// The vertices that determine the polygon's shape. Independent of orientation.
+        /// </summary>
         public readonly Vector2[] Vertices;
         protected float roughRadius;
         protected float roughWidth;
@@ -111,6 +118,12 @@ namespace Phantom.Shapes
                 this.projections[i] = this.Project(this.normals[i], Vector2.Zero);
         }
 
+
+        /// <summary>
+        /// Creates and caches a rotated version of the polygon
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns></returns>
         public Vector2[] RotatedVertices(float angle)
         {
             if (angle == 0)

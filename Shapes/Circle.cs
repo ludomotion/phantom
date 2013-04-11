@@ -9,6 +9,9 @@ using Phantom.Physics;
 
 namespace Phantom.Shapes
 {
+    /// <summary>
+    /// A circular shape with a radius. It's origin is always at the shape's center.
+    /// </summary>
     public class Circle : Shape
     {
         private static CircleVisitor visitor = new CircleVisitor();
@@ -28,6 +31,9 @@ namespace Phantom.Shapes
             }
         }
 
+        /// <summary>
+        /// The circle's radius
+        /// </summary>
         public float Radius { get; protected set; }
 
         public Circle(float radius)
