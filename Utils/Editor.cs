@@ -41,12 +41,14 @@ namespace Phantom.Utils
             public string Name;
             public LayerType Type;
             public Dictionary<string, PCNComponent> EntityList;
-            public EditorLayer(Component layer, string name, LayerType type, Dictionary<string, PCNComponent> entityList)
+            public int TileSize;
+            public EditorLayer(Component layer, string name, LayerType type, Dictionary<string, PCNComponent> entityList, int tileSize)
             {
                 this.Layer = layer;
                 this.Name = name;
                 this.Type = type;
                 this.EntityList = entityList;
+                this.TileSize = tileSize;
             }
         }
 
@@ -78,9 +80,9 @@ namespace Phantom.Utils
         private Component propertiesWindowTarget;
 
 
-        public static void Initialize(SpriteFont font, float tileSize)
+        public static void Initialize(SpriteFont font)
         {
-            MapLoader.Initialize(tileSize);
+            MapLoader.Initialize();
             GUISettings.Initialize(font);
             PhantomGame.Game.Console.Register("editor", "Opens editor window.", delegate(string[] argv)
             {
@@ -110,13 +112,13 @@ namespace Phantom.Utils
                 if (c.Properties != null && c.Properties.GetString("editable", null) != null)
                 {
                     string name = c.Properties.GetString("editable", null);
-                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties, null));
+                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties, null, 0));
                     if (c is EntityLayer)
                     {
                         if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("tileList", "")))
-                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles, MapLoader.EntityLists[c.Properties.GetString("tileList", "")]));
+                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles, MapLoader.EntityLists[c.Properties.GetString("tileList", "")], c.Properties.GetInt("tileSize", 0)));
                         if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("entityList", "")))
-                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities, MapLoader.EntityLists[c.Properties.GetString("entityList", "")]));
+                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities, MapLoader.EntityLists[c.Properties.GetString("entityList", "")], 0));
                     }
                 }
                 
@@ -324,8 +326,8 @@ namespace Phantom.Utils
 
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
-                tilesX = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.X / MapLoader.TileSize);
-                tilesY = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.Y / MapLoader.TileSize);
+                tilesX = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.X / layers[currentLayer].TileSize);
+                tilesY = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.Y / layers[currentLayer].TileSize);
                 tileMap = MapLoader.ConstructTileMap((EntityLayer)layers[currentLayer].Layer);
             }
         }
@@ -447,8 +449,12 @@ namespace Phantom.Utils
 
         private Vector2 SnapPosition(Vector2 position)
         {
-            position.X = (float)Math.Floor(position.X / MapLoader.TileSize) * MapLoader.TileSize + MapLoader.TileSize * 0.5f;
-            position.Y = (float)Math.Floor(position.Y / MapLoader.TileSize) * MapLoader.TileSize + MapLoader.TileSize * 0.5f;
+            int ts = layers[currentLayer].TileSize;
+            if (ts > 0)
+            {
+                position.X = (float)Math.Floor(position.X / ts) * ts + ts * 0.5f;
+                position.Y = (float)Math.Floor(position.Y / ts) * ts + ts * 0.5f;
+            }
             return position;
         }
 
@@ -704,8 +710,8 @@ namespace Phantom.Utils
             EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
             if (entities != null)
             {
-                int x = (int)Math.Floor(mousePosition.X / MapLoader.TileSize);
-                int y = (int)Math.Floor(mousePosition.Y / MapLoader.TileSize);
+                int x = (int)Math.Floor(mousePosition.X / layers[currentLayer].TileSize);
+                int y = (int)Math.Floor(mousePosition.Y / layers[currentLayer].TileSize);
                 int index = x + y * tilesX;
                 if (drawingType != null)
                 {
@@ -744,8 +750,8 @@ namespace Phantom.Utils
             EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
             if (entities != null)
             {
-                int x = (int)Math.Floor(mousePosition.X / MapLoader.TileSize);
-                int y = (int)Math.Floor(mousePosition.Y / MapLoader.TileSize);
+                int x = (int)Math.Floor(mousePosition.X / layers[currentLayer].TileSize);
+                int y = (int)Math.Floor(mousePosition.Y / layers[currentLayer].TileSize);
                 int index = x + y * tilesX;
                 Entity entity = tileMap[index];
                 if (entity != null)
@@ -829,10 +835,10 @@ namespace Phantom.Utils
                 {
                     Vector2 pos = SnapPosition(mousePosition) - topLeft;
                     info.Canvas.Begin();
-                    info.Canvas.MoveTo(pos - Vector2.One * MapLoader.TileSize * 0.5f);
-                    info.Canvas.LineTo(pos + Vector2.One * MapLoader.TileSize * 0.5f);
-                    info.Canvas.MoveTo(pos + new Vector2(MapLoader.TileSize * 0.5f, -MapLoader.TileSize * 0.5f));
-                    info.Canvas.LineTo(pos + new Vector2(-MapLoader.TileSize * 0.5f, MapLoader.TileSize * 0.5f));
+                    info.Canvas.MoveTo(pos - Vector2.One * layers[currentLayer].TileSize * 0.5f);
+                    info.Canvas.LineTo(pos + Vector2.One * layers[currentLayer].TileSize * 0.5f);
+                    info.Canvas.MoveTo(pos + new Vector2(layers[currentLayer].TileSize * 0.5f, -layers[currentLayer].TileSize * 0.5f));
+                    info.Canvas.LineTo(pos + new Vector2(-layers[currentLayer].TileSize * 0.5f, layers[currentLayer].TileSize * 0.5f));
                     info.Canvas.Stroke();
                 }
             }

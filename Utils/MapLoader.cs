@@ -17,21 +17,20 @@ using Trace = System.Console;
 
 namespace Phantom.Utils
 {
+    /// <summary>
+    /// Static class that handles loading and saving of maps from and to PCN format.
+    /// </summary>
     public static class MapLoader
     {
+        /// <summary>
+        /// A dictionary containing dictionaries for entityLists
+        /// </summary>
         public static Dictionary<string, Dictionary<string, PCNComponent>> EntityLists;
-        public static float TileSize;
-        //private static string filename;
 
-        public static Dictionary<string, string> EmbeddedFiles;
-
-
-        public static void Initialize(float tileSize)
+        public static void Initialize()
         {
-            TileSize = tileSize;
             EntityLists = new Dictionary<string, Dictionary<string, PCNComponent>>();
 
-            EmbeddedFiles = new Dictionary<string,string>();
             PhantomGame.Game.Console.Register("savemap", "Saves the current map to file.", delegate(string[] argv)
             {
                 if (argv.Length < 2)
@@ -39,21 +38,12 @@ namespace Phantom.Utils
                 else
                     MapLoader.SaveMap(argv[1]);
             });
-            PhantomGame.Game.Console.Register("storemap", "Saves the current map to memory.", delegate(string[] argv)
-            {
-                if (argv.Length < 2)
-                    Trace.WriteLine("Filename expected!");
-                else
-                    MapLoader.StoreMap(argv[1]);
-            });
             PhantomGame.Game.Console.Register("openmap", "Loads the current map to file.", delegate(string[] argv)
             {
                 if (argv.Length < 2)
                     Trace.WriteLine("Filename expected!");
-                if (argv.Length == 2)
-                    MapLoader.OpenMap(argv[1], null);
-                else
-                    MapLoader.OpenMap(argv[1], argv[2]);
+                if (argv.Length >= 2)
+                    MapLoader.OpenMap(argv[1]);
             });
         }
 
@@ -96,35 +86,14 @@ namespace Phantom.Utils
             state.Properties.Objects["filename"] = filename;
         }
 
-        public static void StoreMap(string filename)
-        {
-            GameState state = GetState();
-            string data = GetMapData();
-            EmbeddedFiles[filename] = data;
-            Trace.WriteLine("Map stored.");
 
-            if (state.Properties == null)
-                state.Properties = new PropertyCollection();
-            state.Properties.Objects["filename"] = filename;
-        }
-
+        
         public static void OpenMap(string filename)
         {
-            OpenMap(filename, null);
-        }
-
-        public static void OpenMap(string filename, string option)
-        {
             string data = null;
-            if (option != "file" && EmbeddedFiles.ContainsKey(filename))
+            if (System.IO.File.Exists(filename))
             {
-                data = EmbeddedFiles[filename];
-                Trace.WriteLine("Map recovered fromm memory.");
-            }
-            if (option != "stored")
-            {
-                if (System.IO.File.Exists(filename))
-                    data = System.IO.File.ReadAllText(filename);
+                data = System.IO.File.ReadAllText(filename);
                 Trace.WriteLine("Map opened from file.");
             }
             if (data != null)
@@ -169,8 +138,11 @@ namespace Phantom.Utils
 
         public static Entity[] ConstructTileMap(EntityLayer entityLayer)
         {
-            int width = (int)Math.Ceiling(entityLayer.Bounds.X/TileSize);
-            int height = (int)Math.Ceiling(entityLayer.Bounds.Y/TileSize);
+            int tileSize = entityLayer.Properties.GetInt("tileSize", 0);
+            if (tileSize <= 0)
+                return new Entity[] {};
+            int width = (int)Math.Ceiling(entityLayer.Bounds.X / tileSize);
+            int height = (int)Math.Ceiling(entityLayer.Bounds.Y / tileSize);
             Entity[] result = new Entity[width*height];
 
             foreach (Component component in entityLayer.Components)
@@ -180,8 +152,8 @@ namespace Phantom.Utils
                 {
                     if (entity.Properties.GetInt("isTile", 0) > 0)
                     {
-                        int x = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.X / TileSize), 0, width-1);
-                        int y = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.Y / TileSize), 0, height - 1);
+                        int x = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.X / tileSize), 0, width-1);
+                        int y = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.Y / tileSize), 0, height - 1);
                         result[x + y * width] = entity;
                     }
                 }
@@ -195,10 +167,11 @@ namespace Phantom.Utils
         {
             string data = "";
             string list = entityLayer.Properties.GetString("tiles", "");
-            if (list != "")
+            int tileSize = entityLayer.Properties.GetInt("tileSize", 0);
+            if (list != "" && tileSize>0)
             {
-                int width = (int)Math.Ceiling(entityLayer.Bounds.X / TileSize);
-                int height = (int)Math.Ceiling(entityLayer.Bounds.Y / TileSize);
+                int width = (int)Math.Ceiling(entityLayer.Bounds.X / tileSize);
+                int height = (int)Math.Ceiling(entityLayer.Bounds.Y / tileSize);
                 data += "tiles [";
                 Dictionary<string, int> tileList = new Dictionary<string, int>();
                 int c = 0;
@@ -313,8 +286,12 @@ namespace Phantom.Utils
             PCNComponent tileDefs = new PCNComponent(lines[index]);
             index++;
 
-            int width = (int)Math.Ceiling(entities.Bounds.X / TileSize);
-            int height = (int)Math.Ceiling(entities.Bounds.Y / TileSize);
+            int tileSize = entities.Properties.GetInt("tileSize", 0);
+            if (tileSize <= 0)
+                return;
+
+            int width = (int)Math.Ceiling(entities.Bounds.X / tileSize);
+            int height = (int)Math.Ceiling(entities.Bounds.Y / tileSize);
             
             for (int y = 0; y < height; y++)
             {
@@ -324,15 +301,16 @@ namespace Phantom.Utils
                     string tile = lines[index].Substring(x * 4, 3);
                     int t = -1;
                     if (int.TryParse(tile, out t) && t >= 0 && t < tileDefs.Components.Count)
-                        AddTile(x, y, tileList[tileDefs.Components[t].Name], entities, tileDefs.Components[t].Name);
+                        AddTile(x, y, tileSize, tileList[tileDefs.Components[t].Name], entities, tileDefs.Components[t].Name);
                 }
                 index++;
             }
         }
 
-        private static void AddTile(int x, int y, PCNComponent blueprint, EntityLayer entities, string blueprintName)
+        private static void AddTile(int x, int y, int tileSize, PCNComponent blueprint, EntityLayer entities, string blueprintName)
         {
-            Vector2 position = new Vector2((x + 0.5f) * TileSize, (y + 0.5f) * TileSize);
+
+            Vector2 position = new Vector2((x + 0.5f) * tileSize, (y + 0.5f) * tileSize);
             Entity entity = EntityFactory.AssembleEntity(blueprint, blueprintName);
             entity.Position = position;
             entity.Properties.Ints["isTile"] = 1;

@@ -27,6 +27,7 @@ namespace Phantom.Core
             this.Properties.Floats["Height"] = height;
             this.Properties.Objects["entityList"] = "";
             this.Properties.Objects["tileList"] = "";
+            this.Properties.Ints["tileSize"] = 0;
         }
 
         public EntityLayer(Renderer renderer, Integrator integrator)
