@@ -33,7 +33,6 @@ namespace Phantom.Core
         {
             if( info == null )
                 this.renderer.Render(info);
-            //!base.Render();
         }
 
     }
