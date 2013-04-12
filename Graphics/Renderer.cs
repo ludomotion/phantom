@@ -10,6 +10,9 @@ using Phantom.Cameras;
 
 namespace Phantom.Graphics
 {
+    /// <summary>
+    /// The Renderer class renders all other components in its parent component.
+    /// </summary>
     public class Renderer : Component
     {
         public enum ViewportPolicy
