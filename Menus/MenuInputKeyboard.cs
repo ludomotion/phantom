@@ -7,19 +7,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Phantom.Menus
 {
-    public class MenuInputKeyboard : Component
+    public class MenuInputKeyboard : MenuInputBase
     {
-        private Menu menu;
         private KeyboardState previous;
-
-        public override void OnAdd(Component parent)
-        {
-            base.OnAdd(parent);
-            previous = Keyboard.GetState();
-            menu = parent as Menu;
-            if (menu == null)
-                throw new Exception("MenuInputKeyboard can only be added to a Menu component.");
-        }
 
         public override Component.MessageResult HandleMessage(int message, object data)
         {
@@ -39,14 +29,16 @@ namespace Phantom.Menus
         {
             base.Update(elapsed);
             KeyboardState current = Keyboard.GetState();
-            if (current.IsKeyDown(Keys.Left) && !previous.IsKeyDown(Keys.Left))
+            if (current.IsKeyDown(Keys.Left))
                 DoKeyLeft();
-            if (current.IsKeyDown(Keys.Right) && !previous.IsKeyDown(Keys.Right))
+            else if (current.IsKeyDown(Keys.Right))
                 DoKeyRight();
-            if (current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
+            else if (current.IsKeyDown(Keys.Up))
                 DoKeyUp();
-            if (current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
+            else if (current.IsKeyDown(Keys.Down))
                 DoKeyDown();
+            else
+                ClearCoolDown();
             if (current.IsKeyDown(Keys.Space) && !previous.IsKeyDown(Keys.Space))
                 StartPress();
             if (current.IsKeyDown(Keys.Enter) && !previous.IsKeyDown(Keys.Enter))
@@ -56,96 +48,10 @@ namespace Phantom.Menus
             if (!current.IsKeyDown(Keys.Enter) && previous.IsKeyDown(Keys.Enter))
                 EndPress();
             if (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape))
-                DoKeyEscape();
+                DoKeyBack();
             
 
             previous = current;
-        }
-
-        private void DoKeyLeft()
-        {
-            if (menu.Selected != null && menu.Selected.Left != null)
-            {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Left;
-                while (menu.Selected.Left != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Left;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
-            }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.PreviousOption);
-            else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
-        }
-
-        private void DoKeyRight()
-        {
-            if (menu.Selected != null && menu.Selected.Right != null)
-            {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Right;
-                while (menu.Selected.Right != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Right;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
-            }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.NextOption);
-            else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
-
-        }
-
-        private void DoKeyUp()
-        {
-            if (menu.Selected != null && menu.Selected.Above != null)
-            {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Above;
-                while (menu.Selected.Above != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Above;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
-            }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.NextOption);
-            else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
-        }
-
-        private void DoKeyDown()
-        {
-            if (menu.Selected != null && menu.Selected.Below != null)
-            {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Below;
-                while (menu.Selected.Below != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Below;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
-            }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.PreviousOption);
-            else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
-        }
-
-        private void StartPress()
-        {
-            if (menu.Selected != null)
-                menu.Selected.StartPress();
-        }
-
-        private void EndPress()
-        {
-            if (menu.Selected != null)
-                menu.Selected.EndPress();
-        }
-
-        private void DoKeyEscape()
-        {
-            menu.Back();
         }
        
     }
