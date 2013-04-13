@@ -106,6 +106,10 @@
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
+    <Compile Include="Menus\MenuInputKeyboard.cs" />
+    <Compile Include="Menus\Menu.cs" />
+    <Compile Include="Menus\MenuButton.cs" />
+    <Compile Include="Menus\MenuControl.cs" />
     <Compile Include="Messages.cs" />
     <Compile Include="Misc\Components\DelayedMessage.cs" />
     <Compile Include="Misc\Components\MessageDelay.cs" />
@@ -163,6 +167,7 @@
     <Compile Include="UI\PhWindow.cs" />
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityMap.cs" />
+    <Compile Include="Utils\GraphicsUtils.cs" />
     <Compile Include="Utils\MapLoader.cs" />
     <Compile Include="Utils\Performance\Profiler.cs" />
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
