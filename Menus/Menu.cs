@@ -24,7 +24,7 @@ namespace Phantom.Menus
 
         public MenuOrientation Orientation;
 
-        private List<MenuControl> controls;
+        internal List<MenuControl> Controls;
         private MenuControl selected;
         private Renderer renderer;
         public MenuControl Selected
@@ -50,35 +50,34 @@ namespace Phantom.Menus
             this.Orientation = orientation;
             AddComponent(renderer);
             OnlyOnTop = true;
-            controls = new List<MenuControl>();
+            Controls = new List<MenuControl>();
             this.renderer = renderer;
         }
 
         public override void ClearComponents()
         {
             base.ClearComponents();
-            controls.Clear();
+            Controls.Clear();
         }
 
         protected override void OnComponentAdded(Component child)
         {
             base.OnComponentAdded(child);
             if (child is MenuControl)
-                controls.Add((MenuControl)child);
+                Controls.Add((MenuControl)child);
         }
 
         protected override void OnComponentRemoved(Component child)
         {
             base.OnComponentRemoved(child);
             if (child is MenuControl)
-                controls.Remove((MenuControl)child);
+                Controls.Remove((MenuControl)child);
         }
 
         public override void BackOnTop()
         {
             base.BackOnTop();
-            if (Selected == null && controls.Count > 0)
-                Selected = controls[0];
+            HandleMessage(Messages.MenuActivated, null);
         }
 
         public override void Render(RenderInfo info)
@@ -101,21 +100,21 @@ namespace Phantom.Menus
 
         public void ConnectControls(float maxDistance)
         {
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
                 switch (Orientation)
                 {
                     case MenuOrientation.LeftToRight:
-                        FindConnectionsLeftRight(controls[i], maxDistance);
+                        FindConnectionsLeftRight(Controls[i], maxDistance);
                         break;
                     case MenuOrientation.TopToBottom:
-                        FindConnectionsTopBottom(controls[i], maxDistance);
+                        FindConnectionsTopBottom(Controls[i], maxDistance);
                         break;
                     case MenuOrientation.LeftToRightTopToBottom:
                     case MenuOrientation.TopToBottomLeftToRight:
                     case MenuOrientation.TwoDimensional:
-                        FindConnectionsTopBottom(controls[i], maxDistance);
-                        FindConnectionsLeftRight(controls[i], maxDistance);
+                        FindConnectionsTopBottom(Controls[i], maxDistance);
+                        FindConnectionsLeftRight(Controls[i], maxDistance);
                         break;
                 }
             }
@@ -136,23 +135,23 @@ namespace Phantom.Menus
             menuControl.Below = null;
             float distanceAbove = maxDistance * maxDistance;
             float distanceBelow = maxDistance * maxDistance;
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i] != menuControl)
+                if (Controls[i] != menuControl)
                 {
-                    Vector2 d = controls[i].Position - menuControl.Position;
+                    Vector2 d = Controls[i].Position - menuControl.Position;
                     if (Math.Abs(d.X)<Math.Abs(d.Y)) 
                     {
                         float distance = d.LengthSquared();
                         if (d.Y > 0 && distance < distanceBelow)
                         {
                             distanceBelow = distance;
-                            menuControl.Below = controls[i];
+                            menuControl.Below = Controls[i];
                         } 
                         else if (d.Y < 0 && distance < distanceAbove)
                         {
                             distanceAbove = distance;
-                            menuControl.Above = controls[i];
+                            menuControl.Above = Controls[i];
                         }
                     }
                 }
@@ -165,23 +164,23 @@ namespace Phantom.Menus
             menuControl.Right = null;
             float distanceLeft = maxDistance * maxDistance;
             float distanceRight = maxDistance * maxDistance;
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i] != menuControl)
+                if (Controls[i] != menuControl)
                 {
-                    Vector2 d = controls[i].Position - menuControl.Position;
+                    Vector2 d = Controls[i].Position - menuControl.Position;
                     if (Math.Abs(d.X) > Math.Abs(d.Y))
                     {
                         float distance = d.LengthSquared();
                         if (d.X > 0 && distance < distanceRight)
                         {
                             distanceRight = distance;
-                            menuControl.Right = controls[i];
+                            menuControl.Right = Controls[i];
                         }
                         else if (d.X < 0 && distance < distanceLeft)
                         {
                             distanceLeft = distance;
-                            menuControl.Left = controls[i];
+                            menuControl.Left = Controls[i];
                         }
                     }
                 }
@@ -190,11 +189,11 @@ namespace Phantom.Menus
 
         private void RemoveConnectionsTopToBottom()
         {
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i].Right == null && controls[i].Left != null)
+                if (Controls[i].Right == null && Controls[i].Left != null)
                 {
-                    MenuControl mc = controls[i].Left;
+                    MenuControl mc = Controls[i].Left;
                     int max = 100;
                     while (mc.Left != null && max > 0 && mc.Left.Below != null)
                     {
@@ -202,30 +201,30 @@ namespace Phantom.Menus
                         max--;
                     }
 
-                    controls[i].Right = mc.Below;
+                    Controls[i].Right = mc.Below;
                 }
             }
 
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i].Right != null && controls[i].Right.Left == null)
-                    controls[i].Right.Left = controls[i];
+                if (Controls[i].Right != null && Controls[i].Right.Left == null)
+                    Controls[i].Right.Left = Controls[i];
             }
 
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                controls[i].Above = null;
-                controls[i].Below = null;
+                Controls[i].Above = null;
+                Controls[i].Below = null;
             }
         }
 
         private void RemoveConnectionsLeftToRight()
         {
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i].Below == null && controls[i].Above != null)
+                if (Controls[i].Below == null && Controls[i].Above != null)
                 {
-                    MenuControl mc = controls[i].Above;
+                    MenuControl mc = Controls[i].Above;
                     int max = 100;
                     while (mc.Above != null && max > 0 && mc.Above.Right != null)
                     {
@@ -233,40 +232,40 @@ namespace Phantom.Menus
                         max--;
                     }
 
-                    controls[i].Below = mc.Right;
+                    Controls[i].Below = mc.Right;
                 }
             }
 
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                if (controls[i].Below != null && controls[i].Below.Above == null)
-                    controls[i].Below.Above = controls[i];
+                if (Controls[i].Below != null && Controls[i].Below.Above == null)
+                    Controls[i].Below.Above = Controls[i];
             } 
             
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                controls[i].Left = null;
-                controls[i].Right = null;
+                Controls[i].Left = null;
+                Controls[i].Right = null;
             }
         }
 
         public void WrapControls()
         {
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
                 switch (Orientation)
                 {
                     case MenuOrientation.LeftToRight:
                     case MenuOrientation.LeftToRightTopToBottom:
-                        WrapLeftRight(controls[i]);
+                        WrapLeftRight(Controls[i]);
                         break;
                     case MenuOrientation.TopToBottom:
                     case MenuOrientation.TopToBottomLeftToRight:
-                        WrapTopBottom(controls[i]);
+                        WrapTopBottom(Controls[i]);
                         break;
                     case MenuOrientation.TwoDimensional:
-                        WrapTopBottom(controls[i]);
-                        WrapLeftRight(controls[i]);
+                        WrapTopBottom(Controls[i]);
+                        WrapLeftRight(Controls[i]);
                         break;
                 }
             }
@@ -340,5 +339,18 @@ namespace Phantom.Menus
             }
         }
 
+
+        public MenuControl GetControlAt(Vector2 position)
+        {
+            for (int i = 0; i < Controls.Count; i++)
+            {
+                if (Controls[i].Shape != null)
+                {
+                    if (Controls[i].Shape.InShape(position))
+                        return Controls[i];
+                }
+            }
+            return null;
+        }
     }
 }

@@ -31,6 +31,7 @@ namespace Phantom.Menus
         {
             this.Position = position;
             this.Shape = shape;
+            this.Shape.SetStubEntity(new Entity(position));
         }
 
         public override void OnAncestryChanged()

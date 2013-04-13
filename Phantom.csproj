@@ -110,6 +110,7 @@
     <Compile Include="Menus\Menu.cs" />
     <Compile Include="Menus\MenuButton.cs" />
     <Compile Include="Menus\MenuControl.cs" />
+    <Compile Include="Menus\MenuInputMouse.cs" />
     <Compile Include="Menus\MenuOptionButton.cs" />
     <Compile Include="Menus\MenuToggleButton.cs" />
     <Compile Include="Messages.cs" />

@@ -44,6 +44,7 @@ namespace Phantom
 
         public const int MenuClick = 300;
         public const int MenuChangeOption = 301;
+        public const int MenuActivated = 302;
 
         public const int PropertiesChanged = 999;
 

@@ -21,6 +21,20 @@ namespace Phantom.Menus
                 throw new Exception("MenuInputKeyboard can only be added to a Menu component.");
         }
 
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case (Messages.MenuActivated):
+                    previous = Keyboard.GetState();
+                    if (menu.Selected == null && menu.Controls.Count > 0)
+                        menu.Selected = menu.Controls[0];
+
+                    break;
+            }
+            return base.HandleMessage(message, data);
+        }
+
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
@@ -54,6 +68,8 @@ namespace Phantom.Menus
                 menu.Selected = menu.Selected.Left;
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.PreviousOption);
+            else if (menu.Controls.Count > 0)
+                menu.Selected = menu.Controls[0];
         }
 
         private void DoKeyRight()
@@ -62,6 +78,9 @@ namespace Phantom.Menus
                 menu.Selected = menu.Selected.Right;
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.NextOption);
+            else if (menu.Controls.Count > 0)
+                menu.Selected = menu.Controls[0];
+
         }
 
         private void DoKeyUp()
@@ -70,6 +89,8 @@ namespace Phantom.Menus
                 menu.Selected = menu.Selected.Above;
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.NextOption);
+            else if (menu.Controls.Count > 0)
+                menu.Selected = menu.Controls[0];
         }
 
         private void DoKeyDown()
@@ -78,6 +99,8 @@ namespace Phantom.Menus
                 menu.Selected = menu.Selected.Below;
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.PreviousOption);
+            else if (menu.Controls.Count > 0)
+                menu.Selected = menu.Controls[0];
         }
 
         private void StartPress()
