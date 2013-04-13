@@ -50,11 +50,11 @@ namespace Phantom.Menus
                 menu.HandleMessage(Messages.MenuOptionChanged, this);
         }
 
-        public override void Click(ClickType type)
+        public override void Click(ClickType type, int player)
         {
             if (!Enabled)
                 return;
-            base.Click(type);
+            base.Click(type, player);
             if (type == ClickType.NextOption || type == ClickType.Select)
                 SetOption(option + 1);
             if (type == ClickType.PreviousOption)

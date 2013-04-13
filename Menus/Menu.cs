@@ -27,9 +27,9 @@ namespace Phantom.Menus
         public MenuOrientation Orientation;
 
         public List<MenuControl> Controls;
-        private MenuControl selected;
+        private MenuControl[] selected;
         private Renderer renderer;
-        public MenuControl Selected
+        /*public MenuControl Selected
         {
             get { return selected; }
             set
@@ -38,17 +38,18 @@ namespace Phantom.Menus
                     return;
                 if (selected != null)
                 {
-                    selected.CancelPress();
-                    selected.Selected = false;
+                    selected.CancelPress(0);
+                    selected.Selected &= 255 - (1 << 0);
                 }
                 selected = value;
                 if (selected != null)
-                    selected.Selected = true;
+                    selected.Selected |= 1;
             }
-        }
+        }*/
 
         public Menu(Renderer renderer, MenuOrientation orientation)
         {
+            selected = new MenuControl[4]; 
             this.Orientation = orientation;
             AddComponent(renderer);
             OnlyOnTop = true;
@@ -89,6 +90,26 @@ namespace Phantom.Menus
             else
                 renderer.Render(null);
         }
+
+        public void SetSelected(int player, MenuControl value)
+        {
+            if (selected[player] == value)
+                return;
+            if (selected[player] != null)
+            {
+                selected[player].CancelPress(player);
+                selected[player].Selected &= 255 - (1 << player);
+            }
+            selected[player] = value;
+            if (selected[player] != null)
+                selected[player].Selected |= 1 << player;
+        }
+
+        public MenuControl GetSelected(int player)
+        {
+            return selected[player];
+        }
+
 
         public virtual void Back()
         {

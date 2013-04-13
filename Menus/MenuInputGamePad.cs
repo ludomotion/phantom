@@ -17,6 +17,7 @@ namespace Phantom.Menus
         public MenuInputGamePad(PlayerIndex index)
         {
             this.index = index;
+            this.player = (int)index;
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
@@ -25,8 +26,8 @@ namespace Phantom.Menus
             {
                 case (Messages.MenuActivated):
                     previous = GamePad.GetState(index);
-                    if (menu.Selected == null && menu.Controls.Count > 0)
-                        menu.Selected = menu.Controls[0];
+                    if (menu.GetSelected(player) == null && menu.Controls.Count > 0)
+                        menu.SetSelected(player, menu.Controls[0]);
 
                     break;
             }

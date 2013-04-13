@@ -13,11 +13,10 @@ namespace Phantom.Menus
     public class MenuControl : Component
     {
         public string Name;
-        //TODO: Change to int so that multiple controllers might control the same menu
-        public bool Selected;
+        public int Selected;
         public bool Enabled = true;
 
-        protected bool pressed;
+        protected int pressed;
         protected Menu menu;
         public MenuControl Left;
         public MenuControl Right;
@@ -47,37 +46,39 @@ namespace Phantom.Menus
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (Selected)
+            if (Selected>0)
                 currentSelected += Math.Min(1 - currentSelected, elapsed * selectSpeed);
             else
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
         }
 
-        public virtual void StartPress() 
+        public virtual void StartPress(int player) 
         {
             if (Enabled)
-                pressed = true;
+                pressed |= 1 << player;
         }
 
-        public virtual void EndPress()
+        public virtual void EndPress(int player)
         {
-            if (pressed)
+            int pl = 1 << player;
+            if ((pressed & pl) == pl)
             {
-                pressed = false;
-                Click(ClickType.Select);
+                pressed &= 255 - pl;
+                Click(ClickType.Select, player);
             }
         }
 
-        public virtual void CancelPress()
+        public virtual void CancelPress(int player)
         {
-            pressed = false;
+            int pl = 1 << player;
+            pressed &= 255-pl;
         }
 
-        public virtual void Click(ClickType type)
+        public virtual void Click(ClickType type, int player)
         {
         }
 
-        public virtual void ClickAt(Vector2 position)
+        public virtual void ClickAt(Vector2 position, int player)
         {
         }
 

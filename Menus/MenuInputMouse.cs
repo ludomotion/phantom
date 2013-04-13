@@ -8,9 +8,8 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
-    public class MenuInputMouse : Component
+    public class MenuInputMouse : MenuInputBase
     {
-        private Menu menu;
         private MouseState previous;
         private MenuControl mouseDown;
 
@@ -29,7 +28,7 @@ namespace Phantom.Menus
             {
                 case (Messages.MenuActivated):
                     previous = Mouse.GetState();
-                    menu.Selected = menu.GetControlAt(new Vector2(previous.X, previous.Y));
+                    menu.SetSelected(player, menu.GetControlAt(new Vector2(previous.X, previous.Y)));
                     break;
             }
             return base.HandleMessage(message, data);
@@ -42,25 +41,26 @@ namespace Phantom.Menus
             Vector2 mouse = new Vector2(current.X, current.Y);
             if (current.X != previous.X || current.Y != previous.Y)
             {
-                menu.Selected = menu.GetControlAt(mouse);
-                if (mouseDown != null && menu.Selected == mouseDown)
-                    menu.Selected.ClickAt(mouse - menu.Selected.Position);
+                menu.SetSelected(player, menu.GetControlAt(mouse));
+                if (mouseDown != null && menu.GetSelected(player) == mouseDown)
+                    mouseDown.ClickAt(mouse - mouseDown.Position, 0);
             }
 
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
             {
-                menu.Selected = menu.GetControlAt(mouse);
-                if (menu.Selected != null)
+                MenuControl hover = menu.GetControlAt(mouse);
+                menu.SetSelected(player, hover);
+                if (hover != null)
                 {
-                    menu.Selected.StartPress();
-                    menu.Selected.ClickAt(mouse - menu.Selected.Position);
-                    mouseDown = menu.Selected;
+                    hover.StartPress(0);
+                    hover.ClickAt(mouse - hover.Position, 0);
+                    mouseDown = hover;
                 }
             }
             if (current.LeftButton != ButtonState.Pressed && previous.LeftButton == ButtonState.Pressed)
             {
-                if (menu.Selected != null)
-                    menu.Selected.EndPress();
+                if (menu.GetSelected(player) != null)
+                    menu.GetSelected(player).EndPress(0);
                 mouseDown = null;
             }
             previous = current;

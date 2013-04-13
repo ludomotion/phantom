@@ -31,17 +31,17 @@ namespace Phantom.Menus
             }
 
             GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, Menu.ColorShadow, 2);
-            float down = this.pressed ? 0 : 2;
+            float down = this.pressed > 0 ? 0 : 2;
             GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, Menu.ColorShadow, 2);
 
             info.Batch.DrawString(Menu.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
         }
 
-        public override void Click(ClickType type)
+        public override void Click(ClickType type, int player)
         {
             if (Enabled && type == ClickType.Select)
                 menu.HandleMessage(Messages.MenuClicked, this);
-            base.Click(type);
+            base.Click(type, player);
         }
 
 

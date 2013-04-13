@@ -12,6 +12,7 @@ namespace Phantom.Menus
         protected Menu menu;
         private float timer = 0;
         private float keyTimeOut = 0.4f;
+        protected int player = 0;
 
         public override void OnAdd(Component parent)
         {
@@ -41,20 +42,21 @@ namespace Phantom.Menus
             if (keyTimeOut > 0.2f)
                 keyTimeOut -= 0.1f;
 
-
-            if (menu.Selected != null && menu.Selected.Left != null)
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null && selected.Left != null)
             {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Left;
-                while (menu.Selected.Left != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Left;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
+                MenuControl current = selected;
+                selected = selected.Left;
+                while (selected.Left != null && !selected.Enabled && selected != current)
+                    selected = selected.Left;
+                if (!selected.Enabled)
+                    selected = current;
+                menu.SetSelected(player, selected);
             }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.PreviousOption);
+            else if (selected != null)
+                selected.Click(ClickType.PreviousOption, player);
             else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
+                menu.SetSelected(player, menu.Controls[0]);
         }
 
         protected void DoKeyRight()
@@ -66,19 +68,21 @@ namespace Phantom.Menus
                 keyTimeOut -= 0.1f;
 
 
-            if (menu.Selected != null && menu.Selected.Right != null)
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null && selected.Left != null)
             {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Right;
-                while (menu.Selected.Right != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Right;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
+                MenuControl current = selected;
+                selected = selected.Right;
+                while (selected.Right != null && !selected.Enabled && selected != current)
+                    selected = selected.Right;
+                if (!selected.Enabled)
+                    selected = current;
+                menu.SetSelected(player, selected);
             }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.NextOption);
+            else if (selected != null)
+                selected.Click(ClickType.NextOption, player);
             else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
+                menu.SetSelected(player, menu.Controls[0]);
 
         }
 
@@ -90,19 +94,21 @@ namespace Phantom.Menus
             if (keyTimeOut > 0.2f)
                 keyTimeOut -= 0.1f;
 
-            if (menu.Selected != null && menu.Selected.Above != null)
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null && selected.Above != null)
             {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Above;
-                while (menu.Selected.Above != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Above;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
+                MenuControl current = selected;
+                selected = selected.Above;
+                while (selected.Above != null && !selected.Enabled && selected != current)
+                    selected = selected.Above;
+                if (!selected.Enabled)
+                    selected = current;
+                menu.SetSelected(player, selected);
             }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.NextOption);
+            else if (selected != null)
+                selected.Click(ClickType.NextOption, player);
             else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
+                menu.SetSelected(player, menu.Controls[0]);
         }
 
         protected void DoKeyDown()
@@ -114,31 +120,35 @@ namespace Phantom.Menus
                 keyTimeOut -= 0.1f;
 
 
-            if (menu.Selected != null && menu.Selected.Below != null)
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null && selected.Above != null)
             {
-                MenuControl current = menu.Selected;
-                menu.Selected = menu.Selected.Below;
-                while (menu.Selected.Below != null && !menu.Selected.Enabled && menu.Selected != current)
-                    menu.Selected = menu.Selected.Below;
-                if (!menu.Selected.Enabled)
-                    menu.Selected = current;
+                MenuControl current = selected;
+                selected = selected.Below;
+                while (selected.Below != null && !selected.Enabled && selected != current)
+                    selected = selected.Below;
+                if (!selected.Enabled)
+                    selected = current;
+                menu.SetSelected(player, selected);
             }
-            else if (menu.Selected != null)
-                menu.Selected.Click(ClickType.PreviousOption);
+            else if (selected != null)
+                selected.Click(ClickType.PreviousOption, player);
             else if (menu.Controls.Count > 0)
-                menu.Selected = menu.Controls[0];
+                menu.SetSelected(player, menu.Controls[0]);
         }
 
         protected void StartPress()
         {
-            if (menu.Selected != null)
-                menu.Selected.StartPress();
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null)
+                selected.StartPress(player);
         }
 
         protected void EndPress()
         {
-            if (menu.Selected != null)
-                menu.Selected.EndPress();
+            MenuControl selected = menu.GetSelected(player);
+            if (selected != null)
+                selected.EndPress(player);
         }
 
         protected void DoKeyBack()

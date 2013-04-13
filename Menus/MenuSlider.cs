@@ -77,11 +77,11 @@ namespace Phantom.Menus
         public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
             : this(name, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, Orientation.Horizontal, false) { }
 
-        public override void Click(ClickType type)
+        public override void Click(ClickType type, int player)
         {
             if (!Enabled)
                 return;
-            base.Click(type);
+            base.Click(type, player);
             if (type == ClickType.NextOption)
                 SetValue(currentValue + step);
             if (type == ClickType.PreviousOption)
@@ -153,12 +153,12 @@ namespace Phantom.Menus
             info.Batch.DrawString(Menu.Font, Caption, Position - rect.HalfSize, text);
         }
 
-        public override void ClickAt(Vector2 position)
+        public override void ClickAt(Vector2 position, int player)
         {
             if (!Enabled)
                 return;
 
-            base.ClickAt(position);
+            base.ClickAt(position, player);
             float rel = 0;
             if (orientation == Orientation.Horizontal)
             {

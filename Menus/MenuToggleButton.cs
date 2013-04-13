@@ -36,9 +36,9 @@ namespace Phantom.Menus
                 menu.HandleMessage(Messages.MenuOptionChanged, this);
         }
 
-        public override void Click(ClickType type)
+        public override void Click(ClickType type, int player)
         {
-            base.Click(type);
+            base.Click(type, player);
             if (type == ClickType.Select)
                 Option = 1 - Option;
         }

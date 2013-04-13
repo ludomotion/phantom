@@ -17,8 +17,8 @@ namespace Phantom.Menus
             {
                 case (Messages.MenuActivated):
                     previous = Keyboard.GetState();
-                    if (menu.Selected == null && menu.Controls.Count > 0)
-                        menu.Selected = menu.Controls[0];
+                    if (menu.GetSelected(player) == null && menu.Controls.Count > 0)
+                        menu.SetSelected(player, menu.Controls[0]);
 
                     break;
             }
