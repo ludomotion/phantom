@@ -35,7 +35,10 @@ namespace Phantom.Menus
                 if (selected == value)
                     return;
                 if (selected != null)
+                {
+                    selected.CancelPress();
                     selected.Selected = false;
+                }
                 selected = value;
                 if (selected != null)
                     selected.Selected = true;

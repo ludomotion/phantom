@@ -14,6 +14,7 @@ namespace Phantom.Menus
     {
 
         public bool Selected;
+        protected bool pressed;
         protected Menu menu;
         public MenuControl Left;
         public MenuControl Right;
@@ -47,12 +48,23 @@ namespace Phantom.Menus
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
         }
 
-        public virtual void StartClick(ClickType type) 
+        public virtual void StartPress() 
         {
+            pressed = true;
         }
 
-        public virtual void EndClick(ClickType type)
+        public virtual void EndPress()
         {
+            if (pressed)
+            {
+                pressed = false;
+                Click(ClickType.Select);
+            }
+        }
+
+        public virtual void CancelPress()
+        {
+            pressed = false;
         }
 
         public virtual void Click(ClickType type)

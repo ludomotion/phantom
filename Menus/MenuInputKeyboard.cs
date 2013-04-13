@@ -34,13 +34,13 @@ namespace Phantom.Menus
             if (current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
                 DoKeyDown();
             if (current.IsKeyDown(Keys.Space) && !previous.IsKeyDown(Keys.Space))
-                StartClick();
+                StartPress();
             if (current.IsKeyDown(Keys.Enter) && !previous.IsKeyDown(Keys.Enter))
-                StartClick();
+                StartPress();
             if (!current.IsKeyDown(Keys.Space) && previous.IsKeyDown(Keys.Space))
-                EndClick();
+                EndPress();
             if (!current.IsKeyDown(Keys.Enter) && previous.IsKeyDown(Keys.Enter))
-                EndClick();
+                EndPress();
             if (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape))
                 DoKeyEscape();
             
@@ -52,36 +52,44 @@ namespace Phantom.Menus
         {
             if (menu.Selected != null && menu.Selected.Left != null)
                 menu.Selected = menu.Selected.Left;
+            else if (menu.Selected != null)
+                menu.Selected.Click(ClickType.PreviousOption);
         }
 
         private void DoKeyRight()
         {
             if (menu.Selected != null && menu.Selected.Right != null)
                 menu.Selected = menu.Selected.Right;
+            else if (menu.Selected != null)
+                menu.Selected.Click(ClickType.NextOption);
         }
 
         private void DoKeyUp()
         {
             if (menu.Selected != null && menu.Selected.Above != null)
                 menu.Selected = menu.Selected.Above;
+            else if (menu.Selected != null)
+                menu.Selected.Click(ClickType.NextOption);
         }
 
         private void DoKeyDown()
         {
             if (menu.Selected != null && menu.Selected.Below != null)
                 menu.Selected = menu.Selected.Below;
+            else if (menu.Selected != null)
+                menu.Selected.Click(ClickType.PreviousOption);
         }
 
-        private void StartClick()
+        private void StartPress()
         {
             if (menu.Selected != null)
-                menu.Selected.StartClick(ClickType.Select);
+                menu.Selected.StartPress();
         }
 
-        private void EndClick()
+        private void EndPress()
         {
             if (menu.Selected != null)
-                menu.Selected.EndClick(ClickType.Select);
+                menu.Selected.EndPress();
         }
 
         private void DoKeyEscape()

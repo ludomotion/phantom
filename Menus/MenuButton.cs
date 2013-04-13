@@ -24,10 +24,18 @@ namespace Phantom.Menus
             Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
             Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
 
-            GraphicsUtils.DrawShape(info, this.Position + Vector2.One, this.Shape, Color.Transparent, Menu.ColorShadow, 2);
-            GraphicsUtils.DrawShape(info, this.Position, this.Shape, face, Menu.ColorShadow, 2);
+            GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, Menu.ColorShadow, 2);
+            float down = this.pressed ? 0 : 2;
+            GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, Menu.ColorShadow, 2);
 
-            info.Batch.DrawString(Menu.Font, Caption, Position-size*0.5f, text);
+            info.Batch.DrawString(Menu.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
+        }
+
+        public override void Click(ClickType type)
+        {
+            if (type == ClickType.Select)
+                menu.HandleMessage(Messages.MenuClick, this);
+            base.Click(type);
         }
 
 
