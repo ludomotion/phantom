@@ -10,7 +10,6 @@ namespace Phantom.Menus
     public class MenuOptionButton : MenuButton
     {
         protected string[] options;
-        protected string prefix;
         private int option;
         private bool wrap = false;
         public int Option {
@@ -18,20 +17,22 @@ namespace Phantom.Menus
             set {SetOption(value);}
         }
 
-        public MenuOptionButton(string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
-            : base (caption, position, shape)
+        public MenuOptionButton(string name, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
+            : base (name, position, shape)
         {
-            prefix = caption;
             this.options = options;
             Option = selectedOption;
             this.wrap = wrap;
         }
 
-        public MenuOptionButton(string caption, Vector2 position, Shape shape, int selectedOption, params string[] options)
-            : this (caption, position, shape, true, selectedOption, options) { }
+        public MenuOptionButton(string name, Vector2 position, Shape shape, int selectedOption, params string[] options)
+            : this (name, position, shape, true, selectedOption, options) { }
 
         protected void SetOption(int value)
         {
+            if (option == value)
+                return;
+
             if (wrap)
             {
                 while (value < 0) value += options.Length;
@@ -43,7 +44,8 @@ namespace Phantom.Menus
             }
 
             option = value;
-            Caption = prefix + " " + options[option];
+            Caption = Name + " " + options[option];
+            menu.HandleMessage(Messages.MenuOptionChanged, this);
         }
 
         public override void Click(ClickType type)

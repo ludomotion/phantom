@@ -12,7 +12,7 @@ namespace Phantom.Menus
 
     public class MenuControl : Component
     {
-
+        public string Name;
         public bool Selected;
         protected bool pressed;
         protected Menu menu;
@@ -27,8 +27,9 @@ namespace Phantom.Menus
         protected float deselectSpeed = 4;
         protected float currentSelected = 0;
 
-        public MenuControl(Vector2 position, Shape shape)
+        public MenuControl(string name, Vector2 position, Shape shape)
         {
+            this.Name = name;
             this.Position = position;
             this.Shape = shape;
             this.Shape.SetStubEntity(new Entity(position));
@@ -69,6 +70,10 @@ namespace Phantom.Menus
         }
 
         public virtual void Click(ClickType type)
+        {
+        }
+
+        public virtual void ClickAt(Vector2 position)
         {
         }
 

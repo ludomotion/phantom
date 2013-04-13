@@ -42,9 +42,9 @@ namespace Phantom
         public const int MapLoaded = 210;
         public const int MapReset = 211;
 
-        public const int MenuClick = 300;
-        public const int MenuChangeOption = 301;
-        public const int MenuActivated = 302;
+        public const int MenuActivated = 300;
+        public const int MenuClicked = 301;
+        public const int MenuOptionChanged = 302;
 
         public const int PropertiesChanged = 999;
 

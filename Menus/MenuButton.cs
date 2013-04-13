@@ -12,10 +12,10 @@ namespace Phantom.Menus
     {
         public string Caption;
 
-        public MenuButton(string caption, Vector2 position, Shape shape)
-            : base(position, shape)
+        public MenuButton(string name, Vector2 position, Shape shape)
+            : base(name, position, shape)
         {
-            this.Caption = caption;
+            this.Caption = name;
         }
 
         public override void Render(Graphics.RenderInfo info)
@@ -34,7 +34,7 @@ namespace Phantom.Menus
         public override void Click(ClickType type)
         {
             if (type == ClickType.Select)
-                menu.HandleMessage(Messages.MenuClick, this);
+                menu.HandleMessage(Messages.MenuClicked, this);
             base.Click(type);
         }
 

@@ -284,9 +284,9 @@ namespace Phantom.Menus
                         mc = mc.Below;
                         max--;
                     }
+                    menuControl.Above = mc;
+                    mc.Below = menuControl;
                 }
-                menuControl.Above = mc;
-                mc.Below = menuControl;
             }
             if (menuControl.Below == null)
             {
@@ -299,9 +299,9 @@ namespace Phantom.Menus
                         mc = mc.Above;
                         max--;
                     }
+                    menuControl.Below = mc;
+                    mc.Above = menuControl;
                 }
-                menuControl.Below = mc;
-                mc.Above = menuControl;
             }
         }
 
@@ -318,9 +318,9 @@ namespace Phantom.Menus
                         mc = mc.Right;
                         max--;
                     }
+                    menuControl.Left = mc;
+                    mc.Right = menuControl;
                 }
-                menuControl.Left = mc;
-                mc.Right = menuControl;
             }
             if (menuControl.Right == null)
             {
@@ -333,9 +333,9 @@ namespace Phantom.Menus
                         mc = mc.Left;
                         max--;
                     }
+                    menuControl.Right = mc;
+                    mc.Left = menuControl;
                 }
-                menuControl.Right = mc;
-                mc.Left = menuControl;
             }
         }
 
