@@ -29,7 +29,6 @@ namespace Phantom.Menus
         public List<MenuControl> Controls;
         private MenuControl[] selected;
         private Renderer renderer;
-        public int Leader = 0;
 
         public Menu(Renderer renderer, MenuOrientation orientation)
         {
@@ -364,7 +363,7 @@ namespace Phantom.Menus
         {
             for (int i = 0; i < Controls.Count; i++)
             {
-                if (Controls[i].Enabled && (!Controls[i].MustBeLeader || player == Leader))
+                if (Controls[i].Enabled && (Controls[i].PlayerMask & (1 << player)) > 0)
                     return Controls[i];
             }
             return null;

@@ -39,7 +39,7 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (Enabled && type == ClickType.Select && (!MustBeLeader || player == menu.Leader))
+            if (Enabled && (PlayerMask & (1 << player)) > 0)
                 menu.HandleMessage(Messages.MenuClicked, this);
             base.Click(type, player);
         }

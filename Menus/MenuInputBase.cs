@@ -52,7 +52,8 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Left;
-                while (selected.Left != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
+                
+                while (selected.Left != null && (!selected.Enabled || (selected.PlayerMask & (1 << player)) == 0) && selected != current)
                     selected = selected.Left;
                 if (!selected.Enabled)
                     selected = current;
@@ -78,7 +79,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Right;
-                while (selected.Right != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
+                while (selected.Right != null && (!selected.Enabled || (selected.PlayerMask & (1 << player)) == 0) && selected != current)
                     selected = selected.Right;
                 if (!selected.Enabled)
                     selected = current;
@@ -104,7 +105,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Above;
-                while (selected.Above != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
+                while (selected.Above != null && (!selected.Enabled || (selected.PlayerMask & (1 << player)) == 0) && selected != current)
                     selected = selected.Above;
                 if (!selected.Enabled)
                     selected = current;
@@ -130,7 +131,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Below;
-                while (selected.Below != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
+                while (selected.Below != null && (!selected.Enabled || (selected.PlayerMask & (1 << player)) == 0) && selected != current)
                     selected = selected.Below;
                 if (!selected.Enabled)
                     selected = current;

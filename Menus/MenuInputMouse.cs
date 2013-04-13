@@ -49,7 +49,7 @@ namespace Phantom.Menus
             if (current.X != previous.X || current.Y != previous.Y)
             {
                 MenuControl hover = menu.GetControlAt(mouse);
-                if (hover != null && hover.MustBeLeader && this.player != menu.Leader)
+                if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                     hover = null;
                 menu.SetSelected(player, hover);
                 if (mouseDown != null && menu.GetSelected(player) == mouseDown)
@@ -59,7 +59,7 @@ namespace Phantom.Menus
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
             {
                 MenuControl hover = menu.GetControlAt(mouse);
-                if (hover != null && hover.MustBeLeader && this.player != menu.Leader)
+                if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                     hover = null;
                 menu.SetSelected(player, hover);
                 if (hover != null)

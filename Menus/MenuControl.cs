@@ -24,7 +24,7 @@ namespace Phantom.Menus
         public MenuControl Below;
         public Vector2 Position;
         public Shape Shape;
-        public bool MustBeLeader = false;
+        public int PlayerMask = 255;
 
         protected float selectSpeed = 4;
         protected float deselectSpeed = 4;

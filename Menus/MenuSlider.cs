@@ -79,7 +79,7 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (Enabled && (!MustBeLeader || player == menu.Leader))
+            if (Enabled && (PlayerMask & (1 << player)) > 0)
             {
                 base.Click(type, player);
                 if (type == ClickType.NextOption)
@@ -156,7 +156,7 @@ namespace Phantom.Menus
 
         public override void ClickAt(Vector2 position, int player)
         {
-            if (Enabled && (!MustBeLeader || player == menu.Leader))
+            if (Enabled && (PlayerMask & (1 << player)) > 0)
             {
                 base.ClickAt(position, player);
                 float rel = 0;
