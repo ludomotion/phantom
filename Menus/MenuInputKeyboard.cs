@@ -65,7 +65,14 @@ namespace Phantom.Menus
         private void DoKeyLeft()
         {
             if (menu.Selected != null && menu.Selected.Left != null)
+            {
+                MenuControl current = menu.Selected;
                 menu.Selected = menu.Selected.Left;
+                while (menu.Selected.Left != null && !menu.Selected.Enabled && menu.Selected != current)
+                    menu.Selected = menu.Selected.Left;
+                if (!menu.Selected.Enabled)
+                    menu.Selected = current;
+            }
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.PreviousOption);
             else if (menu.Controls.Count > 0)
@@ -75,7 +82,14 @@ namespace Phantom.Menus
         private void DoKeyRight()
         {
             if (menu.Selected != null && menu.Selected.Right != null)
+            {
+                MenuControl current = menu.Selected;
                 menu.Selected = menu.Selected.Right;
+                while (menu.Selected.Right != null && !menu.Selected.Enabled && menu.Selected != current)
+                    menu.Selected = menu.Selected.Right;
+                if (!menu.Selected.Enabled)
+                    menu.Selected = current;
+            }
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.NextOption);
             else if (menu.Controls.Count > 0)
@@ -86,7 +100,14 @@ namespace Phantom.Menus
         private void DoKeyUp()
         {
             if (menu.Selected != null && menu.Selected.Above != null)
+            {
+                MenuControl current = menu.Selected;
                 menu.Selected = menu.Selected.Above;
+                while (menu.Selected.Above != null && !menu.Selected.Enabled && menu.Selected != current)
+                    menu.Selected = menu.Selected.Above;
+                if (!menu.Selected.Enabled)
+                    menu.Selected = current;
+            }
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.NextOption);
             else if (menu.Controls.Count > 0)
@@ -96,7 +117,14 @@ namespace Phantom.Menus
         private void DoKeyDown()
         {
             if (menu.Selected != null && menu.Selected.Below != null)
+            {
+                MenuControl current = menu.Selected;
                 menu.Selected = menu.Selected.Below;
+                while (menu.Selected.Below != null && !menu.Selected.Enabled && menu.Selected != current)
+                    menu.Selected = menu.Selected.Below;
+                if (!menu.Selected.Enabled)
+                    menu.Selected = current;
+            }
             else if (menu.Selected != null)
                 menu.Selected.Click(ClickType.PreviousOption);
             else if (menu.Controls.Count > 0)

@@ -24,6 +24,12 @@ namespace Phantom.Menus
             Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
             Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
 
+            if (!Enabled)
+            {
+                face = Menu.ColorFaceDisabled;
+                text = Menu.ColorTextDisabled;
+            }
+
             GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, Menu.ColorShadow, 2);
             float down = this.pressed ? 0 : 2;
             GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, Menu.ColorShadow, 2);
@@ -33,7 +39,7 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type)
         {
-            if (type == ClickType.Select)
+            if (Enabled && type == ClickType.Select)
                 menu.HandleMessage(Messages.MenuClicked, this);
             base.Click(type);
         }

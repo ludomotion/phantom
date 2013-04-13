@@ -21,6 +21,7 @@ namespace Phantom.Menus
             : base (name, position, shape)
         {
             this.options = options;
+            option = -1;
             Option = selectedOption;
             this.wrap = wrap;
         }
@@ -45,11 +46,14 @@ namespace Phantom.Menus
 
             option = value;
             Caption = Name + " " + options[option];
-            menu.HandleMessage(Messages.MenuOptionChanged, this);
+            if (menu != null)
+                menu.HandleMessage(Messages.MenuOptionChanged, this);
         }
 
         public override void Click(ClickType type)
         {
+            if (!Enabled)
+                return;
             base.Click(type);
             if (type == ClickType.NextOption || type == ClickType.Select)
                 SetOption(option + 1);

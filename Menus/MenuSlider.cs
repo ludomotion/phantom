@@ -79,6 +79,8 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type)
         {
+            if (!Enabled)
+                return;
             base.Click(type);
             if (type == ClickType.NextOption)
                 SetValue(currentValue + step);
@@ -118,6 +120,12 @@ namespace Phantom.Menus
             Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
             Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
 
+            if (!Enabled)
+            {
+                face = Menu.ColorFaceDisabled;
+                text = Menu.ColorTextDisabled;
+            }
+
             Vector2 p = Position;
             if (orientation == Orientation.Horizontal)
             {
@@ -147,6 +155,9 @@ namespace Phantom.Menus
 
         public override void ClickAt(Vector2 position)
         {
+            if (!Enabled)
+                return;
+
             base.ClickAt(position);
             float rel = 0;
             if (orientation == Orientation.Horizontal)

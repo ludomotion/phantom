@@ -17,14 +17,16 @@ namespace Phantom.Menus
         public static SpriteFont Font;
         public static Color ColorText = Color.Black;
         public static Color ColorTextHighLight = Color.Blue;
+        public static Color ColorTextDisabled = Color.Gray;
         public static Color ColorFace = Color.Gray;
         public static Color ColorFaceHighLight = Color.Yellow;
+        public static Color ColorFaceDisabled = Color.Silver;
         public static Color ColorShadow = Color.Black;
 
 
         public MenuOrientation Orientation;
 
-        internal List<MenuControl> Controls;
+        public List<MenuControl> Controls;
         private MenuControl selected;
         private Renderer renderer;
         public MenuControl Selected

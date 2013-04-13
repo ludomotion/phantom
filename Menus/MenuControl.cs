@@ -13,7 +13,10 @@ namespace Phantom.Menus
     public class MenuControl : Component
     {
         public string Name;
+        //TODO: Change to int so that multiple controllers might control the same menu
         public bool Selected;
+        public bool Enabled = true;
+
         protected bool pressed;
         protected Menu menu;
         public MenuControl Left;
@@ -52,7 +55,8 @@ namespace Phantom.Menus
 
         public virtual void StartPress() 
         {
-            pressed = true;
+            if (Enabled)
+                pressed = true;
         }
 
         public virtual void EndPress()
