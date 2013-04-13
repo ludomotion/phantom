@@ -52,13 +52,14 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (!Enabled)
-                return;
-            base.Click(type, player);
-            if (type == ClickType.NextOption || type == ClickType.Select)
-                SetOption(option + 1);
-            if (type == ClickType.PreviousOption)
-                SetOption(option - 1);
+            if (Enabled && (!MustBeLeader || player == menu.Leader))
+            {
+                base.Click(type, player);
+                if (type == ClickType.NextOption || type == ClickType.Select)
+                    SetOption(option + 1);
+                if (type == ClickType.PreviousOption)
+                    SetOption(option - 1);
+            }
         }
     
     }

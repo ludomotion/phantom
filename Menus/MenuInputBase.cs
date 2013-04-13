@@ -12,7 +12,12 @@ namespace Phantom.Menus
         protected Menu menu;
         private float timer = 0;
         private float keyTimeOut = 0.4f;
-        protected int player = 0;
+        protected int player;
+
+        public MenuInputBase(int player)
+        {
+            this.player = player;
+        }
 
         public override void OnAdd(Component parent)
         {
@@ -47,7 +52,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Left;
-                while (selected.Left != null && !selected.Enabled && selected != current)
+                while (selected.Left != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
                     selected = selected.Left;
                 if (!selected.Enabled)
                     selected = current;
@@ -55,8 +60,8 @@ namespace Phantom.Menus
             }
             else if (selected != null)
                 selected.Click(ClickType.PreviousOption, player);
-            else if (menu.Controls.Count > 0)
-                menu.SetSelected(player, menu.Controls[0]);
+            else 
+                menu.SetSelected(player, menu.GetFirstControl(player));
         }
 
         protected void DoKeyRight()
@@ -73,7 +78,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Right;
-                while (selected.Right != null && !selected.Enabled && selected != current)
+                while (selected.Right != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
                     selected = selected.Right;
                 if (!selected.Enabled)
                     selected = current;
@@ -81,8 +86,8 @@ namespace Phantom.Menus
             }
             else if (selected != null)
                 selected.Click(ClickType.NextOption, player);
-            else if (menu.Controls.Count > 0)
-                menu.SetSelected(player, menu.Controls[0]);
+            else
+                menu.SetSelected(player, menu.GetFirstControl(player));
 
         }
 
@@ -99,7 +104,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Above;
-                while (selected.Above != null && !selected.Enabled && selected != current)
+                while (selected.Above != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
                     selected = selected.Above;
                 if (!selected.Enabled)
                     selected = current;
@@ -107,8 +112,8 @@ namespace Phantom.Menus
             }
             else if (selected != null)
                 selected.Click(ClickType.NextOption, player);
-            else if (menu.Controls.Count > 0)
-                menu.SetSelected(player, menu.Controls[0]);
+            else
+                menu.SetSelected(player, menu.GetFirstControl(player));
         }
 
         protected void DoKeyDown()
@@ -125,7 +130,7 @@ namespace Phantom.Menus
             {
                 MenuControl current = selected;
                 selected = selected.Below;
-                while (selected.Below != null && !selected.Enabled && selected != current)
+                while (selected.Below != null && (!selected.Enabled || (selected.MustBeLeader && player != menu.Leader)) && selected != current)
                     selected = selected.Below;
                 if (!selected.Enabled)
                     selected = current;

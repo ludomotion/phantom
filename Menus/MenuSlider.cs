@@ -79,13 +79,14 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (!Enabled)
-                return;
-            base.Click(type, player);
-            if (type == ClickType.NextOption)
-                SetValue(currentValue + step);
-            if (type == ClickType.PreviousOption)
-                SetValue(currentValue - step);
+            if (Enabled && (!MustBeLeader || player == menu.Leader))
+            {
+                base.Click(type, player);
+                if (type == ClickType.NextOption)
+                    SetValue(currentValue + step);
+                if (type == ClickType.PreviousOption)
+                    SetValue(currentValue - step);
+            }
         }
 
         private void SetValue(float value)
@@ -155,21 +156,21 @@ namespace Phantom.Menus
 
         public override void ClickAt(Vector2 position, int player)
         {
-            if (!Enabled)
-                return;
-
-            base.ClickAt(position, player);
-            float rel = 0;
-            if (orientation == Orientation.Horizontal)
+            if (Enabled && (!MustBeLeader || player == menu.Leader))
             {
-                rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
+                base.ClickAt(position, player);
+                float rel = 0;
+                if (orientation == Orientation.Horizontal)
+                {
+                    rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
+                }
+                else
+                {
+                    rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
+                }
+                rel = MathHelper.Clamp(rel, 0, 1);
+                SetValue(minValue + (maxValue - minValue) * rel);
             }
-            else
-            {
-                rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
-            }
-            rel = MathHelper.Clamp(rel, 0, 1);
-            SetValue(minValue + (maxValue - minValue) * rel);
 
         }
     }

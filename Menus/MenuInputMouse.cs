@@ -13,6 +13,13 @@ namespace Phantom.Menus
         private MouseState previous;
         private MenuControl mouseDown;
 
+        public MenuInputMouse()
+            : base(0) { }
+
+        public MenuInputMouse(int player)
+            : base(player) { }
+
+
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
@@ -41,7 +48,10 @@ namespace Phantom.Menus
             Vector2 mouse = new Vector2(current.X, current.Y);
             if (current.X != previous.X || current.Y != previous.Y)
             {
-                menu.SetSelected(player, menu.GetControlAt(mouse));
+                MenuControl hover = menu.GetControlAt(mouse);
+                if (hover != null && hover.MustBeLeader && this.player != menu.Leader)
+                    hover = null;
+                menu.SetSelected(player, hover);
                 if (mouseDown != null && menu.GetSelected(player) == mouseDown)
                     mouseDown.ClickAt(mouse - mouseDown.Position, 0);
             }
@@ -49,6 +59,8 @@ namespace Phantom.Menus
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
             {
                 MenuControl hover = menu.GetControlAt(mouse);
+                if (hover != null && hover.MustBeLeader && this.player != menu.Leader)
+                    hover = null;
                 menu.SetSelected(player, hover);
                 if (hover != null)
                 {

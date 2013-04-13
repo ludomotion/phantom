@@ -29,23 +29,7 @@ namespace Phantom.Menus
         public List<MenuControl> Controls;
         private MenuControl[] selected;
         private Renderer renderer;
-        /*public MenuControl Selected
-        {
-            get { return selected; }
-            set
-            {
-                if (selected == value)
-                    return;
-                if (selected != null)
-                {
-                    selected.CancelPress(0);
-                    selected.Selected &= 255 - (1 << 0);
-                }
-                selected = value;
-                if (selected != null)
-                    selected.Selected |= 1;
-            }
-        }*/
+        public int Leader = 0;
 
         public Menu(Renderer renderer, MenuOrientation orientation)
         {
@@ -372,6 +356,16 @@ namespace Phantom.Menus
                     if (Controls[i].Shape.InShape(position))
                         return Controls[i];
                 }
+            }
+            return null;
+        }
+
+        public MenuControl GetFirstControl(int player)
+        {
+            for (int i = 0; i < Controls.Count; i++)
+            {
+                if (Controls[i].Enabled && (!Controls[i].MustBeLeader || player == Leader))
+                    return Controls[i];
             }
             return null;
         }

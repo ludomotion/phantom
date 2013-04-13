@@ -11,6 +11,12 @@ namespace Phantom.Menus
     {
         private KeyboardState previous;
 
+        public MenuInputKeyboard()
+            : base(0) { }
+
+        public MenuInputKeyboard(int player)
+            : base(player) { }
+
         public override Component.MessageResult HandleMessage(int message, object data)
         {
             switch (message)
@@ -18,7 +24,7 @@ namespace Phantom.Menus
                 case (Messages.MenuActivated):
                     previous = Keyboard.GetState();
                     if (menu.GetSelected(player) == null && menu.Controls.Count > 0)
-                        menu.SetSelected(player, menu.Controls[0]);
+                        menu.SetSelected(player, menu.GetFirstControl(player));
 
                     break;
             }
