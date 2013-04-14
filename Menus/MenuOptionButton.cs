@@ -76,7 +76,7 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (Enabled && (PlayerMask & (1 << player)) > 0)
+            if (CanUse(player))
             {
                 base.Click(type, player);
                 if (type == ClickType.NextOption || type == ClickType.Select)

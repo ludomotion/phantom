@@ -175,47 +175,51 @@ namespace Phantom.Menus
         {
             base.Render(info);
 
-            //Vector2 size = Menu.Font.MeasureString(Caption);
-            Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
-            Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
-
-            if (!Enabled)
+            if (Visible)
             {
-                face = Menu.ColorFaceDisabled;
-                text = Menu.ColorTextDisabled;
-            }
 
-            Vector2 p = Position;
-            if (orientation == Orientation.Horizontal)
-            {
-                info.Canvas.FillColor = face;
-                info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X, 3), 0);
+                //Vector2 size = Menu.Font.MeasureString(Caption);
+                Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
+                Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
+
+                if (!Enabled)
+                {
+                    face = Menu.ColorFaceDisabled;
+                    text = Menu.ColorTextDisabled;
+                }
+
+                Vector2 p = Position;
+                if (orientation == Orientation.Horizontal)
+                {
+                    info.Canvas.FillColor = face;
+                    info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X, 3), 0);
+                    info.Canvas.FillColor = Menu.ColorShadow;
+                    info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X - 2, 1), 0);
+
+                    p.X += ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.X - HandleWidth * 0.5f) * 2;
+                }
+                else
+                {
+                    info.Canvas.FillColor = face;
+                    info.Canvas.FillRect(p, new Vector2(3, rect.HalfSize.Y), 0);
+                    info.Canvas.FillColor = Menu.ColorShadow;
+                    info.Canvas.FillRect(p, new Vector2(1, rect.HalfSize.Y - 2), 0);
+
+                    p.Y -= ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.Y - HandleHeight * 0.5f) * 2;
+                }
                 info.Canvas.FillColor = Menu.ColorShadow;
-                info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X - 2, 1), 0);
-
-                p.X += ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.X - HandleWidth * 0.5f) * 2;
-            }
-            else
-            {
+                info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f, HandleHeight * 0.5f), 0);
                 info.Canvas.FillColor = face;
-                info.Canvas.FillRect(p, new Vector2(3, rect.HalfSize.Y), 0);
-                info.Canvas.FillColor = Menu.ColorShadow;
-                info.Canvas.FillRect(p, new Vector2(1, rect.HalfSize.Y - 2), 0);
+                info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
 
-                p.Y -= ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.Y - HandleHeight * 0.5f) * 2;
+                if (Menu.Font != null)
+                    info.Batch.DrawString(Menu.Font, caption, Position - rect.HalfSize, text);
             }
-            info.Canvas.FillColor = Menu.ColorShadow;
-            info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f, HandleHeight * 0.5f), 0);
-            info.Canvas.FillColor = face;
-            info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
-
-            if (Menu.Font != null)
-                info.Batch.DrawString(Menu.Font, caption, Position - rect.HalfSize, text);
         }
 
         public override void ClickAt(Vector2 position, int player)
         {
-            if (Enabled && (PlayerMask & (1 << player)) > 0)
+            if (CanUse(player))
             {
                 base.ClickAt(position, player);
                 float rel = 0;

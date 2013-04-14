@@ -37,7 +37,7 @@ namespace Phantom.Menus
         /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
-            if (Menu.Font != null)
+            if (Menu.Font != null && Visible)
             {
                 Vector2 size = Menu.Font.MeasureString(Caption);
                 Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
@@ -59,7 +59,7 @@ namespace Phantom.Menus
 
         public override void Click(ClickType type, int player)
         {
-            if (Enabled && (PlayerMask & (1 << player)) > 0)
+            if (CanUse(player))
                 menu.HandleMessage(Messages.MenuClicked, this);
             base.Click(type, player);
         }

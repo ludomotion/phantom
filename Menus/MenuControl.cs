@@ -36,6 +36,16 @@ namespace Phantom.Menus
         public bool Enabled = true;
 
         /// <summary>
+        /// Flag indicating the control should be rendered
+        /// </summary>
+        public bool Visible = true;
+
+        /// <summary>
+        /// Flag indicating whether control is currently tweening (and therefore cannot be used at the same time)
+        /// </summary>
+        public bool Tweening = false;
+
+        /// <summary>
         /// A bit flag indicating which players are currently pressing the control
         /// </summary>
         protected int pressed;
@@ -131,7 +141,7 @@ namespace Phantom.Menus
         public virtual void StartPress(int player) 
         {
             int pl = 1 << player;
-            if (Enabled && (PlayerMask & pl) > 0)
+            if (CanUse(player))
                 pressed |= pl;
         }
 
@@ -175,6 +185,16 @@ namespace Phantom.Menus
         /// <param name="player"></param>
         public virtual void ClickAt(Vector2 position, int player)
         {
+        }
+
+        /// <summary>
+        /// Quick check if the control can be used by a player (must be enabled, visible, not tweening and the playerMask must fit)
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public bool CanUse(int player)
+        {
+            return (Enabled && Visible && !Tweening && ((PlayerMask & 1 << player) > 0));
         }
 
 

@@ -6,9 +6,12 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Utils
 {
+    public enum TweenState { In, Out, TweeningIn, TweeningOut }
+
+    public delegate float TweenFunction(float t);
+
     public static class TweenFunctions
     {
-        public delegate float TweenFunction(float t);
 
         public static float Linear(float t)
         {

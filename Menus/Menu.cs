@@ -9,12 +9,12 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
+    //DONE: Support simple tweening to make menu's more lively
     //TODO: Create a MenuInputTouch component
     //TODO: Include a default menu font in the library
     //TODO: Include a white sprite and use that to draw instead of the canvas based calls
     //TODO: Include a simple sprite frames based renderer for the default components
     //TODO: Implement basic back behavior
-    //TODO: Support simple tweening to make menu's more lively
 
     /// <summary>
     /// A Menu game state implements basic functionality to keep track of menu controls.
