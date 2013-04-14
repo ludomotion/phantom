@@ -9,6 +9,12 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
+    //TODO: Create a MenuInputTouch component
+    //TODO: Include a default menu font in the library
+    //TODO: Include a white sprite and use that to draw instead of the canvas based calls
+    //TODO: Include a simple sprite frames based renderer for the default components
+    //TODO: Implement basic back behavior
+    //TODO: Support simple tweening to make menu's more lively
 
     /// <summary>
     /// A Menu game state implements basic functionality to keep track of menu controls.
@@ -82,7 +88,7 @@ namespace Phantom.Menus
         /// A font used by the default renderers of the MenuControls
         /// </summary>
         public static SpriteFont Font;
-        //Default colors
+        //Default colors not the best solution but hey!
         public static Color ColorText = Color.Black;
         public static Color ColorTextHighLight = Color.Blue;
         public static Color ColorTextDisabled = Color.Gray;
