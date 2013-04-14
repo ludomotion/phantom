@@ -8,28 +8,99 @@ using Phantom.Shapes;
 
 namespace Phantom.Menus
 {
-    public enum ClickType { Select, NextOption, PreviousOption }
-
+    /// <summary>
+    /// The base class from which all MenuControls are derived. It implements
+    /// basic behavior and sets up a few simple methods that can be overridden
+    /// to create new types of controls.
+    /// </summary>
     public class MenuControl : Component
     {
+        /// <summary>
+        /// The type of click/command that was passed to the control
+        /// </summary>
+        public enum ClickType { Select, NextOption, PreviousOption }
+
+        /// <summary>
+        /// The name of the control can be used to identify it in the menu
+        /// </summary>
         public string Name;
+
+        /// <summary>
+        /// A bit flag indicating which players have currently selected the control
+        /// </summary>
         public int Selected;
+
+        /// <summary>
+        /// A flag indicating the control is active
+        /// </summary>
         public bool Enabled = true;
 
+        /// <summary>
+        /// A bit flag indicating which players are currently pressing the control
+        /// </summary>
         protected int pressed;
+
+        /// <summary>
+        /// A reference to the menu the control is part of
+        /// </summary>
         protected Menu menu;
+
+        /// <summary>
+        /// The control's left neighbor
+        /// </summary>
         public MenuControl Left;
+
+        /// <summary>
+        /// The control's right neighbor
+        /// </summary>
         public MenuControl Right;
+
+        /// <summary>
+        /// The control's above neighbor
+        /// </summary>
         public MenuControl Above;
+
+        /// <summary>
+        /// The control's below neighbor
+        /// </summary>
         public MenuControl Below;
+
+        /// <summary>
+        /// The control's designed position
+        /// </summary>
         public Vector2 Position;
+
+        /// <summary>
+        /// The control's shape
+        /// </summary>
         public Shape Shape;
+
+        /// <summary>
+        /// A bit flag indicating which players can use the control.
+        /// </summary>
         public int PlayerMask = 255;
 
+        /// <summary>
+        /// The speed at which the currentSelected flat goes to 1 when selected. The default is 4 which means it will fade in in 1/4 seconds.
+        /// </summary>
         protected float selectSpeed = 4;
+
+        /// <summary>
+        /// The speed at which the currentSelected flat goes to 0 when not selected. The default is 4 which means it will fade out in 1/4 seconds.
+        /// </summary>
         protected float deselectSpeed = 4;
+
+        /// <summary>
+        /// A value between 0 and 1 that fades in or out when the control is selected or not selected. Can be used to fade in glows, colors, etc.
+        /// </summary>
         protected float currentSelected = 0;
 
+        /// <summary>
+        /// Base constructor needs a name, position and shape.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="position"></param>
+        /// <param name="shape"></param>
         public MenuControl(string name, Vector2 position, Shape shape)
         {
             this.Name = name;
@@ -53,12 +124,21 @@ namespace Phantom.Menus
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
         }
 
+        /// <summary>
+        /// A player starts pressing the control
+        /// </summary>
+        /// <param name="player"></param>
         public virtual void StartPress(int player) 
         {
-            if (Enabled)
-                pressed |= 1 << player;
+            int pl = 1 << player;
+            if (Enabled && (PlayerMask & pl) > 0)
+                pressed |= pl;
         }
 
+        /// <summary>
+        /// A player releases the control, this will generate a select click (if the control was also pressed)
+        /// </summary>
+        /// <param name="player"></param>
         public virtual void EndPress(int player)
         {
             int pl = 1 << player;
@@ -69,16 +149,30 @@ namespace Phantom.Menus
             }
         }
 
+        /// <summary>
+        /// Resets the pressed without generating a click
+        /// </summary>
+        /// <param name="player"></param>
         public virtual void CancelPress(int player)
         {
             int pl = 1 << player;
             pressed &= 255-pl;
         }
 
+        /// <summary>
+        /// Override this function to implement click behavior
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="player"></param>
         public virtual void Click(ClickType type, int player)
         {
         }
 
+        /// <summary>
+        /// Override this function to implement behavior to respond to mouse and touch clicks at a specific location
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="player"></param>
         public virtual void ClickAt(Vector2 position, int player)
         {
         }

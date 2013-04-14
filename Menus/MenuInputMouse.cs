@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// Implements mouse input for menu controls. 
+    /// </summary>
     public class MenuInputMouse : MenuInputBase
     {
         private MouseState previous;
@@ -53,7 +56,7 @@ namespace Phantom.Menus
                     hover = null;
                 menu.SetSelected(player, hover);
                 if (mouseDown != null && menu.GetSelected(player) == mouseDown)
-                    mouseDown.ClickAt(mouse - mouseDown.Position, 0);
+                    mouseDown.ClickAt(mouse - mouseDown.Position, player);
             }
 
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
@@ -64,15 +67,15 @@ namespace Phantom.Menus
                 menu.SetSelected(player, hover);
                 if (hover != null)
                 {
-                    hover.StartPress(0);
-                    hover.ClickAt(mouse - hover.Position, 0);
+                    hover.StartPress(player);
+                    hover.ClickAt(mouse - hover.Position, player);
                     mouseDown = hover;
                 }
             }
             if (current.LeftButton != ButtonState.Pressed && previous.LeftButton == ButtonState.Pressed)
             {
                 if (menu.GetSelected(player) != null)
-                    menu.GetSelected(player).EndPress(0);
+                    menu.GetSelected(player).EndPress(player);
                 mouseDown = null;
             }
             previous = current;

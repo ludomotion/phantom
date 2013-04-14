@@ -8,6 +8,11 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// Implements the control for a GamePad. The DPad and sticks can be used to move the 
+    /// selected control, or change values of sliders and optio buttons.
+    /// The A button is used to click buttons. Back calls the menu Back method
+    /// </summary>
     public class MenuInputGamePad : MenuInputBase
     {
         private GamePadState previous;

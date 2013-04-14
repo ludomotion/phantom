@@ -7,8 +7,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// The base class from which different input handlers are derived
+    /// </summary>
     public class MenuInputBase : Component
     {
+        /// <summary>
+        /// A reference to the menu
+        /// </summary>
         protected Menu menu;
         private float timer = 0;
         private float keyTimeOut = 0.4f;
@@ -60,7 +66,7 @@ namespace Phantom.Menus
                 menu.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.PreviousOption, player);
+                selected.Click(MenuControl.ClickType.PreviousOption, player);
             else 
                 menu.SetSelected(player, menu.GetFirstControl(player));
         }
@@ -86,7 +92,7 @@ namespace Phantom.Menus
                 menu.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.NextOption, player);
+                selected.Click(MenuControl.ClickType.NextOption, player);
             else
                 menu.SetSelected(player, menu.GetFirstControl(player));
 
@@ -112,7 +118,7 @@ namespace Phantom.Menus
                 menu.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.NextOption, player);
+                selected.Click(MenuControl.ClickType.NextOption, player);
             else
                 menu.SetSelected(player, menu.GetFirstControl(player));
         }
@@ -138,7 +144,7 @@ namespace Phantom.Menus
                 menu.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.PreviousOption, player);
+                selected.Click(MenuControl.ClickType.PreviousOption, player);
             else if (menu.Controls.Count > 0)
                 menu.SetSelected(player, menu.Controls[0]);
         }

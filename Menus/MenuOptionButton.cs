@@ -7,27 +7,51 @@ using Phantom.Shapes;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// A simple menu button that can be clicked to change between a number of options.
+    /// If the state changes it passes a MenuOptionChanged message to the menu.
+    /// If controlled by keyboard or gamepad and in a menu that is not ordered in two-dimensions
+    /// the direction keys or sticks can be used to cycle through the options.
+    /// </summary>
     public class MenuOptionButton : MenuButton
     {
+        /// <summary>
+        /// A string containg the options
+        /// </summary>
         protected string[] options;
         private int option;
         private bool wrap = false;
+        private string prefix;
+        /// <summary>
+        /// Sets or returns the current option
+        /// </summary>
         public int Option {
             get {return option;}
             set {SetOption(value);}
         }
 
-        public MenuOptionButton(string name, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
-            : base (name, position, shape)
+        /// <summary>
+        /// Creates a menu option button
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="caption"></param>
+        /// <param name="position"></param>
+        /// <param name="shape"></param>
+        /// <param name="wrap">Indicates whether the options cycle</param>
+        /// <param name="selectedOption"></param>
+        /// <param name="options"></param>
+        public MenuOptionButton(string name, string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
+            : base (name, caption, position, shape)
         {
+            prefix = caption;
             this.options = options;
             option = -1;
             Option = selectedOption;
             this.wrap = wrap;
         }
 
-        public MenuOptionButton(string name, Vector2 position, Shape shape, int selectedOption, params string[] options)
-            : this (name, position, shape, true, selectedOption, options) { }
+        public MenuOptionButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, params string[] options)
+            : this (name, caption, position, shape, true, selectedOption, options) { }
 
         protected void SetOption(int value)
         {
@@ -45,7 +69,7 @@ namespace Phantom.Menus
             }
 
             option = value;
-            Caption = Name + " " + options[option];
+            Caption = prefix + " " + options[option];
             if (menu != null)
                 menu.HandleMessage(Messages.MenuOptionChanged, this);
         }

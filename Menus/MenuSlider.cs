@@ -7,8 +7,16 @@ using Phantom.Shapes;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// A menu slider control which can be used to control float values or lists of options.
+    /// If the state changes it passes a MenuOptionChanged message to the menu.
+    /// Sliders must have a rectangular shape (OABB).
+    /// </summary>
     public class MenuSlider : MenuControl
     {
+        /// <summary>
+        /// Orientation options for the sliders.
+        /// </summary>
         public enum Orientation { Horizontal, Vertical }
         private float minValue;
         private float maxValue;
@@ -19,20 +27,43 @@ namespace Phantom.Menus
         private bool snap;
         private string[] options;
 
+        /// <summary>
+        /// The default width for the sliders handle. Used to determine the visual range in which the slider can be moved
+        /// </summary>
         protected float HandleWidth = 20;
+
+        /// <summary>
+        /// The default height for the sliders handle. Used to determine the visual range in which the slider can be moved
+        /// </summary>
         protected float HandleHeight = 20;
 
+        /// <summary>
+        /// The sliders caption
+        /// </summary>
         public string Caption;
 
+        private string caption;
 
-        public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, Orientation orientation, params string[] options)
+        /// <summary>
+        /// Creates a slider with a numbe of fixed options that correspond to different floating scale values
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="caption"></param>
+        /// <param name="position"></param>
+        /// <param name="shape"></param>
+        /// <param name="minValue"></param>
+        /// <param name="maxValue"></param>
+        /// <param name="currentValue"></param>
+        /// <param name="orientation"></param>
+        /// <param name="options">The preset options</param>
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, Orientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = minValue;
             this.maxValue = maxValue;
             this.options = options;
             this.step = (maxValue-minValue)/(options.Length-1);
-            this.Caption = name;
+            this.Caption = caption;
             this.rect = shape;
             this.orientation = orientation;
             this.snap = true;
@@ -40,14 +71,24 @@ namespace Phantom.Menus
             SetValue(currentValue);
         }
 
-        public MenuSlider(string name, Vector2 position, OABB shape, int currentOption, Orientation orientation, params string[] options)
+        /// <summary>
+        /// Creates a slider with a numbe of fixed options.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="caption"></param>
+        /// <param name="position"></param>
+        /// <param name="shape"></param>
+        /// <param name="currentOption"></param>
+        /// <param name="orientation"></param>
+        /// <param name="options"></param>
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, int currentOption, Orientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = 0;
             this.maxValue = options.Length - 1;
             this.options = options;
             this.step = 1;
-            this.Caption = name;
+            this.Caption = caption;
             this.rect = shape;
             this.orientation = orientation;
             this.snap = true;
@@ -55,7 +96,20 @@ namespace Phantom.Menus
             SetValue(currentValue);
         }
 
-        public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation, bool snap)
+        /// <summary>
+        /// Creates a value slider
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="caption"></param>
+        /// <param name="position"></param>
+        /// <param name="shape"></param>
+        /// <param name="minValue"></param>
+        /// <param name="maxValue"></param>
+        /// <param name="currentValue"></param>
+        /// <param name="step"></param>
+        /// <param name="orientation"></param>
+        /// <param name="snap">The value always snaps to the indicated steps</param>
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation, bool snap)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -69,13 +123,13 @@ namespace Phantom.Menus
             SetValue(currentValue);
         }
 
-        public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation)
-            : this(name, position, shape, minValue, maxValue, currentValue, step, orientation, false) { }
-        public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
-            : this(name, position, shape, minValue, maxValue, currentValue, step, Orientation.Horizontal, false) { }
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, orientation, false) { }
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, Orientation.Horizontal, false) { }
 
-        public MenuSlider(string name, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
-            : this(name, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, Orientation.Horizontal, false) { }
+        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, Orientation.Horizontal, false) { }
 
         public override void Click(ClickType type, int player)
         {
@@ -108,11 +162,15 @@ namespace Phantom.Menus
                 menu.HandleMessage(Messages.MenuOptionChanged, this);
             if (options != null)
             {
-                Caption = Name + " " + options[(int)currentValue];
+                caption = Caption + " " + options[(int)currentValue];
             }
 
         }
 
+        /// <summary>
+        /// A simple rendering routine for the slider
+        /// </summary>
+        /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
             base.Render(info);
@@ -151,7 +209,8 @@ namespace Phantom.Menus
             info.Canvas.FillColor = face;
             info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
 
-            info.Batch.DrawString(Menu.Font, Caption, Position - rect.HalfSize, text);
+            if (Menu.Font != null)
+                info.Batch.DrawString(Menu.Font, caption, Position - rect.HalfSize, text);
         }
 
         public override void ClickAt(Vector2 position, int player)

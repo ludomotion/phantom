@@ -9,12 +9,80 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Menus
 {
-    public enum MenuOrientation { TopToBottom, LeftToRight, TopToBottomLeftToRight, LeftToRightTopToBottom, TwoDimensional };
 
+    /// <summary>
+    /// A Menu game state implements basic functionality to keep track of menu controls.
+    /// The constructor takes a renderer to visualize components added to the menu.
+    /// By adding MenuControls components or instances from derived classes the menu
+    /// is populated. By adding MenuInput components the menu can be controlled by
+    /// several input devices.
+    /// 
+    /// The menu class implements the methods ConnectControls and WrapControls to
+    /// automatically connect controls based on the menu's ordering and the controls'
+    /// relative positions. These methods should be called it the menu is to be
+    /// controlled by keyboard or gamepad.
+    /// 
+    /// To use the basic menu simply inherit the Menu class, add controls and input handlers 
+    /// to it. For example a menu controlled by keyboard or mouse  might look something like this:
+    /// 
+    ///public class KeyboardMenu : Menu
+    ///{
+    ///    public KeyboardMenu()
+    ///        : base(new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas), 1)
+    ///    {
+    ///        Menu.Font = PhantomGame.Game.Content.Load<SpriteFont>("menu");
+    ///        AddComponent(new MenuToggleButton("Test1", "Test1", new Vector2(200, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
+    ///        AddComponent(new MenuSlider("Slider", "Slider1", new Vector2(200, 200), new OABB(new Vector2(100, 30)), 0, MenuSlider.Orientation.Horizontal, "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four"));
+    ///        AddComponent(new MenuOptionButton("Test2", "Test2", new Vector2(500, 100), new OABB(new Vector2(100, 30)), 0, "one", "two", "three"));
+    ///        AddComponent(new MenuButton("Test3", "Test3", new Vector2(500, 200), new OABB(new Vector2(100, 30))));
+    ///        AddComponent(new MenuInputMouse(0));
+    ///        //if the same menu is controlled by mouse and keyboard, it is best to added the mouse first and the keyboard second
+    ///        //This way the keyboard will select an option when the menu is activated
+    ///        AddComponent(new MenuInputKeyboard(0));
+    ///        ConnectControls(Menu.Ordering.TopToBottomLeftToRight);
+    ///        WrapControls(Menu.Ordering.TopToBottomLeftToRight);
+    ///    }
+    ///}
+    ///
+    /// A menu that is controlled by four gamepads might look something lige this:
+    /// 
+    ///public class GamePadMenu : Menu
+    ///{
+    ///    public GamePadMenu()
+    ///        : base(new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas), 4)
+    ///    {
+    ///        Menu.Font = PhantomGame.Game.Content.Load<SpriteFont>("menu");
+    ///        AddComponent(new MenuToggleButton("Test1", "Test1", new Vector2(200, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
+    ///        AddComponent(new MenuSlider("Slider", "Slider1", new Vector2(200, 200), new OABB(new Vector2(100, 30)), 0, MenuSlider.Orientation.Horizontal, "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four"));
+    ///        AddComponent(new MenuToggleButton("Test2", "Test2", new Vector2(500, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
+    ///        AddComponent(new MenuButton("Start", "Start", new Vector2(500, 200), new OABB(new Vector2(100, 30))));
+    ///        AddComponent(new MenuInputGamePad(PlayerIndex.One));
+    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Two));
+    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Three));
+    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Four));
+    ///        ConnectControls(Menu.Ordering.TopToBottomLeftToRight);
+    ///        WrapControls(Menu.Ordering.TopToBottomLeftToRight);
+    ///        //Only player's one and four can activate the start button
+    ///        Controls[3].PlayerMask = 9;
+    ///    }
+    ///}
+    ///
+    /// To respond to the controls. Respond to the MenuClicked and MenuOptionChanged messages that pass the source control as its data parameter. 
+    /// </summary>
+    
     public class Menu : GameState
     {
+        /// <summary>
+        /// Menu ordering determines how controls are linked.
+        /// </summary>
+        public enum Ordering { TopToBottom, LeftToRight, TopToBottomLeftToRight, LeftToRightTopToBottom, TwoDimensional };
+
         //TODO this should be a font included in the library
+        /// <summary>
+        /// A font used by the default renderers of the MenuControls
+        /// </summary>
         public static SpriteFont Font;
+        //Default colors
         public static Color ColorText = Color.Black;
         public static Color ColorTextHighLight = Color.Blue;
         public static Color ColorTextDisabled = Color.Gray;
@@ -23,27 +91,35 @@ namespace Phantom.Menus
         public static Color ColorFaceDisabled = Color.Silver;
         public static Color ColorShadow = Color.Black;
 
-
-        public MenuOrientation Orientation;
-
+        /// <summary>
+        /// All the controls added to the menu.
+        /// </summary>
         public List<MenuControl> Controls;
         private MenuControl[] selected;
         private Renderer renderer;
 
-        public Menu(Renderer renderer, MenuOrientation orientation)
+        /// <summary>
+        /// Creates a menu class
+        /// </summary>
+        /// <param name="renderer">The renderer component that is responsible for rendering the controlss</param>
+        /// <param name="maxPlayers">The number of players that can control the menu simultaneously</param>
+        public Menu(Renderer renderer, int playerCount)
         {
-            selected = new MenuControl[4]; 
-            this.Orientation = orientation;
+            selected = new MenuControl[playerCount]; 
+            this.renderer = renderer;
             AddComponent(renderer);
             OnlyOnTop = true;
             Controls = new List<MenuControl>();
-            this.renderer = renderer;
         }
 
+        /// <summary>
+        /// Clears all components but retains the renderer
+        /// </summary>
         public override void ClearComponents()
         {
             base.ClearComponents();
             Controls.Clear();
+            AddComponent(renderer);
         }
 
         protected override void OnComponentAdded(Component child)
@@ -74,8 +150,15 @@ namespace Phantom.Menus
                 renderer.Render(null);
         }
 
+        /// <summary>
+        /// Set the selected control for a controlling player
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="value"></param>
         public void SetSelected(int player, MenuControl value)
         {
+            if (player < 0 || player >= selected.Length)
+                return;
             if (selected[player] == value)
                 return;
             if (selected[player] != null)
@@ -88,48 +171,66 @@ namespace Phantom.Menus
                 selected[player].Selected |= 1 << player;
         }
 
+        /// <summary>
+        /// Get the selected control for a controlling player
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
         public MenuControl GetSelected(int player)
         {
+            if (player < 0 || player >= selected.Length)
+                return null;
             return selected[player];
         }
 
-
+        /// <summary>
+        /// Override to implement back behavior
+        /// </summary>
         public virtual void Back()
         {
             //TODO 
         }
 
-        public void ConnectControls()
+        /// <summary>
+        /// Connect all controls based on a ordering and their relative positions
+        /// </summary>
+        /// <param name="ordering"></param>
+        public void ConnectControls(Ordering ordering)
         {
-            ConnectControls(float.MaxValue);
+            ConnectControls(ordering, float.MaxValue);
         }
 
-        public void ConnectControls(float maxDistance)
+        /// <summary>
+        /// Connect all controls based on a ordering and their relative positions
+        /// </summary>
+        /// <param name="ordering"></param>
+        /// <param name="maxDistance">Max distance for controls to be connected (distance betwene their positions, not their shapes)</param>
+        public void ConnectControls(Ordering ordering, float maxDistance)
         {
             for (int i = 0; i < Controls.Count; i++)
             {
-                switch (Orientation)
+                switch (ordering)
                 {
-                    case MenuOrientation.LeftToRight:
+                    case Ordering.LeftToRight:
                         FindConnectionsLeftRight(Controls[i], maxDistance);
                         break;
-                    case MenuOrientation.TopToBottom:
+                    case Ordering.TopToBottom:
                         FindConnectionsTopBottom(Controls[i], maxDistance);
                         break;
-                    case MenuOrientation.LeftToRightTopToBottom:
-                    case MenuOrientation.TopToBottomLeftToRight:
-                    case MenuOrientation.TwoDimensional:
+                    case Ordering.LeftToRightTopToBottom:
+                    case Ordering.TopToBottomLeftToRight:
+                    case Ordering.TwoDimensional:
                         FindConnectionsTopBottom(Controls[i], maxDistance);
                         FindConnectionsLeftRight(Controls[i], maxDistance);
                         break;
                 }
             }
-            switch (Orientation)
+            switch (ordering)
             {
-                case MenuOrientation.LeftToRightTopToBottom:
+                case Ordering.LeftToRightTopToBottom:
                     RemoveConnectionsTopToBottom();
                     break;
-                case MenuOrientation.TopToBottomLeftToRight:
+                case Ordering.TopToBottomLeftToRight:
                     RemoveConnectionsLeftToRight();
                     break;
             }
@@ -255,21 +356,25 @@ namespace Phantom.Menus
             }
         }
 
-        public void WrapControls()
+        /// <summary>
+        /// Wrap controls after they have been connected. Connects the first to the last control
+        /// </summary>
+        /// <param name="ordering"></param>
+        public void WrapControls(Ordering ordering)
         {
             for (int i = 0; i < Controls.Count; i++)
             {
-                switch (Orientation)
+                switch (ordering)
                 {
-                    case MenuOrientation.LeftToRight:
-                    case MenuOrientation.LeftToRightTopToBottom:
+                    case Ordering.LeftToRight:
+                    case Ordering.LeftToRightTopToBottom:
                         WrapLeftRight(Controls[i]);
                         break;
-                    case MenuOrientation.TopToBottom:
-                    case MenuOrientation.TopToBottomLeftToRight:
+                    case Ordering.TopToBottom:
+                    case Ordering.TopToBottomLeftToRight:
                         WrapTopBottom(Controls[i]);
                         break;
-                    case MenuOrientation.TwoDimensional:
+                    case Ordering.TwoDimensional:
                         WrapTopBottom(Controls[i]);
                         WrapLeftRight(Controls[i]);
                         break;
@@ -345,7 +450,11 @@ namespace Phantom.Menus
             }
         }
 
-
+        /// <summary>
+        /// Find the first control at a specific position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
         public MenuControl GetControlAt(Vector2 position)
         {
             for (int i = 0; i < Controls.Count; i++)
@@ -359,6 +468,11 @@ namespace Phantom.Menus
             return null;
         }
 
+        /// <summary>
+        /// Returns the first control that can be used by a player
+        /// </summary>
+        /// <param name="player"></param>
+        /// <returns></returns>
         public MenuControl GetFirstControl(int player)
         {
             for (int i = 0; i < Controls.Count; i++)

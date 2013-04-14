@@ -7,6 +7,11 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// Implements the control for keyboard. The arrow keys can be used to move the 
+    /// selected control, or change values of sliders and optio buttons.
+    /// The space bar or enter key is used to click buttons. Escape calls the menu Back method.
+    /// </summary>
     public class MenuInputKeyboard : MenuInputBase
     {
         private KeyboardState previous;
