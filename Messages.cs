@@ -45,6 +45,7 @@ namespace Phantom
         public const int MenuActivated = 300;
         public const int MenuClicked = 301;
         public const int MenuOptionChanged = 302;
+        public const int MenuControlMoved = 303;
         public const int TweenIn = 350;
         public const int TweenOut = 351;
 

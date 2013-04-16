@@ -10,6 +10,7 @@ namespace Phantom.Menus
 {
     public class MenuControlTweener : Component
     {
+        //TODO Should operate on alpha, orientation and scale as well?
         private Vector2 positionIn;
         private Vector2 positionOut;
         private TweenState state;

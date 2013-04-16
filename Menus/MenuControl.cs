@@ -105,6 +105,8 @@ namespace Phantom.Menus
         /// </summary>
         protected float currentSelected = 0;
 
+        private Entity stub;
+
         /// <summary>
         /// Base constructor needs a name, position and shape.
         /// </summary>
@@ -116,7 +118,8 @@ namespace Phantom.Menus
             this.Name = name;
             this.Position = position;
             this.Shape = shape;
-            this.Shape.SetStubEntity(new Entity(position));
+            this.stub = new Entity(position);
+            this.Shape.SetStubEntity(stub);
         }
 
         public override void OnAncestryChanged()
@@ -132,6 +135,17 @@ namespace Phantom.Menus
                 currentSelected += Math.Min(1 - currentSelected, elapsed * selectSpeed);
             else
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
+        }
+
+        public override Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case Messages.MenuControlMoved:
+                    this.stub.Position = this.Position;
+                    break;
+            }
+            return base.HandleMessage(message, data);
         }
 
         /// <summary>

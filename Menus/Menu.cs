@@ -116,6 +116,17 @@ namespace Phantom.Menus
             AddComponent(renderer);
             OnlyOnTop = true;
             Controls = new List<MenuControl>();
+
+
+            PhantomGame.Game.Console.Register("edit_menu", "Allows control over the menu controls with the mouse.", delegate(string[] argv)
+            {
+                for (int i = 0; i < this.Components.Count; i++)
+                {
+                    if (Components[i] is MenuInputMouse)
+                        RemoveComponent(Components[i]);
+                }
+                this.AddComponent(new MenuDesigner());
+            });
         }
 
         /// <summary>
@@ -147,6 +158,8 @@ namespace Phantom.Menus
             base.BackOnTop();
             HandleMessage(Messages.MenuActivated, null);
         }
+
+
 
         public override void Render(RenderInfo info)
         {

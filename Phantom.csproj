@@ -107,6 +107,7 @@
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="Menus\MenuControlTweener.cs" />
+    <Compile Include="Menus\MenuDesigner.cs" />
     <Compile Include="Menus\MenuInputGamePad.cs" />
     <Compile Include="Menus\MenuInputBase.cs" />
     <Compile Include="Menus\MenuInputKeyboard.cs" />
