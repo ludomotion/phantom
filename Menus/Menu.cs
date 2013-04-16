@@ -17,7 +17,7 @@ namespace Phantom.Menus
     //TODO: Implement basic back behavior
 
     /// <summary>
-    /// A Menu game state implements basic functionality to keep track of menu controls.
+    /// A Menu layer implements basic functionality to keep track of menu controls.
     /// The constructor takes a renderer to visualize components added to the menu.
     /// By adding MenuControls components or instances from derived classes the menu
     /// is populated. By adding MenuInput components the menu can be controlled by
@@ -28,10 +28,11 @@ namespace Phantom.Menus
     /// relative positions. These methods should be called it the menu is to be
     /// controlled by keyboard or gamepad.
     /// 
-    /// To use the basic menu simply inherit the Menu class, add controls and input handlers 
-    /// to it. For example a menu controlled by keyboard or mouse  might look something like this:
+    /// To use the basic menu simply add a Menu instance to a gamestate, and add controls 
+    /// and input handlers to it. For example a menu controlled by keyboard or mouse  
+    /// might look something like this:
     /// 
-    ///public class KeyboardMenu : Menu
+    ///public class KeyboardMenu : GameState
     ///{
     ///    public KeyboardMenu()
     ///        : base(new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas), 1)
@@ -76,7 +77,7 @@ namespace Phantom.Menus
     /// To respond to the controls. Respond to the MenuClicked and MenuOptionChanged messages that pass the source control as its data parameter. 
     /// </summary>
     
-    public class Menu : GameState
+    public class Menu : Layer
     {
         /// <summary>
         /// Menu ordering determines how controls are linked.
@@ -114,19 +115,22 @@ namespace Phantom.Menus
             selected = new MenuControl[playerCount]; 
             this.renderer = renderer;
             AddComponent(renderer);
-            OnlyOnTop = true;
             Controls = new List<MenuControl>();
 
-
-            PhantomGame.Game.Console.Register("edit_menu", "Allows control over the menu controls with the mouse.", delegate(string[] argv)
+#if DEBUG
+            if (PhantomGame.Game.Console != null)
             {
-                for (int i = 0; i < this.Components.Count; i++)
+                PhantomGame.Game.Console.Register("edit_menu", "Allows control over the menu controls with the mouse.", delegate(string[] argv)
                 {
-                    if (Components[i] is MenuInputMouse)
-                        RemoveComponent(Components[i]);
-                }
-                this.AddComponent(new MenuDesigner());
-            });
+                    for (int i = 0; i < this.Components.Count; i++)
+                    {
+                        if (Components[i] is MenuInputMouse)
+                            RemoveComponent(Components[i]);
+                    }
+                    this.AddComponent(new MenuDesigner());
+                });
+            }
+#endif
         }
 
         /// <summary>
@@ -153,11 +157,11 @@ namespace Phantom.Menus
                 Controls.Remove((MenuControl)child);
         }
 
-        public override void BackOnTop()
-        {
-            base.BackOnTop();
-            HandleMessage(Messages.MenuActivated, null);
-        }
+        //public override void BackOnTop()
+        //{
+         //   base.BackOnTop();
+         //   HandleMessage(Messages.MenuActivated, null);
+        //}
 
 
 

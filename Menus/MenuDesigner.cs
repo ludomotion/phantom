@@ -6,11 +6,13 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Phantom.Menus
 {
     /// <summary>
-    /// A class that allows you to drag menu controls and report on their current location
+    /// A component that allows you to drag menu controls and report on their current location when added to a menu.
+    /// In debug mode, typing edit_menu into the console will automatically add the MenuDesigner to the menu
     /// </summary>
     public class MenuDesigner : Component
     {
@@ -29,11 +31,11 @@ namespace Phantom.Menus
             if (menu == null)
                 throw new Exception(this.GetType().Name + " can only be added to a Menu component.");
 
-            PhantomGame.Game.Console.Register("report_menu", "Displays the current position of menu items.", delegate(string[] argv)
+            PhantomGame.Game.Console.Register("menu_report", "Displays the current position of menu items.", delegate(string[] argv)
             {
                 this.ProduceReport();
             });
-            PhantomGame.Game.Console.Register("code_menu", "Displays the current position of menu items.", delegate(string[] argv)
+            PhantomGame.Game.Console.Register("menu_code", "Generates code to position the menu items to the currently designed position and copies that code to the clipboard.", delegate(string[] argv)
             {
                 this.ProduceCode();
             });
@@ -49,10 +51,23 @@ namespace Phantom.Menus
 
         private void ProduceCode()
         {
-            Trace.WriteLine("Start code.");
+            Trace.WriteLine("*** Start code ***");
+            string code = "";
             for (int i = 0; i < menu.Controls.Count; i++)
-                Trace.WriteLine("menu.Controls["+i+"].Position = new Vector("+ menu.Controls[i].Position.X+", "+menu.Controls[i].Position.Y+");");
-            Trace.WriteLine("End code.");
+            {
+                string line = "menu.Controls[" + i + "].Position = new Vector2(" + menu.Controls[i].Position.X + ", " + menu.Controls[i].Position.Y + ");";
+                Trace.WriteLine(line);
+                code += line + "\n";
+            }
+            Trace.WriteLine("*** End code ***");
+
+            Thread thread = new Thread(new ThreadStart(() =>
+            {
+                System.Windows.Forms.Clipboard.SetText(code);
+                Trace.WriteLine("Code copied to clipboard.");
+            }));
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
 

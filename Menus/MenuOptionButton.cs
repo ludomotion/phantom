@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
+using Phantom.Core;
 
 namespace Phantom.Menus
 {
@@ -70,8 +71,10 @@ namespace Phantom.Menus
 
             option = value;
             Caption = prefix + " " + options[option];
-            if (menu != null)
-                menu.HandleMessage(Messages.MenuOptionChanged, this);
+
+            GameState state = this.GetAncestor<GameState>();
+            if (state != null)
+                state.HandleMessage(Messages.MenuOptionChanged, this);
         }
 
         public override void Click(ClickType type, int player)
