@@ -33,17 +33,28 @@ namespace Phantom.Menus
             {
                 this.ProduceReport();
             });
+            PhantomGame.Game.Console.Register("code_menu", "Displays the current position of menu items.", delegate(string[] argv)
+            {
+                this.ProduceCode();
+            });
         }
 
         private void ProduceReport()
         {
             Trace.WriteLine("Start report menu control positions.");
             for (int i = 0; i < menu.Controls.Count; i++)
-            {
                 Trace.WriteLine(menu.Controls[i].Name + " " + menu.Controls[i].Position);
-            }
             Trace.WriteLine("End report.");
         }
+
+        private void ProduceCode()
+        {
+            Trace.WriteLine("Start code.");
+            for (int i = 0; i < menu.Controls.Count; i++)
+                Trace.WriteLine("menu.Controls["+i+"].Position = new Vector("+ menu.Controls[i].Position.X+", "+menu.Controls[i].Position.Y+");");
+            Trace.WriteLine("End code.");
+        }
+
 
         public override Component.MessageResult HandleMessage(int message, object data)
         {
