@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 namespace Phantom.Menus
 {
     //DONE: Support simple tweening to make menu's more lively
+    //TODO: Create containers and dragable items (inventory system)
     //TODO: Create a MenuInputTouch component
     //TODO: Include a default menu font in the library
     //TODO: Include a white sprite and use that to draw instead of the canvas based calls
@@ -32,49 +33,11 @@ namespace Phantom.Menus
     /// and input handlers to it. For example a menu controlled by keyboard or mouse  
     /// might look something like this:
     /// 
-    ///public class KeyboardMenu : GameState
-    ///{
-    ///    public KeyboardMenu()
-    ///        : base(new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas), 1)
-    ///    {
-    ///        Menu.Font = PhantomGame.Game.Content.Load<SpriteFont>("menu");
-    ///        AddComponent(new MenuToggleButton("Test1", "Test1", new Vector2(200, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
-    ///        AddComponent(new MenuSlider("Slider", "Slider1", new Vector2(200, 200), new OABB(new Vector2(100, 30)), 0, MenuSlider.Orientation.Horizontal, "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four"));
-    ///        AddComponent(new MenuOptionButton("Test2", "Test2", new Vector2(500, 100), new OABB(new Vector2(100, 30)), 0, "one", "two", "three"));
-    ///        AddComponent(new MenuButton("Test3", "Test3", new Vector2(500, 200), new OABB(new Vector2(100, 30))));
-    ///        AddComponent(new MenuInputMouse(0));
-    ///        //if the same menu is controlled by mouse and keyboard, it is best to added the mouse first and the keyboard second
-    ///        //This way the keyboard will select an option when the menu is activated
-    ///        AddComponent(new MenuInputKeyboard(0));
-    ///        ConnectControls(Menu.Ordering.TopToBottomLeftToRight);
-    ///        WrapControls(Menu.Ordering.TopToBottomLeftToRight);
-    ///    }
-    ///}
+    /// *** insert example here ***
     ///
-    /// A menu that is controlled by four gamepads might look something lige this:
-    /// 
-    ///public class GamePadMenu : Menu
-    ///{
-    ///    public GamePadMenu()
-    ///        : base(new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas), 4)
-    ///    {
-    ///        Menu.Font = PhantomGame.Game.Content.Load<SpriteFont>("menu");
-    ///        AddComponent(new MenuToggleButton("Test1", "Test1", new Vector2(200, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
-    ///        AddComponent(new MenuSlider("Slider", "Slider1", new Vector2(200, 200), new OABB(new Vector2(100, 30)), 0, MenuSlider.Orientation.Horizontal, "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four", "one", "two", "three", "four"));
-    ///        AddComponent(new MenuToggleButton("Test2", "Test2", new Vector2(500, 100), new OABB(new Vector2(100, 30)), 0, "true", "false"));
-    ///        AddComponent(new MenuButton("Start", "Start", new Vector2(500, 200), new OABB(new Vector2(100, 30))));
-    ///        AddComponent(new MenuInputGamePad(PlayerIndex.One));
-    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Two));
-    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Three));
-    ///        AddComponent(new MenuInputGamePad(PlayerIndex.Four));
-    ///        ConnectControls(Menu.Ordering.TopToBottomLeftToRight);
-    ///        WrapControls(Menu.Ordering.TopToBottomLeftToRight);
-    ///        //Only player's one and four can activate the start button
-    ///        Controls[3].PlayerMask = 9;
-    ///    }
-    ///}
-    ///
-    /// To respond to the controls. Respond to the MenuClicked and MenuOptionChanged messages that pass the source control as its data parameter. 
+    /// To respond to the controls. Respond to the MenuClicked and MenuOptionChanged messages 
+    /// that pass the source control as its data parameter. The messages are passed to the game 
+    /// state.
     /// </summary>
     
     public class Menu : Layer

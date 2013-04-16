@@ -16,11 +16,16 @@ namespace Phantom.Menus
     {
         private KeyboardState previous;
 
+        public Dictionary<Keys, MenuControl> KeyBindings;
+
         public MenuInputKeyboard()
-            : base(0) { }
+            : this(0) { }
 
         public MenuInputKeyboard(int player)
-            : base(player) { }
+            : base(player) 
+        {
+            KeyBindings = new Dictionary<Keys, MenuControl>();
+        }
 
         public override Component.MessageResult HandleMessage(int message, object data)
         {
@@ -60,7 +65,15 @@ namespace Phantom.Menus
                 EndPress();
             if (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape))
                 DoKeyBack();
-            
+
+            foreach (KeyValuePair<Keys, MenuControl> binding in KeyBindings)
+            {
+                if (current.IsKeyDown(binding.Key) && !previous.IsKeyDown(binding.Key))
+                {
+                    menu.SetSelected(player, binding.Value);
+                    binding.Value.Click(MenuControl.ClickType.Select, player);
+                }
+            }
 
             previous = current;
         }
