@@ -183,6 +183,9 @@ namespace Phantom.Menus
         {
             switch (message)
             {
+                case Messages.SetPosition:
+                    this.positionIn = (Vector2)data;
+                    break;
                 case Messages.TweenIn:
                     if (data is float)
                         TweenIn((float)data);

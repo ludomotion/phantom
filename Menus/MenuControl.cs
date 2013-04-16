@@ -141,7 +141,8 @@ namespace Phantom.Menus
         {
             switch (message)
             {
-                case Messages.MenuControlMoved:
+                case Messages.SetPosition:
+                    this.Position = (Vector2)data;
                     this.stub.Position = this.Position;
                     break;
             }

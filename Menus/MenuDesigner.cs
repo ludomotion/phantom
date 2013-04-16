@@ -55,7 +55,7 @@ namespace Phantom.Menus
             string code = "";
             for (int i = 0; i < menu.Controls.Count; i++)
             {
-                string line = "menu.Controls[" + i + "].Position = new Vector2(" + menu.Controls[i].Position.X + ", " + menu.Controls[i].Position.Y + ");";
+                string line = "menu.Controls[" + i + "].HandleMessage(Messages.SetPosition, new Vector2(" + menu.Controls[i].Position.X + ", " + menu.Controls[i].Position.Y + "));";
                 Trace.WriteLine(line);
                 code += line + "\n";
             }
@@ -104,7 +104,7 @@ namespace Phantom.Menus
             {
                 if (dragging != null)
                 {
-                    dragging.HandleMessage(Messages.MenuControlMoved, null);
+                    dragging.HandleMessage(Messages.SetPosition, dragging.Position);
                     dragging = null;
                 }
             }
