@@ -135,6 +135,7 @@ namespace Phantom.Menus
                 currentSelected += Math.Min(1 - currentSelected, elapsed * selectSpeed);
             else
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
+            stub.Position = this.Position;
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
@@ -143,7 +144,6 @@ namespace Phantom.Menus
             {
                 case Messages.SetPosition:
                     this.Position = (Vector2)data;
-                    this.stub.Position = this.Position;
                     break;
             }
             return base.HandleMessage(message, data);

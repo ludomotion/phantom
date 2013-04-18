@@ -8,7 +8,7 @@ using Phantom.Utils;
 
 namespace Phantom.Menus
 {
-    public enum MenuContainerContentState { Docked, Dragged, Moving, None }
+    public enum MenuContainerContentState { Docked, Dragged, Moving, Floating }
 
     /// <summary>
     /// A draggable object that can be moved between to MenuContainers
@@ -34,6 +34,8 @@ namespace Phantom.Menus
         /// </summary>
         public MenuContainer LastContainer {get; private set;}
 
+        public Vector2 LastPosition { get; private set; }
+
         /// <summary>
         /// The component's current location
         /// </summary>
@@ -42,7 +44,9 @@ namespace Phantom.Menus
         /// <summary>
         /// The target of location (used for auto moves)
         /// </summary>
-        private MenuContainer target;
+        private MenuContainer targetContainer;
+
+        private Vector2 targetPosition;
 
         /// <summary>
         /// The departure point of an auto move
@@ -54,8 +58,19 @@ namespace Phantom.Menus
         /// </summary>
         private float tween;
 
+        /// <summary>
+        /// The maximum content items of the same type in a single stack
+        /// </summary>
         public int StackSize = 1;
+        /// <summary>
+        /// The current count of content items on this stack
+        /// </summary>
         public int Count = 1;
+
+        /// <summary>
+        /// Flag that indicates if the content can float (be dragged to a position that is not a container)
+        /// </summary>
+        public bool CanFloat = true;
 
         /// <summary>
         /// The Content's state
@@ -69,7 +84,7 @@ namespace Phantom.Menus
             this.StackSize = stackSize;
             this.Count = count;
             this.Caption = caption;
-            this.State = MenuContainerContentState.None;
+            this.State = MenuContainerContentState.Floating;
             if (container != null)
                 Dock(container);
         }
@@ -88,14 +103,24 @@ namespace Phantom.Menus
                 Position = Container.Position;
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
-            }
-            if (State == MenuContainerContentState.Moving)
+            } 
+            else if (State == MenuContainerContentState.Moving)
             {
                 tween -= Math.Min(tween, elapsed * MoveSpeed);
-                if (tween == 0)
-                    Dock(target);
+                if (targetContainer != null)
+                {
+                    if (tween == 0)
+                        Dock(targetContainer);
+                    else
+                        Position = Vector2.Lerp(targetContainer.Position, moveOrigin, MoveTween(tween));
+                }
                 else
-                    Position = Vector2.Lerp(target.Position, moveOrigin, MoveTween(tween));
+                {
+                    if (tween == 0)
+                        State = MenuContainerContentState.Floating;
+                    else
+                        Position = Vector2.Lerp(targetPosition, moveOrigin, MoveTween(tween));
+                }
             }
         }
 
@@ -134,9 +159,10 @@ namespace Phantom.Menus
         /// </summary>
         public virtual void Undock()
         {
+            this.LastContainer = this.Container;
+            LastPosition = Position;
             if (this.Container != null)
             {
-                this.LastContainer = this.Container;
                 this.Container.Content = null;
                 this.Container = null;
             }
@@ -153,6 +179,8 @@ namespace Phantom.Menus
             {
                 if (LastContainer != null)
                     MoveTo(LastContainer);
+                else
+                    MoveTo(LastPosition);
                 return;
             }
             if (container.Content != null)
@@ -172,14 +200,20 @@ namespace Phantom.Menus
                         //return any left-overs
                         container.Content.Count = container.Content.StackSize;
                         this.Count = s - container.Content.StackSize;
-                        this.MoveTo(LastContainer);
+                        if (LastContainer != null)
+                            MoveTo(LastContainer);
+                        else
+                            MoveTo(LastPosition);
                     }
                     return;
                 }
                 else
                 {
                     //swap
-                    container.Content.MoveTo(this.LastContainer);
+                    if (LastContainer != null)
+                        container.Content.MoveTo(LastContainer);
+                    else
+                        container.Content.MoveTo(LastPosition);
                 }
             }
             this.Container = container;
@@ -188,7 +222,7 @@ namespace Phantom.Menus
         }
 
         /// <summary>
-        /// Move the content to a specific target
+        /// Move the content to a specific target container
         /// </summary>
         /// <param name="container"></param>
         public virtual void MoveTo(MenuContainer container)
@@ -198,7 +232,25 @@ namespace Phantom.Menus
             State = MenuContainerContentState.Moving;
             tween = 1;
             moveOrigin = this.Position;
-            target = container;
+            targetContainer = container;
+            targetPosition = container.Position;
+        }
+
+
+        /// <summary>
+        /// Move the content to a specific target position
+        /// </summary>
+        /// <param name="position"></param>
+        public virtual void MoveTo(Vector2 position)
+        {
+            if (this.Container != null)
+                Undock();
+            State = MenuContainerContentState.Moving;
+            tween = 1;
+            moveOrigin = this.Position;
+            targetContainer = null;
+            targetPosition = position;
+            Selected = 0;
         }
 
         /// <summary>
@@ -207,8 +259,15 @@ namespace Phantom.Menus
         /// <param name="position"></param>
         public virtual void DropAt(Vector2 position)
         {
-            if (LastContainer != null)
+            if (!CanFloat && LastContainer != null)
                 MoveTo(LastContainer);
+            else
+            {
+                HandleMessage(Messages.SetPosition, Position);
+                State = MenuContainerContentState.Floating;
+                LastContainer = null;
+            }
+
         }
 
 

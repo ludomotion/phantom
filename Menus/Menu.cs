@@ -437,23 +437,34 @@ namespace Phantom.Menus
         }
 
         /// <summary>
-        /// Find the first control at a specific position
+        /// Find the last control at a specific position
         /// </summary>
         /// <param name="position"></param>
+        /// <param name="exclude">This control is excluded from the search</param>
         /// <returns></returns>
-        public MenuControl GetControlAt(Vector2 position)
+        public MenuControl GetControlAt(Vector2 position, MenuControl exclude)
         {
-            for (int i = 0; i < Controls.Count; i++)
+            for (int i = Controls.Count-1; i >= 0; i--)
             {
-                if (Controls[i].Shape != null)
+                if (Controls[i] != exclude && Controls[i].Shape != null)
                 {
-                    if (!(Controls[i] is MenuContainerContent) && Controls[i].Shape.InShape(position))
+                    if (Controls[i].Shape.InShape(position))
                     {
                         return Controls[i];
                     }
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Find the last control at a specific position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public MenuControl GetControlAt(Vector2 position)
+        {
+            return GetControlAt(position, null);
         }
 
         /// <summary>

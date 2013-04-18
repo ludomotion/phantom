@@ -5,6 +5,7 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
 
 namespace Phantom.Menus
 {
@@ -51,9 +52,12 @@ namespace Phantom.Menus
             base.Update(elapsed);
             MouseState current = Mouse.GetState();
             Vector2 mouse = new Vector2(current.X, current.Y);
-            MenuControl hover = menu.GetControlAt(mouse);
+            MenuControl hover = menu.GetControlAt(mouse, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;
+            MenuContainerContent content = (hover as MenuContainerContent);
+            if (content != null && content.Container != null)
+                hover = content.Container;
 
             if (current.X != previous.X || current.Y != previous.Y)
             {
@@ -64,6 +68,7 @@ namespace Phantom.Menus
                 if (draggingContent != null)
                 {
                     draggingContent.Position = mouse;
+                    draggingContent.Selected = 1;
                 }
                 else
                 {
@@ -77,6 +82,11 @@ namespace Phantom.Menus
                         {
                             menu.GetSelected(player).CancelPress(player);
                             draggingContent = (hover as MenuContainer).Content;
+                            draggingContent.Undock();
+                        }
+                        if (hover is MenuContainerContent && hover.Enabled)
+                        {
+                            draggingContent = hover as MenuContainerContent;
                             draggingContent.Undock();
                         }
                     }

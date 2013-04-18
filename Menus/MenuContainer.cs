@@ -55,6 +55,11 @@ namespace Phantom.Menus
             }
         }
 
+        /// <summary>
+        /// Return false if a MenuContainerContent cannot be docked at the container
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
         public virtual bool CanAccept(MenuContainerContent content)
         {
             if (!this.Enabled) return false;
