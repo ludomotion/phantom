@@ -54,18 +54,31 @@ namespace Phantom.Menus
         /// </summary>
         private float tween;
 
+        public int StackSize = 1;
+        public int Count = 1;
+
         /// <summary>
         /// The Content's state
         /// </summary>
         public MenuContainerContentState State { get; private set; }
 
-        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container)
+        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container, int stackSize, int count)
             : base(name, position, shape)
+        
         {
+            this.StackSize = stackSize;
+            this.Count = count;
             this.Caption = caption;
-            this.Container = container;
-            this.State = (container == null) ? MenuContainerContentState.None : MenuContainerContentState.Docked;
+            this.State = MenuContainerContentState.None;
+            if (container != null)
+                Dock(container);
         }
+
+        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container, int stackSize)
+            : this(name, caption, position, shape, container, stackSize, 1) { }
+
+        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container)
+            : this(name, caption, position, shape, container, 1, 1) { }
 
         public override void Update(float elapsed)
         {
@@ -95,7 +108,10 @@ namespace Phantom.Menus
         {
             if (Menu.Font != null && Visible)
             {
-                Vector2 size = Menu.Font.MeasureString(Caption);
+                string c = Caption;
+                if (Count > 1)
+                    c = (c + " " + Count).Trim();
+                Vector2 size = Menu.Font.MeasureString(c);
                 Color face = Color.Lerp(Menu.ColorFaceDisabled, Menu.ColorFaceHighLight, this.currentSelected);
                 Color text = Menu.ColorFaceHighLight;
 
@@ -110,7 +126,7 @@ namespace Phantom.Menus
                 size.X *= -0.5f;
                 size.Y = this.Shape.RoughWidth * 0.5f;
                 if (this.currentSelected>0.5f) 
-                    info.Batch.DrawString(Menu.Font, Caption, Position + size, text);
+                    info.Batch.DrawString(Menu.Font, c, Position + size, text);
             }
         }
 
@@ -134,6 +150,33 @@ namespace Phantom.Menus
         /// <param name="container"></param>
         public virtual void Dock(MenuContainer container)
         {
+            if (container.Content != null)
+            {
+                //its not empty, check if it is the same and then try to stack
+                if (this.StackSize > 1 && this.Name == container.Content.Name)
+                {
+                    int s = container.Content.Count + this.Count;
+                    if (s <= container.Content.StackSize)
+                    {
+                        //this stacks fits with the other stack
+                        this.Destroyed = true;
+                        container.Content.Count = s;
+                    }
+                    else
+                    {
+                        //return any left-overs
+                        container.Content.Count = container.Content.StackSize;
+                        this.Count = s - container.Content.StackSize;
+                        this.MoveTo(LastContainer);
+                    }
+                    return;
+                }
+                else
+                {
+                    //swap
+                    container.Content.MoveTo(this.LastContainer);
+                }
+            }
             this.Container = container;
             container.Content = this;
             State = MenuContainerContentState.Docked;

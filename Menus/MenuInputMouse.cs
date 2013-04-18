@@ -104,14 +104,8 @@ namespace Phantom.Menus
                 {
                     //end drag
                     MenuContainer container = hover as MenuContainer;
-                    if (container != null && container.Content == null)
+                    if (container != null)
                     {
-                        draggingContent.Dock(container);
-                    }
-                    else if (container != null && container.Content != null && draggingContent.LastContainer!=null)
-                    {
-                        //swap
-                        container.Content.MoveTo(draggingContent.LastContainer);
                         draggingContent.Dock(container);
                     }
                     else
