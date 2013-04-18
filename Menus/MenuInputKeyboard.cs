@@ -71,7 +71,11 @@ namespace Phantom.Menus
                 if (current.IsKeyDown(binding.Key) && !previous.IsKeyDown(binding.Key))
                 {
                     menu.SetSelected(player, binding.Value);
-                    binding.Value.Click(MenuControl.ClickType.Select, player);
+                    binding.Value.StartPress(player);
+                }
+                if (!current.IsKeyDown(binding.Key) && previous.IsKeyDown(binding.Key))
+                {
+                    binding.Value.EndPress(player);
                 }
             }
 

@@ -106,6 +106,8 @@
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
+    <Compile Include="Menus\MenuContainer.cs" />
+    <Compile Include="Menus\MenuInputKeyboardShortCuts.cs" />
     <Compile Include="Menus\MenuControlTweener.cs" />
     <Compile Include="Menus\MenuDesigner.cs" />
     <Compile Include="Menus\MenuInputGamePad.cs" />
