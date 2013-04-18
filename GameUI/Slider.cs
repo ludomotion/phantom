@@ -18,13 +18,13 @@ namespace Phantom.GameUI
         /// <summary>
         /// Orientation options for the sliders.
         /// </summary>
-        public enum Orientation { Horizontal, Vertical }
+        public enum SliderOrientation { Horizontal, Vertical }
         private float minValue;
         private float maxValue;
         private float currentValue;
         private float step;
         private OABB rect;
-        private Orientation orientation;
+        private SliderOrientation sliderOrientation;
         private bool snap;
         private string[] options;
 
@@ -55,9 +55,9 @@ namespace Phantom.GameUI
         /// <param name="minValue"></param>
         /// <param name="maxValue"></param>
         /// <param name="currentValue"></param>
-        /// <param name="orientation"></param>
+        /// <param name="sliderOientation"></param>
         /// <param name="options">The preset options</param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, Orientation orientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, SliderOrientation sliderOientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -66,7 +66,7 @@ namespace Phantom.GameUI
             this.step = (maxValue-minValue)/(options.Length-1);
             this.Caption = caption;
             this.rect = shape;
-            this.orientation = orientation;
+            this.sliderOrientation = sliderOientation;
             this.snap = true;
             currentValue = -1;
             SetValue(currentValue);
@@ -82,7 +82,7 @@ namespace Phantom.GameUI
         /// <param name="currentOption"></param>
         /// <param name="orientation"></param>
         /// <param name="options"></param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, Orientation orientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, SliderOrientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = 0;
@@ -91,7 +91,7 @@ namespace Phantom.GameUI
             this.step = 1;
             this.Caption = caption;
             this.rect = shape;
-            this.orientation = orientation;
+            this.sliderOrientation = orientation;
             this.snap = true;
             currentValue = -1;
             SetValue(currentValue);
@@ -110,7 +110,7 @@ namespace Phantom.GameUI
         /// <param name="step"></param>
         /// <param name="orientation"></param>
         /// <param name="snap">The value always snaps to the indicated steps</param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation, bool snap)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, SliderOrientation orientation, bool snap)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -118,19 +118,19 @@ namespace Phantom.GameUI
             this.step = step;
             this.Caption = name;
             this.rect = shape;
-            this.orientation = orientation;
+            this.sliderOrientation = orientation;
             this.snap = snap;
             currentValue = -1;
             SetValue(currentValue);
         }
 
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, SliderOrientation orientation)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, step, orientation, false) { }
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
-            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, Orientation.Horizontal, false) { }
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, SliderOrientation.Horizontal, false) { }
 
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
-            : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, Orientation.Horizontal, false) { }
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, SliderOrientation.Horizontal, false) { }
 
         public override void Click(ClickType type, int player)
         {
@@ -193,7 +193,7 @@ namespace Phantom.GameUI
                 }
 
                 Vector2 p = Position;
-                if (orientation == Orientation.Horizontal)
+                if (sliderOrientation == SliderOrientation.Horizontal)
                 {
                     info.Canvas.FillColor = face;
                     info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X, 3), 0);
@@ -227,7 +227,7 @@ namespace Phantom.GameUI
             {
                 base.ClickAt(position, player);
                 float rel = 0;
-                if (orientation == Orientation.Horizontal)
+                if (sliderOrientation == SliderOrientation.Horizontal)
                 {
                     rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
                 }

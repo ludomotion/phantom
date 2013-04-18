@@ -13,7 +13,7 @@ namespace Phantom.GameUI
     /// basic behavior and sets up a few simple methods that can be overridden
     /// to create new types of controls.
     /// </summary>
-    public class UIElement : Component
+    public class UIElement : Entity
     {
         /// <summary>
         /// The type of click/command that was passed to the control
@@ -76,16 +76,6 @@ namespace Phantom.GameUI
         public UIElement Below;
 
         /// <summary>
-        /// The control's designed position
-        /// </summary>
-        public Vector2 Position;
-
-        /// <summary>
-        /// The control's shape
-        /// </summary>
-        public Shape Shape;
-
-        /// <summary>
         /// A bit flag indicating which players can use the control.
         /// </summary>
         public int PlayerMask = 255;
@@ -105,8 +95,6 @@ namespace Phantom.GameUI
         /// </summary>
         protected float currentSelected = 0;
 
-        private Entity stub;
-
         /// <summary>
         /// Base constructor needs a name, position and shape.
         /// </summary>
@@ -114,12 +102,10 @@ namespace Phantom.GameUI
         /// <param name="position"></param>
         /// <param name="shape"></param>
         public UIElement(string name, Vector2 position, Shape shape)
+            : base (position)
         {
             this.Name = name;
-            this.Position = position;
-            this.Shape = shape;
-            this.stub = new Entity(position);
-            this.Shape.SetStubEntity(stub);
+            AddComponent(shape);
         }
 
         public override void OnAncestryChanged()
@@ -135,7 +121,6 @@ namespace Phantom.GameUI
                 currentSelected += Math.Min(1 - currentSelected, elapsed * selectSpeed);
             else
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
-            stub.Position = this.Position;
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
