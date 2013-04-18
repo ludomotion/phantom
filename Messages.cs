@@ -45,6 +45,8 @@ namespace Phantom
         public const int UIActivated = 300;
         public const int UIElementClicked = 301;
         public const int UIElementValueChanged = 302;
+        public const int Select = 310;
+        public const int Deselect = 311;
         public const int TweenIn = 350;
         public const int TweenOut = 351;
 

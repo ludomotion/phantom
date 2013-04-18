@@ -147,6 +147,16 @@ namespace Phantom.Shapes
             return false;
         }
 
+        public override bool InRect(Vector2 topLeft, Vector2 bottomRight)
+        {
+            for (int i = 0; i < this.shapes.Count; i++)
+            {
+                if (!this.shapes[i].Shape.InRect(topLeft, bottomRight))
+                    return false;
+            }
+            return (this.shapes.Count > 0);
+        }
+
         public override CollisionData Collide(Shape other)
         {
             results.Clear();

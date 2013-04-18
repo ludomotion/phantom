@@ -245,6 +245,22 @@ namespace Phantom.Physics
         }
 
         /// <summary>
+        /// Returns all entities in the indicated rectangle
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        public virtual List<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight)
+        {
+            List<Entity> result = new List<Entity>();
+            for (int i = 0; i < entities.Count; i++)
+                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight))
+                    result.Add(entities[i]);
+            return result;
+        }
+
+
+        /// <summary>
         /// Called by the parents layer when its size is changed, removes or destroys the entities that are outside the new bounds.
         /// </summary>
         /// <param name="bounds"></param>
@@ -260,5 +276,6 @@ namespace Phantom.Physics
                 }
             }
         }
+
     }
 }

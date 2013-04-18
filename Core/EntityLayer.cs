@@ -118,6 +118,12 @@ namespace Phantom.Core
             return integrator.GetEntityCloseTo(position, distance);
         }
 
+        public List<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight)
+        {
+            return integrator.GetEntitiesInRect(topLeft, bottomRight); 
+        }
+
+
         /// <summary>
         /// Remove all components that are marked as Ghosts.
         /// </summary>
@@ -146,5 +152,6 @@ namespace Phantom.Core
             this.Bounds = new Vector2(width, height);
             integrator.ChangeSize(this.Bounds, true);
         }
+
     }
 }

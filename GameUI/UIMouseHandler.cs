@@ -14,10 +14,13 @@ namespace Phantom.GameUI
     /// </summary>
     public class UIMouseHandler : UIBaseHandler
     {
-        private MouseState previous;
+        protected MouseState previous;
+        protected MouseState current;
+        protected UIElement hover;
         private UIElement mouseDown;
         private UIContent draggingContent;
-        private Vector2 mouseDownPosition;
+        protected Vector2 mouseDownPosition;
+        protected Vector2 mousePosition;
 
         public UIMouseHandler()
             : base(0) { }
@@ -29,7 +32,7 @@ namespace Phantom.GameUI
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            previous = Mouse.GetState();
+            current = Mouse.GetState();
             layer = parent as UILayer;
             if (layer == null)
                 throw new Exception("MenuMouseKeyboard can only be added to a Menu component.");
@@ -40,7 +43,7 @@ namespace Phantom.GameUI
             switch (message)
             {
                 case (Messages.UIActivated):
-                    previous = Mouse.GetState();
+                    current = Mouse.GetState();
                     layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
                     break;
             }
@@ -50,9 +53,10 @@ namespace Phantom.GameUI
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            MouseState current = Mouse.GetState();
-            Vector2 mouse = new Vector2(current.X, current.Y);
-            UIElement hover = layer.GetControlAt(mouse, draggingContent);
+            previous = current;
+            current = Mouse.GetState();
+            mousePosition = new Vector2(current.X, current.Y);
+            hover = layer.GetControlAt(mousePosition, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;
             UIContent content = (hover as UIContent);
@@ -67,7 +71,7 @@ namespace Phantom.GameUI
                 //if dragging update the position
                 if (draggingContent != null)
                 {
-                    draggingContent.Position = mouse;
+                    draggingContent.Position = mousePosition;
                     draggingContent.Selected = 1;
                 }
                 else
@@ -75,13 +79,13 @@ namespace Phantom.GameUI
                     //if pressing the left button at the same location pass the info
                     if (mouseDown != null && hover == mouseDown) 
                     {
-                        mouseDown.ClickAt(mouse - mouseDown.Position, player);
+                        mouseDown.ClickAt(mousePosition - mouseDown.Position, player);
 
                         //check if I can start dragging something;
-                        if (hover is UIContainer && (hover as UIContainer).GetContentAt(mouse) != null && hover.Enabled)
+                        if (hover is UIContainer && (hover as UIContainer).GetContentAt(mousePosition) != null && hover.Enabled)
                         {
                             layer.GetSelected(player).CancelPress(player);
-                            draggingContent = (hover as UIContainer).GetContentAt(mouse);
+                            draggingContent = (hover as UIContainer).GetContentAt(mousePosition);
                             draggingContent.Undock();
                         }
                         if (hover is UIContent && hover.Enabled)
@@ -96,12 +100,12 @@ namespace Phantom.GameUI
             //Start clicking
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
             {
-                mouseDownPosition = mouse;
+                mouseDownPosition = mousePosition;
                 layer.SetSelected(player, hover);
                 if (hover != null)
                 {
                     hover.StartPress(player);
-                    hover.ClickAt(mouse - hover.Position, player);
+                    hover.ClickAt(mousePosition - hover.Position, player);
                     mouseDown = hover;
                 }
             }
@@ -119,7 +123,7 @@ namespace Phantom.GameUI
                     }
                     else
                     {
-                        draggingContent.DropAt(mouse);
+                        draggingContent.DropAt(mousePosition);
                     }
 
                 }
@@ -131,7 +135,6 @@ namespace Phantom.GameUI
                 mouseDown = null;
                 draggingContent = null;
             }
-            previous = current;
         }
     }
 }

@@ -75,6 +75,11 @@ namespace Phantom.Shapes
             return (delta.LengthSquared() < this.Radius * this.Radius);
         }
 
+        public override bool InRect(Vector2 topLeft, Vector2 bottomRight)
+        {
+            return (this.Entity.Position.X - Radius >= topLeft.X && this.Entity.Position.X + Radius <= bottomRight.X && this.Entity.Position.Y - Radius >= topLeft.Y && this.Entity.Position.Y + Radius <= bottomRight.Y);
+        }
+
 		public override CollisionData Collide(Shape other)
 		{
 			#if IOS

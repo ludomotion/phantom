@@ -67,6 +67,14 @@ namespace Phantom.Shapes
         public abstract bool InShape(Vector2 position);
 
         /// <summary>
+        /// Returns true if the shape is entirely within the specified rectangle
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        public abstract bool InRect(Vector2 topLeft, Vector2 bottomRight);
+
+        /// <summary>
         /// Returns the distance to the specified point (0 if the point is in the shape)
         /// </summary>
         /// <param name="point"></param>

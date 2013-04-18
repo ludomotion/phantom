@@ -83,7 +83,7 @@ namespace Phantom.GameUI
 #if DEBUG
             if (PhantomGame.Game.Console != null)
             {
-                PhantomGame.Game.Console.Register("edit_menu", "Allows control over the menu controls with the mouse.", delegate(string[] argv)
+                PhantomGame.Game.Console.Register("edit_ui", "Allows control over the ui elements with the mouse to reposition them.", delegate(string[] argv)
                 {
                     for (int i = 0; i < this.Components.Count; i++)
                     {
