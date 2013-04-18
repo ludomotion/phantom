@@ -54,5 +54,11 @@ namespace Phantom.Menus
                 info.Batch.DrawString(Menu.Font, Caption, Position + size, text);
             }
         }
+
+        public virtual bool CanAccept(MenuContainerContent content)
+        {
+            if (!this.Enabled) return false;
+            return true;
+        }
     }
 }

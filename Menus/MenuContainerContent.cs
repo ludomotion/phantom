@@ -85,10 +85,9 @@ namespace Phantom.Menus
             base.Update(elapsed);
             if (State == MenuContainerContentState.Docked && Container != null)
             {
-                if (Container.Content == null)
-                    Container.Content = this;
                 Position = Container.Position;
                 Selected = Container.Selected;
+                Enabled = Container.Enabled;
             }
             if (State == MenuContainerContentState.Moving)
             {
@@ -117,7 +116,7 @@ namespace Phantom.Menus
 
                 if (!Enabled)
                 {
-                    face = Menu.ColorFaceDisabled;
+                    face = Menu.ColorFace;
                     text = Menu.ColorFace;
                 }
 
@@ -125,7 +124,7 @@ namespace Phantom.Menus
 
                 size.X *= -0.5f;
                 size.Y = this.Shape.RoughWidth * 0.5f;
-                if (this.currentSelected>0.5f) 
+                if (this.currentSelected>0.5f && Enabled) 
                     info.Batch.DrawString(Menu.Font, c, Position + size, text);
             }
         }
@@ -150,6 +149,12 @@ namespace Phantom.Menus
         /// <param name="container"></param>
         public virtual void Dock(MenuContainer container)
         {
+            if (!CanDockAt(container) || !container.CanAccept(this))
+            {
+                if (LastContainer != null)
+                    MoveTo(LastContainer);
+                return;
+            }
             if (container.Content != null)
             {
                 //its not empty, check if it is the same and then try to stack
@@ -204,6 +209,17 @@ namespace Phantom.Menus
         {
             if (LastContainer != null)
                 MoveTo(LastContainer);
+        }
+
+
+        /// <summary>
+        /// SImple check if an item can dock at a particular container
+        /// </summary>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public virtual bool CanDockAt(MenuContainer container)
+        {
+            return true;
         }
     }
 }

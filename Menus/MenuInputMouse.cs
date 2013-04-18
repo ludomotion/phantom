@@ -68,13 +68,12 @@ namespace Phantom.Menus
                 else
                 {
                     //if pressing the left button at the same location pass the info
-                    if (mouseDown != null && menu.GetSelected(player) == mouseDown)
+                    if (mouseDown != null && hover == mouseDown) 
+                    {
                         mouseDown.ClickAt(mouse - mouseDown.Position, player);
 
-                    //check if I can start dragging something;
-                    if (current.LeftButton == ButtonState.Pressed)
-                    {
-                        if (hover is MenuContainer && (hover as MenuContainer).Content != null)
+                        //check if I can start dragging something;
+                        if (hover is MenuContainer && (hover as MenuContainer).Content != null && hover.Enabled)
                         {
                             menu.GetSelected(player).CancelPress(player);
                             draggingContent = (hover as MenuContainer).Content;
