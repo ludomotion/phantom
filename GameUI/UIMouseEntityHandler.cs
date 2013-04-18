@@ -8,11 +8,40 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Phantom.GameUI
 {
+    public struct MouseCommand
+    {
+        public string Name;
+        public Vector2 Position;
+        public Entity Entity;
+        public MouseCommand(string name, Vector2 position)
+        {
+            this.Position = position;
+            this.Name = name;
+            this.Entity = null;
+        }
+        public MouseCommand(string name, Vector2 position, Entity entity)
+        {
+            this.Position = position;
+            this.Name = name;
+            this.Entity = entity;
+        }
+        public MouseCommand(string name, Entity entity)
+        {
+            this.Position = entity.Position;
+            this.Name = name;
+            this.Entity = entity;
+        }
+
+    }
     public class UIMouseEntityHandler : UIMouseHandler
     {
+        
         private EntityLayer entityLayer;
         private bool selecting = false;
         private List<Entity> selected;
+
+        public int Capacity = -1;
+        public string Command = "";
 
         public UIMouseEntityHandler(EntityLayer entityLayer)
             : base(0)
@@ -20,6 +49,13 @@ namespace Phantom.GameUI
             this.entityLayer = entityLayer;
             selecting = false;
             selected = new List<Entity>();
+        }
+
+        public override void OnAdd(Component parent)
+        {
+            base.OnAdd(parent);
+            Parent.HandleMessage(Messages.MouseCommandSelected, "Select");
+
         }
 
         public override void Update(float elapsed)
@@ -38,22 +74,33 @@ namespace Phantom.GameUI
                 //not hovering over anything
                 if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
                 {
-                    ClearSelected();
-                    List<Entity> entities = entityLayer.GetEntitiesAt(mousePosition);
-                    bool selected = false;
-                    for (int i = 0; i < entities.Count; i++)
+                    if (Command == "Select")
                     {
-                        if (AddSelected(entities[i]))
+                        ClearSelected();
+                        List<Entity> entities = entityLayer.GetEntitiesAt(mousePosition);
+                        bool selected = false;
+                        for (int i = 0; i < entities.Count; i++)
                         {
-                            selected = true;
-                            break;
+                            if (AddSelected(entities[i]))
+                            {
+                                selected = true;
+                                break;
+                            }
+                        }
+                        if (!selected)
+                        {
+                            mouseDownPosition = mousePosition;
+                            selecting = true;
                         }
                     }
-                    if (!selected)
+                    else
                     {
-                        mouseDownPosition = mousePosition;
-                        selecting = true;
+                        InstructSelected(new MouseCommand(Command, mousePosition, entityLayer.GetEntityAt(mousePosition)));
                     }
+                }
+                if (current.RightButton == ButtonState.Pressed && previous.RightButton != ButtonState.Pressed)
+                {
+                    InstructSelected(new MouseCommand("Right", mousePosition, entityLayer.GetEntityAt(mousePosition)));
                 }
             }
             if (selecting)
@@ -64,6 +111,13 @@ namespace Phantom.GameUI
                     selecting = false;
                 }
             }
+        }
+        
+        private void InstructSelected(MouseCommand mouseCommand)
+        {
+            foreach (Entity e in selected)
+                e.HandleMessage(Messages.DoMouseCommand, mouseCommand);
+            Parent.HandleMessage(Messages.MouseCommandSelected, "Select");
         }
 
         private void SelectAll(Vector2 corner1, Vector2 corner2)
@@ -105,6 +159,17 @@ namespace Phantom.GameUI
                 hs *= 0.5f;
                 info.Canvas.StrokeRect(mouseDownPosition + hs, hs, 0);
             }
+        }
+
+        public override Core.Component.MessageResult HandleMessage(int message, object data)
+        {
+            switch (message)
+            {
+                case Messages.MouseCommandSelected:
+                    Command = (string)data;
+                    return MessageResult.HANDLED;
+            }
+            return base.HandleMessage(message, data);
         }
 
     }
