@@ -70,7 +70,7 @@ namespace Phantom.Menus
         /// <summary>
         /// Flag that indicates if the content can float (be dragged to a position that is not a container)
         /// </summary>
-        public bool CanFloat = true;
+        public bool CanFloat = false;
 
         /// <summary>
         /// The Content's state
@@ -87,6 +87,8 @@ namespace Phantom.Menus
             this.State = MenuContainerContentState.Floating;
             if (container != null)
                 Dock(container);
+            else
+                CanFloat = true;
         }
 
         public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container, int stackSize)
@@ -100,7 +102,7 @@ namespace Phantom.Menus
             base.Update(elapsed);
             if (State == MenuContainerContentState.Docked && Container != null)
             {
-                Position = Container.Position;
+                //Position = Container.Position;
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
             } 
@@ -163,7 +165,7 @@ namespace Phantom.Menus
             LastPosition = Position;
             if (this.Container != null)
             {
-                this.Container.Content = null;
+                this.Container.RemoveContent(this);
                 this.Container = null;
             }
             State = MenuContainerContentState.Dragged;
@@ -183,23 +185,24 @@ namespace Phantom.Menus
                     MoveTo(LastPosition);
                 return;
             }
-            if (container.Content != null)
+            MenuContainerContent other = container.GetContentAt(this.Position);
+            if (other != null)
             {
                 //its not empty, check if it is the same and then try to stack
-                if (this.StackSize > 1 && this.Name == container.Content.Name)
+                if (this.StackSize > 1 && this.Name == other.Name)
                 {
-                    int s = container.Content.Count + this.Count;
-                    if (s <= container.Content.StackSize)
+                    int s = other.Count + this.Count;
+                    if (s <= other.StackSize)
                     {
                         //this stacks fits with the other stack
                         this.Destroyed = true;
-                        container.Content.Count = s;
+                        other.Count = s;
                     }
                     else
                     {
                         //return any left-overs
-                        container.Content.Count = container.Content.StackSize;
-                        this.Count = s - container.Content.StackSize;
+                        other.Count = other.StackSize;
+                        this.Count = s - other.StackSize;
                         if (LastContainer != null)
                             MoveTo(LastContainer);
                         else
@@ -207,17 +210,10 @@ namespace Phantom.Menus
                     }
                     return;
                 }
-                else
-                {
-                    //swap
-                    if (LastContainer != null)
-                        container.Content.MoveTo(LastContainer);
-                    else
-                        container.Content.MoveTo(LastPosition);
-                }
+                
             }
             this.Container = container;
-            container.Content = this;
+            container.AddContent(this);
             State = MenuContainerContentState.Docked;
         }
 

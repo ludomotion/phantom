@@ -78,10 +78,10 @@ namespace Phantom.Menus
                         mouseDown.ClickAt(mouse - mouseDown.Position, player);
 
                         //check if I can start dragging something;
-                        if (hover is MenuContainer && (hover as MenuContainer).Content != null && hover.Enabled)
+                        if (hover is MenuContainer && (hover as MenuContainer).GetContentAt(mouse) != null && hover.Enabled)
                         {
                             menu.GetSelected(player).CancelPress(player);
-                            draggingContent = (hover as MenuContainer).Content;
+                            draggingContent = (hover as MenuContainer).GetContentAt(mouse);
                             draggingContent.Undock();
                         }
                         if (hover is MenuContainerContent && hover.Enabled)

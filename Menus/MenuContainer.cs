@@ -21,7 +21,9 @@ namespace Phantom.Menus
         /// <summary>
         /// The container's current content
         /// </summary>
-        public MenuContainerContent Content;
+        private MenuContainerContent content;
+
+        
 
         public MenuContainer(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
@@ -63,7 +65,44 @@ namespace Phantom.Menus
         public virtual bool CanAccept(MenuContainerContent content)
         {
             if (!this.Enabled) return false;
+
+            if (this.content!=null) 
+            {
+                //try swap
+                if (content.LastContainer != null)
+                {
+                    if (content.LastContainer.CanAccept(this.content) && this.content.CanDockAt(content.LastContainer))
+                        this.content.MoveTo(content.LastContainer);
+                    else
+                        return false;
+                }
+                else
+                {
+                    if (this.content.CanFloat)
+                        this.content.MoveTo(content.LastPosition);
+                    else
+                        return false;
+                }
+            }
+
             return true;
+        }
+
+        public virtual MenuContainerContent GetContentAt(Vector2 position)
+        {
+            return content;
+        }
+
+        public virtual void AddContent(MenuContainerContent content)
+        {
+            this.content = content;
+            this.content.Position = this.Position;
+        }
+
+        public virtual void RemoveContent(MenuContainerContent content)
+        {
+            if (content == this.content)
+                this.content = null;
         }
     }
 }
