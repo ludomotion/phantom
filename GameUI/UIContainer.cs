@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A Menu Control that can hold MenuContainerContent instances. Useful for inventory or draggable options
     /// </summary>
-    public class MenuContainer : MenuControl
+    public class UIContainer : UIElement
     {
         /// <summary>
         /// The control's visible caption
@@ -21,11 +21,11 @@ namespace Phantom.Menus
         /// <summary>
         /// The container's current content
         /// </summary>
-        private MenuContainerContent content;
+        private UIContent content;
 
         
 
-        public MenuContainer(string name, string caption, Vector2 position, Shape shape)
+        public UIContainer(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
         {
             this.Caption = caption;
@@ -37,23 +37,23 @@ namespace Phantom.Menus
         /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
-            if (Menu.Font != null && Visible)
+            if (UILayer.Font != null && Visible)
             {
-                Vector2 size = Menu.Font.MeasureString(Caption);
-                Color face = Menu.ColorFace;
-                Color text = Color.Lerp(Menu.ColorShadow, Menu.ColorFaceHighLight, this.currentSelected);
+                Vector2 size = UILayer.Font.MeasureString(Caption);
+                Color face = UILayer.ColorFace;
+                Color text = Color.Lerp(UILayer.ColorShadow, UILayer.ColorFaceHighLight, this.currentSelected);
 
                 if (!Enabled)
                 {
-                    face = Menu.ColorFaceDisabled;
-                    text = Menu.ColorFace;
+                    face = UILayer.ColorFaceDisabled;
+                    text = UILayer.ColorFace;
                 }
 
                 GraphicsUtils.DrawShape(info, this.Position, this.Shape, face, text, 2);
 
                 size.X *= -0.5f;
                 size.Y = this.Shape.RoughWidth * 0.5f;
-                info.Batch.DrawString(Menu.Font, Caption, Position + size, text);
+                info.Batch.DrawString(UILayer.Font, Caption, Position + size, text);
             }
         }
 
@@ -62,7 +62,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public virtual bool CanAccept(MenuContainerContent content)
+        public virtual bool CanAccept(UIContent content)
         {
             if (!this.Enabled) return false;
 
@@ -88,18 +88,18 @@ namespace Phantom.Menus
             return true;
         }
 
-        public virtual MenuContainerContent GetContentAt(Vector2 position)
+        public virtual UIContent GetContentAt(Vector2 position)
         {
             return content;
         }
 
-        public virtual void AddContent(MenuContainerContent content)
+        public virtual void AddContent(UIContent content)
         {
             this.content = content;
             this.content.Position = this.Position;
         }
 
-        public virtual void RemoveContent(MenuContainerContent content)
+        public virtual void RemoveContent(UIContent content)
         {
             if (content == this.content)
                 this.content = null;

@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Core;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A simple menu button that can be clicked to change between a number of options.
@@ -14,7 +14,7 @@ namespace Phantom.Menus
     /// If controlled by keyboard or gamepad and in a menu that is not ordered in two-dimensions
     /// the direction keys or sticks can be used to cycle through the options.
     /// </summary>
-    public class MenuOptionButton : MenuButton
+    public class OptionButton : Button
     {
         /// <summary>
         /// A string containg the options
@@ -41,7 +41,7 @@ namespace Phantom.Menus
         /// <param name="wrap">Indicates whether the options cycle</param>
         /// <param name="selectedOption"></param>
         /// <param name="options"></param>
-        public MenuOptionButton(string name, string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
+        public OptionButton(string name, string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
             : base (name, caption, position, shape)
         {
             prefix = caption;
@@ -51,7 +51,7 @@ namespace Phantom.Menus
             this.wrap = wrap;
         }
 
-        public MenuOptionButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, params string[] options)
+        public OptionButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, params string[] options)
             : this (name, caption, position, shape, true, selectedOption, options) { }
 
         protected void SetOption(int value)
@@ -74,7 +74,7 @@ namespace Phantom.Menus
 
             GameState state = this.GetAncestor<GameState>();
             if (state != null)
-                state.HandleMessage(Messages.MenuOptionChanged, this);
+                state.HandleMessage(Messages.UIElementValueChanged, this);
         }
 
         public override void Click(ClickType type, int player)

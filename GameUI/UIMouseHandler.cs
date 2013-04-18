@@ -7,22 +7,22 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// Implements mouse input for menu controls. 
     /// </summary>
-    public class MenuInputMouse : MenuInputBase
+    public class UIMouseHandler : UIBaseHandler
     {
         private MouseState previous;
-        private MenuControl mouseDown;
-        private MenuContainerContent draggingContent;
+        private UIElement mouseDown;
+        private UIContent draggingContent;
         private Vector2 mouseDownPosition;
 
-        public MenuInputMouse()
+        public UIMouseHandler()
             : base(0) { }
 
-        public MenuInputMouse(int player)
+        public UIMouseHandler(int player)
             : base(player) { }
 
 
@@ -30,8 +30,8 @@ namespace Phantom.Menus
         {
             base.OnAdd(parent);
             previous = Mouse.GetState();
-            menu = parent as Menu;
-            if (menu == null)
+            layer = parent as UILayer;
+            if (layer == null)
                 throw new Exception("MenuMouseKeyboard can only be added to a Menu component.");
         }
 
@@ -39,9 +39,9 @@ namespace Phantom.Menus
         {
             switch (message)
             {
-                case (Messages.MenuActivated):
+                case (Messages.UIActivated):
                     previous = Mouse.GetState();
-                    menu.SetSelected(player, menu.GetControlAt(new Vector2(previous.X, previous.Y)));
+                    layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
                     break;
             }
             return base.HandleMessage(message, data);
@@ -52,17 +52,17 @@ namespace Phantom.Menus
             base.Update(elapsed);
             MouseState current = Mouse.GetState();
             Vector2 mouse = new Vector2(current.X, current.Y);
-            MenuControl hover = menu.GetControlAt(mouse, draggingContent);
+            UIElement hover = layer.GetControlAt(mouse, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;
-            MenuContainerContent content = (hover as MenuContainerContent);
+            UIContent content = (hover as UIContent);
             if (content != null && content.Container != null)
                 hover = content.Container;
 
             if (current.X != previous.X || current.Y != previous.Y)
             {
                 //Check which item I am hovering and select it
-                menu.SetSelected(player, hover);
+                layer.SetSelected(player, hover);
 
                 //if dragging update the position
                 if (draggingContent != null)
@@ -78,15 +78,15 @@ namespace Phantom.Menus
                         mouseDown.ClickAt(mouse - mouseDown.Position, player);
 
                         //check if I can start dragging something;
-                        if (hover is MenuContainer && (hover as MenuContainer).GetContentAt(mouse) != null && hover.Enabled)
+                        if (hover is UIContainer && (hover as UIContainer).GetContentAt(mouse) != null && hover.Enabled)
                         {
-                            menu.GetSelected(player).CancelPress(player);
-                            draggingContent = (hover as MenuContainer).GetContentAt(mouse);
+                            layer.GetSelected(player).CancelPress(player);
+                            draggingContent = (hover as UIContainer).GetContentAt(mouse);
                             draggingContent.Undock();
                         }
-                        if (hover is MenuContainerContent && hover.Enabled)
+                        if (hover is UIContent && hover.Enabled)
                         {
-                            draggingContent = hover as MenuContainerContent;
+                            draggingContent = hover as UIContent;
                             draggingContent.Undock();
                         }
                     }
@@ -97,7 +97,7 @@ namespace Phantom.Menus
             if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
             {
                 mouseDownPosition = mouse;
-                menu.SetSelected(player, hover);
+                layer.SetSelected(player, hover);
                 if (hover != null)
                 {
                     hover.StartPress(player);
@@ -112,7 +112,7 @@ namespace Phantom.Menus
                 if (draggingContent != null)
                 {
                     //end drag
-                    MenuContainer container = hover as MenuContainer;
+                    UIContainer container = hover as UIContainer;
                     if (container != null)
                     {
                         draggingContent.Dock(container);
@@ -125,8 +125,8 @@ namespace Phantom.Menus
                 }
                 else
                 {
-                    if (menu.GetSelected(player) != null)
-                        menu.GetSelected(player).EndPress(player);
+                    if (layer.GetSelected(player) != null)
+                        layer.GetSelected(player).EndPress(player);
                 }
                 mouseDown = null;
                 draggingContent = null;

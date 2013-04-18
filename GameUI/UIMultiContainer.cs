@@ -5,25 +5,25 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
-    public class MenuMultiContainer : MenuContainer
+    public class UIMultiContainer : UIContainer
     {
         public int Capacity;
-        public List<MenuContainerContent> Contents {get; private set;}
+        public List<UIContent> Contents {get; private set;}
 
-        public MenuMultiContainer(string name, string caption, Vector2 position, Shape shape, int capacity)
+        public UIMultiContainer(string name, string caption, Vector2 position, Shape shape, int capacity)
             : base(name, caption, position, shape)
         {
-            this.Contents = new List<MenuContainerContent>();
+            this.Contents = new List<UIContent>();
             this.Capacity = capacity;
         }
 
-        public override bool CanAccept(MenuContainerContent content)
+        public override bool CanAccept(UIContent content)
         {
             if (!this.Enabled)
                 return false;
-            MenuContainerContent currentContent = GetContentAt(content.Position);
+            UIContent currentContent = GetContentAt(content.Position);
 
             if (currentContent != null && content.LastContainer != this && Contents.Count == Capacity)
             {
@@ -46,7 +46,7 @@ namespace Phantom.Menus
             return true;
         }
 
-        public override MenuContainerContent GetContentAt(Vector2 position)
+        public override UIContent GetContentAt(Vector2 position)
         {
             for (int i = Contents.Count - 1; i >= 0; i--)
             {
@@ -56,12 +56,12 @@ namespace Phantom.Menus
             return null;
         }
 
-        public override void RemoveContent(MenuContainerContent content)
+        public override void RemoveContent(UIContent content)
         {
             Contents.Remove(content);
         }
 
-        public override void AddContent(MenuContainerContent content)
+        public override void AddContent(UIContent content)
         {
             Contents.Add(content);
         }

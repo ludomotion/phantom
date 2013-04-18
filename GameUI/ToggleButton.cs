@@ -6,13 +6,13 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Core;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A simple button with two states that toggle when clicked. 
     /// If the state changes it passes a MenuOptionChanged message to the menu.
     /// </summary>
-    public class MenuToggleButton : MenuButton
+    public class ToggleButton : Button
     {
         /// <summary>
         /// An array containg the names of the two options
@@ -30,7 +30,7 @@ namespace Phantom.Menus
 
 
 
-        public MenuToggleButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, string option0, string option1)
+        public ToggleButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, string option0, string option1)
             : base (name, caption, position, shape)
         {
             prefix = caption;
@@ -48,7 +48,7 @@ namespace Phantom.Menus
 
             GameState state = this.GetAncestor<GameState>();
             if (state != null)
-                state.HandleMessage(Messages.MenuOptionChanged, this);
+                state.HandleMessage(Messages.UIElementValueChanged, this);
         }
 
         public override void Click(ClickType type, int player)

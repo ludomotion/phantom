@@ -6,14 +6,14 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
-    public enum MenuContainerContentState { Docked, Dragged, Moving, Floating }
+    public enum UIContentState { Docked, Dragged, Moving, Floating }
 
     /// <summary>
     /// A draggable object that can be moved between to MenuContainers
     /// </summary>
-    public class MenuContainerContent : MenuControl
+    public class UIContent : UIElement
     {
         /// <summary>
         /// The default move speed between locations
@@ -32,19 +32,19 @@ namespace Phantom.Menus
         /// <summary>
         /// The component's last location (used for dragging)
         /// </summary>
-        public MenuContainer LastContainer {get; private set;}
+        public UIContainer LastContainer {get; private set;}
 
         public Vector2 LastPosition { get; private set; }
 
         /// <summary>
         /// The component's current location
         /// </summary>
-        public MenuContainer Container {get; private set;}
+        public UIContainer Container {get; private set;}
 
         /// <summary>
         /// The target of location (used for auto moves)
         /// </summary>
-        private MenuContainer targetContainer;
+        private UIContainer targetContainer;
 
         private Vector2 targetPosition;
 
@@ -75,38 +75,38 @@ namespace Phantom.Menus
         /// <summary>
         /// The Content's state
         /// </summary>
-        public MenuContainerContentState State { get; private set; }
+        public UIContentState State { get; private set; }
 
-        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container, int stackSize, int count)
+        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container, int stackSize, int count)
             : base(name, position, shape)
         
         {
             this.StackSize = stackSize;
             this.Count = count;
             this.Caption = caption;
-            this.State = MenuContainerContentState.Floating;
+            this.State = UIContentState.Floating;
             if (container != null)
                 Dock(container);
             else
                 CanFloat = true;
         }
 
-        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container, int stackSize)
+        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container, int stackSize)
             : this(name, caption, position, shape, container, stackSize, 1) { }
 
-        public MenuContainerContent(string name, string caption, Vector2 position, Shape shape, MenuContainer container)
+        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container)
             : this(name, caption, position, shape, container, 1, 1) { }
 
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (State == MenuContainerContentState.Docked && Container != null)
+            if (State == UIContentState.Docked && Container != null)
             {
                 //Position = Container.Position;
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
             } 
-            else if (State == MenuContainerContentState.Moving)
+            else if (State == UIContentState.Moving)
             {
                 tween -= Math.Min(tween, elapsed * MoveSpeed);
                 if (targetContainer != null)
@@ -119,7 +119,7 @@ namespace Phantom.Menus
                 else
                 {
                     if (tween == 0)
-                        State = MenuContainerContentState.Floating;
+                        State = UIContentState.Floating;
                     else
                         Position = Vector2.Lerp(targetPosition, moveOrigin, MoveTween(tween));
                 }
@@ -132,19 +132,19 @@ namespace Phantom.Menus
         /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
-            if (Menu.Font != null && Visible)
+            if (UILayer.Font != null && Visible)
             {
                 string c = Caption;
                 if (Count > 1)
                     c = (c + " " + Count).Trim();
-                Vector2 size = Menu.Font.MeasureString(c);
-                Color face = Color.Lerp(Menu.ColorFaceDisabled, Menu.ColorFaceHighLight, this.currentSelected);
-                Color text = Menu.ColorFaceHighLight;
+                Vector2 size = UILayer.Font.MeasureString(c);
+                Color face = Color.Lerp(UILayer.ColorFaceDisabled, UILayer.ColorFaceHighLight, this.currentSelected);
+                Color text = UILayer.ColorFaceHighLight;
 
                 if (!Enabled)
                 {
-                    face = Menu.ColorFace;
-                    text = Menu.ColorFace;
+                    face = UILayer.ColorFace;
+                    text = UILayer.ColorFace;
                 }
 
                 GraphicsUtils.DrawShape(info, this.Position, this.Shape, face, Color.Transparent, 0);
@@ -152,7 +152,7 @@ namespace Phantom.Menus
                 size.X *= -0.5f;
                 size.Y = this.Shape.RoughWidth * 0.5f;
                 if (this.currentSelected>0.5f && Enabled) 
-                    info.Batch.DrawString(Menu.Font, c, Position + size, text);
+                    info.Batch.DrawString(UILayer.Font, c, Position + size, text);
             }
         }
 
@@ -168,14 +168,14 @@ namespace Phantom.Menus
                 this.Container.RemoveContent(this);
                 this.Container = null;
             }
-            State = MenuContainerContentState.Dragged;
+            State = UIContentState.Dragged;
         }
 
         /// <summary>
         /// Dock the content at a container
         /// </summary>
         /// <param name="container"></param>
-        public virtual void Dock(MenuContainer container)
+        public virtual void Dock(UIContainer container)
         {
             if (!CanDockAt(container) || !container.CanAccept(this))
             {
@@ -185,7 +185,7 @@ namespace Phantom.Menus
                     MoveTo(LastPosition);
                 return;
             }
-            MenuContainerContent other = container.GetContentAt(this.Position);
+            UIContent other = container.GetContentAt(this.Position);
             if (other != null)
             {
                 //its not empty, check if it is the same and then try to stack
@@ -214,18 +214,18 @@ namespace Phantom.Menus
             }
             this.Container = container;
             container.AddContent(this);
-            State = MenuContainerContentState.Docked;
+            State = UIContentState.Docked;
         }
 
         /// <summary>
         /// Move the content to a specific target container
         /// </summary>
         /// <param name="container"></param>
-        public virtual void MoveTo(MenuContainer container)
+        public virtual void MoveTo(UIContainer container)
         {
             if (this.Container!= null)
                 Undock();
-            State = MenuContainerContentState.Moving;
+            State = UIContentState.Moving;
             tween = 1;
             moveOrigin = this.Position;
             targetContainer = container;
@@ -241,7 +241,7 @@ namespace Phantom.Menus
         {
             if (this.Container != null)
                 Undock();
-            State = MenuContainerContentState.Moving;
+            State = UIContentState.Moving;
             tween = 1;
             moveOrigin = this.Position;
             targetContainer = null;
@@ -260,7 +260,7 @@ namespace Phantom.Menus
             else
             {
                 HandleMessage(Messages.SetPosition, Position);
-                State = MenuContainerContentState.Floating;
+                State = UIContentState.Floating;
                 LastContainer = null;
             }
 
@@ -272,7 +272,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="container"></param>
         /// <returns></returns>
-        public virtual bool CanDockAt(MenuContainer container)
+        public virtual bool CanDockAt(UIContainer container)
         {
             return true;
         }

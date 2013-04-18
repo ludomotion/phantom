@@ -5,26 +5,26 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// Implements only keyboard shortcuts. The arrow keys can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The space bar or enter key is used to click buttons. Escape calls the menu Back method.
     /// </summary>
-    public class MenuInputKeyboardShortCuts : MenuInputBase
+    public class UIKeyboardShortCuts : UIBaseHandler
     {
         private KeyboardState previous;
 
-        public Dictionary<Keys, MenuControl> KeyBindings;
+        public Dictionary<Keys, UIElement> KeyBindings;
 
-        public MenuInputKeyboardShortCuts()
+        public UIKeyboardShortCuts()
             : this(0) { }
 
-        public MenuInputKeyboardShortCuts(int player)
+        public UIKeyboardShortCuts(int player)
             : base(player) 
         {
-            KeyBindings = new Dictionary<Keys, MenuControl>();
+            KeyBindings = new Dictionary<Keys, UIElement>();
         }
 
         public override void Update(float elapsed)
@@ -35,11 +35,11 @@ namespace Phantom.Menus
             if (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape))
                 DoKeyBack();
 
-            foreach (KeyValuePair<Keys, MenuControl> binding in KeyBindings)
+            foreach (KeyValuePair<Keys, UIElement> binding in KeyBindings)
             {
                 if (current.IsKeyDown(binding.Key) && !previous.IsKeyDown(binding.Key))
                 {
-                    menu.SetSelected(player, binding.Value);
+                    layer.SetSelected(player, binding.Value);
                     binding.Value.StartPress(player);
                 }
                 if (!current.IsKeyDown(binding.Key) && previous.IsKeyDown(binding.Key))

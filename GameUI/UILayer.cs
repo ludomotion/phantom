@@ -7,7 +7,7 @@ using Phantom.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     //DONE: Support simple tweening to make menu's more lively
     //TODO: Create containers and dragable items (inventory system)
@@ -40,7 +40,7 @@ namespace Phantom.Menus
     /// state.
     /// </summary>
     
-    public class Menu : Layer
+    public class UILayer : Layer
     {
         /// <summary>
         /// Menu ordering determines how controls are linked.
@@ -64,8 +64,8 @@ namespace Phantom.Menus
         /// <summary>
         /// All the controls added to the menu.
         /// </summary>
-        public List<MenuControl> Controls;
-        private MenuControl[] selected;
+        public List<UIElement> Controls;
+        private UIElement[] selected;
         private Renderer renderer;
 
         /// <summary>
@@ -73,12 +73,12 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="renderer">The renderer component that is responsible for rendering the controlss</param>
         /// <param name="maxPlayers">The number of players that can control the menu simultaneously</param>
-        public Menu(Renderer renderer, int playerCount)
+        public UILayer(Renderer renderer, int playerCount)
         {
-            selected = new MenuControl[playerCount]; 
+            selected = new UIElement[playerCount]; 
             this.renderer = renderer;
             AddComponent(renderer);
-            Controls = new List<MenuControl>();
+            Controls = new List<UIElement>();
 
 #if DEBUG
             if (PhantomGame.Game.Console != null)
@@ -87,10 +87,10 @@ namespace Phantom.Menus
                 {
                     for (int i = 0; i < this.Components.Count; i++)
                     {
-                        if (Components[i] is MenuInputMouse)
+                        if (Components[i] is UIMouseHandler)
                             RemoveComponent(Components[i]);
                     }
-                    this.AddComponent(new MenuDesigner());
+                    this.AddComponent(new UIDesigner());
                 });
             }
 #endif
@@ -109,23 +109,16 @@ namespace Phantom.Menus
         protected override void OnComponentAdded(Component child)
         {
             base.OnComponentAdded(child);
-            if (child is MenuControl)
-                Controls.Add((MenuControl)child);
+            if (child is UIElement)
+                Controls.Add((UIElement)child);
         }
 
         protected override void OnComponentRemoved(Component child)
         {
             base.OnComponentRemoved(child);
-            if (child is MenuControl)
-                Controls.Remove((MenuControl)child);
+            if (child is UIElement)
+                Controls.Remove((UIElement)child);
         }
-
-        //public override void BackOnTop()
-        //{
-         //   base.BackOnTop();
-         //   HandleMessage(Messages.MenuActivated, null);
-        //}
-
 
 
         public override void Render(RenderInfo info)
@@ -141,7 +134,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="player"></param>
         /// <param name="value"></param>
-        public void SetSelected(int player, MenuControl value)
+        public void SetSelected(int player, UIElement value)
         {
             if (player < 0 || player >= selected.Length)
                 return;
@@ -162,7 +155,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        public MenuControl GetSelected(int player)
+        public UIElement GetSelected(int player)
         {
             if (player < 0 || player >= selected.Length)
                 return null;
@@ -222,7 +215,7 @@ namespace Phantom.Menus
             }
         }
 
-        private void FindConnectionsTopBottom(MenuControl menuControl, float maxDistance)
+        private void FindConnectionsTopBottom(UIElement menuControl, float maxDistance)
         {
             menuControl.Above = null;
             menuControl.Below = null;
@@ -251,7 +244,7 @@ namespace Phantom.Menus
             }
         }
 
-        private void FindConnectionsLeftRight(MenuControl menuControl, float maxDistance)
+        private void FindConnectionsLeftRight(UIElement menuControl, float maxDistance)
         {
             menuControl.Left = null;
             menuControl.Right = null;
@@ -286,7 +279,7 @@ namespace Phantom.Menus
             {
                 if (Controls[i].Right == null && Controls[i].Left != null)
                 {
-                    MenuControl mc = Controls[i].Left;
+                    UIElement mc = Controls[i].Left;
                     int max = 100;
                     while (mc.Left != null && max > 0 && mc.Left.Below != null)
                     {
@@ -317,7 +310,7 @@ namespace Phantom.Menus
             {
                 if (Controls[i].Below == null && Controls[i].Above != null)
                 {
-                    MenuControl mc = Controls[i].Above;
+                    UIElement mc = Controls[i].Above;
                     int max = 100;
                     while (mc.Above != null && max > 0 && mc.Above.Right != null)
                     {
@@ -368,11 +361,11 @@ namespace Phantom.Menus
             }
         }
 
-        private void WrapTopBottom(MenuControl menuControl)
+        private void WrapTopBottom(UIElement menuControl)
         {
             if (menuControl.Above == null)
             {
-                MenuControl mc = menuControl.Below;
+                UIElement mc = menuControl.Below;
                 if (mc != null)
                 {
                     int max = 100;
@@ -387,7 +380,7 @@ namespace Phantom.Menus
             }
             if (menuControl.Below == null)
             {
-                MenuControl mc = menuControl.Above;
+                UIElement mc = menuControl.Above;
                 if (mc != null)
                 {
                     int max = 100;
@@ -402,11 +395,11 @@ namespace Phantom.Menus
             }
         }
 
-        private void WrapLeftRight(MenuControl menuControl)
+        private void WrapLeftRight(UIElement menuControl)
         {
             if (menuControl.Left == null)
             {
-                MenuControl mc = menuControl.Right;
+                UIElement mc = menuControl.Right;
                 if (mc != null)
                 {
                     int max = 100;
@@ -421,7 +414,7 @@ namespace Phantom.Menus
             }
             if (menuControl.Right == null)
             {
-                MenuControl mc = menuControl.Left;
+                UIElement mc = menuControl.Left;
                 if (mc != null)
                 {
                     int max = 100;
@@ -442,7 +435,7 @@ namespace Phantom.Menus
         /// <param name="position"></param>
         /// <param name="exclude">This control is excluded from the search</param>
         /// <returns></returns>
-        public MenuControl GetControlAt(Vector2 position, MenuControl exclude)
+        public UIElement GetControlAt(Vector2 position, UIElement exclude)
         {
             for (int i = Controls.Count-1; i >= 0; i--)
             {
@@ -462,7 +455,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public MenuControl GetControlAt(Vector2 position)
+        public UIElement GetControlAt(Vector2 position)
         {
             return GetControlAt(position, null);
         }
@@ -472,7 +465,7 @@ namespace Phantom.Menus
         /// </summary>
         /// <param name="player"></param>
         /// <returns></returns>
-        public MenuControl GetFirstControl(int player)
+        public UIElement GetFirstControl(int player)
         {
             for (int i = 0; i < Controls.Count; i++)
             {

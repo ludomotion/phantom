@@ -7,13 +7,13 @@ using Phantom.Shapes;
 using Phantom.Utils;
 using Phantom.Core;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A simple menu button that can be clicked to throw MenuClicked messages in the menu.
     /// It renders a simple button if the menu's renderer has a canvas.
     /// </summary>
-    public class MenuButton : MenuControl
+    public class Button : UIElement
     {
         /// <summary>
         /// The buttons visible caption
@@ -26,7 +26,7 @@ namespace Phantom.Menus
         /// <param name="name"></param>
         /// <param name="position"></param>
         /// <param name="shape"></param>
-        public MenuButton(string name, string caption, Vector2 position, Shape shape)
+        public Button(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
         {
             this.Caption = caption;
@@ -38,23 +38,23 @@ namespace Phantom.Menus
         /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
-            if (Menu.Font != null && Visible)
+            if (UILayer.Font != null && Visible)
             {
-                Vector2 size = Menu.Font.MeasureString(Caption);
-                Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
-                Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
+                Vector2 size = UILayer.Font.MeasureString(Caption);
+                Color face = Color.Lerp(UILayer.ColorFace, UILayer.ColorFaceHighLight, this.currentSelected);
+                Color text = Color.Lerp(UILayer.ColorText, UILayer.ColorTextHighLight, this.currentSelected);
 
                 if (!Enabled)
                 {
-                    face = Menu.ColorFaceDisabled;
-                    text = Menu.ColorTextDisabled;
+                    face = UILayer.ColorFaceDisabled;
+                    text = UILayer.ColorTextDisabled;
                 }
 
-                GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, Menu.ColorShadow, 2);
+                GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, UILayer.ColorShadow, 2);
                 float down = this.pressed > 0 ? 0 : 2;
-                GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, Menu.ColorShadow, 2);
+                GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
 
-                info.Batch.DrawString(Menu.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
+                info.Batch.DrawString(UILayer.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Phantom.Menus
             {
                 GameState state = this.GetAncestor<GameState>();
                 if (state!=null)
-                    state.HandleMessage(Messages.MenuClicked, this);
+                    state.HandleMessage(Messages.UIElementClicked, this);
             }
             base.Click(type, player);
         }

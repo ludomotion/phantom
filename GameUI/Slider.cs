@@ -6,14 +6,14 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Core;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A menu slider control which can be used to control float values or lists of options.
     /// If the state changes it passes a MenuOptionChanged message to the menu.
     /// Sliders must have a rectangular shape (OABB).
     /// </summary>
-    public class MenuSlider : MenuControl
+    public class Slider : UIElement
     {
         /// <summary>
         /// Orientation options for the sliders.
@@ -57,7 +57,7 @@ namespace Phantom.Menus
         /// <param name="currentValue"></param>
         /// <param name="orientation"></param>
         /// <param name="options">The preset options</param>
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, Orientation orientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, Orientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -82,7 +82,7 @@ namespace Phantom.Menus
         /// <param name="currentOption"></param>
         /// <param name="orientation"></param>
         /// <param name="options"></param>
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, int currentOption, Orientation orientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, Orientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = 0;
@@ -110,7 +110,7 @@ namespace Phantom.Menus
         /// <param name="step"></param>
         /// <param name="orientation"></param>
         /// <param name="snap">The value always snaps to the indicated steps</param>
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation, bool snap)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation, bool snap)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -124,12 +124,12 @@ namespace Phantom.Menus
             SetValue(currentValue);
         }
 
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, Orientation orientation)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, step, orientation, false) { }
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, step, Orientation.Horizontal, false) { }
 
-        public MenuSlider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, Orientation.Horizontal, false) { }
 
         public override void Click(ClickType type, int player)
@@ -167,7 +167,7 @@ namespace Phantom.Menus
 
             GameState state = this.GetAncestor<GameState>();
             if (state != null)
-                state.HandleMessage(Messages.MenuOptionChanged, this);
+                state.HandleMessage(Messages.UIElementValueChanged, this);
 
         }
 
@@ -183,13 +183,13 @@ namespace Phantom.Menus
             {
 
                 //Vector2 size = Menu.Font.MeasureString(Caption);
-                Color face = Color.Lerp(Menu.ColorFace, Menu.ColorFaceHighLight, this.currentSelected);
-                Color text = Color.Lerp(Menu.ColorText, Menu.ColorTextHighLight, this.currentSelected);
+                Color face = Color.Lerp(UILayer.ColorFace, UILayer.ColorFaceHighLight, this.currentSelected);
+                Color text = Color.Lerp(UILayer.ColorText, UILayer.ColorTextHighLight, this.currentSelected);
 
                 if (!Enabled)
                 {
-                    face = Menu.ColorFaceDisabled;
-                    text = Menu.ColorTextDisabled;
+                    face = UILayer.ColorFaceDisabled;
+                    text = UILayer.ColorTextDisabled;
                 }
 
                 Vector2 p = Position;
@@ -197,7 +197,7 @@ namespace Phantom.Menus
                 {
                     info.Canvas.FillColor = face;
                     info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X, 3), 0);
-                    info.Canvas.FillColor = Menu.ColorShadow;
+                    info.Canvas.FillColor = UILayer.ColorShadow;
                     info.Canvas.FillRect(p, new Vector2(rect.HalfSize.X - 2, 1), 0);
 
                     p.X += ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.X - HandleWidth * 0.5f) * 2;
@@ -206,18 +206,18 @@ namespace Phantom.Menus
                 {
                     info.Canvas.FillColor = face;
                     info.Canvas.FillRect(p, new Vector2(3, rect.HalfSize.Y), 0);
-                    info.Canvas.FillColor = Menu.ColorShadow;
+                    info.Canvas.FillColor = UILayer.ColorShadow;
                     info.Canvas.FillRect(p, new Vector2(1, rect.HalfSize.Y - 2), 0);
 
                     p.Y -= ((currentValue - minValue) / (maxValue - minValue) - 0.5f) * (rect.HalfSize.Y - HandleHeight * 0.5f) * 2;
                 }
-                info.Canvas.FillColor = Menu.ColorShadow;
+                info.Canvas.FillColor = UILayer.ColorShadow;
                 info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f, HandleHeight * 0.5f), 0);
                 info.Canvas.FillColor = face;
                 info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
 
-                if (Menu.Font != null)
-                    info.Batch.DrawString(Menu.Font, caption, Position - rect.HalfSize, text);
+                if (UILayer.Font != null)
+                    info.Batch.DrawString(UILayer.Font, caption, Position - rect.HalfSize, text);
             }
         }
 

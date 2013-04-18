@@ -8,34 +8,34 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// A component that allows you to drag menu controls and report on their current location when added to a menu.
     /// In debug mode, typing edit_menu into the console will automatically add the MenuDesigner to the menu
     /// </summary>
-    public class MenuDesigner : Component
+    public class UIDesigner : Component
     {
-        private Menu menu;
+        private UILayer menu;
 
         private MouseState previous;
 
         private Vector2 dragOffset;
-        private MenuControl dragging;
+        private UIElement dragging;
 
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            menu = parent as Menu;
+            menu = parent as UILayer;
             previous = Mouse.GetState();
             if (menu == null)
                 throw new Exception(this.GetType().Name + " can only be added to a Menu component.");
 
-            PhantomGame.Game.Console.Register("menu_report", "Displays the current position of menu items.", delegate(string[] argv)
+            PhantomGame.Game.Console.Register("ui_report", "Displays the current position of menu items.", delegate(string[] argv)
             {
                 this.ProduceReport();
             });
-            PhantomGame.Game.Console.Register("menu_code", "Generates code to position the menu items to the currently designed position and copies that code to the clipboard.", delegate(string[] argv)
+            PhantomGame.Game.Console.Register("ui_code", "Generates code to position the menu items to the currently designed position and copies that code to the clipboard.", delegate(string[] argv)
             {
                 this.ProduceCode();
             });
@@ -75,7 +75,7 @@ namespace Phantom.Menus
         {
             switch (message)
             {
-                case (Messages.MenuActivated):
+                case (Messages.UIActivated):
                     previous = Mouse.GetState();
                     break;
             }

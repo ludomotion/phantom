@@ -5,36 +5,36 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// Implements the control for keyboard. The arrow keys can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The space bar or enter key is used to click buttons. Escape calls the menu Back method.
     /// </summary>
-    public class MenuInputKeyboard : MenuInputBase
+    public class UIKeyboardHandler : UIBaseHandler
     {
         private KeyboardState previous;
 
-        public Dictionary<Keys, MenuControl> KeyBindings;
+        public Dictionary<Keys, UIElement> KeyBindings;
 
-        public MenuInputKeyboard()
+        public UIKeyboardHandler()
             : this(0) { }
 
-        public MenuInputKeyboard(int player)
+        public UIKeyboardHandler(int player)
             : base(player) 
         {
-            KeyBindings = new Dictionary<Keys, MenuControl>();
+            KeyBindings = new Dictionary<Keys, UIElement>();
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
         {
             switch (message)
             {
-                case (Messages.MenuActivated):
+                case (Messages.UIActivated):
                     previous = Keyboard.GetState();
-                    if (menu.GetSelected(player) == null && menu.Controls.Count > 0)
-                        menu.SetSelected(player, menu.GetFirstControl(player));
+                    if (layer.GetSelected(player) == null && layer.Controls.Count > 0)
+                        layer.SetSelected(player, layer.GetFirstControl(player));
 
                     break;
             }
@@ -66,11 +66,11 @@ namespace Phantom.Menus
             if (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape))
                 DoKeyBack();
 
-            foreach (KeyValuePair<Keys, MenuControl> binding in KeyBindings)
+            foreach (KeyValuePair<Keys, UIElement> binding in KeyBindings)
             {
                 if (current.IsKeyDown(binding.Key) && !previous.IsKeyDown(binding.Key))
                 {
-                    menu.SetSelected(player, binding.Value);
+                    layer.SetSelected(player, binding.Value);
                     binding.Value.StartPress(player);
                 }
                 if (!current.IsKeyDown(binding.Key) && previous.IsKeyDown(binding.Key))

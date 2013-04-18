@@ -6,14 +6,14 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// The base class from which all MenuControls are derived. It implements
     /// basic behavior and sets up a few simple methods that can be overridden
     /// to create new types of controls.
     /// </summary>
-    public class MenuControl : Component
+    public class UIElement : Component
     {
         /// <summary>
         /// The type of click/command that was passed to the control
@@ -53,27 +53,27 @@ namespace Phantom.Menus
         /// <summary>
         /// A reference to the menu the control is part of
         /// </summary>
-        protected Menu menu;
+        protected UILayer layer;
 
         /// <summary>
         /// The control's left neighbor
         /// </summary>
-        public MenuControl Left;
+        public UIElement Left;
 
         /// <summary>
         /// The control's right neighbor
         /// </summary>
-        public MenuControl Right;
+        public UIElement Right;
 
         /// <summary>
         /// The control's above neighbor
         /// </summary>
-        public MenuControl Above;
+        public UIElement Above;
 
         /// <summary>
         /// The control's below neighbor
         /// </summary>
-        public MenuControl Below;
+        public UIElement Below;
 
         /// <summary>
         /// The control's designed position
@@ -113,7 +113,7 @@ namespace Phantom.Menus
         /// <param name="name"></param>
         /// <param name="position"></param>
         /// <param name="shape"></param>
-        public MenuControl(string name, Vector2 position, Shape shape)
+        public UIElement(string name, Vector2 position, Shape shape)
         {
             this.Name = name;
             this.Position = position;
@@ -125,7 +125,7 @@ namespace Phantom.Menus
         public override void OnAncestryChanged()
         {
             base.OnAncestryChanged();
-            menu = GetAncestor<Menu>();
+            layer = GetAncestor<UILayer>();
         }
 
         public override void Update(float elapsed)

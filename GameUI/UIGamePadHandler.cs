@@ -6,20 +6,20 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// Implements the control for a GamePad. The DPad and sticks can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The A button is used to click buttons. Back calls the menu Back method
     /// </summary>
-    public class MenuInputGamePad : MenuInputBase
+    public class UIGamePadHandler : UIBaseHandler
     {
         private GamePadState previous;
         private PlayerIndex index;
         private float threshold = 0.8f;
 
-        public MenuInputGamePad(PlayerIndex index)
+        public UIGamePadHandler(PlayerIndex index)
             : base((int)index)
         {
             this.index = index;
@@ -29,10 +29,10 @@ namespace Phantom.Menus
         {
             switch (message)
             {
-                case (Messages.MenuActivated):
+                case (Messages.UIActivated):
                     previous = GamePad.GetState(index);
-                    if (menu.GetSelected(player) == null && menu.Controls.Count > 0)
-                        menu.SetSelected(player, menu.GetFirstControl(player));
+                    if (layer.GetSelected(player) == null && layer.Controls.Count > 0)
+                        layer.SetSelected(player, layer.GetFirstControl(player));
 
                     break;
             }

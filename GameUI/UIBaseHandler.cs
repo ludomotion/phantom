@@ -5,22 +5,22 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
     /// <summary>
     /// The base class from which different input handlers are derived
     /// </summary>
-    public class MenuInputBase : Component
+    public class UIBaseHandler : Component
     {
         /// <summary>
         /// A reference to the menu
         /// </summary>
-        protected Menu menu;
+        protected UILayer layer;
         private float timer = 0;
         private float keyTimeOut = 0.4f;
         protected int player;
 
-        public MenuInputBase(int player)
+        public UIBaseHandler(int player)
         {
             this.player = player;
         }
@@ -28,8 +28,8 @@ namespace Phantom.Menus
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            menu = parent as Menu;
-            if (menu == null)
+            layer = parent as UILayer;
+            if (layer == null)
                 throw new Exception(this.GetType().Name+" can only be added to a Menu component.");
         }
 
@@ -53,22 +53,22 @@ namespace Phantom.Menus
             if (keyTimeOut > 0.2f)
                 keyTimeOut -= 0.1f;
 
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null && selected.Left != null)
             {
-                MenuControl current = selected;
+                UIElement current = selected;
                 selected = selected.Left;
 
                 while (selected.Left != null && !selected.CanUse(player) && selected != current)
                     selected = selected.Left;
                 if (!selected.Enabled)
                     selected = current;
-                menu.SetSelected(player, selected);
+                layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(MenuControl.ClickType.PreviousOption, player);
+                selected.Click(UIElement.ClickType.PreviousOption, player);
             else 
-                menu.SetSelected(player, menu.GetFirstControl(player));
+                layer.SetSelected(player, layer.GetFirstControl(player));
         }
 
         protected void DoKeyRight()
@@ -80,21 +80,21 @@ namespace Phantom.Menus
                 keyTimeOut -= 0.1f;
 
 
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null && selected.Left != null)
             {
-                MenuControl current = selected;
+                UIElement current = selected;
                 selected = selected.Right;
                 while (selected.Right != null && !selected.CanUse(player) && selected != current)
                     selected = selected.Right;
                 if (!selected.Enabled)
                     selected = current;
-                menu.SetSelected(player, selected);
+                layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(MenuControl.ClickType.NextOption, player);
+                selected.Click(UIElement.ClickType.NextOption, player);
             else
-                menu.SetSelected(player, menu.GetFirstControl(player));
+                layer.SetSelected(player, layer.GetFirstControl(player));
 
         }
 
@@ -106,21 +106,21 @@ namespace Phantom.Menus
             if (keyTimeOut > 0.2f)
                 keyTimeOut -= 0.1f;
 
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null && selected.Above != null)
             {
-                MenuControl current = selected;
+                UIElement current = selected;
                 selected = selected.Above;
                 while (selected.Above != null && !selected.CanUse(player) && selected != current)
                     selected = selected.Above;
                 if (!selected.Enabled)
                     selected = current;
-                menu.SetSelected(player, selected);
+                layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(MenuControl.ClickType.NextOption, player);
+                selected.Click(UIElement.ClickType.NextOption, player);
             else
-                menu.SetSelected(player, menu.GetFirstControl(player));
+                layer.SetSelected(player, layer.GetFirstControl(player));
         }
 
         protected void DoKeyDown()
@@ -132,40 +132,40 @@ namespace Phantom.Menus
                 keyTimeOut -= 0.1f;
 
 
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null && selected.Above != null)
             {
-                MenuControl current = selected;
+                UIElement current = selected;
                 selected = selected.Below;
                 while (selected.Below != null && !selected.CanUse(player) && selected != current)
                     selected = selected.Below;
                 if (!selected.Enabled)
                     selected = current;
-                menu.SetSelected(player, selected);
+                layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(MenuControl.ClickType.PreviousOption, player);
-            else if (menu.Controls.Count > 0)
-                menu.SetSelected(player, menu.Controls[0]);
+                selected.Click(UIElement.ClickType.PreviousOption, player);
+            else if (layer.Controls.Count > 0)
+                layer.SetSelected(player, layer.Controls[0]);
         }
 
         protected void StartPress()
         {
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null)
                 selected.StartPress(player);
         }
 
         protected void EndPress()
         {
-            MenuControl selected = menu.GetSelected(player);
+            UIElement selected = layer.GetSelected(player);
             if (selected != null)
                 selected.EndPress(player);
         }
 
         protected void DoKeyBack()
         {
-            menu.Back();
+            layer.Back();
         }
        
     }

@@ -6,15 +6,15 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Utils;
 
-namespace Phantom.Menus
+namespace Phantom.GameUI
 {
-    public class MenuControlTweener : Component
+    public class UITweener : Component
     {
         //TODO Should operate on alpha, orientation and scale as well?
         private Vector2 positionIn;
         private Vector2 positionOut;
         private TweenState state;
-        private MenuControl control;
+        private UIElement control;
         private float tween;
         private float speedIn;
         private float speedOut;
@@ -23,7 +23,7 @@ namespace Phantom.Menus
         private bool reverse = false;
 
 
-        public MenuControlTweener(Vector2 positionOut, TweenState state, float tween, TweenFunction functionIn, float speedIn, TweenFunction functionOut, float speedOut)
+        public UITweener(Vector2 positionOut, TweenState state, float tween, TweenFunction functionIn, float speedIn, TweenFunction functionOut, float speedOut)
         {
             this.positionOut = positionOut;
             this.state = state;
@@ -34,13 +34,13 @@ namespace Phantom.Menus
             this.speedOut = speedOut;
         }
 
-        public MenuControlTweener(Vector2 positionOut, TweenState state, float tween, TweenFunction function, float speedIn, float speedOut)
+        public UITweener(Vector2 positionOut, TweenState state, float tween, TweenFunction function, float speedIn, float speedOut)
             : this(positionOut, state, tween, function, speedIn, function, speedOut) { }
 
-        public MenuControlTweener(Vector2 positionOut, TweenState state, float tween, TweenFunction function, float speed)
+        public UITweener(Vector2 positionOut, TweenState state, float tween, TweenFunction function, float speed)
             : this(positionOut, state, tween, function, speed, function, speed) { }
 
-        public MenuControlTweener(Vector2 positionOut, TweenState state, TweenFunction function, float speed)
+        public UITweener(Vector2 positionOut, TweenState state, TweenFunction function, float speed)
             : this(positionOut, state, 0, function, speed, function, speed) 
         {
             switch (state)
@@ -59,7 +59,7 @@ namespace Phantom.Menus
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            control = parent as MenuControl;
+            control = parent as UIElement;
             if (control == null)
                 throw new Exception("MenuControlTweener must be added to a MenuControl component.");
 
