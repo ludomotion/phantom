@@ -447,8 +447,10 @@ namespace Phantom.Menus
             {
                 if (Controls[i].Shape != null)
                 {
-                    if (Controls[i].Shape.InShape(position))
+                    if (!(Controls[i] is MenuContainerContent) && Controls[i].Shape.InShape(position))
+                    {
                         return Controls[i];
+                    }
                 }
             }
             return null;

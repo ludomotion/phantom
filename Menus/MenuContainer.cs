@@ -8,12 +8,20 @@ using Phantom.Utils;
 
 namespace Phantom.Menus
 {
+    /// <summary>
+    /// A Menu Control that can hold MenuContainerContent instances. Useful for inventory or draggable options
+    /// </summary>
     public class MenuContainer : MenuControl
     {
         /// <summary>
-        /// The buttons visible caption
+        /// The control's visible caption
         /// </summary>
         public string Caption;
+
+        /// <summary>
+        /// The container's current content
+        /// </summary>
+        public MenuContainerContent Content;
 
         public MenuContainer(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
@@ -42,7 +50,7 @@ namespace Phantom.Menus
                 GraphicsUtils.DrawShape(info, this.Position, this.Shape, face, text, 2);
 
                 size.X *= -0.5f;
-                size.Y = this.Shape.RoughWidth * 0.5f + 2;
+                size.Y = this.Shape.RoughWidth * 0.5f;
                 info.Batch.DrawString(Menu.Font, Caption, Position + size, text);
             }
         }

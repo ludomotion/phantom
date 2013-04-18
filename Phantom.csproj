@@ -107,12 +107,13 @@
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="Menus\MenuContainer.cs" />
-    <Compile Include="Menus\MenuInputKeyboardShortCuts.cs" />
+    <Compile Include="Menus\MenuContainerContent.cs" />
+    <Compile Include="Menus\MenuInputKeyboard.cs" />
     <Compile Include="Menus\MenuControlTweener.cs" />
     <Compile Include="Menus\MenuDesigner.cs" />
     <Compile Include="Menus\MenuInputGamePad.cs" />
     <Compile Include="Menus\MenuInputBase.cs" />
-    <Compile Include="Menus\MenuInputKeyboard.cs" />
+    <Compile Include="Menus\MenuInputKeyboardShortCuts.cs" />
     <Compile Include="Menus\Menu.cs" />
     <Compile Include="Menus\MenuButton.cs" />
     <Compile Include="Menus\MenuControl.cs" />
