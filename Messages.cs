@@ -48,7 +48,7 @@ namespace Phantom
         public const int Select = 310;
         public const int Deselect = 311;
         public const int DoMouseCommand = 312;
-        public const int MouseCommandSelected = 313;
+        public const int ToolSelected = 313;
         public const int TweenIn = 350;
         public const int TweenOut = 351;
 

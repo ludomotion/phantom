@@ -54,7 +54,7 @@ namespace Phantom.GameUI
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
-            Parent.HandleMessage(Messages.MouseCommandSelected, "Select");
+            Parent.HandleMessage(Messages.ToolSelected, "Select");
 
         }
 
@@ -117,7 +117,7 @@ namespace Phantom.GameUI
         {
             foreach (Entity e in selected)
                 e.HandleMessage(Messages.DoMouseCommand, mouseCommand);
-            Parent.HandleMessage(Messages.MouseCommandSelected, "Select");
+            Parent.HandleMessage(Messages.ToolSelected, "Select");
         }
 
         private void SelectAll(Vector2 corner1, Vector2 corner2)
@@ -165,7 +165,7 @@ namespace Phantom.GameUI
         {
             switch (message)
             {
-                case Messages.MouseCommandSelected:
+                case Messages.ToolSelected:
                     Command = (string)data;
                     return MessageResult.HANDLED;
             }

@@ -103,7 +103,7 @@
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\InputComponent.cs" />
     <Compile Include="Core\PropertyCollection.cs" />
-    <Compile Include="GameUI\MouseCommandButton.cs" />
+    <Compile Include="GameUI\ToolButton.cs" />
     <Compile Include="GameUI\UIMouseEntityHandler.cs" />
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Graphics\Particles\Particle.cs" />

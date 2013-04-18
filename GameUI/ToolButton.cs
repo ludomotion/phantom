@@ -8,12 +8,12 @@ using Phantom.Utils;
 
 namespace Phantom.GameUI
 {
-    public class MouseCommandButton : Button
+    public class ToolButton : Button
     {
-        public bool SelectedCommand = false;
-        private float currentSelectedCommand = 0;
+        public bool SelectedTool = false;
+        private float currentSelectedTool = 0;
 
-        public MouseCommandButton(string name, string caption, Vector2 position, Shape shape)
+        public ToolButton(string name, string caption, Vector2 position, Shape shape)
             : base(name, caption, position, shape)
         {
         }
@@ -24,18 +24,18 @@ namespace Phantom.GameUI
             {
                 UILayer layer = this.GetAncestor<UILayer>();
                 if (layer != null)
-                    layer.HandleMessage(Messages.MouseCommandSelected, this.Name);
-                SelectedCommand = true;
+                    layer.HandleMessage(Messages.ToolSelected, this.Name);
+                SelectedTool = true;
             }
         }
 
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (SelectedCommand)
-                currentSelectedCommand += Math.Min(1 - currentSelectedCommand, elapsed * selectSpeed);
+            if (SelectedTool)
+                currentSelectedTool += Math.Min(1 - currentSelectedTool, elapsed * selectSpeed);
             else
-                currentSelectedCommand -= Math.Min(currentSelectedCommand, elapsed * deselectSpeed);
+                currentSelectedTool -= Math.Min(currentSelectedTool, elapsed * deselectSpeed);
         }
 
 
@@ -49,7 +49,7 @@ namespace Phantom.GameUI
             if (UILayer.Font != null && Visible)
             {
                 Vector2 size = UILayer.Font.MeasureString(Caption);
-                Color face = Color.Lerp(UILayer.ColorFace, UILayer.ColorFaceHighLight, this.currentSelectedCommand);
+                Color face = Color.Lerp(UILayer.ColorFace, UILayer.ColorFaceHighLight, this.currentSelectedTool);
                 Color text = Color.Lerp(UILayer.ColorText, UILayer.ColorTextHighLight, this.currentSelected);
 
                 if (!Enabled)
@@ -60,6 +60,7 @@ namespace Phantom.GameUI
 
                 GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, UILayer.ColorShadow, 2);
                 float down = this.pressed > 0 ? 0 : 2;
+                down = Math.Min(2-currentSelectedTool, down);
                 GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
 
                 info.Batch.DrawString(UILayer.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
@@ -70,8 +71,8 @@ namespace Phantom.GameUI
         {
             switch (message)
             {
-                case Messages.MouseCommandSelected:
-                    SelectedCommand = ((string)data == this.Name);
+                case Messages.ToolSelected:
+                    SelectedTool = ((string)data == this.Name);
                     return MessageResult.HANDLED;
             }
             return base.HandleMessage(message, data);
