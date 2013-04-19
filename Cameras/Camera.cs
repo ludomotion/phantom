@@ -64,5 +64,20 @@ namespace Phantom.Cameras
             }
             return base.HandleMessage(message, data);
         }
+
+		public Matrix CreateMatrix(float width, float height)
+		{
+			Matrix result = Matrix.Identity;
+			if (this.Zoom != 1)
+			{
+				result *= Matrix.CreateTranslation(-new Vector3(this.Position + this.Focus, 0));
+				result *= Matrix.CreateScale(this.Zoom, this.Zoom, 1);
+				result *= Matrix.CreateRotationZ(this.Orientation);
+				result *= Matrix.CreateTranslation(new Vector3(this.Position + this.Focus, 0));
+
+			}
+			result *= Matrix.CreateTranslation(width * .5f - this.Position.X, height * .5f - this.Position.Y, 0);
+			return result;
+		}
     }
 }

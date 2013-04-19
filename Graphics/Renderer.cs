@@ -227,17 +227,8 @@ namespace Phantom.Graphics
             info.World = Matrix.Identity;
             if (this.layer != null && this.layer.Camera != null && (this.Options & RenderOptions.IgnoreCamera) == 0)
             {
-                Camera c = this.layer.Camera;
-                if (c.Zoom != 1)
-                {
-                    info.World *= Matrix.CreateTranslation(-new Vector3(c.Position + c.Focus, 0));
-                    info.World *= Matrix.CreateScale(c.Zoom, c.Zoom, 1);
-					info.World *= Matrix.CreateRotationZ(c.Orientation);
-					info.World *= Matrix.CreateTranslation(new Vector3(c.Position + c.Focus, 0));
-
-                }
-                info.World *= Matrix.CreateTranslation(info.Width * .5f - c.Position.X, info.Height * .5f - c.Position.Y, 0);
-                info.Camera = c;
+				info.Camera = this.layer.Camera;
+				info.World *= info.Camera.CreateMatrix(info.Width, info.Height);
             }
 
 
