@@ -721,31 +721,34 @@ namespace Phantom.Utils
                 int x = (int)Math.Floor(mousePosition.X / layers[currentLayer].TileSize);
                 int y = (int)Math.Floor(mousePosition.Y / layers[currentLayer].TileSize);
                 int index = x + y * tilesX;
-                if (drawingType != null)
+                if (index >= 0 && index < tileMap.Length)
                 {
-                    if (tileMap[index] != null && tileMap[index].GetType() != drawingType.GetType()) 
+                    if (drawingType != null)
                     {
-                        tileMap[index].Destroyed = true;
-                        entities.RemoveComponent(tileMap[index]);
-                        tileMap[index] = null;
-                    }
+                        if (tileMap[index] != null && tileMap[index].GetType() != drawingType.GetType())
+                        {
+                            tileMap[index].Destroyed = true;
+                            entities.RemoveComponent(tileMap[index]);
+                            tileMap[index] = null;
+                        }
 
-                    if (tileMap[index] == null)
-                    {
-                        Entity entity = EntityFactory.AssembleEntity(drawingType, drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, ""));
-                        entity.Position = SnapPosition(mousePosition);
-                        entity.Properties.Ints["isTile"] = 1;
-                        entities.AddComponent(entity);
-                        tileMap[index] = entity;
+                        if (tileMap[index] == null)
+                        {
+                            Entity entity = EntityFactory.AssembleEntity(drawingType, drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, ""));
+                            entity.Position = SnapPosition(mousePosition);
+                            entity.Properties.Ints["isTile"] = 1;
+                            entities.AddComponent(entity);
+                            tileMap[index] = entity;
+                        }
                     }
-                }
-                else
-                {
-                    if (tileMap[index] != null)
+                    else
                     {
-                        tileMap[index].Destroyed = true;
-                        entities.RemoveComponent(tileMap[index]);
-                        tileMap[index] = null;
+                        if (tileMap[index] != null)
+                        {
+                            tileMap[index].Destroyed = true;
+                            entities.RemoveComponent(tileMap[index]);
+                            tileMap[index] = null;
+                        }
                     }
                 }
             }
