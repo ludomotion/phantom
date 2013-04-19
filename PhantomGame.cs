@@ -222,8 +222,12 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
-			if (XnaGame.IsActive) { // To prevent a MonoMac bug on exit
-				int startIndex;
+#if MACOS
+			// To prevent a MonoMac bug on exit
+			if (XnaGame.IsActive) 
+				return;
+#endif
+			int startIndex;
 #if DEBUG // Update Profiler
 				Profiler.Instance.BeginRender ();
 #endif
@@ -240,8 +244,7 @@ namespace Phantom
 #if DEBUG // Update Profiler
 				Profiler.Instance.EndRender ();
 #endif
-			}
-        }
+		}
 
         protected override void OnComponentAdded(Component component)
         {
