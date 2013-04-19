@@ -823,7 +823,7 @@ namespace Phantom.Utils
                         }
                         else if (entity == hoveringEntity)
                         {
-                            string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, hoveringEntity.GetType().Name);
+                            string name = hoveringEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, hoveringEntity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
                         }
