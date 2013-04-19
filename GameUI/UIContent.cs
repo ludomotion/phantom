@@ -120,7 +120,7 @@ namespace Phantom.GameUI
                 else
                 {
                     if (tween == 0)
-                        State = UIContentState.Floating;
+                        DropAt(targetPosition);
                     else
                         Position = Vector2.Lerp(targetPosition, moveOrigin, MoveTween(tween));
                 }

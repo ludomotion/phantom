@@ -72,7 +72,7 @@ namespace Phantom.GameUI
                 //try swap
                 if (content.LastContainer != null)
                 {
-                    if (content.LastContainer.CanAccept(this.content) && this.content.CanDockAt(content.LastContainer))
+                    if (content.LastContainer.CanAccept(this.content) && this != content.LastContainer && this.content.CanDockAt(content.LastContainer))
                         this.content.MoveTo(content.LastContainer);
                     else
                         return false;
