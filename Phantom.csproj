@@ -130,9 +130,10 @@
     <Compile Include="Misc\Components\MessageDelegate.cs" />
     <Compile Include="Misc\DebugLayer.cs" />
     <Compile Include="Misc\DeviceHardware.cs" />
-    <Compile Include="Misc\MathUtils.cs" />
-    <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
+    <Compile Include="Misc\PhantomUtils.Graphics.cs" />
+    <Compile Include="Misc\PhantomUtils.Math.cs" />
+    <Compile Include="Misc\PhantomUtils.Misc.cs" />
     <Compile Include="Misc\Tests\RendererCanvasTest.cs" />
     <Compile Include="Misc\Triangulator.cs" />
     <Compile Include="Physics\Components\Atractor.cs" />
@@ -151,8 +152,6 @@
     <Compile Include="Graphics\ShapeRenderer.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\SpriteRenderer.cs" />
-    <Compile Include="Misc\DrawUtils.cs" />
-    <Compile Include="Misc\VectorUtils.cs" />
     <Compile Include="Misc\XnaPhantomComponent.cs" />
     <Compile Include="PhantomGame.cs" />
     <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
@@ -182,7 +181,6 @@
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityFactory.cs" />
     <Compile Include="Utils\EntityMap.cs" />
-    <Compile Include="Utils\GraphicsUtils.cs" />
     <Compile Include="Utils\MapLoader.cs" />
     <Compile Include="Utils\Performance\Profiler.cs" />
     <Compile Include="Utils\Performance\ProfilerNode.cs" />

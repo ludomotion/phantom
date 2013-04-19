@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
+using Phantom.Misc;
 
 namespace Phantom.GameUI
 {
@@ -49,7 +50,7 @@ namespace Phantom.GameUI
                     text = UILayer.ColorFace;
                 }
 
-                GraphicsUtils.DrawShape(info, this.Position, this.Shape, face, text, 2);
+				PhantomUtils.DrawShape(info, this.Position, this.Shape, face, text, 2);
 
                 size.X *= -0.5f;
                 size.Y = this.Shape.RoughWidth * 0.5f;

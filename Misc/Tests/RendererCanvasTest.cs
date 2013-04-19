@@ -244,9 +244,9 @@ namespace Phantom.Misc.Tests
 
         private void GenerateColors()
         {
-            this.one = DrawUtils.Colors[PhantomGame.Randy.Next(DrawUtils.Colors.Count)];
-            this.two = DrawUtils.Colors[PhantomGame.Randy.Next(DrawUtils.Colors.Count)];
-            this.six = DrawUtils.Colors[PhantomGame.Randy.Next(DrawUtils.Colors.Count)];
+			this.one = PhantomUtils.Colors[PhantomGame.Randy.Next(PhantomUtils.Colors.Count)];
+			this.two = PhantomUtils.Colors[PhantomGame.Randy.Next(PhantomUtils.Colors.Count)];
+			this.six = PhantomUtils.Colors[PhantomGame.Randy.Next(PhantomUtils.Colors.Count)];
         }
 
         private void NextResolution()

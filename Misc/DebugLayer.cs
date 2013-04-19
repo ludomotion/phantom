@@ -163,7 +163,7 @@ namespace Phantom.Misc
         {
             if (this.Color.ContainsKey(name))
                 return this.Color[name];
-            Color c = DrawUtils.Colors[Math.Abs(name.GetHashCode()*2) % DrawUtils.Colors.Count];
+			Color c = PhantomUtils.Colors[Math.Abs(name.GetHashCode() * 2) % PhantomUtils.Colors.Count];
             c.A = 255;
             return c;
         }

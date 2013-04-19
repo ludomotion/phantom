@@ -502,7 +502,7 @@ namespace Phantom.Misc
                     if (common == null)
                         common = command + ' ';
                     else
-                        common = MiscUtils.FindOverlap(common, command);
+                        common = PhantomUtils.FindOverlap(common, command);
                 }
 
                 // Found a common text:

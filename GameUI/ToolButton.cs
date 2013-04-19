@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
+using Phantom.Misc;
 
 namespace Phantom.GameUI
 {
@@ -58,10 +59,10 @@ namespace Phantom.GameUI
                     text = UILayer.ColorTextDisabled;
                 }
 
-                GraphicsUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, UILayer.ColorShadow, 2);
+				PhantomUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, UILayer.ColorShadow, 2);
                 float down = this.pressed > 0 ? 0 : 2;
                 down = Math.Min(2-currentSelectedTool, down);
-                GraphicsUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
+				PhantomUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
 
                 info.Batch.DrawString(UILayer.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
             }

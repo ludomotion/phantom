@@ -168,7 +168,7 @@ namespace Phantom.Shapes
             Vector2 intersection = new Vector2();
             for (int i = 0; i < this.Vertices.Length; i++)
             {
-                if (MathUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point - this.Entity.Position, Vector2.Zero, ref intersection))
+				if (PhantomUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point - this.Entity.Position, Vector2.Zero, ref intersection))
                     return intersection + this.Entity.Position;
             }
 
@@ -183,7 +183,7 @@ namespace Phantom.Shapes
             float dist = float.MaxValue;
             for (int i = 0; i < this.Vertices.Length; i++)
             {
-                Vector2 v = MathUtils.ClosestPointOnLine(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point);
+				Vector2 v = PhantomUtils.ClosestPointOnLine(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point);
                 float d = (v-point).LengthSquared();
                 if (d < dist)
                 {
