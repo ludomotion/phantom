@@ -40,11 +40,15 @@ namespace Phantom.Utils
             public Component Layer;
             public string Name;
             public LayerType Type;
-            public EditorLayer(Component layer, string name, LayerType type)
+            public Dictionary<string, PCNComponent> EntityList;
+            public int TileSize;
+            public EditorLayer(Component layer, string name, LayerType type, Dictionary<string, PCNComponent> entityList, int tileSize)
             {
                 this.Layer = layer;
                 this.Name = name;
                 this.Type = type;
+                this.EntityList = entityList;
+                this.TileSize = tileSize;
             }
         }
 
@@ -59,7 +63,7 @@ namespace Phantom.Utils
         private int tilesY;
 
         private Entity drawingEntity;
-        private Type drawingType;
+        private PCNComponent drawingType;
         private Entity hoveringEntity;
         private Entity selectedEntity;
 
@@ -69,17 +73,16 @@ namespace Phantom.Utils
         private KeyboardState previousKeyboard = Keyboard.GetState();
 
         private PhWindow layerWindow;
-        private PhWindow entitiesWindow;
-        private PhWindow tilesWindow;
         private PhWindow propertiesWindow;
+        private PhWindow entitiesWindow;
         private PhWindow main;
         private PhControl windows;
         private Component propertiesWindowTarget;
 
 
-        public static void Initialize(SpriteFont font, float tileSize, Type[] tiles, Type[] entities)
+        public static void Initialize(SpriteFont font)
         {
-            MapLoader.Initialize(tileSize, tiles, entities);
+            MapLoader.Initialize();
             GUISettings.Initialize(font);
             PhantomGame.Game.Console.Register("editor", "Opens editor window.", delegate(string[] argv)
             {
@@ -109,13 +112,13 @@ namespace Phantom.Utils
                 if (c.Properties != null && c.Properties.GetString("editable", null) != null)
                 {
                     string name = c.Properties.GetString("editable", null);
-                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties));
+                    layers.Add(new EditorLayer(c, name + " (Properties)", LayerType.Properties, null, 0));
                     if (c is EntityLayer)
                     {
-                        if (MapLoader.TileList != null && c.Properties.GetBoolean("tiles", false))
-                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles));
-                        if (MapLoader.EntityList != null && c.Properties.GetBoolean("entities", false))
-                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities));
+                        if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("tileList", "")))
+                            layers.Add(new EditorLayer(c, name + " (Tiles)", LayerType.Tiles, MapLoader.EntityLists[c.Properties.GetString("tileList", "")], c.Properties.GetInt("tileSize", 0)));
+                        if (MapLoader.EntityLists.ContainsKey(c.Properties.GetString("entityList", "")))
+                            layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities, MapLoader.EntityLists[c.Properties.GetString("entityList", "")], 0));
                     }
                 }
                 
@@ -161,33 +164,23 @@ namespace Phantom.Utils
             for (int i = 0; i < layers.Count; i++)
                 layerWindow.AddComponent(new PhButton(10, 30+i*32, 480, 24, layers[i].Name, SelectLayer));
             windows.AddComponent(layerWindow);
+        }
 
-            tilesWindow = new PhWindow(100, 100, 500, 500, "Tiles");
-            tilesWindow.Ghost = true;
-            int x = 10;
-            y = 30;
-            tilesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
-            y += 32;
-            for (int i = 0; i < MapLoader.TileList.Length; i++)
-            {
-                tilesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.ShortTypeName(MapLoader.TileList[i]), SelectEntity));
-                y += 32;
-                if (y > 500 - 32)
-                {
-                    x += 168;
-                    y = 30;
-                }
-            }
-            windows.AddComponent(tilesWindow);
-
-
-            entitiesWindow = new PhWindow(100, 100, 500, 500, "Entities");
+        private PhWindow BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, bool includeNone, string name)
+        {
+            entitiesWindow = new PhWindow(100, 100, 500, 500, name);
             entitiesWindow.Ghost = true;
-            x = 10;
-            y = 30;
-            for (int i = 0; i < MapLoader.EntityList.Length; i++)
+            int x = 10;
+            int y = 30;
+            if (includeNone)
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, MapLoader.ShortTypeName(MapLoader.EntityList[i]), SelectEntity));
+                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
+                y += 32;
+            }
+
+            foreach (KeyValuePair<string, PCNComponent> entity in entityList)
+            {
+                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entity.Key, SelectEntity));
                 y += 32;
                 if (y > 500 - 32)
                 {
@@ -195,16 +188,34 @@ namespace Phantom.Utils
                     y = 30;
                 }
             }
-            windows.AddComponent(entitiesWindow);
 
+            entitiesWindow.OnClose = CloseEntityWindow;
+            return entitiesWindow;
+        }
+
+        private void CloseEntityWindow(PhControl sender)
+        {
+            if (entitiesWindow != null)
+            {
+                windows.RemoveComponent(entitiesWindow);
+                entitiesWindow = null;
+            }
         }
 
         private void StartSelectEntity(PhControl sender)
         {
             if (layers[currentLayer].Type == LayerType.Tiles)
-                tilesWindow.Show();
+            {
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, true, "Tiles");
+                windows.AddComponent(window);
+                window.Show();
+            }
             if (layers[currentLayer].Type == LayerType.Entities)
-                entitiesWindow.Show();
+            {
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, false, "Entities");
+                windows.AddComponent(window);
+                window.Show();
+            }
         }
 
         private void StartSelectLayer(PhControl sender)
@@ -262,35 +273,18 @@ namespace Phantom.Utils
         private void SelectEntity(PhControl sender)
         {
             PhButton button = sender as PhButton;
-            if (layers[currentLayer].Type == LayerType.Tiles)
+            if (layers[currentLayer].EntityList != null)
             {
                 drawingType = null;
                 drawingEntity = null;
-                for (int i = 0; i < MapLoader.TileList.Length; i++)
+                if (layers[currentLayer].EntityList.ContainsKey(button.Text))
                 {
-                    if (MapLoader.ShortTypeName(MapLoader.TileList[i]) == button.Text)
-                    {
-                        drawingType = MapLoader.TileList[i];
-                        drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
-                        break;
-                    }
+                    drawingType = layers[currentLayer].EntityList[button.Text];
+                    drawingEntity = EntityFactory.AssembleEntity(drawingType, button.Text);
+                    drawingEntity.Position = mousePosition;
                 }
-                tilesWindow.Hide();
             }
-            else
-            {
-                for (int i = 0; i < MapLoader.EntityList.Length; i++)
-                {
-                    if (MapLoader.ShortTypeName(MapLoader.EntityList[i]) == button.Text)
-                    {
-                        drawingType = MapLoader.EntityList[i];
-                        drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
-                        break;
-                    }
-                }
-                entitiesWindow.Hide();
-            }
-
+            (button.Parent as PhWindow).Hide();
         }
 
         private void SelectLayer(PhControl sender)
@@ -332,8 +326,8 @@ namespace Phantom.Utils
 
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
-                tilesX = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.X / MapLoader.TileSize);
-                tilesY = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.Y / MapLoader.TileSize);
+                tilesX = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.X / layers[currentLayer].TileSize);
+                tilesY = (int)Math.Ceiling(((EntityLayer)layers[currentLayer].Layer).Bounds.Y / layers[currentLayer].TileSize);
                 tileMap = MapLoader.ConstructTileMap((EntityLayer)layers[currentLayer].Layer);
             }
         }
@@ -425,20 +419,10 @@ namespace Phantom.Utils
                 }
                 if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
                 {
-                    if (layers[currentLayer].Type == LayerType.Entities)
-                    {
-                        if (entitiesWindow.Ghost)
-                            entitiesWindow.Show();
-                        else
-                            entitiesWindow.Hide();
-                    }
-                    if (layers[currentLayer].Type == LayerType.Tiles)
-                    {
-                        if (tilesWindow.Ghost)
-                            tilesWindow.Show();
-                        else
-                            tilesWindow.Hide();
-                    }
+                    if (entitiesWindow == null)
+                        StartSelectEntity(null);
+                    else
+                        entitiesWindow.Hide();
                 }
                 if (currentKeyboard.IsKeyDown(Keys.Escape) && previousKeyboard.IsKeyUp(Keys.Escape))
                 {
@@ -465,8 +449,12 @@ namespace Phantom.Utils
 
         private Vector2 SnapPosition(Vector2 position)
         {
-            position.X = (float)Math.Floor(position.X / MapLoader.TileSize) * MapLoader.TileSize + MapLoader.TileSize * 0.5f;
-            position.Y = (float)Math.Floor(position.Y / MapLoader.TileSize) * MapLoader.TileSize + MapLoader.TileSize * 0.5f;
+            int ts = layers[currentLayer].TileSize;
+            if (ts > 0)
+            {
+                position.X = (float)Math.Floor(position.X / ts) * ts + ts * 0.5f;
+                position.Y = (float)Math.Floor(position.Y / ts) * ts + ts * 0.5f;
+            }
             return position;
         }
 
@@ -502,8 +490,10 @@ namespace Phantom.Utils
             {
                 mouseOffset = hoveringEntity.Position - mousePosition;
                 selectedEntity = hoveringEntity;
-                drawingType = selectedEntity.GetType();
-                drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                string blueprintName = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                drawingType = layers[currentLayer].EntityList[blueprintName];
+                drawingEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
+                drawingEntity.Position = mousePosition;
                 CopyProperties(selectedEntity, drawingEntity);
                 //Randomize the seed if there is any
                 if (drawingEntity.Properties.GetInt("Seed", -1) > 0)
@@ -515,7 +505,9 @@ namespace Phantom.Utils
             else if (drawingType != null) //Drawing
             {
                 EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
-                selectedEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
+                string blueprintName = drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                selectedEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
+                selectedEntity.Position = mousePosition;
                 entities.AddComponent(selectedEntity);
                 hoveringEntity = selectedEntity;
                 CopyProperties(drawingEntity, selectedEntity);
@@ -554,7 +546,7 @@ namespace Phantom.Utils
         private void MouseRightDownEntities()
         {
             if (selectedEntity!=null) {
-                CreatePropertiesWindow(MapLoader.ShortTypeName(selectedEntity.GetType()), selectedEntity);
+                CreatePropertiesWindow(selectedEntity.GetType().Name, selectedEntity);
             }
         }
 
@@ -718,8 +710,8 @@ namespace Phantom.Utils
             EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
             if (entities != null)
             {
-                int x = (int)Math.Floor(mousePosition.X / MapLoader.TileSize);
-                int y = (int)Math.Floor(mousePosition.Y / MapLoader.TileSize);
+                int x = (int)Math.Floor(mousePosition.X / layers[currentLayer].TileSize);
+                int y = (int)Math.Floor(mousePosition.Y / layers[currentLayer].TileSize);
                 int index = x + y * tilesX;
                 if (drawingType != null)
                 {
@@ -732,7 +724,8 @@ namespace Phantom.Utils
 
                     if (tileMap[index] == null)
                     {
-                        Entity entity = (Entity)Activator.CreateInstance(drawingType, SnapPosition(mousePosition));
+                        Entity entity = EntityFactory.AssembleEntity(drawingType, drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, ""));
+                        entity.Position = SnapPosition(mousePosition);
                         entity.Properties.Ints["isTile"] = 1;
                         entities.AddComponent(entity);
                         tileMap[index] = entity;
@@ -757,21 +750,17 @@ namespace Phantom.Utils
             EntityLayer entities = layers[currentLayer].Layer as EntityLayer;
             if (entities != null)
             {
-                int x = (int)Math.Floor(mousePosition.X / MapLoader.TileSize);
-                int y = (int)Math.Floor(mousePosition.Y / MapLoader.TileSize);
+                int x = (int)Math.Floor(mousePosition.X / layers[currentLayer].TileSize);
+                int y = (int)Math.Floor(mousePosition.Y / layers[currentLayer].TileSize);
                 int index = x + y * tilesX;
                 Entity entity = tileMap[index];
                 if (entity != null)
                 {
-                    for (int i = 0; i < MapLoader.TileList.Length; i++)
-                    {
-                        if (MapLoader.TileList[i] == entity.GetType())
-                        {
-                            drawingType = MapLoader.TileList[i];
-                            drawingEntity = (Entity)Activator.CreateInstance(drawingType, mousePosition);
-                            return;
-                        }
-                    }
+                    string blueprintName = entity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                    drawingType = layers[currentLayer].EntityList[blueprintName];
+                    drawingEntity = EntityFactory.AssembleEntity(drawingType, blueprintName);
+                    drawingEntity.Position = mousePosition;
+                    return;
                 }
                 drawingEntity = null;
                 drawingType = null;
@@ -817,13 +806,13 @@ namespace Phantom.Utils
                     {
                         if (entity == selectedEntity)
                         {
-                            string name = MapLoader.ShortTypeName(selectedEntity.GetType());
+                            string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, entity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Yellow);
                         }
                         else if (entity == hoveringEntity)
                         {
-                            string name = MapLoader.ShortTypeName(hoveringEntity.GetType());
+                            string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, hoveringEntity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
                             info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
                         }
@@ -838,7 +827,7 @@ namespace Phantom.Utils
                 if (drawingEntity != null && hoveringEntity == null)
                 {
                     DrawEntity(info, topLeft, drawingEntity);
-                    string name = MapLoader.ShortTypeName(drawingEntity.GetType());
+                    string name = drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, drawingEntity.GetType().Name); ;
                     Vector2 size = font.MeasureString(name);
                     info.Batch.DrawString(font, name, drawingEntity.Position - topLeft - size * 0.5f, Color.Red);
                 }
@@ -846,10 +835,10 @@ namespace Phantom.Utils
                 {
                     Vector2 pos = SnapPosition(mousePosition) - topLeft;
                     info.Canvas.Begin();
-                    info.Canvas.MoveTo(pos - Vector2.One * MapLoader.TileSize * 0.5f);
-                    info.Canvas.LineTo(pos + Vector2.One * MapLoader.TileSize * 0.5f);
-                    info.Canvas.MoveTo(pos + new Vector2(MapLoader.TileSize * 0.5f, -MapLoader.TileSize * 0.5f));
-                    info.Canvas.LineTo(pos + new Vector2(-MapLoader.TileSize * 0.5f, MapLoader.TileSize * 0.5f));
+                    info.Canvas.MoveTo(pos - Vector2.One * layers[currentLayer].TileSize * 0.5f);
+                    info.Canvas.LineTo(pos + Vector2.One * layers[currentLayer].TileSize * 0.5f);
+                    info.Canvas.MoveTo(pos + new Vector2(layers[currentLayer].TileSize * 0.5f, -layers[currentLayer].TileSize * 0.5f));
+                    info.Canvas.LineTo(pos + new Vector2(-layers[currentLayer].TileSize * 0.5f, layers[currentLayer].TileSize * 0.5f));
                     info.Canvas.Stroke();
                 }
             }
@@ -881,6 +870,7 @@ namespace Phantom.Utils
             }
             return topLeft;
         }
+
 
 
     }

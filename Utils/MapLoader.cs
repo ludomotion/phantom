@@ -17,23 +17,20 @@ using Trace = System.Console;
 
 namespace Phantom.Utils
 {
-    public class MapLoader
+    /// <summary>
+    /// Static class that handles loading and saving of maps from and to PCN format.
+    /// </summary>
+    public static class MapLoader
     {
-        public static Type[] TileList;
-        public static Type[] EntityList;
-        public static float TileSize;
-        //private static string filename;
+        /// <summary>
+        /// A dictionary containing dictionaries for entityLists
+        /// </summary>
+        public static Dictionary<string, Dictionary<string, PCNComponent>> EntityLists;
 
-        public static Dictionary<string,string> EmbeddedFiles;
-
-
-        public static void Initialize(float tileSize, Type[] tiles, Type[] entities)
+        public static void Initialize()
         {
-            MapLoader.EntityList = entities;
-            MapLoader.TileList = tiles;
+            EntityLists = new Dictionary<string, Dictionary<string, PCNComponent>>();
 
-            MapLoader.TileSize = tileSize;
-            EmbeddedFiles = new Dictionary<string,string>();
             PhantomGame.Game.Console.Register("savemap", "Saves the current map to file.", delegate(string[] argv)
             {
                 if (argv.Length < 2)
@@ -41,22 +38,37 @@ namespace Phantom.Utils
                 else
                     MapLoader.SaveMap(argv[1]);
             });
-            PhantomGame.Game.Console.Register("storemap", "Saves the current map to memory.", delegate(string[] argv)
-            {
-                if (argv.Length < 2)
-                    Trace.WriteLine("Filename expected!");
-                else
-                    MapLoader.StoreMap(argv[1]);
-            });
             PhantomGame.Game.Console.Register("openmap", "Loads the current map to file.", delegate(string[] argv)
             {
                 if (argv.Length < 2)
                     Trace.WriteLine("Filename expected!");
-                if (argv.Length == 2)
-                    MapLoader.OpenMap(argv[1], null);
-                else
-                    MapLoader.OpenMap(argv[1], argv[2]);
+                if (argv.Length >= 2)
+                    MapLoader.OpenMap(argv[1]);
             });
+        }
+
+        public static void OpenEntityList(string listname, string filename)
+        {
+            string data = null;
+            if (System.IO.File.Exists(filename))
+                data = System.IO.File.ReadAllText(filename);
+            if (data != null)
+            {
+                Dictionary<string, PCNComponent> entities = new Dictionary<string, PCNComponent>();
+                string[] lines = data.Split('\n');
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    int p = lines[i].IndexOf(' ');
+                    if (p > 0)
+                    {
+                        string name = lines[i].Substring(0, p);
+                        entities[name] = new PCNComponent(lines[i].Substring(p + 1));
+                    }
+                }
+                EntityLists[listname] = entities;
+            }
+            else
+                Trace.WriteLine("WARNING List not found! "+filename);
         }
 
         public static void SaveMap(string filename)
@@ -74,35 +86,14 @@ namespace Phantom.Utils
             state.Properties.Objects["filename"] = filename;
         }
 
-        public static void StoreMap(string filename)
-        {
-            GameState state = GetState();
-            string data = GetMapData();
-            EmbeddedFiles[filename] = data;
-            Trace.WriteLine("Map stored.");
 
-            if (state.Properties == null)
-                state.Properties = new PropertyCollection();
-            state.Properties.Objects["filename"] = filename;
-        }
-
+        
         public static void OpenMap(string filename)
         {
-            OpenMap(filename, null);
-        }
-
-        public static void OpenMap(string filename, string option)
-        {
             string data = null;
-            if (option != "file" && EmbeddedFiles.ContainsKey(filename))
+            if (System.IO.File.Exists(filename))
             {
-                data = EmbeddedFiles[filename];
-                Trace.WriteLine("Map recovered fromm memory.");
-            }
-            if (option != "stored")
-            {
-                if (System.IO.File.Exists(filename))
-                    data = System.IO.File.ReadAllText(filename);
+                data = System.IO.File.ReadAllText(filename);
                 Trace.WriteLine("Map opened from file.");
             }
             if (data != null)
@@ -134,10 +125,12 @@ namespace Phantom.Utils
             {
                 if (component.Properties != null && component.Properties.GetString("editable", null) != null)
                 {
-                    data += component.Properties.GetString("editable", "") + GetProperties(component.Properties) + '\n';
+                    data += "component "+component.Properties.GetString("editable", "") + "("+PhantomComponentNotation.PropertiesToPCNString(component.Properties) + ")\n";
 
                     if (component is EntityLayer)
-                        data += GetEntityData((EntityLayer)component) + '\n';
+                    {
+                        data += GetEntityData((EntityLayer)component) + "\n";
+                    }
                 }
             }
             return data;
@@ -145,8 +138,11 @@ namespace Phantom.Utils
 
         public static Entity[] ConstructTileMap(EntityLayer entityLayer)
         {
-            int width = (int)Math.Ceiling(entityLayer.Bounds.X/TileSize);
-            int height = (int)Math.Ceiling(entityLayer.Bounds.Y/TileSize);
+            int tileSize = entityLayer.Properties.GetInt("tileSize", 0);
+            if (tileSize <= 0)
+                return new Entity[] {};
+            int width = (int)Math.Ceiling(entityLayer.Bounds.X / tileSize);
+            int height = (int)Math.Ceiling(entityLayer.Bounds.Y / tileSize);
             Entity[] result = new Entity[width*height];
 
             foreach (Component component in entityLayer.Components)
@@ -156,8 +152,8 @@ namespace Phantom.Utils
                 {
                     if (entity.Properties.GetInt("isTile", 0) > 0)
                     {
-                        int x = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.X / TileSize), 0, width-1);
-                        int y = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.Y / TileSize), 0, height - 1);
+                        int x = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.X / tileSize), 0, width-1);
+                        int y = (int)MathHelper.Clamp((int)Math.Floor(entity.Position.Y / tileSize), 0, height - 1);
                         result[x + y * width] = entity;
                     }
                 }
@@ -170,14 +166,24 @@ namespace Phantom.Utils
         private static string GetEntityData(EntityLayer entityLayer)
         {
             string data = "";
-            if (entityLayer.Properties.GetBoolean("tiles", true))
+            string list = entityLayer.Properties.GetString("tiles", "");
+            int tileSize = entityLayer.Properties.GetInt("tileSize", 0);
+            if (list != "" && tileSize>0)
             {
-                int width = (int)Math.Ceiling(entityLayer.Bounds.X / TileSize);
-                int height = (int)Math.Ceiling(entityLayer.Bounds.Y / TileSize);
-                data += "tiles";
-                for (int i = 0; i < TileList.Length; i++)
-                    data += " " + ShortTypeName(TileList[i]);
-                data += "\n";
+                int width = (int)Math.Ceiling(entityLayer.Bounds.X / tileSize);
+                int height = (int)Math.Ceiling(entityLayer.Bounds.Y / tileSize);
+                data += "tiles [";
+                Dictionary<string, int> tileList = new Dictionary<string, int>();
+                int c = 0;
+                foreach(KeyValuePair<string, PCNComponent> tile in EntityLists[list])
+                {
+                    if (c > 0) 
+                        data += " ";
+                    data += tile.Key;
+                    tileList[tile.Key] = c;
+                    c++;
+                }
+                data += "]\n";
 
                 Entity[] tileMap = ConstructTileMap(entityLayer);
 
@@ -189,15 +195,9 @@ namespace Phantom.Utils
                         int index = x + y * width;
                         if (tileMap[index] != null)
                         {
-                            for (int i = 0; i < TileList.Length; i++)
-                            {
-                                if (TileList[i] == tileMap[index].GetType())
-                                {
-                                    tile = i;
-                                    break;
-                                }
-
-                            }
+                            string n = tileMap[index].Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, "");
+                            if (tileList.ContainsKey(n))
+                                tile = tileList[n];
                         }
                         string t = tile.ToString();
                         while (t.Length < 3) t = " " + t;
@@ -218,84 +218,29 @@ namespace Phantom.Utils
 
         public static string EntityString(Entity entity)
         {
-            string e = "entity " + ShortTypeName(entity.GetType()) + " " + Math.Round(entity.Position.X) + " " + Math.Round(entity.Position.Y) + " " + Math.Round(MathHelper.ToDegrees(entity.Orientation));
-            e += GetProperties(entity.Properties);
+            string e = "entity " + EntityFactory.InstanceToPCNString(entity);
             return e;
         }
 
-        private static string GetProperties(PropertyCollection properties)
+        private static void ParseProperties(Component component, PCNComponent description, int firstValue)
         {
-            string result = "";
-            foreach (KeyValuePair<string, int> property in properties.Ints)
+            for (int i = firstValue; i < description.Members.Count; i++)
             {
-                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
-                    result += " " + property.Key + "=" + property.Value.ToString();
-            }
-            foreach (KeyValuePair<string, float> property in properties.Floats)
-            {
-                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
-                    result += " " + property.Key + "=" + property.Value.ToString()+"f";
-            }
-            foreach (KeyValuePair<string, object> property in properties.Objects)
-            {
-                if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
-                {
-                    //TODO Escape spaces in a string
-                    if (property.Value is string)
-                        result += " " + property.Key + "=\"" + (string)property.Value + "\"";
-                    //TODO Creates Hex Representation?
-                    if (property.Value is Color)
-                        result += " " + property.Key + "=#" + ((Color)property.Value).A.ToString("X2") +((Color)property.Value).R.ToString("X2") +((Color)property.Value).G.ToString("X2") +((Color)property.Value).B.ToString("X2"); 
-                }
-            }
-            return result;
-        }
-
-        private static void ParseProperties(Component component, string[] values, int firstValue)
-        {
-            for (int i = firstValue; i < values.Length; i++)
-            {
-                string[] member = values[i].Split('=');
-                if (member.Length >= 2)
-                {
-                    if (member[1].EndsWith("f"))
-                    {
-                        //float
-                        float f = 0;
-                        float.TryParse(member[1].Substring(0, member[1].Length - 1), out f);
-                        component.Properties.Floats[member[0]] = f;
-                    }
-                    else if (member[1].StartsWith("\""))
-                    {
-                        //string
-                        //TODO Unescape spaces
-                        component.Properties.Objects[member[0]] = member[1].Substring(1, member[1].Length - 2);
-                    }
-                    else if (member[1].StartsWith("#"))
-                    {
-                        //color
-                        int c = 0;
-                        int.TryParse(member[1].Substring(1, member[1].Length - 1), NumberStyles.HexNumber, null, out c);
-                        component.Properties.Objects[member[0]] = c.ToColor();
-                    }
-                    else
-                    {
-                        //int
-                        int j = 0;
-                        int.TryParse(member[1], out j);
-                        component.Properties.Ints[member[0]] = j;
-                    }
-                }
+                if (description.Members[i].Value is int)
+                    component.Properties.SetInt(description.Members[i].Name, (int)description.Members[i].Value);
+                else if (description.Members[i].Value is float)
+                    component.Properties.SetFloat(description.Members[i].Name, (float)description.Members[i].Value);
+                else
+                    component.Properties.SetObject(description.Members[i].Name, description.Members[i].Value);
             }
 
-            if (values.Length >= firstValue)
+            if (description.Members.Count >= firstValue)
                 component.HandleMessage(Messages.PropertiesChanged, null);
-
         }
 
         private static void ParseData(string data)
         {
-            string[] lines = data.Split('\n', '\r');
+            string[] lines = data.Split('\n');
             ClearState();
             int i = 0;
             GameState state = GetState();
@@ -306,26 +251,29 @@ namespace Phantom.Utils
                 {
                     ParseTiles(lines, ref i, entities);
                 }
-                else if (lines[i].StartsWith("entity ") && entities!=null)
+                else if (lines[i].StartsWith("entity ") && entities != null)
                 {
-                    ParseEntity(lines[i], entities);
+                    ParseEntity(lines[i].Substring(7), entities);
+                    i++;
+                }
+                else if (lines[i].StartsWith("component "))
+                {
+                    PCNComponent component = new PCNComponent(lines[i].Substring(10));
+                    for (int j = 0; j < state.Components.Count; j++)
+                    {
+                        if (state.Components[j].Properties != null && state.Components[j].Properties.GetString("editable", "") == component.Name)
+                        {
+                            ParseProperties(state.Components[j], component, 0);
+                            if (state.Components[j] is EntityLayer)
+                                entities = state.Components[j] as EntityLayer;
+                        }
+                    }
                     i++;
                 }
                 else
                 {
-                    string[] values = lines[i].Split(' ');
-                    if (values.Length > 1)
-                    {
-                        for (int j = 0; j < state.Components.Count; j++)
-                        {
-                            if (state.Components[j].Properties != null && state.Components[j].Properties.GetString("editable", "") == values[0])
-                            {
-                                ParseProperties(state.Components[j], values, 1);
-                                if (state.Components[j] is EntityLayer)
-                                    entities = state.Components[j] as EntityLayer;
-                            }
-                        }
-                    }
+                    if (lines[i].Length>0) 
+                        Trace.WriteLine("WARNING: MapLoader did not understand: " + lines[i]);
                     i++;
                 }
             }
@@ -333,22 +281,17 @@ namespace Phantom.Utils
 
         private static void ParseTiles(string[] lines, ref int index, EntityLayer entities)
         {
-            string[] parameters = lines[index].Split(' ');
+            string tileListName = entities.Properties.GetString("tileList", "");
+            Dictionary<string, PCNComponent> tileList = EntityLists[tileListName];
+            PCNComponent tileDefs = new PCNComponent(lines[index]);
             index++;
 
-            Dictionary<int, Type> types = new Dictionary<int, Type>();
-            for (int i = 1; i < parameters.Length; i++)
-            {
-                for (int j =0; j<TileList.Length; j++)
-                    if (ShortTypeName(TileList[j]) == parameters[i])
-                    {
-                        types[i-1] = TileList[j];
-                        break;
-                    }
-            }
+            int tileSize = entities.Properties.GetInt("tileSize", 0);
+            if (tileSize <= 0)
+                return;
 
-            int width = (int)Math.Ceiling(entities.Bounds.X / TileSize);
-            int height = (int)Math.Ceiling(entities.Bounds.Y / TileSize);
+            int width = (int)Math.Ceiling(entities.Bounds.X / tileSize);
+            int height = (int)Math.Ceiling(entities.Bounds.Y / tileSize);
             
             for (int y = 0; y < height; y++)
             {
@@ -357,69 +300,31 @@ namespace Phantom.Utils
                     while (lines[index].Length == 0) index++;
                     string tile = lines[index].Substring(x * 4, 3);
                     int t = -1;
-                    if (int.TryParse(tile, out t) && types.ContainsKey(t))
-                        AddTile(x, y, types[t], entities);
+                    if (int.TryParse(tile, out t) && t >= 0 && t < tileDefs.Components.Count)
+                        AddTile(x, y, tileSize, tileList[tileDefs.Components[t].Name], entities, tileDefs.Components[t].Name);
                 }
                 index++;
             }
         }
 
-        private static void AddTile(int x, int y, Type tile, EntityLayer entities)
+        private static void AddTile(int x, int y, int tileSize, PCNComponent blueprint, EntityLayer entities, string blueprintName)
         {
-            Vector2 position = new Vector2((x + 0.5f) * TileSize, (y + 0.5f) * TileSize);
 
-            Entity entity = (Entity)Activator.CreateInstance(tile, position);
+            Vector2 position = new Vector2((x + 0.5f) * tileSize, (y + 0.5f) * tileSize);
+            Entity entity = EntityFactory.AssembleEntity(blueprint, blueprintName);
+            entity.Position = position;
             entity.Properties.Ints["isTile"] = 1;
             entities.AddComponent(entity);
         }
 
-        private static void ParseEntity(string line, EntityLayer entities)
+        private static void ParseEntity(string description, EntityLayer entities)
         {
-            string[] parameters = line.Split(' ');
-            if (parameters.Length<5) {
-                Trace.WriteLine("Entity requires at least 4 parameters (type x y orientation).");
-                return;
-            }
-            Vector2 position = new Vector2();
-            if (!float.TryParse(parameters[2], out position.X))
-            {
-                Trace.WriteLine("Error parsing entity x.");
-                return;
-            }
-            if (!float.TryParse(parameters[3], out position.Y))
-            {
-                Trace.WriteLine("Error parsing entity y."); 
-                return;
-            }
-            float orientation = 0;
-            if (!float.TryParse(parameters[4], out orientation))
-            {
-                Trace.WriteLine("Error parsing entity orientation.");
-                return;
-            }
-            int type = -1;
-            for (int i = 0; i < EntityList.Length; i++)
-            {
-                if (ShortTypeName(EntityList[i]) == parameters[1])
-                {
-                    type =i;
-                    break;
-                }
-            }
-
-            if (type < 0)
-            {
-                Trace.WriteLine("Could not find entity type "+parameters[1]+".");
-                return;
-            }
-
-            Entity entity = (Entity)Activator.CreateInstance(EntityList[type], position);
-            entity.Orientation = MathHelper.ToRadians(orientation);
+            string listName = entities.Properties.GetString("entityList", "");
+            PCNComponent instance = new PCNComponent(description);
+            PCNComponent blueprint = EntityLists[listName][instance.Name];
+            Entity entity = EntityFactory.BuildInstance(blueprint, instance, instance.Name);
             entities.AddComponent(entity);
-            ParseProperties(entity, parameters, 5);
         }
-
-        
 
         private static void ClearState()
         {
@@ -430,18 +335,6 @@ namespace Phantom.Utils
                     ((EntityLayer)c).ClearComponents();
             }
         }
-
-        public static string ShortTypeName(Type type)
-        {
-            if (type == null)
-                return "<null>";
-            string result = type.ToString();
-            result = result.Substring(result.LastIndexOf('.') + 1);
-            return result;
-        }
-
-        
-
 
     }
 }

@@ -10,6 +10,9 @@ namespace Phantom.UI
     public class PhWindow : PhControl
     {
         public string Text;
+        public PhControl.GUIAction OnClose = null;
+
+
         public PhWindow(float left, float top, float width, float height, string text)
             : base(left, top, width, height)
         {
@@ -83,6 +86,8 @@ namespace Phantom.UI
                 }
             }
             ParentControl.Ghost = parentGhost;
+            if (OnClose != null)
+                OnClose(this);
 
         }
 

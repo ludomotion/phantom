@@ -8,6 +8,8 @@ namespace Phantom.Cameras
 {
     public class CameraComponent : Component
     {
+        public static bool InFactory { get { return false; } }
+
         public Camera Camera { get; private set; }
 
         public override void OnAncestryChanged()

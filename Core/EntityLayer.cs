@@ -40,10 +40,11 @@ namespace Phantom.Core
             this.Properties = new PropertyCollection();
             //TODO: comment these (when new editor is finished)
             this.Properties.Objects["editable"] = "EntityLayer";
-            this.Properties.Ints["tiles"] = 1;
-            this.Properties.Ints["entities"] = 1;
             this.Properties.Floats["Width"] = width;
             this.Properties.Floats["Height"] = height;
+            this.Properties.Objects["entityList"] = "";
+            this.Properties.Objects["tileList"] = "";
+            this.Properties.Ints["tileSize"] = 0;
         }
 
         /// <summary>
