@@ -348,8 +348,16 @@ namespace Phantom.Utils
             }
             else
             {
-                mousePosition.X = currentMouse.X + Editing.Camera.Left;
-                mousePosition.Y = currentMouse.Y + Editing.Camera.Top;
+                if (Editing.Camera != null)
+                {
+                    mousePosition.X = currentMouse.X + Editing.Camera.Left;
+                    mousePosition.Y = currentMouse.Y + Editing.Camera.Top;
+                }
+                else
+                {
+                    mousePosition.X = currentMouse.X;
+                    mousePosition.Y = currentMouse.Y;
+                }
 
                 switch (layers[currentLayer].Type)
                 {
@@ -784,7 +792,10 @@ namespace Phantom.Utils
         private void DrawEntities(RenderInfo info, EntityLayer entities)
         {
             int tiles = layers[currentLayer].Type == LayerType.Entities ? 0: 1;
-            Vector2 topLeft = new Vector2(info.Camera.Left, info.Camera.Top);
+
+            Vector2 topLeft = new Vector2(0, 0);
+            if (Editing.Camera!=null) 
+                topLeft = new Vector2(info.Camera.Left, info.Camera.Top);
             for (int i = 0; i < entities.Components.Count; i++)
             {
                 Entity entity = entities.Components[i] as Entity;

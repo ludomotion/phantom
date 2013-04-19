@@ -166,7 +166,7 @@ namespace Phantom.Utils
         private static string GetEntityData(EntityLayer entityLayer)
         {
             string data = "";
-            string list = entityLayer.Properties.GetString("tiles", "");
+            string list = entityLayer.Properties.GetString("tileList", "");
             int tileSize = entityLayer.Properties.GetInt("tileSize", 0);
             if (list != "" && tileSize>0)
             {
