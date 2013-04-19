@@ -162,6 +162,28 @@ namespace Phantom.Shapes
             }
         }
 
+        public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
+        {
+            //TODO: Needs to take orientation into account
+            Vector2[] result = new Vector2[this.Vertices.Length];
+            int found = 0;
+            Vector2 intersection = new Vector2();
+
+            Vector2 relStart = start - this.Entity.Position;
+            Vector2 relEnd = end - this.Entity.Position;
+
+            for (int i = 0; i < this.Vertices.Length; i++)
+            {
+                if (PhantomUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], relStart, relEnd, ref intersection))
+                {
+                    result[found++] = intersection + this.Entity.Position;
+                }
+            }
+
+            Array.Resize(ref result, found);
+            return result;
+        }
+
         public override Vector2 EdgeIntersection(Vector2 point)
         {
             //TODO: Needs to take orientation into account, and it doesn't work properly

@@ -46,6 +46,14 @@ namespace Phantom.Shapes
         public abstract void Scale(float scalar);
 
         /// <summary>
+        /// Returns the points on the shape's edges that intersect with the line segment from <paramref name="start"/> to <paramref name="end"/>
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public abstract Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end);
+
+        /// <summary>
         /// Returns the points on the shape's edge that in the specified direction from the shape's origin
         /// </summary>
         /// <param name="direction"></param>

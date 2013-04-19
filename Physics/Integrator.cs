@@ -217,6 +217,15 @@ namespace Phantom.Physics
         }
 
         /// <summary>
+        /// Returns an array with all entities.
+        /// </summary>
+        /// <returns></returns>
+        public virtual Entity[] GetEntities()
+        {
+            return entities.ToArray();
+        }
+
+        /// <summary>
         /// Returns all entities at the indicated position
         /// </summary>
         /// <param name="position"></param>

@@ -52,6 +52,24 @@ namespace Phantom.Shapes
             return new Polygon.Projection(dot - this.Radius, dot + this.Radius);
         }
 
+        public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
+        {
+            Vector2 relStart = start - this.Entity.Position;
+            Vector2 relEnd = end - this.Entity.Position;
+
+            Vector2 closestPoint = PhantomUtils.ClosestPointOnLine(relStart, relEnd, Vector2.Zero);
+            float distance = closestPoint.Length();
+
+            if (distance == this.Radius) return new Vector2[] { closestPoint + this.Entity.Position };
+            if (distance < this.Radius)
+            {
+                float angle = (float)Math.Acos(Radius / distance);
+
+                return new Vector2[] { (closestPoint.Normalized() * Radius).RotateBy(angle) + this.Entity.Position, (closestPoint.Normalized() * Radius).RotateBy(-angle) + this.Entity.Position };
+            }
+            else return new Vector2[0];
+        }
+
         public override Vector2 EdgeIntersection(Vector2 point)
         {
             Vector2 delta = point - this.Entity.Position;

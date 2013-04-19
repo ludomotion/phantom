@@ -89,6 +89,15 @@ namespace Phantom.Core
         }
 
         /// <summary>
+        /// Returns an array with all entities.
+        /// </summary>
+        /// <returns></returns>
+        public Entity[] GetEntities()
+        {
+            return integrator.GetEntities();
+        }
+
+        /// <summary>
         /// Returns the first entity that was found at the specified location
         /// </summary>
         /// <param name="position"></param>

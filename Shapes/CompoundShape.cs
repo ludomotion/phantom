@@ -86,6 +86,34 @@ namespace Phantom.Shapes
             }
         }
 
+        public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
+        {
+            // TODO: Not tested yet
+            int i, s, points = 0, curr = 0;
+
+            Vector2[][] result = new Vector2[shapes.Count][];
+            for (i = 0; i < this.shapes.Count; i++)
+            {
+                result[i] = shapes[i].Shape.IntersectEdgesWithLine(start - shapes[i].Offset, end - shapes[i].Offset);
+                for (s = 0; s < result[i].Length; s++)
+                {
+                    result[i][s] += shapes[i].Offset;
+                }
+                points += result[i].Length;
+            }
+
+            Vector2[] intersections = new Vector2[points];
+            for (i = 0; i < this.shapes.Count; i++)
+            {
+                for (s = 0; s < result[i].Length; s++)
+                {
+                    intersections[curr++] = result[i][s];
+                }
+            }
+
+            return intersections;
+        }
+
         public override Vector2 EdgeIntersection(Vector2 point)
         {
             Vector2 intersection = Vector2.Zero;
