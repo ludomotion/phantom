@@ -52,14 +52,14 @@ namespace Phantom.Graphics
         public RenderOptions Options { get; protected set; }
 
         private Layer layer;
-        private SpriteBatch batch;
-        private SpriteSortMode sortMode;
-        private BlendState blendState;
+        protected SpriteBatch batch;
+        protected SpriteSortMode sortMode;
+        protected BlendState blendState;
 
         private Action<RenderInfo> activeRenderPass;
 
         private Canvas canvas;
-		private Effect fx;
+        protected Effect fx;
 
         public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
         {
@@ -131,7 +131,7 @@ namespace Phantom.Graphics
             base.Render(info);
         }
 
-        private void RenderPassFullLock(RenderInfo info)
+        protected virtual void RenderPassFullLock(RenderInfo info)
         {
             lock (PhantomGame.Game.GlobalRenderLock)
             {
@@ -151,7 +151,7 @@ namespace Phantom.Graphics
             }
         }
 
-        private void RenderPassEndLock(RenderInfo info)
+        protected virtual void RenderPassEndLock(RenderInfo info)
         {
             this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
             IList<Component> components = this.Parent.Components;

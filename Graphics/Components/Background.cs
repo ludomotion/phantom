@@ -15,9 +15,9 @@ namespace Phantom.Graphics.Components
         private Color bottom;
 
         private BasicEffect effect;
-        private VertexPositionColor[] vertices;
-        private short[] indices;
         private VertexBuffer vertex;
+        private IndexBuffer index;
+        private int numVertices, numIndexes;
 
         public Background(Color top, Color middle, Color bottom)
         {
@@ -27,7 +27,7 @@ namespace Phantom.Graphics.Components
 
             this.effect = new BasicEffect(PhantomGame.Game.GraphicsDevice);
             this.effect.VertexColorEnabled = true;
-            this.vertices = new VertexPositionColor[] {
+            VertexPositionColor[] vertices = new VertexPositionColor[] {
                     new VertexPositionColor(new Vector3(-1, -1, 0), top),
                     new VertexPositionColor(new Vector3(1, -1, 0), top),
                     new VertexPositionColor(new Vector3(-1, 0, 0), middle),
@@ -35,15 +35,19 @@ namespace Phantom.Graphics.Components
                     new VertexPositionColor(new Vector3(-1, 1, 0), bottom),
                     new VertexPositionColor(new Vector3(1, 1, 0), bottom)
             };
-            this.indices = new short[] { 
+            short[] indices = new short[] { 
                 0, 1, 2, 
                 2, 1, 3, 
                 2, 3, 4, 
                 4, 3, 5 };
 
-            vertex = new VertexBuffer(PhantomGame.Game.GraphicsDevice, VertexPositionColor.VertexDeclaration, this.vertices.Length, BufferUsage.None);
+            this.numVertices = vertices.Length;
+            this.numIndexes = indices.Length;
 
-            vertex.SetData<VertexPositionColor>(this.vertices);
+            this.vertex = new VertexBuffer(PhantomGame.Game.GraphicsDevice, VertexPositionColor.VertexDeclaration, this.numVertices, BufferUsage.None);
+            this.vertex.SetData<VertexPositionColor>(vertices);
+            this.index = new IndexBuffer(PhantomGame.Game.GraphicsDevice, typeof(short), this.numIndexes, BufferUsage.None);
+            this.index.SetData<short>(indices);
         }
 
         public Background(Color color)
@@ -59,7 +63,9 @@ namespace Phantom.Graphics.Components
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                PhantomGame.Game.GraphicsDevice.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, this.vertices, 0, this.vertices.Length, this.indices, 0, 4);
+                PhantomGame.Game.GraphicsDevice.SetVertexBuffer(this.vertex);
+                PhantomGame.Game.GraphicsDevice.Indices = this.index;
+                PhantomGame.Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, this.numVertices, 0, this.numIndexes / 3);
             }
             base.Render(info);
         }
