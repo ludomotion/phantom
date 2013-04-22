@@ -155,7 +155,7 @@ namespace Phantom.Utils
         }
     }
 
-    static class PhantomComponentNotation
+    public static class PhantomComponentNotation
     {
         public static string ComponentToPCNString(Component component)
         {
