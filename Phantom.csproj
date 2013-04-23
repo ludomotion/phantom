@@ -179,6 +179,7 @@
     <Compile Include="UI\PhInputDialog.cs" />
     <Compile Include="UI\PhTextEdit.cs" />
     <Compile Include="UI\PhWindow.cs" />
+    <Compile Include="Utils\Asynchrony.cs" />
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityFactory.cs" />
     <Compile Include="Utils\EntityMap.cs" />
