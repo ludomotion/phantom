@@ -233,19 +233,19 @@ namespace Phantom.Utils
             //string: "XXX"
             if (v[0] == '"' && v[v.Length - 1] == '"')
                 return v.Substring(1, v.Length - 2);
-            //float: 0.0f
-            if (v[v.Length - 1] == 'f')
-            {
-                float f = 0;
-                float.TryParse(v.Substring(0, v.Length - 1), out f);
-                return f;
-            }
             //color: #000000
             if (v.StartsWith("#"))
             {
                 int c = 0;
                 int.TryParse(v.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out c);
                 return c.ToColor();
+            }
+            //float: 0.0f
+            if (v[v.Length - 1] == 'f')
+            {
+                float f = 0;
+                float.TryParse(v.Substring(0, v.Length - 1), out f);
+                return f;
             }
             //hex: 0x0
             if (v.StartsWith("0x"))
