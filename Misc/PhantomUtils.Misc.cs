@@ -44,5 +44,33 @@ namespace Phantom.Misc
 				i += 1;
 			return a.Substring(0, i);
 		}
+
+		/// <summary>
+		/// Returns a new dictionary of this ... others merged leftward.
+		/// Keeps the type of 'this', which must be default-instantiable.
+		/// </summary>
+		/// <exmaple>
+		/// result = map.MergeLeft(other1, other2, ...)
+		/// </exmaple>
+		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="K"></typeparam>
+		/// <typeparam name="V"></typeparam>
+		/// <param name="me"></param>
+		/// <param name="others"></param>
+		public static void MergeLeft<T, K, V>(this T me, params IDictionary<K, V>[] others)
+			where T : IDictionary<K, V>, new()
+		{
+			T newMap = new T();
+			foreach (IDictionary<K, V> other in others)
+			{
+				if( other != null )
+				{
+					foreach (KeyValuePair<K, V> p in other)
+					{
+						me[p.Key] = p.Value;
+					}
+				}
+			}
+		}
 	}
 }

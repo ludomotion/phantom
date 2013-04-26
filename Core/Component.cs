@@ -359,6 +359,21 @@ namespace Phantom.Core
         
         //*/
 
+
+		/// <summary>
+		/// Remove all child components by type.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		public void RemoveAllComponentsByType<T>()
+		{
+			for (int i = this.Components.Count-1; i >= 0; i--)
+			{
+				Component component = this.Components[i];
+				if (component is T)
+					this.RemoveComponent(component);
+			}
+		}
+
         /// <summary>
         /// Get a list of all the component's children that match a certain type.
         /// </summary>

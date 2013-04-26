@@ -193,7 +193,7 @@ namespace Phantom.Misc
                 this.history.Insert(0, "" + this.settings.LineCount);
                 System.IO.File.WriteAllLines("konsoul.dat", this.history.ToArray());
             }
-            catch (System.IO.IOException)
+            catch (Exception)
             {
             }
 #endif // WINDOWS || LINUX || MACOS

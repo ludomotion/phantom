@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Phantom.Misc;
 
 namespace Phantom.Core
 {
@@ -10,6 +11,7 @@ namespace Phantom.Core
     /// A propertyCollection contains a set of arbirary variables associated with a component. 
     /// It facilitates indirect communication between components.
     /// </summary>
+	[Serializable]
     public class PropertyCollection
     {
         private Dictionary<string, int> ints;
@@ -195,5 +197,16 @@ namespace Phantom.Core
             Objects[name] = value;
         }
 
-    }
+		/// <summary>
+		/// Merge all properties of an other collection into this one.
+		/// See: PhantomUtils.MergeLeft
+		/// </summary>
+		/// <param name="p"></param>
+		public void Merge(PropertyCollection p)
+		{
+			this.ints.MergeLeft<Dictionary<string, int>, string, int>(p.ints);
+			this.floats.MergeLeft<Dictionary<string, float>, string, float>(p.floats);
+			this.objects.MergeLeft<Dictionary<string, object>, string, object>(p.objects);
+		}
+	}
 }
