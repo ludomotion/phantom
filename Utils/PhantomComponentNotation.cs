@@ -14,6 +14,12 @@ namespace Phantom.Utils
         public string Name;
         public object Value;
 
+        public PCNMember(string name, object value)
+        {
+            this.Name = name;
+            this.Value = value;
+        }
+
         public PCNMember(string description)
         {
             //Trace.WriteLine("Parse member: " + description);
