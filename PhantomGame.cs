@@ -153,6 +153,8 @@ namespace Phantom
         public virtual void SetupGraphics()
         {
             this.graphics = new GraphicsDeviceManager(XnaGame);
+            this.graphics.GraphicsProfile = GraphicsProfile.HiDef;
+
 #if DEBUG
             XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
 #endif
@@ -192,9 +194,7 @@ namespace Phantom
 
             this.Initialize();
 
-#if !XBOX && !TOUCH
-            Trace.WriteLine("PhantomGame Initialized: " + Assembly.GetEntryAssembly().FullName);
-#endif
+            Trace.WriteLine("PhantomGame Initialized: " + this.Name);
         }
 
         internal void XnaUpdate(GameTime gameTime)

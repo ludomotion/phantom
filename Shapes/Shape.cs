@@ -54,6 +54,14 @@ namespace Phantom.Shapes
         public abstract Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end);
 
         /// <summary>
+        /// Returns the the shape's umbra projected from a given origin as a list of triangle strip vertex coordinates
+        /// </summary>
+        /// <param name="origin">The projection origin (e.g. light source)</param>
+        /// <param name="includeShape">Whether of not to include the shape itself</param>
+        /// <returns></returns>
+        public abstract Vector2[] UmbraProjection(Vector2 origin, float maxDistance, bool includeShape);
+
+        /// <summary>
         /// Returns the points on the shape's edge that in the specified direction from the shape's origin
         /// </summary>
         /// <param name="direction"></param>

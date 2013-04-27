@@ -114,6 +114,11 @@ namespace Phantom.Shapes
             return intersections;
         }
 
+        public override Vector2[] UmbraProjection(Vector2 origin, float maxDistance, bool includeShape)
+        {
+            return new Vector2[0];
+        }
+
         public override Vector2 EdgeIntersection(Vector2 point)
         {
             Vector2 intersection = Vector2.Zero;

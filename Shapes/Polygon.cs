@@ -202,6 +202,32 @@ namespace Phantom.Shapes
             return result;
         }
 
+        public override Vector2[] UmbraProjection(Vector2 origin, float maxDistance, bool includeShape)
+        {
+            List<Vector2> vertices = new List<Vector2>();
+
+            Vector2 delta = this.Entity.Position - origin;
+            float length = delta.Length();
+
+            float arcAngle = (float)Math.Acos(this.roughWidth / length);
+            float lightAngle = delta.Angle();
+            float angle1 = lightAngle + arcAngle;
+            float angle2 = lightAngle - arcAngle;
+
+            Vector2 umbraPoint1 = this.Entity.Position + new Vector2(this.roughWidth * (float)Math.Cos(angle1), this.roughWidth * (float)Math.Sin(angle1));
+            Vector2 umbraPoint2 = this.Entity.Position + new Vector2(this.roughWidth * (float)Math.Cos(angle2), this.roughWidth * (float)Math.Sin(angle2));
+
+            Vector2 farPoint1 = origin + (umbraPoint1 - origin).Normalized() * maxDistance;
+            Vector2 farPoint2 = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+
+            vertices.Add(umbraPoint1);
+            vertices.Add(umbraPoint2);
+            vertices.Add(farPoint1);
+            vertices.Add(farPoint2);
+
+            return vertices.ToArray();
+        }
+
         public override Vector2 EdgeIntersection(Vector2 point)
         {
             //TODO: Needs to take orientation into account, and it doesn't work properly
