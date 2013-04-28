@@ -37,6 +37,8 @@ namespace Phantom
         public readonly static Random Randy = new Random();
 #endif
 
+        public static long FrameCount = 0;
+
         public string Name { get; protected set; }
         public Color BackgroundColor { get; protected set; }
 
@@ -197,6 +199,7 @@ namespace Phantom
 
         internal void XnaUpdate(GameTime gameTime)
         {
+            FrameCount++;
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
             elapsed *= this.multiplier;
             this.TotalTime += elapsed;

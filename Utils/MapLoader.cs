@@ -332,7 +332,13 @@ namespace Phantom.Utils
             foreach (Component c in state.Components)
             {
                 if (c is EntityLayer)
-                    ((EntityLayer)c).ClearComponents();
+                {
+                    for (int i = c.Components.Count - 1; i >= 0; i--)
+                    {
+                        if (c.Components[i] is Entity)
+                            c.RemoveComponent(c.Components[i]);
+                    }
+                }
             }
         }
 
