@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Phantom.Graphics;
@@ -13,6 +12,7 @@ using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Phantom.UI;
 using System.Globalization;
+using System.IO;
 
 namespace Phantom.Utils
 {
@@ -240,6 +240,26 @@ namespace Phantom.Utils
             string filename = "";
             if (Editing.Properties != null)
                 filename = Editing.Properties.GetString("filename", "");
+#if DEBUG
+            string searchname = Path.GetFileName(filename);
+            string basedir = Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
+            string startdir = Path.GetFullPath(Path.Combine(basedir, "../../../../"));
+
+            if ((startdir.Split(Path.DirectorySeparatorChar).Length - 1) > 2) // If the startdir end up to be C:\...
+            {
+                string[] found = Directory.GetFiles(Path.Combine(basedir, "../../../../"), "*.contentproj", SearchOption.AllDirectories);
+                if (found.Length > 0)
+                {
+                    found = Directory.GetFiles(Path.GetDirectoryName(found[0]), searchname, SearchOption.AllDirectories);
+                    if (found.Length > 0)
+                    {
+                        Uri file = new Uri(Path.GetFullPath(found[0]));
+                        Uri folder = new Uri(basedir.TrimEnd('/') + '/');
+                        filename = Uri.UnescapeDataString(folder.MakeRelativeUri(file).ToString().Replace('/', Path.DirectorySeparatorChar));
+                    }
+                }
+            }
+#endif
             windows.AddComponent(new PhInputDialog(100, 100, "Save Map", "Filename:", filename, ConfirmSave));
         }
 
