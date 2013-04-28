@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace Phantom.Misc
 {
@@ -17,6 +18,17 @@ namespace Phantom.Misc
 		{
 			return (float)random.NextDouble();
 		}
+
+        /// <summary>
+        /// Returns a vector of length 1 with a random direction
+        /// </summary>
+        /// <param name="random"></param>
+        /// <returns></returns>
+        public static Vector2 NextVector2(this Random random)
+        {
+            double a = random.NextDouble() * Math.PI * 2;
+            return new Vector2((float)Math.Cos(a), (float)Math.Sin(a));
+        }
 
 		/// <summary>
 		/// Uses PhantomGame.Randy to select a random value from the parameters
