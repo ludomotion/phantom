@@ -6,6 +6,7 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using Phantom.Graphics;
 
 namespace Phantom.GameUI
 {
@@ -21,6 +22,7 @@ namespace Phantom.GameUI
         private UIContent draggingContent;
         protected Vector2 mouseDownPosition;
         protected Vector2 mousePosition;
+        private Renderer renderer;
 
         public UIMouseHandler()
             : base(0) { }
@@ -36,6 +38,7 @@ namespace Phantom.GameUI
             layer = parent as UILayer;
             if (layer == null)
                 throw new Exception("MenuMouseKeyboard can only be added to a Menu component.");
+            this.renderer = layer.GetComponentByType<Renderer>();
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
@@ -56,6 +59,11 @@ namespace Phantom.GameUI
             previous = current;
             current = Mouse.GetState();
             mousePosition = new Vector2(current.X, current.Y);
+            if (this.renderer != null)
+            {
+                Matrix renderMatrix = this.renderer.CreateMatrix();
+                mousePosition = Vector2.Transform(mousePosition, Matrix.Invert(renderMatrix));
+            }
             hover = layer.GetControlAt(mousePosition, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;

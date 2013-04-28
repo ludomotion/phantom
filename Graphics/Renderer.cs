@@ -304,6 +304,11 @@ namespace Phantom.Graphics
                 this.activeRenderPass = this.RenderPassEndLock;
         }
 
+        public Matrix CreateMatrix()
+        {
+            return this.BuildRenderInfo().World;
+        }
+
 
         public static SpriteSortMode ToSortMode(RenderOptions options)
         {
