@@ -178,7 +178,7 @@ namespace Phantom.Utils
                 foreach(KeyValuePair<string, PCNComponent> tile in EntityLists[list])
                 {
                     if (c > 0) 
-                        data += " ";
+                        data += ", ";
                     data += tile.Key;
                     tileList[tile.Key] = c;
                     c++;
