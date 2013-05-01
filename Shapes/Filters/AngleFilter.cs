@@ -49,14 +49,14 @@ namespace Phantom.Shapes.Filters
 		{
 			Vector2 delta = e.Position - this.Position;
 			float a = delta.Angle();
-			return PhantomUtils.AngleDifference(a, Orientation) <= this.halfarc;
+			return Math.Abs(PhantomUtils.AngleDifference(a, Orientation)) <= this.halfarc;
 		}
 
 		public bool ContainsFormEntity(Core.Entity e)
 		{
 			Vector2 delta = e.Position - this.Entity.Position;
 			float a = delta.Angle();
-			return PhantomUtils.AngleDifference(a, this.Entity.Orientation) <= this.halfarc;
+			return Math.Abs(PhantomUtils.AngleDifference(a, this.Entity.Orientation)) <= this.halfarc;
 		}
 
 		public bool Contains(Entity e)
