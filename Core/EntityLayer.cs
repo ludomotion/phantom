@@ -6,6 +6,7 @@ using Phantom.Graphics;
 using Phantom.Shapes;
 using Phantom.Physics;
 using Microsoft.Xna.Framework;
+using Phantom.Shapes.Filters;
 
 namespace Phantom.Core
 {
@@ -133,6 +134,24 @@ namespace Phantom.Core
             return integrator.GetEntitiesInRect(topLeft, bottomRight); 
         }
 
+
+		public IEnumerable<Entity> GetEntitiesByFilter(IFilter filter)
+		{
+			return integrator.GetEntitiesByFilter(filter);
+		}
+
+		public void ExecuteInFilter(IFilter filter, Action<Entity> callback)
+		{
+			integrator.ExecuteInFilter(filter, callback);
+		}
+		public void ExecuteOutFilter(IFilter filter, Action<Entity> callback)
+		{
+			integrator.ExecuteOutFilter(filter, callback);
+		}
+		public void ExecuteInOutFilter(IFilter filter, Action<Entity> callbackIn, Action<Entity> callbackOut)
+		{
+			integrator.ExecuteInOutFilter(filter, callbackIn, callbackOut);
+		}
 
         /// <summary>
         /// Remove all components that are marked as Ghosts.
