@@ -93,9 +93,27 @@ namespace Phantom.Shapes
             return (delta.LengthSquared() < this.Radius * this.Radius);
         }
 
-        public override bool InRect(Vector2 topLeft, Vector2 bottomRight)
+        public override bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            return (this.Entity.Position.X - Radius >= topLeft.X && this.Entity.Position.X + Radius <= bottomRight.X && this.Entity.Position.Y - Radius >= topLeft.Y && this.Entity.Position.Y + Radius <= bottomRight.Y);
+			if (partial)
+			{
+				Vector2 pos = this.Entity.Position;
+				if (pos.X + Radius >= topLeft.X && pos.X - Radius <= bottomRight.X && pos.Y + Radius >= topLeft.Y && pos.Y - Radius <= bottomRight.Y)
+				{
+					if (pos.X < topLeft.X && pos.Y < topLeft.Y && (pos - topLeft).Length() < Radius) // in topleft corner
+						return false;
+					if (pos.X > bottomRight.X && pos.Y < topLeft.Y && (pos - topLeft).Length() < Radius) // in topright corner
+						return false;
+					if (pos.X > bottomRight.X && pos.Y > bottomRight.Y && (pos - topLeft).Length() < Radius) // in bottomright corner
+						return false;
+					if (pos.X < topLeft.X && pos.Y > bottomRight.Y && (pos - topLeft).Length() < Radius) // in bottomleft corner
+						return false;
+					return true;
+				}
+				return false;
+			}
+			else
+				return (this.Entity.Position.X - Radius >= topLeft.X && this.Entity.Position.X + Radius <= bottomRight.X && this.Entity.Position.Y - Radius >= topLeft.Y && this.Entity.Position.Y + Radius <= bottomRight.Y);
         }
 
 		public override CollisionData Collide(Shape other)

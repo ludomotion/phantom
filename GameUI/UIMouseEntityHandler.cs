@@ -124,7 +124,7 @@ namespace Phantom.GameUI
         {
             Vector2 topLeft = new Vector2(Math.Min(corner1.X, corner2.X), Math.Min(corner1.Y, corner2.Y));
             Vector2 bottomRight = new Vector2(Math.Max(corner1.X, corner2.X), Math.Max(corner1.Y, corner2.Y));
-            List<Entity> entities = entityLayer.GetEntitiesInRect(topLeft, bottomRight);
+			List<Entity> entities = new List<Entity>(entityLayer.GetEntitiesInRect(topLeft, bottomRight, false));
             for (int i = 0; i < entities.Count; i++)
                 AddSelected(entities[i]);
         }

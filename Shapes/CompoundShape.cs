@@ -175,11 +175,11 @@ namespace Phantom.Shapes
             return false;
         }
 
-        public override bool InRect(Vector2 topLeft, Vector2 bottomRight)
+        public override bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             for (int i = 0; i < this.shapes.Count; i++)
             {
-                if (!this.shapes[i].Shape.InRect(topLeft, bottomRight))
+				if (!this.shapes[i].Shape.InRect(topLeft, bottomRight, partial))
                     return false;
             }
             return (this.shapes.Count > 0);

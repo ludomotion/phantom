@@ -107,6 +107,7 @@
     <Compile Include="GameUI\ToolButton.cs" />
     <Compile Include="GameUI\UIMouseEntityHandler.cs" />
     <Compile Include="Graphics\Canvas.cs" />
+    <Compile Include="Graphics\EntityRenderer.cs" />
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="GameUI\UIContainer.cs" />

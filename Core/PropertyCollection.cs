@@ -204,8 +204,17 @@ namespace Phantom.Core
 		/// <param name="p"></param>
 		public void Merge(PropertyCollection p)
 		{
-			this.ints.MergeLeft<Dictionary<string, int>, string, int>(p.ints);
-			this.floats.MergeLeft<Dictionary<string, float>, string, float>(p.floats);
+			if (this.ints == null)
+				this.ints = p.ints;
+			else
+				this.ints.MergeLeft<Dictionary<string, int>, string, int>(p.ints);
+			if (this.floats == null)
+				this.floats = p.floats;
+			else
+				this.floats.MergeLeft<Dictionary<string, float>, string, float>(p.floats);
+			if (this.objects == null)
+				this.objects = p.objects;
+			else
 			this.objects.MergeLeft<Dictionary<string, object>, string, object>(p.objects);
 		}
 	}

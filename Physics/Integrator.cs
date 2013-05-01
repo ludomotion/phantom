@@ -259,13 +259,11 @@ namespace Phantom.Physics
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
         /// <returns></returns>
-        public virtual List<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight)
+		public virtual IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            List<Entity> result = new List<Entity>();
-            for (int i = 0; i < entities.Count; i++)
-                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight))
-                    result.Add(entities[i]);
-            return result;
+			for (int i = 0; i < entities.Count; i++)
+				if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
+					yield return entities[i];
         }
 
 		internal IEnumerable<Entity> GetEntitiesByFilter(Shapes.Filters.IFilter filter)

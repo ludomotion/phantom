@@ -234,19 +234,27 @@ namespace Phantom.Shapes
             return true;
         }
 
-        public override bool InRect(Vector2 topLeft, Vector2 bottomRight)
+        public override bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             //TODO: Needs to take orientation into account
             Vector2 origin = Vector2.Zero;
             if (this.Entity != null)
                 origin = this.Entity.Position;
 
-            for (int i = 0; i < this.Vertices.Length; i++ )
-            {
-                if (this.Vertices[i].X+origin.X<topLeft.X || this.Vertices[i].X+origin.X>bottomRight.X || this.Vertices[i].Y+origin.Y<topLeft.Y || this.Vertices[i].Y+origin.Y>bottomRight.Y) 
-                    return false;
-            }
-            return true;
+			if (partial)
+			{
+				for (int i = 0; i < this.Vertices.Length; i++)
+					if (!(this.Vertices[i].X + origin.X < topLeft.X || this.Vertices[i].X + origin.X > bottomRight.X || this.Vertices[i].Y + origin.Y < topLeft.Y || this.Vertices[i].Y + origin.Y > bottomRight.Y))
+						return true;
+				return false;
+			}
+			else
+			{
+				for (int i = 0; i < this.Vertices.Length; i++)
+					if (this.Vertices[i].X + origin.X < topLeft.X || this.Vertices[i].X + origin.X > bottomRight.X || this.Vertices[i].Y + origin.Y < topLeft.Y || this.Vertices[i].Y + origin.Y > bottomRight.Y)
+						return false;
+				return true;
+			}
         }
 
         public override CollisionData Collide(Shape other)

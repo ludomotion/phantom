@@ -7,6 +7,7 @@ using Phantom.Shapes;
 using Phantom.Physics;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes.Filters;
+using System.Diagnostics;
 
 namespace Phantom.Core
 {
@@ -56,7 +57,11 @@ namespace Phantom.Core
         public EntityLayer(Renderer renderer, Integrator integrator)
             :this(PhantomGame.Game.Width, PhantomGame.Game.Height, renderer, integrator)
         {
-        }
+#if DEBUG
+			if (!(renderer is EntityRenderer))
+				Debug.WriteLine("warning: Please add an EntityRenderer to an EntityLayer");
+#endif
+			}
 
         protected override void OnComponentAdded(Component component)
         {
@@ -129,9 +134,9 @@ namespace Phantom.Core
             return integrator.GetEntityCloseTo(position, distance);
         }
 
-        public List<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight)
+        public IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            return integrator.GetEntitiesInRect(topLeft, bottomRight); 
+			return integrator.GetEntitiesInRect(topLeft, bottomRight, partial); 
         }
 
 

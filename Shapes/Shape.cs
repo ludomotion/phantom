@@ -80,7 +80,7 @@ namespace Phantom.Shapes
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
         /// <returns></returns>
-        public abstract bool InRect(Vector2 topLeft, Vector2 bottomRight);
+        public abstract bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial);
 
         /// <summary>
         /// Returns the distance to the specified point (0 if the point is in the shape)
