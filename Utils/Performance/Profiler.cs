@@ -188,6 +188,18 @@ namespace Phantom.Utils.Performance
 			for (int i = 0; i < node.Childern.Count; i++)
 				this.OutputReport(node.Childern[i]);
 		}
+
+		[Conditional("DEBUG")]
+		public static void BeginProfiling(string name)
+		{
+			Profiler.Instance.Begin(name);
+		}
+
+		[Conditional("DEBUG")]
+		public static void EndProfiling(string name)
+		{
+			Profiler.Instance.End(name);
+		}
 	}
 
 	public static class ProfilerHelpers

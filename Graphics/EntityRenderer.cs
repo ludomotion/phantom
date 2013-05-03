@@ -7,6 +7,10 @@ using Microsoft.Xna.Framework;
 
 namespace Phantom.Graphics
 {
+
+	/// <summary>
+	/// Modification to the normal renderer that only renders 
+	/// </summary>
 	public class EntityRenderer : Renderer
 	{
 		public float IncludeMargin;
