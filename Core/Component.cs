@@ -114,6 +114,7 @@ namespace Phantom.Core
         public virtual void OnRemove()
         {
             this.Parent = null;
+			this.OnAncestryChanged();
         }
 
         /// <summary>
