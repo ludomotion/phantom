@@ -14,21 +14,31 @@ namespace Phantom.Graphics
         private float thickness;
         private Color fill;
         private Color stroke;
+        private int renderPass;
 
-        public ShapeRenderer(float thickness, Color fill, Color stroke )
+        public ShapeRenderer(float thickness, Color fill, Color stroke, int renderPass )
         {
             this.thickness = thickness;
             this.fill = fill;
             this.stroke = stroke;
+            this.renderPass = renderPass;
+        }
+        public ShapeRenderer(float thickness, Color color, int renderPass)
+            : this(thickness, color, Color.Lerp(color, Color.Black, .8f), renderPass)
+        {
+        }
+        public ShapeRenderer(float thickness, Color fill, Color stroke)
+            : this(thickness, fill, stroke, -1)
+        {
         }
         public ShapeRenderer(float thickness, Color color)
-            :this(thickness, color, Color.Lerp(color, Color.Black, .8f))
+            : this(thickness, color, Color.Lerp(color, Color.Black, .8f), -1)
         {
         }
 
         public override void Render(RenderInfo info)
         {
-            if( info.Canvas != null )
+            if( info.Canvas != null && (this.renderPass == -1 || this.renderPass == info.Pass) )
                 this.Entity.Shape.Accept(this, info);
             base.Render(info);
         }

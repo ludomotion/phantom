@@ -91,26 +91,26 @@ namespace Phantom.Shapes
                 this.normals[i] = delta.LeftPerproduct().Normalized();
             }
 
-            // Remove duplicates:
-            int removed = 0;
-            for (int i = this.normals.Length - 1; i >= 0; i--)
-            {
-                for (int j = 0; j < i; j++)
-                {
-                    if (Math.Abs(Vector2.Dot(this.normals[i], this.normals[j])) == 1)
-                    {
-                        this.normals[i] = Vector2.Zero;
-                        removed += 1;
-                        break;
-                    }
-                }
-            }
-            Vector2[] n = new Vector2[this.normals.Length - removed];
-            int c = 0;
-            for (int i = 0; i < this.normals.Length; i++)
-                if (this.normals[i].LengthSquared() != 0)
-                    n[c++] = this.normals[i];
-            this.normals = n;
+            //// Remove duplicates:
+            //int removed = 0;
+            //for (int i = this.normals.Length - 1; i >= 0; i--)
+            //{
+            //    for (int j = 0; j < i; j++)
+            //    {
+            //        if (Math.Abs(Vector2.Dot(this.normals[i], this.normals[j])) == 1)
+            //        {
+            //            this.normals[i] = Vector2.Zero;
+            //            removed += 1;
+            //            break;
+            //        }
+            //    }
+            //}
+            //Vector2[] n = new Vector2[this.normals.Length - removed];
+            //int c = 0;
+            //for (int i = 0; i < this.normals.Length; i++)
+            //    if (this.normals[i].LengthSquared() != 0)
+            //        n[c++] = this.normals[i];
+            //this.normals = n;
 
 
             this.projections = new Projection[this.normals.Length];
@@ -202,30 +202,126 @@ namespace Phantom.Shapes
             return result;
         }
 
-        public override Vector2[] UmbraProjection(Vector2 origin, float maxDistance, bool includeShape)
+        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, bool includeShape, out Vector2[] umbra, out Vector2[] penumbra)
         {
+            int i;
+
             List<Vector2> vertices = new List<Vector2>();
+            List<Vector2> penvertices = new List<Vector2>();
+            Vector2[] farPoint1 = new Vector2[this.Vertices.Length];
+            Vector2[] farPoint2 = new Vector2[this.Vertices.Length];
 
-            Vector2 delta = this.Entity.Position - origin;
-            float length = delta.Length();
+            bool[] facing = new bool[this.normals.Length];
+            bool[] halfFacing = new bool[this.normals.Length];
+            List<int> boundary = new List<int>();
 
-            float arcAngle = (float)Math.Acos(this.roughWidth / length);
-            float lightAngle = delta.Angle();
-            float angle1 = lightAngle + arcAngle;
-            float angle2 = lightAngle - arcAngle;
+            Vector2 closest;
+            int closestIndex;
 
-            Vector2 umbraPoint1 = this.Entity.Position + new Vector2(this.roughWidth * (float)Math.Cos(angle1), this.roughWidth * (float)Math.Sin(angle1));
-            Vector2 umbraPoint2 = this.Entity.Position + new Vector2(this.roughWidth * (float)Math.Cos(angle2), this.roughWidth * (float)Math.Sin(angle2));
+            Vector2 relOrigin = origin - this.Entity.Position;
+            for (i = 0; i < this.Vertices.Length; i++)
+            {
+                closest = this.Vertices[i];
+                closestIndex = i;
+                Vector2 delta = relOrigin - this.Vertices[i];
+                Vector2 delta2 = relOrigin - this.Vertices[(i + 1) % this.Vertices.Length];
 
-            Vector2 farPoint1 = origin + (umbraPoint1 - origin).Normalized() * maxDistance;
-            Vector2 farPoint2 = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+                if (delta2.LengthSquared() < delta.LengthSquared())
+                {
+                    closestIndex = (i + 1) % this.Vertices.Length;
+                    closest = this.Vertices[closestIndex];
+                    delta = delta2;
+                }
 
-            vertices.Add(umbraPoint1);
-            vertices.Add(umbraPoint2);
-            vertices.Add(farPoint1);
-            vertices.Add(farPoint2);
+                float dot = Vector2.Dot(this.normals[i], delta);
 
-            return vertices.ToArray();
+                facing[i] = dot > 0;
+                if (facing[i])
+                {
+                    float dotHalf = Vector2.Dot(this.normals[i], (relOrigin - this.normals[i] * lightRadius) - closest);
+                    halfFacing[closestIndex] = dotHalf < 0;
+                }
+                else
+                {
+                    float dotHalf = Vector2.Dot(this.normals[i], (relOrigin + this.normals[i] * lightRadius) - closest);
+                    halfFacing[closestIndex] = dotHalf > 0;
+                }
+
+                if (i > 0 && facing[i] != facing[i - 1])
+                {
+                    boundary.Add(i);
+                }
+            }
+            if (boundary.Count == 1) boundary.Add(0);
+
+            for (i = 0; i < this.Vertices.Length; i++)
+            {
+                bool penumbraNow = false;
+                if (lightRadius > 0f)
+                {
+                    if (boundary.Contains(i) || halfFacing[i])
+                    {
+                        Vector2 closePoint = this.Vertices[i] + this.Entity.Position;
+
+                        Vector2 delta = closePoint - origin; // from light source to boundary point
+                        float distance = delta.Length();
+                        Vector2 center = closePoint + delta; // light source reflected on the boundary point
+                        float sideAngle = (float)Math.Asin(lightRadius / distance); // half of the shadow 'fin' arc
+                        float centerAngle = delta.Angle();
+                        float angle1 = centerAngle + sideAngle;
+                        float angle2 = centerAngle - sideAngle;
+
+                        Vector2 sidePoint1 = center + new Vector2(lightRadius * (float)Math.Cos(angle1), lightRadius * (float)Math.Sin(angle1));
+                        Vector2 sidePoint2 = center + new Vector2(lightRadius * (float)Math.Cos(angle2), lightRadius * (float)Math.Sin(angle2));
+
+                        Vector2 farSidePoint1 = origin + (sidePoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
+                        Vector2 farSidePoint2 = origin + (sidePoint2 - origin).Normalized() * maxDistance;
+
+                        //if (!facing[i])
+                        //{
+                        //    Vector2 swap = farSidePoint2;
+                        //    farSidePoint2 = farSidePoint1;
+                        //    farSidePoint1 = swap;
+                        //}
+
+                        farPoint1[i].X = farSidePoint2.X;
+                        farPoint1[i].Y = farSidePoint2.Y;
+                        penumbraNow = true;
+
+                        penvertices.Add(closePoint);
+                        penvertices.Add(farSidePoint1);
+                        penvertices.Add(farSidePoint2);
+                    }
+                }
+
+                if (facing[i] == includeShape) // use inner edges if including shape, outer otherwise
+                {
+                    Vector2 umbraPoint1 = this.Vertices[i] + this.Entity.Position;
+                    Vector2 umbraPoint2 = this.Vertices[(i + 1) % this.Vertices.Length] + this.Entity.Position;
+
+                    if (!facing[i])
+                    {
+                        Vector2 swap = umbraPoint1;
+                        umbraPoint2 = umbraPoint1;
+                        umbraPoint1 = swap;
+                    }
+
+                    if (!penumbraNow) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
+                    farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+
+                    vertices.Add(umbraPoint1);
+                    vertices.Add(umbraPoint2);
+                    vertices.Add(farPoint1[i]);
+                    vertices.Add(farPoint1[i]);
+                    vertices.Add(umbraPoint2);
+                    vertices.Add(farPoint2[i]);
+                }
+            }
+
+            umbra = vertices.ToArray();
+            penumbra = penvertices.ToArray();
+
+            return umbra.Length > 2;
         }
 
         public override Vector2 EdgeIntersection(Vector2 point)

@@ -91,6 +91,7 @@ namespace Phantom.Graphics
             this.effect.DiffuseColor = color.ToVector3();
             this.effect.Alpha = color.A / 255f;
 
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Canvas.pixel, 0, 2);
         }
@@ -110,6 +111,7 @@ namespace Phantom.Graphics
             this.effect.DiffuseColor = color.ToVector3();
             this.effect.Alpha = color.A / 255f;
 
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, circle.Vertices, 0, segments + 1, circle.Indices, 0, segments);
         }
@@ -155,6 +157,7 @@ namespace Phantom.Graphics
             this.effect.DiffuseColor = this.StrokeColor.ToVector3();
             this.effect.Alpha = this.StrokeColor.A / 255f;
 
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Canvas.pixel, 0, 2);
 
@@ -221,9 +224,9 @@ namespace Phantom.Graphics
             this.effect.DiffuseColor = this.StrokeColor.ToVector3();
             this.effect.Alpha = this.StrokeColor.A / 255f;
 
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleStrip, vertices, 0, segments * 2, indices, 0, segments * 2);
-
         }
 
         public void Stroke()
@@ -300,9 +303,9 @@ namespace Phantom.Graphics
             this.effect.DiffuseColor = color.ToVector3();
             this.effect.Alpha = color.A / 255f;
 
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3);
-
         }
 
         public void Begin()

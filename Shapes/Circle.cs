@@ -70,7 +70,7 @@ namespace Phantom.Shapes
             else return new Vector2[0];
         }
 
-        public override Vector2[] UmbraProjection(Vector2 origin, float maxDistance, bool includeShape)
+        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, bool includeShape, out Vector2[] umbra, out Vector2[] penumbra)
         {
             List<Vector2> vertices = new List<Vector2>();
 
@@ -91,9 +91,14 @@ namespace Phantom.Shapes
             vertices.Add(umbraPoint1);
             vertices.Add(umbraPoint2);
             vertices.Add(farPoint1);
+            vertices.Add(farPoint1);
+            vertices.Add(umbraPoint2);
             vertices.Add(farPoint2);
 
-            return vertices.ToArray();
+            umbra = vertices.ToArray();
+            penumbra = new Vector2[0];
+
+            return umbra.Length > 2;
         }
 
         public override Vector2 EdgeIntersection(Vector2 point)
