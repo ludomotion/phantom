@@ -162,6 +162,24 @@ namespace Phantom.Shapes
             }
         }
 
+        public Polygon Scaled(float scalar)
+        {
+            Vector2[] scaledVertices = new Vector2[this.Vertices.Length];
+            for (int j = 0; j < this.Vertices.Length; j++)
+                scaledVertices[j] = this.Vertices[j] * scalar;
+
+            return new Polygon(scaledVertices);
+        }
+
+        public Polygon DeepCopy()
+        {
+            Vector2[] newVertices = new Vector2[this.Vertices.Length];
+            for (int j = 0; j < this.Vertices.Length; j++)
+                newVertices[j] = new Vector2(this.Vertices[j].X, this.Vertices[j].Y);
+
+            return new Polygon(newVertices);
+        }
+
         public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
         {
             //TODO: Needs to take orientation into account

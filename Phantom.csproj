@@ -133,6 +133,7 @@
     <Compile Include="Misc\DebugLayer.cs" />
     <Compile Include="Misc\DeviceHardware.cs" />
     <Compile Include="Misc\Konsoul.cs" />
+    <Compile Include="Misc\PhantomUtils.AI.cs" />
     <Compile Include="Misc\PhantomUtils.Graphics.cs" />
     <Compile Include="Misc\PhantomUtils.Math.cs" />
     <Compile Include="Misc\PhantomUtils.Misc.cs" />

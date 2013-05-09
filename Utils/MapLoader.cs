@@ -27,6 +27,8 @@ namespace Phantom.Utils
         /// </summary>
         public static Dictionary<string, Dictionary<string, PCNComponent>> EntityLists;
 
+        private static char[] lineSplit = new char[] { '\n', '\r' };
+
         public static void Initialize()
         {
             EntityLists = new Dictionary<string, Dictionary<string, PCNComponent>>();
@@ -240,7 +242,7 @@ namespace Phantom.Utils
 
         private static void ParseData(string data)
         {
-            string[] lines = data.Split('\n');
+            string[] lines = data.Split(lineSplit, StringSplitOptions.RemoveEmptyEntries);
             ClearState();
             int i = 0;
             GameState state = GetState();
