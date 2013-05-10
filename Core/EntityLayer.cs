@@ -64,14 +64,16 @@ namespace Phantom.Core
 			}
 
         protected override void OnComponentAdded(Component component)
-        {
-            this.integrator.OnComponentAddedToLayer(component);
+		{
+			this.integrator.OnComponentAddedToLayer(component);
+			this.renderer.OnComponentAddedToLayer(component);
             base.OnComponentAdded(component);
         }
 
         protected override void OnComponentRemoved(Component component)
         {
-            this.integrator.OnComponentRemovedToLayer(component);
+			this.integrator.OnComponentRemovedToLayer(component);
+			this.renderer.OnComponentRemovedToLayer(component);
             base.OnComponentRemoved(component);
         }
 

@@ -337,5 +337,13 @@ namespace Phantom.Graphics
                 return BlendState.Opaque;
             return BlendState.AlphaBlend;
         }
-    }
+
+		internal virtual void OnComponentAddedToLayer(Component component)
+		{
+		}
+
+		internal virtual void OnComponentRemovedToLayer(Component component)
+		{
+		}
+	}
 }

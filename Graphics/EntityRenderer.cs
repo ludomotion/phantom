@@ -16,10 +16,12 @@ namespace Phantom.Graphics
 		public float IncludeMargin;
 
 		private EntityLayer entityLayer;
+		private IList<Component> nonEntities;
 
 		public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
 			:base(passes, viewportPolicy, renderOptions)
 		{
+			this.nonEntities = new List<Component>();
 		}
 
 		public override void OnAdd(Core.Component parent)
@@ -55,6 +57,9 @@ namespace Phantom.Graphics
 				foreach (Entity e in this.entityLayer.GetEntitiesInRect(topleft, bottomright, true))
 					if (!e.Ghost)
 						e.Render(info);
+				foreach (Component c in this.nonEntities)
+					if (!c.Ghost)
+						c.Render(info);
 				this.batch.End();
 			}
 		}
@@ -66,10 +71,24 @@ namespace Phantom.Graphics
 			foreach (Entity e in this.entityLayer.GetEntitiesInRect(topleft, bottomright, true))
 				if (!e.Ghost)
 					e.Render(info);
+			foreach (Component c in this.nonEntities)
+				if (!c.Ghost)
+					c.Render(info);
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 				this.batch.End();
 			}
+		}
+
+		internal override void OnComponentAddedToLayer(Component component)
+		{
+			if (!(component is Entity))
+				this.nonEntities.Add(component);
+		}
+
+		internal override void OnComponentRemovedToLayer(Component component)
+		{
+			this.nonEntities.Remove(component);
 		}
 	}
 }
