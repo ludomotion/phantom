@@ -70,7 +70,7 @@ namespace Phantom.Shapes
             else return new Vector2[0];
         }
 
-        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, bool includeShape, out Vector2[] umbra, out Vector2[] penumbra)
+        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, out Vector2[] umbra, out Vector2[] penumbra)
         {
             List<Vector2> vertices = new List<Vector2>();
 

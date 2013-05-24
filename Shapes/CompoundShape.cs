@@ -114,7 +114,7 @@ namespace Phantom.Shapes
             return intersections;
         }
 
-        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, bool includeShape, out Vector2[] umbra, out Vector2[] penumbra)
+        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, out Vector2[] umbra, out Vector2[] penumbra)
         {
             // TODO: Not tested yet
             int i, s, points = 0, curr = 0, penPoints = 0, penCurr = 0;
@@ -123,7 +123,7 @@ namespace Phantom.Shapes
             Vector2[][] penResult = new Vector2[shapes.Count][];
             for (i = 0; i < this.shapes.Count; i++)
             {
-                shapes[i].Shape.UmbraProjection(origin, maxDistance, lightRadius, includeShape, out result[i], out penResult[i]);
+                shapes[i].Shape.UmbraProjection(origin, maxDistance, lightRadius, out result[i], out penResult[i]);
                 points += result[i].Length;
                 penPoints += penResult[i].Length;
             }

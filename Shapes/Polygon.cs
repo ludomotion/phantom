@@ -202,9 +202,11 @@ namespace Phantom.Shapes
             return result;
         }
 
-        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, bool includeShape, out Vector2[] umbra, out Vector2[] penumbra)
+        public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, out Vector2[] umbra, out Vector2[] penumbra)
         {
-            int i;
+            int n, i, j, f;
+
+            int numVerts = this.Vertices.Length;
 
             List<Vector2> vertices = new List<Vector2>();
             List<Vector2> penvertices = new List<Vector2>();
@@ -212,102 +214,161 @@ namespace Phantom.Shapes
             Vector2[] farPoint2 = new Vector2[this.Vertices.Length];
 
             bool[] facing = new bool[this.normals.Length];
-            bool[] halfFacing = new bool[this.normals.Length];
-            List<int> boundary = new List<int>();
+            bool[] finVisible = new bool[this.normals.Length];
+            bool[] farFinVisible = new bool[this.normals.Length];
+            bool[] boundary = new bool[this.normals.Length];
 
             Vector2 closest;
-            int closestIndex;
+            Vector2 delta;
+            Vector2 delta2;
+            float deltaDist;
+            float delta2Dist;
 
-            Vector2 relOrigin = origin - this.Entity.Position;
-            for (i = 0; i < this.Vertices.Length; i++)
+            int closestIndex;
+            int farthestIndex;
+
+            Vector2[] finLightDirection = new Vector2[this.normals.Length];
+            Vector2[] finDarkDirection = new Vector2[this.normals.Length];
+
+            bool[] firstClosest = new bool[this.normals.Length];
+
+            for (i = 0; i < numVerts; i++)
             {
+                finVisible[i] = false;
+            }
+
+            // Check all edges for the ones that have a boundary relative to the light position
+            Vector2 relOrigin = origin - this.Entity.Position;
+            for (n = -1; n < numVerts; n++)
+            {
+                i = (n + numVerts) % numVerts;
+
                 closest = this.Vertices[i];
                 closestIndex = i;
-                Vector2 delta = relOrigin - this.Vertices[i];
-                Vector2 delta2 = relOrigin - this.Vertices[(i + 1) % this.Vertices.Length];
+                farthestIndex = (i + 1) % numVerts;
+                // Calculate the distance from the light source
+                delta = relOrigin - this.Vertices[closestIndex];
+                delta2 = relOrigin - this.Vertices[farthestIndex];
 
-                if (delta2.LengthSquared() < delta.LengthSquared())
+                deltaDist = delta.LengthSquared();
+                delta2Dist = delta.LengthSquared();
+
+                firstClosest[i] = (delta2Dist > deltaDist);
+                // Determine if the first or the second vertex is the closest
+                if (!firstClosest[i])
                 {
-                    closestIndex = (i + 1) % this.Vertices.Length;
+                    closestIndex = farthestIndex;
+                    farthestIndex = i;
                     closest = this.Vertices[closestIndex];
                     delta = delta2;
+                    float swap = deltaDist;
+                    deltaDist = delta2Dist;
+                    delta2Dist = swap;
                 }
 
+                // Determine if the edge faces the light 
                 float dot = Vector2.Dot(this.normals[i], delta);
-
                 facing[i] = dot > 0;
-                if (facing[i])
-                {
-                    float dotHalf = Vector2.Dot(this.normals[i], (relOrigin - this.normals[i] * lightRadius) - closest);
-                    halfFacing[closestIndex] = dotHalf < 0;
-                }
-                else
-                {
-                    float dotHalf = Vector2.Dot(this.normals[i], (relOrigin + this.normals[i] * lightRadius) - closest);
-                    halfFacing[closestIndex] = dotHalf > 0;
-                }
 
-                if (i > 0 && facing[i] != facing[i - 1])
+                if (n > -1)
                 {
-                    boundary.Add(i);
+                    // Determine boundary for hard shadow
+                    boundary[i] = (facing[i] != facing[(i + numVerts - 1) % numVerts]);
+
+                    if (lightRadius > 0f)
+                    {
+                        // Calculate the outer light projection direction on the border of the light source
+                        float angle = (float)Math.Asin(lightRadius / Math.Sqrt(deltaDist));
+                        Vector2 fin1Direction = -delta.RotateBy(angle);
+                        Vector2 fin2Direction = -delta.RotateBy(-angle);
+                        float finDot1 = Vector2.Dot(this.normals[i], fin1Direction);
+                        float finDot2 = Vector2.Dot(this.normals[i], fin2Direction);
+
+                        if (!finVisible[closestIndex])
+                        {
+                            finVisible[closestIndex] = finDot1 > 0 || finDot2 > 0;
+
+                            if (finVisible[closestIndex])
+                            {
+                                // Determine which side of the fin is in the light (has the smaller angle to the edge normal)
+                                if (finDot1 < finDot2)
+                                {
+                                    finLightDirection[closestIndex] = fin2Direction.Normalized();
+                                    finDarkDirection[closestIndex] = fin1Direction.Normalized();
+                                }
+                                else
+                                {
+                                    finLightDirection[closestIndex] = fin1Direction.Normalized();
+                                    finDarkDirection[closestIndex] = fin2Direction.Normalized();
+                                }
+
+                                if (!finVisible[farthestIndex])
+                                {
+                                    finVisible[farthestIndex] = finDot1 > 0 ^ finDot2 > 0;
+
+                                    if (finVisible[farthestIndex])
+                                    {
+                                        // Calculate the outer light projection direction on the border of the light source
+                                        angle = (float)Math.Asin(lightRadius / Math.Sqrt(delta2Dist));
+                                        fin1Direction = -delta.RotateBy(angle);
+                                        fin2Direction = -delta.RotateBy(-angle);
+                                        finDot1 = Vector2.Dot(this.normals[i], fin1Direction);
+                                        finDot2 = Vector2.Dot(this.normals[i], fin2Direction);
+
+                                        // Determine which side of the fin is in the light (has the smaller angle to the edge normal)
+                                        if (finDot1 < finDot2)
+                                        {
+                                            finLightDirection[farthestIndex] = fin2Direction.Normalized();
+                                            finDarkDirection[farthestIndex] = fin1Direction.Normalized();
+                                        }
+                                        else
+                                        {
+                                            finLightDirection[farthestIndex] = fin1Direction.Normalized();
+                                            finDarkDirection[farthestIndex] = fin2Direction.Normalized();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
-            if (boundary.Count == 1) boundary.Add(0);
+
+            Vector2 closePoint;
+            Vector2 farSidePointLight;
+            Vector2 farSidePointDark;
+            Vector2 umbraPoint1;
+            Vector2 umbraPoint2;
 
             for (i = 0; i < this.Vertices.Length; i++)
             {
-                bool penumbraNow = false;
+                j = (i + 1) % numVerts;
+
                 if (lightRadius > 0f)
                 {
-                    if (boundary.Contains(i) || halfFacing[i])
+                    if(finVisible[i])
                     {
-                        Vector2 closePoint = this.Vertices[i] + this.Entity.Position;
+                        closePoint = this.Vertices[i] + this.Entity.Position;
 
-                        Vector2 delta = closePoint - origin; // from light source to boundary point
-                        float distance = delta.Length();
-                        Vector2 center = closePoint + delta; // light source reflected on the boundary point
-                        float sideAngle = (float)Math.Asin(lightRadius / distance); // half of the shadow 'fin' arc
-                        float centerAngle = delta.Angle();
-                        float angle1 = centerAngle + sideAngle;
-                        float angle2 = centerAngle - sideAngle;
+                        farSidePointLight = closePoint + finLightDirection[i] * maxDistance; // TODO: add umbra behind light edge points
+                        farSidePointDark = closePoint + finDarkDirection[i] * maxDistance;
 
-                        Vector2 sidePoint1 = center + new Vector2(lightRadius * (float)Math.Cos(angle1), lightRadius * (float)Math.Sin(angle1));
-                        Vector2 sidePoint2 = center + new Vector2(lightRadius * (float)Math.Cos(angle2), lightRadius * (float)Math.Sin(angle2));
-
-                        Vector2 farSidePoint1 = origin + (sidePoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
-                        Vector2 farSidePoint2 = origin + (sidePoint2 - origin).Normalized() * maxDistance;
-
-                        //if (!facing[i])
-                        //{
-                        //    Vector2 swap = farSidePoint2;
-                        //    farSidePoint2 = farSidePoint1;
-                        //    farSidePoint1 = swap;
-                        //}
-
-                        farPoint1[i].X = farSidePoint2.X;
-                        farPoint1[i].Y = farSidePoint2.Y;
-                        penumbraNow = true;
+                        farPoint2[i] = farSidePointDark;
+                        farPoint1[i] = farSidePointDark;
 
                         penvertices.Add(closePoint);
-                        penvertices.Add(farSidePoint1);
-                        penvertices.Add(farSidePoint2);
+                        penvertices.Add(farSidePointLight);
+                        penvertices.Add(farSidePointDark);
                     }
                 }
 
-                if (facing[i] == includeShape) // use inner edges if including shape, outer otherwise
+                if (facing[i])
                 {
-                    Vector2 umbraPoint1 = this.Vertices[i] + this.Entity.Position;
-                    Vector2 umbraPoint2 = this.Vertices[(i + 1) % this.Vertices.Length] + this.Entity.Position;
+                    umbraPoint1 = this.Vertices[i] + this.Entity.Position;
+                    umbraPoint2 = this.Vertices[j] + this.Entity.Position;
 
-                    if (!facing[i])
-                    {
-                        Vector2 swap = umbraPoint1;
-                        umbraPoint2 = umbraPoint1;
-                        umbraPoint1 = swap;
-                    }
-
-                    if (!penumbraNow) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
-                    farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+                    if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
+                    if (!finVisible[j] || finVisible[i]) farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
 
                     vertices.Add(umbraPoint1);
                     vertices.Add(umbraPoint2);
