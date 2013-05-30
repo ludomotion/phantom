@@ -40,14 +40,14 @@ namespace Phantom.GameUI
         /// <summary>
         /// The component's current location
         /// </summary>
-        public UIContainer Container {get; private set;}
+        public UIContainer Container {get; protected set;}
 
         /// <summary>
         /// The target of location (used for auto moves)
         /// </summary>
         private UIContainer targetContainer;
 
-        private Vector2 targetPosition;
+        protected Vector2 targetPosition;
 
         /// <summary>
         /// The departure point of an auto move
@@ -76,7 +76,7 @@ namespace Phantom.GameUI
         /// <summary>
         /// The Content's state
         /// </summary>
-        public UIContentState State { get; private set; }
+        public UIContentState State { get; protected set; }
 
         public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container, int stackSize, int count)
             : base(name, position, shape)
@@ -87,7 +87,10 @@ namespace Phantom.GameUI
             this.Caption = caption;
             this.State = UIContentState.Floating;
             if (container != null)
-                Dock(container);
+            {
+                if (!(container is UIInventory))
+                    Dock(container);
+            }
             else
                 CanFloat = true;
         }
@@ -101,9 +104,8 @@ namespace Phantom.GameUI
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (State == UIContentState.Docked && Container != null)
+            if (State == UIContentState.Docked && Container != null && !(Container is UIInventory))
             {
-                //Position = Container.Position;
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
             } 
@@ -115,7 +117,7 @@ namespace Phantom.GameUI
                     if (tween == 0)
                         Dock(targetContainer);
                     else
-                        Position = Vector2.Lerp(targetContainer.Position, moveOrigin, MoveTween(tween));
+                        Position = Vector2.Lerp(targetPosition, moveOrigin, MoveTween(tween));
                 }
                 else
                 {

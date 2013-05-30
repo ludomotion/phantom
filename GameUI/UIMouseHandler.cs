@@ -70,6 +70,8 @@ namespace Phantom.GameUI
             UIContent content = (hover as UIContent);
             if (content != null && content.Container != null)
                 hover = content.Container;
+            if (hover is UIInventory)
+                ((UIInventory)hover).UpdateMouse(mousePosition);
 
             if (current.X != previous.X || current.Y != previous.Y)
             {

@@ -103,6 +103,8 @@
     <Compile Include="Core\Input.cs" />
     <Compile Include="Core\InputComponent.cs" />
     <Compile Include="Core\PropertyCollection.cs" />
+    <Compile Include="GameUI\UIInventory.cs" />
+    <Compile Include="GameUI\UIInventoryItem.cs" />
     <Compile Include="GameUI\Label.cs" />
     <Compile Include="GameUI\ToolButton.cs" />
     <Compile Include="GameUI\UIMouseEntityHandler.cs" />
