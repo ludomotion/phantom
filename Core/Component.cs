@@ -132,7 +132,6 @@ namespace Phantom.Core
         /// <param name="child"></param>
         protected virtual void OnComponentRemoved(Component child)
         {
-            child.OnRemove();
         }
 
         /// <summary>
