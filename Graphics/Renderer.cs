@@ -193,11 +193,14 @@ namespace Phantom.Graphics
             {
                 fit = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
                 fill = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
+                info.Padding = new Vector2(paddingX * designSize.Y / resolution.Height, 0);
+
             }
             else
             {
                 fit = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
                 fill = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
+                info.Padding = new Vector2(0, paddingY * designSize.X / resolution.Width );
             }
 
             switch (this.Policy)
@@ -278,6 +281,7 @@ namespace Phantom.Graphics
                 info.Canvas = this.canvas;
             }
 
+
             return info;
         }
 
@@ -345,5 +349,11 @@ namespace Phantom.Graphics
 		internal virtual void OnComponentRemovedToLayer(Component component)
 		{
 		}
-	}
+
+        public Vector2 GetPadding()
+        {
+            RenderInfo info = BuildRenderInfo();
+            return info.Padding;
+        }
+    }
 }

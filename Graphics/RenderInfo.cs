@@ -28,6 +28,7 @@ namespace Phantom.Graphics
         public Camera Camera;
         public Matrix World;
         public Matrix Projection;
+        public Vector2 Padding;
 
     }
 }
