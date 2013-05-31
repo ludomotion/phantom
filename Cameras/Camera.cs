@@ -37,11 +37,19 @@ namespace Phantom.Cameras
             base.Update(elapsed);
             this.Position = this.Target;
 
+            //Fix only for Bezircle? or permanent?
+            /*
             Viewport res = PhantomGame.Game.Resolution;
             this.Top = this.Position.Y - res.Height * .5f / Zoom;
             this.Right = this.Position.X + res.Width * .5f / Zoom;
             this.Bottom = this.Position.Y + res.Height * .5f / Zoom;
             this.Left = this.Position.X - res.Width * .5f / Zoom;
+            /*/
+            this.Top = this.Position.Y - PhantomGame.Game.Height * .5f / Zoom;
+            this.Right = this.Position.X + PhantomGame.Game.Width * .5f / Zoom;
+            this.Bottom = this.Position.Y + PhantomGame.Game.Height * .5f / Zoom;
+            this.Left = this.Position.X - PhantomGame.Game.Width * .5f / Zoom;
+            //*/
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
