@@ -196,6 +196,7 @@
     <Compile Include="Utils\EntityFactory.cs" />
     <Compile Include="Utils\PhantomComponentNotation.cs" />
     <Compile Include="Utils\TweenFunctions.cs" />
+    <Compile Include="Graphics\EntityRenderer.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
