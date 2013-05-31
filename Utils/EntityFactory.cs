@@ -9,6 +9,10 @@ using Phantom.Misc;
 using System.Diagnostics;
 using Phantom.Utils;
 
+#if TOUCH
+using Trace = System.Console;
+#endif
+
 namespace Phantom.Utils
 {
     /// <summary>
