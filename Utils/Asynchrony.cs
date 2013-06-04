@@ -155,8 +155,12 @@ namespace Phantom.Utils
             {
                 for (int i = this.tasks.Count - 1; i >= 0; --i)
                 {
-                    if (this.tasks[i].PerformTest())
+                    ITaskTester tester = this.tasks[i];
+                    if (tester.PerformTest())
+                    {
                         this.tasks.RemoveAt(i);
+                        tester.PerformInvoke();
+                    }
                 }
             }
             base.Update(elapsed);
@@ -174,11 +178,12 @@ namespace Phantom.Utils
         private interface ITaskTester
         {
             bool PerformTest();
+            void PerformInvoke();
         }
         private class TaskTester<T> : ITaskTester
         {
-            public new Task<T> Task;
-            public new Action<T> Action;
+            public Task<T> Task;
+            public Action<T> Action;
             public TaskTester(Task<T> task, Action<T> action)
             {
                 this.Task = task;
@@ -189,10 +194,14 @@ namespace Phantom.Utils
             {
                 if (Task.IsCompleted)
                 {
-                    Action.Invoke(Task.Result);
                     return true;
                 }
                 return false;
+            }
+
+            public void PerformInvoke()
+            {
+                Action.Invoke(Task.Result);
             }
         }
         private class TaskTester : ITaskTester
@@ -209,10 +218,14 @@ namespace Phantom.Utils
             {
                 if (Task.IsCompleted)
                 {
-                    Action.Invoke();
                     return true;
                 }
                 return false;
+            }
+
+            public void PerformInvoke()
+            {
+                Action.Invoke();
             }
         }
     }
