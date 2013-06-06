@@ -8,6 +8,8 @@ using Phantom.Shapes;
 
 namespace Phantom.GameUI
 {
+    public enum UIElementOrientation { LeftRight, TopDown }
+
     /// <summary>
     /// The base class from which all MenuControls are derived. It implements
     /// basic behavior and sets up a few simple methods that can be overridden
@@ -184,6 +186,10 @@ namespace Phantom.GameUI
         /// <param name="position"></param>
         /// <param name="player"></param>
         public virtual void ClickAt(Vector2 position, int player)
+        {
+        }
+
+        public virtual void MoveMouseTo(Vector2 position, int player)
         {
         }
 

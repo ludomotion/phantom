@@ -24,12 +24,29 @@ namespace Phantom.GameUI
         /// </summary>
         private UIContent content;
 
-        
-
         public UIContainer(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
         {
             this.Caption = caption;
+        }
+
+        protected override void OnComponentAdded(Core.Component component)
+        {
+            base.OnComponentAdded(component);
+            if (component is UIContent)
+            {
+                this.content = component as UIContent;
+                this.content.Position = this.Position;
+            }
+        }
+
+        protected override void OnComponentRemoved(Core.Component component)
+        {
+            base.OnComponentRemoved(component);
+
+            if (component == this.content)
+                this.content = null;
+
         }
 
         /// <summary>
@@ -56,6 +73,9 @@ namespace Phantom.GameUI
                 size.Y = this.Shape.RoughWidth * 0.5f;
                 info.Batch.DrawString(UILayer.Font, Caption, Position + size, text);
             }
+            if (content != null)
+                content.Position = this.Position;
+            base.Render(info);
         }
 
         /// <summary>
@@ -94,16 +114,6 @@ namespace Phantom.GameUI
             return content;
         }
 
-        public virtual void AddContent(UIContent content)
-        {
-            this.content = content;
-            this.content.Position = this.Position;
-        }
 
-        public virtual void RemoveContent(UIContent content)
-        {
-            if (content == this.content)
-                this.content = null;
-        }
     }
 }

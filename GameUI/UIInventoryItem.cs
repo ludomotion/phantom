@@ -11,39 +11,34 @@ namespace Phantom.GameUI
     public class UIInventoryItem : UIContent
     {
         protected UIInventory Inventory;
-        internal int InventoryX;
-        internal int InventoryY;
+        public int InventoryX;
+        public int InventoryY;
         internal int Width;
         internal int Height;
 
-        public UIInventoryItem(string name, string caption, Vector2 position, int width, int height, UIInventory inventory, int inventoryX, int inventoryY, UIContainer container)
-            : base(name, caption, position, new OABB(new Vector2(width*inventory.SlotSize.X*0.5f, height*inventory.SlotSize.Y*0.5f)), container)
+        public UIInventoryItem(string name, string caption, Vector2 position, int width, int height, float slotSize, int inventoryX, int inventoryY)
+            : base(name, caption, position, new OABB(new Vector2(width*slotSize*0.5f, height*slotSize*0.5f)))
         {
-            this.Inventory = inventory;
+            this.Inventory = null;
             this.InventoryX = inventoryX;
             this.InventoryY = inventoryY;
             this.Width = width;
             this.Height = height;
-            if (container is UIInventory)
-            {
-                UIInventory inv = (UIInventory)container;
-                if (inventoryX >= 0 && inventoryY >= 0)
-                {
-                    this.Position.X = inv.Position.X + (-0.5f * inv.Width + 0.5f * this.Width + this.InventoryX) * inv.SlotSize.X;
-                    this.Position.Y = inv.Position.Y + (-0.5f * inv.Height + 0.5f * this.Height + this.InventoryY) * inv.SlotSize.Y;
-                }
-                Dock(container);
-            }
         }
 
-        public UIInventoryItem(string name, string caption, int width, int height, UIInventory inventory, UIContainer container)
-            : this(name, caption, container.Position, width, height, inventory, -1, -1, container) { }
+        public UIInventoryItem(string name, string caption, int width, int height, float slotSize)
+            : base(name, caption, new Vector2(float.NaN, float.NaN), new OABB(new Vector2(width * slotSize * 0.5f, height * slotSize * 0.5f)))
+        {
+            this.Inventory = null;
+            this.InventoryX = -1;
+            this.InventoryY = -1;
+            this.Width = width;
+            this.Height = height;
+        }
 
-        public UIInventoryItem(string name, string caption, int width, int height, UIInventory inventory)
-            : this(name, caption, new Vector2(float.NaN, float.NaN), width, height, inventory, -1, -1, inventory) { }
 
-        public UIInventoryItem(string name, string caption, int width, int height, UIInventory inventory, int inventoryX, int inventoryY)
-            : this(name, caption, inventory.Position, width, height, inventory, inventoryX, inventoryY, inventory) { }
+        public UIInventoryItem(string name, string caption, int width, int height, float slotSize, int inventoryX, int inventoryY)
+            : this(name, caption, new Vector2(float.NaN, float.NaN), width, height, slotSize, inventoryX, inventoryY) { }
 
         public override void Update(float elapsed)
         {
@@ -62,6 +57,9 @@ namespace Phantom.GameUI
             if (container is UIInventory)
             {
                 UIInventory inv = (UIInventory)container;
+                if ((float.IsNaN(this.Position.X) || float.IsNaN(this.Position.Y)) && InventoryX >= 0 && InventoryY >= 0)
+                    this.Position = inv.GetPositionInInventory(this);
+                
                 if (float.IsNaN(this.Position.X) || float.IsNaN(this.Position.Y))
                     AddToInventory(inv);
                 else
@@ -110,6 +108,10 @@ namespace Phantom.GameUI
                     return;
                 }
             }
+
+            if (Parent != null)
+                this.Parent.RemoveComponent(this);
+            inv.AddComponent(this);
             this.Container = inv;
             this.Inventory = inv;
             State = UIContentState.Docked;

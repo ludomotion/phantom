@@ -72,6 +72,10 @@ namespace Phantom.GameUI
                 hover = content.Container;
             if (hover is UIInventory)
                 ((UIInventory)hover).UpdateMouse(mousePosition);
+            if (hover is UICarousel)
+                ((UICarousel)hover).UpdateMouse(mousePosition);
+            if (hover is UICarouselContainer)
+                ((UICarouselContainer)hover).UpdateMouse(mousePosition);
 
             if (current.X != previous.X || current.Y != previous.Y)
             {
@@ -89,8 +93,10 @@ namespace Phantom.GameUI
                     //if pressing the left button at the same location pass the info
                     if (mouseDown != null && hover == mouseDown) 
                     {
-                        mouseDown.ClickAt(mousePosition - mouseDown.Position, player);
+                        mouseDown.MoveMouseTo(mousePosition - mouseDown.Position, player);
 
+                        if (hover is UICarousel)
+                            hover = ((UICarousel)hover).GetElementAt(mousePosition);
                         //check if I can start dragging something;
                         if (hover is UIContainer && (hover as UIContainer).GetContentAt(mousePosition) != null && hover.Enabled)
                         {
@@ -126,6 +132,8 @@ namespace Phantom.GameUI
                 if (draggingContent != null)
                 {
                     //end drag
+                    if (hover is UICarousel)
+                        hover = ((UICarousel)hover).GetElementAt(mousePosition);
                     UIContainer container = hover as UIContainer;
                     if (container != null)
                     {

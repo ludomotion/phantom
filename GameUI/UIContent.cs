@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
 using Phantom.Misc;
+using System.Diagnostics;
 
 namespace Phantom.GameUI
 {
@@ -78,7 +79,7 @@ namespace Phantom.GameUI
         /// </summary>
         public UIContentState State { get; protected set; }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container, int stackSize, int count)
+        public UIContent(string name, string caption, Vector2 position, Shape shape, int stackSize, int count)
             : base(name, position, shape)
         
         {
@@ -86,25 +87,18 @@ namespace Phantom.GameUI
             this.Count = count;
             this.Caption = caption;
             this.State = UIContentState.Floating;
-            if (container != null)
-            {
-                if (!(container is UIInventory))
-                    Dock(container);
-            }
-            else
-                CanFloat = true;
         }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container, int stackSize)
-            : this(name, caption, position, shape, container, stackSize, 1) { }
+        public UIContent(string name, string caption, Vector2 position, Shape shape, int stackSize)
+            : this(name, caption, position, shape, stackSize, 1) { }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape, UIContainer container)
-            : this(name, caption, position, shape, container, 1, 1) { }
+        public UIContent(string name, string caption, Vector2 position, Shape shape)
+            : this(name, caption, position, shape, 1, 1) { }
 
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (State == UIContentState.Docked && Container != null && !(Container is UIInventory))
+            if (State == UIContentState.Docked && Container != null && !(Container is UIInventory) && !(Container is UICarouselContainer))
             {
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
@@ -168,7 +162,8 @@ namespace Phantom.GameUI
             LastPosition = Position;
             if (this.Container != null)
             {
-                this.Container.RemoveContent(this);
+                this.Container.RemoveComponent(this);
+                this.Container.GetAncestor<UILayer>().AddComponent(this);
                 this.Container = null;
             }
             State = UIContentState.Dragged;
@@ -216,7 +211,9 @@ namespace Phantom.GameUI
                 
             }
             this.Container = container;
-            container.AddContent(this);
+            if (this.Parent != null)
+                this.Parent.RemoveComponent(this);
+            container.AddComponent(this);
             State = UIContentState.Docked;
         }
 

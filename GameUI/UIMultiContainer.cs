@@ -56,15 +56,19 @@ namespace Phantom.GameUI
             return null;
         }
 
-        public override void RemoveContent(UIContent content)
+        protected override void OnComponentAdded(Core.Component component)
         {
-            Contents.Remove(content);
+            base.OnComponentAdded(component);
+            if (component is UIContent)
+                Contents.Add(component as UIContent);
         }
 
-        public override void AddContent(UIContent content)
+        protected override void OnComponentRemoved(Core.Component component)
         {
-            Contents.Add(content);
-        }
+            base.OnComponentRemoved(component);
+            if (component is UIContent)
+                Contents.Remove(component as UIContent);
 
+        }
     }
 }

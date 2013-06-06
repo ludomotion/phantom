@@ -61,6 +61,8 @@ namespace Phantom.GameUI
                     }
                 }
             }
+            for (int i = 0; i < Components.Count; i++)
+                Components[i].Render(info);
         }
 
         protected virtual void RenderSlot(Graphics.RenderInfo info, Vector2 position, int x, int y)
@@ -78,6 +80,17 @@ namespace Phantom.GameUI
             info.Canvas.FillColor = (Slots[x, y] == null) ? empty : full;
 
             info.Canvas.FillRect(position, s, 0);
+        }
+
+        public Vector2 GetPositionInInventory(UIInventoryItem item)
+        {
+            Vector2 result = new Vector2(item.InventoryX * SlotSize.X, item.InventoryY * SlotSize.Y);
+            result.X += item.Width * SlotSize.X * 0.5f;
+            result.Y += item.Height * SlotSize.Y * 0.5f;
+            result.X -= Size.X * 0.5f;
+            result.Y -= Size.Y * 0.5f;
+            result += this.Position;
+            return result;
         }
 
         public void GetInventoryPosition(UIInventoryItem item, ref int x, ref int y)
@@ -171,18 +184,17 @@ namespace Phantom.GameUI
             return Slots[x, y];
         }
 
-        public override void RemoveContent(UIContent content)
+        protected override void OnComponentRemoved(Core.Component component)
         {
-            if (content is UIInventoryItem)
+            base.OnComponentRemoved(component);
+            if (component is UIInventoryItem)
             {
-                UIInventoryItem item = (UIInventoryItem)content;
+                UIInventoryItem item = (UIInventoryItem)component;
                 if (item.InventoryX >= 0 && item.InventoryY >= 0)
                     for (int y = item.InventoryY; y < item.InventoryY + item.Height; y++)
                         for (int x = item.InventoryX; x < item.InventoryX + item.Width; x++)
                             Slots[x, y] = null;
             }
-            else
-                base.RemoveContent(content);
         }
 
         internal void UpdateMouse(Vector2 mousePosition)
