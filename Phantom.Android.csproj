@@ -66,8 +66,6 @@
     <Compile Include="Misc\Components\MessageDelay.cs" />
     <Compile Include="Misc\Components\MessageDelegate.cs" />
     <Compile Include="Misc\DebugLayer.cs" />
-    <Compile Include="Misc\MathUtils.cs" />
-    <Compile Include="Misc\MiscUtils.cs" />
     <Compile Include="Misc\Konsoul.cs" />
     <Compile Include="Misc\Tests\RendererCanvasTest.cs" />
     <Compile Include="Misc\Triangulator.cs" />
@@ -87,8 +85,6 @@
     <Compile Include="Graphics\ShapeRenderer.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\SpriteRenderer.cs" />
-    <Compile Include="Misc\DrawUtils.cs" />
-    <Compile Include="Misc\VectorUtils.cs" />
     <Compile Include="Misc\XnaPhantomComponent.cs" />
     <Compile Include="PhantomGame.cs" />
     <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
@@ -122,6 +118,24 @@
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
     <Compile Include="Utils\Performance\ProfilerStats.cs" />
     <Compile Include="Misc\DeviceHardware.cs" />
+    <Compile Include="Misc\PhantomUtils.AI.cs" />
+    <Compile Include="Misc\PhantomUtils.Graphics.cs" />
+    <Compile Include="Misc\PhantomUtils.Math.cs" />
+    <Compile Include="Misc\PhantomUtils.Misc.cs" />
+    <Compile Include="Shapes\Filters\AllFlagsFilter.cs" />
+    <Compile Include="Shapes\Filters\AndFilter.cs" />
+    <Compile Include="Shapes\Filters\AngleFilter.cs" />
+    <Compile Include="Shapes\Filters\AnyFlagsFilter.cs" />
+    <Compile Include="Shapes\Filters\DelegateFilter.cs" />
+    <Compile Include="Shapes\Filters\DistanceFilter.cs" />
+    <Compile Include="Shapes\Filters\IFilter.cs" />
+    <Compile Include="Shapes\Filters\NotFilter.cs" />
+    <Compile Include="Shapes\Filters\OrFilter.cs" />
+    <Compile Include="Utils\Asynchrony.cs" />
+    <Compile Include="Utils\EntityFactory.cs" />
+    <Compile Include="Utils\PhantomComponentNotation.cs" />
+    <Compile Include="Utils\TweenFunctions.cs" />
+    <Compile Include="Graphics\EntityRenderer.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
@@ -135,6 +149,7 @@
     <Folder Include="UI\" />
     <Folder Include="Utils\" />
     <Folder Include="Utils\Performance\" />
+    <Folder Include="Shapes\Filters\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -144,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
+    <None Include="Utils\Editor.cs.orig" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame\MonoGame.Framework\MonoGame.Framework.Android.csproj">
