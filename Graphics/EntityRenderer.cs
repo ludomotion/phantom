@@ -12,8 +12,11 @@ namespace Phantom.Graphics
 	/// Modification to the normal renderer that only renders 
 	/// </summary>
 	public class EntityRenderer : Renderer
-	{
-		public float IncludeMargin;
+    {
+        public float IncludeMarginTop;
+        public float IncludeMarginRight;
+        public float IncludeMarginBottom;
+        public float IncludeMarginLeft;
 
 		private EntityLayer entityLayer;
 		private IList<Component> nonEntities;
@@ -41,9 +44,8 @@ namespace Phantom.Graphics
 			{
 				// TODO: Rotation?
 				Vector2 diagonal = new Vector2(info.Width, info.Height) * .5f * (1 / info.Camera.Zoom);
-				diagonal += Vector2.One * IncludeMargin;
-				topleft = info.Camera.Position - diagonal;
-				bottomright = info.Camera.Position + diagonal;
+                topleft = info.Camera.Position - diagonal - new Vector2(IncludeMarginLeft, IncludeMarginTop);
+                bottomright = info.Camera.Position + diagonal + new Vector2(IncludeMarginRight, IncludeMarginBottom);
 			}
 		}
 
