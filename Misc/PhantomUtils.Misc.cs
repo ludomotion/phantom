@@ -84,5 +84,29 @@ namespace Phantom.Misc
 				}
 			}
 		}
+
+        /// <summary>
+        /// Generate a hashcode for a string, using the alorithm Java uses. This because different 
+        /// platforms generated different hashes (Mono vs .NET).
+        /// 
+        /// See: http://docs.oracle.com/javase/6/docs/api/java/lang/String.html#hashCode() (yes, in a C# project)
+        /// </summary>
+        /// <param name="input">input string</param>
+        /// <returns>hashCode of given string (0 if string is empty)</returns>
+        public static int GetHashCode(string input)
+        {
+            if( input == null || input.Length == 0 )
+                return 0;
+
+            int r = 0;
+            int n = input.Length;
+            int p = 31;
+            char[] data = input.ToCharArray();
+
+            for (int i = 0; i < n; i++)
+                r += data[i] * (int)Math.Pow(p, (n - (1+i)));
+
+            return r;
+        }
 	}
 }
