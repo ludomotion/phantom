@@ -144,6 +144,18 @@ namespace Phantom.Utils
         }
 
         /// <summary>
+        /// Simply execute an action in the first game update.
+        /// </summary>
+        /// <param name="action">The action to invoke.</param>
+        public void Dispatch(Action action)
+        {
+            lock (this.tasks)
+            {
+                this.tasks.Add(new DispatchTester(action));
+            }
+        }
+
+        /// <summary>
         /// Within the Update method of this component every
         /// created task is checked if it's ready or not.
         /// If it was ready the callback/action is invoked.
@@ -227,6 +239,23 @@ namespace Phantom.Utils
             {
                 Action.Invoke();
             }
+        }
+        private class DispatchTester : ITaskTester
+        {
+            private Action Action;
+            public DispatchTester(Action action)
+            {
+                this.Action = action;
+            }
+            public bool PerformTest()
+            {
+                return true;
+            }
+            public void PerformInvoke()
+            {
+                Action.Invoke();
+            }
+
         }
     }
 
