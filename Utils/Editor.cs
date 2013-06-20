@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Phantom.UI;
 using System.Globalization;
 using System.IO;
+using Phantom.Cameras.Components;
 
 namespace Phantom.Utils
 {
@@ -104,7 +105,17 @@ namespace Phantom.Utils
             this.Editing = editing;
             this.Editing.HandleMessage(Messages.MapReset, null);
             if (Editing.Camera != null)
+            {
                 this.Editing.Camera.HandleMessage(Messages.CameraStopFollowing, null);
+                while (true)
+                {
+                    CameraOffset offset = this.Editing.Camera.GetComponentByType<CameraOffset>();
+                    if (offset != null)
+                        this.Editing.Camera.RemoveComponent(offset);
+                    else
+                        break;
+                }
+            }
 
             layers = new List<EditorLayer>();
             foreach (Component c in editing.Components)
@@ -121,8 +132,14 @@ namespace Phantom.Utils
                             layers.Add(new EditorLayer(c, name + " (Entities)", LayerType.Entities, MapLoader.EntityLists[c.Properties.GetString("entityList", "")], 0));
                     }
                 }
-                
             }
+
+            /*for (int i = editing.Components.Count - 1; i >= 0; i--)
+            {
+                Component c = editing.Components[i];
+                if (c != editing.Camera && (c.Properties == null || c.Properties.GetString("editable", null) == null))
+                    editing.RemoveComponent(c);
+            }*/
 
             if (layers.Count > 0)
             {
