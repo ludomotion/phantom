@@ -339,6 +339,8 @@ namespace Phantom.Shapes
             Vector2 farSidePointDark;
             Vector2 umbraPoint1;
             Vector2 umbraPoint2;
+            Vector2 backFill1;
+            Vector2 backFill2;
 
             for (i = 0; i < this.Vertices.Length; i++)
             {
@@ -367,8 +369,11 @@ namespace Phantom.Shapes
                     umbraPoint1 = this.Vertices[i] + this.Entity.Position;
                     umbraPoint2 = this.Vertices[j] + this.Entity.Position;
 
-                    if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance; // TODO: add umbra behind light edge points
+                    if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance;
                     if (!finVisible[j] || finVisible[i]) farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+
+                    backFill1 = farPoint1[i] - relOrigin.Normalized() * maxDistance;
+                    backFill2 = farPoint2[i] - relOrigin.Normalized() * maxDistance;
 
                     vertices.Add(umbraPoint1);
                     vertices.Add(umbraPoint2);
@@ -376,6 +381,12 @@ namespace Phantom.Shapes
                     vertices.Add(farPoint1[i]);
                     vertices.Add(umbraPoint2);
                     vertices.Add(farPoint2[i]);
+                    vertices.Add(farPoint1[i]);
+                    vertices.Add(farPoint2[i]);
+                    vertices.Add(backFill1);
+                    vertices.Add(backFill1);
+                    vertices.Add(farPoint2[i]);
+                    vertices.Add(backFill2);
                 }
             }
 
