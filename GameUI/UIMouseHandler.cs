@@ -53,6 +53,16 @@ namespace Phantom.GameUI
             return base.HandleMessage(message, data);
         }
 
+        public Vector2 GetPosition()
+        {
+            return new Vector2(current.X, current.Y);
+        }
+
+        public UIElement GetHoverElement()
+        {
+            return hover;
+        }
+
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
