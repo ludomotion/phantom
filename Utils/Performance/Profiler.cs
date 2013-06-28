@@ -106,7 +106,7 @@ namespace Phantom.Utils.Performance
                     pixel = new Texture2D(PhantomGame.Game.GraphicsDevice, 1, 1);
                     pixel.SetData(new [] { Color.White });
                     background = Color.Black;
-                    background.A = 64;
+                    background.A = 128;
                 }
 
                 this.batch.Begin();
@@ -202,18 +202,4 @@ namespace Phantom.Utils.Performance
 		}
 	}
 
-	public static class ProfilerHelpers
-	{
-		[Conditional("DEBUG")]
-		public static void BeginProfiling(this Component component, string name)
-		{
-			Profiler.Instance.Begin(name);
-		}
-
-		[Conditional("DEBUG")]
-		public static void EndProfiling(this Component component, string name)
-		{
-			Profiler.Instance.End(name);
-		}
-	}
 }
