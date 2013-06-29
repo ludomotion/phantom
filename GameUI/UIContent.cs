@@ -274,7 +274,7 @@ namespace Phantom.GameUI
         /// <returns></returns>
         public virtual bool CanDockAt(UIContainer container)
         {
-            return true;
+            return container.Enabled;
         }
     }
 }
