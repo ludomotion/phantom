@@ -183,31 +183,69 @@ namespace Phantom.Utils
             windows.AddComponent(layerWindow);
         }
 
-        private PhWindow BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, bool includeNone, string name)
+        private int numberOfEntities = 13 * 3;
+        private int firstEntity = 0;
+        private PhWindow BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, string name, int first)
         {
-            entitiesWindow = new PhWindow(100, 100, 500, 500, name);
+            int buttonWidth = 160;
+            int buttonHeight = 24;
+            int spacing = 8;
+            int width = buttonWidth * 3 + spacing * 4;
+            int height = 500;
+            entitiesWindow = new PhWindow(100, 100, width, height, name);
             entitiesWindow.Ghost = true;
-            int x = 10;
-            int y = 30;
-            if (includeNone)
+            int x = spacing;
+            int y = 20 + spacing;
+            bool next = false;
+            bool buttons = false;
+            if (first == -1)
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, "<none>", SelectEntity));
-                y += 32;
+                entitiesWindow.AddComponent(new PhButton(x, y, buttonWidth, buttonHeight, "<none>", SelectEntity));
+                y += buttonHeight + spacing;
+                first++;
+                buttons = true;
             }
 
+            int i =first;
             foreach (KeyValuePair<string, PCNComponent> entity in entityList)
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, 160, 24, entity.Key, SelectEntity));
-                y += 32;
-                if (y > 500 - 32)
+                if (i > 0)
                 {
-                    x += 168;
-                    y = 30;
+                    i--;
+                }
+                else
+                {
+                    buttons = true;
+                    entitiesWindow.AddComponent(new PhButton(x, y, buttonWidth, buttonHeight, entity.Key, SelectEntity));
+                    y += buttonHeight + spacing;
+                    if (y > height - 2 * (buttonHeight + spacing))
+                    {
+                        x += buttonWidth + spacing;
+                        y = 20 + spacing;
+                    }
+
+                    if (x > width - spacing-buttonWidth)
+                    {
+                        next = true;
+                        break;
+                    }
                 }
             }
 
+            if (first != 0)
+                entitiesWindow.AddComponent(new PhButton(spacing, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Previous", SelectPreviousEntities));
+            if (next)
+                entitiesWindow.AddComponent(new PhButton(width - spacing - buttonWidth, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Next", SelectNextEntities));
+
             entitiesWindow.OnClose = CloseEntityWindow;
-            return entitiesWindow;
+
+            if (!buttons && first > 0)
+            {
+                firstEntity -= numberOfEntities;
+                return BuildEntitiesWindow(entityList, name, first - numberOfEntities);
+            }
+            else
+                return entitiesWindow;
         }
 
         private void CloseEntityWindow(PhControl sender)
@@ -219,17 +257,31 @@ namespace Phantom.Utils
             }
         }
 
+        private void SelectNextEntities(PhControl sender)
+        {
+            CloseEntityWindow(sender);
+            firstEntity += numberOfEntities;
+            StartSelectEntity(sender);
+        }
+
+        private void SelectPreviousEntities(PhControl sender)
+        {
+            CloseEntityWindow(sender);
+            firstEntity -= numberOfEntities;
+            StartSelectEntity(sender);
+        }
+
         private void StartSelectEntity(PhControl sender)
         {
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
-                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, true, "Tiles");
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Tiles", firstEntity-1);
                 windows.AddComponent(window);
                 window.Show();
             }
             if (layers[currentLayer].Type == LayerType.Entities)
             {
-                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, false, "Entities");
+                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Entities", firstEntity);
                 windows.AddComponent(window);
                 window.Show();
             }
