@@ -265,5 +265,16 @@ namespace Phantom.GameUI
             else
                 return this;
         }
+
+        public void SetSelection(int index, int player)
+        {
+            if (index >= 0 && index < elements.Count)
+            {
+                elements[selectedElement].Selected = 0;
+                selectedElement = index;
+                elements[selectedElement].Selected = player;
+                SelectionChanged();
+            }
+        }
     }
 }
