@@ -165,7 +165,7 @@ namespace Phantom.Utils
         {
             lock (this.tasks)
             {
-                for (int i = this.tasks.Count - 1; i >= 0; --i)
+                for (int i = this.tasks.Count - 1; i >= 0; i--)
                 {
                     ITaskTester tester = this.tasks[i];
                     if (tester.PerformTest())
