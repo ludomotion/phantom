@@ -167,11 +167,14 @@ namespace Phantom.Utils
             {
                 for (int i = this.tasks.Count - 1; i >= 0; i--)
                 {
-                    ITaskTester tester = this.tasks[i];
-                    if (tester.PerformTest())
+                    if (i >= 0 && i < tasks.Count)
                     {
-                        this.tasks.RemoveAt(i);
-                        tester.PerformInvoke();
+                        ITaskTester tester = this.tasks[i];
+                        if (tester.PerformTest())
+                        {
+                            this.tasks.RemoveAt(i);
+                            tester.PerformInvoke();
+                        }
                     }
                 }
             }
