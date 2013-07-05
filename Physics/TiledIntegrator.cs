@@ -60,6 +60,7 @@ namespace Phantom.Physics
         private int tilesY;
         private int tileCount;
 
+        
         /// <summary>
         /// Creates a new tiledIntegrator
         /// </summary>
@@ -140,7 +141,7 @@ namespace Phantom.Physics
         protected override void CheckEntityCollision(int index)
         {
             Entity e = this.entities[index];
-            if (e.Shape == null)
+            if (e.Shape == null || !e.InitiateCollision)
                 return;
 
             TilePosition tp = this.positions[e];
@@ -160,7 +161,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (e != o &&  !o.Destroyed && o.Shape != null && e.ID > o.ID)
+                        if (e != o &&  !o.Destroyed && o.Shape != null && (!o.InitiateCollision || e.ID > o.ID) )
                             this.CheckCollisionBetween(e, o);
                     }
                 }
