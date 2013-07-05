@@ -77,7 +77,7 @@ namespace Phantom.Physics
                             i = this.entities.Count - 1;
 
                         Entity e = this.entities[i];
-                        if (!e.Destroyed)
+                        if (!e.Destroyed && !e.Ghost)
                         {
                             e.Integrate(devidedElapsed);
                             CheckEntityCollision(i);
