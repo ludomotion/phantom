@@ -47,6 +47,7 @@ namespace Phantom.Shapes
         protected float roughWidth;
 
         private Vector2[] RotationCache;
+        private Vector2[] RotationNormals;
         private float cachedAngle;
 
         internal Vector2[] normals;
@@ -82,6 +83,7 @@ namespace Phantom.Shapes
             this.roughWidth = Math.Abs(xmin - xmax);
             this.roughRadius = (float)Math.Sqrt(this.roughRadius);
             this.RotationCache = new Vector2[this.Vertices.Length];
+            this.RotationNormals = new Vector2[this.Vertices.Length];
 
             this.normals = new Vector2[this.Vertices.Length];
 
@@ -128,13 +130,40 @@ namespace Phantom.Shapes
         {
             if (angle == 0)
                 return this.Vertices;
-            if (cachedAngle == angle)
-                return this.RotationCache;
-            Matrix rotation = Matrix.CreateRotationZ(angle);
-            for (int i = 0; i < this.Vertices.Length; i++)
-                this.RotationCache[i] = Vector2.Transform(this.Vertices[i], rotation);
-            this.cachedAngle = angle;
+
+            if (cachedAngle != angle)
+                this.createRotationCache(angle);
+
             return this.RotationCache;
+        }
+
+        /// <summary>
+        /// Creates and caches the normals of a rotated version of the polygon
+        /// </summary>
+        /// <param name="angle"></param>
+        /// <returns></returns>
+        internal Vector2[] RotatedNormals(float angle)
+        {
+            if (angle == 0)
+                return this.normals;
+
+            if (cachedAngle != angle)
+                this.createRotationCache(angle);
+
+            return this.RotationNormals;
+        }
+
+        private void createRotationCache(float angle)
+        {
+            Matrix rotation = Matrix.CreateRotationZ(angle);
+
+            for (int i = 0; i < this.Vertices.Length; i++)
+            {
+                this.RotationCache[i] = Vector2.Transform(this.Vertices[i], rotation);
+                this.RotationNormals[i] = Vector2.Transform(this.normals[i], rotation);
+            }
+            
+            this.cachedAngle = angle;
         }
 
         internal Projection Project(Vector2 normal, Vector2 delta)
@@ -182,7 +211,6 @@ namespace Phantom.Shapes
 
         public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
         {
-            //TODO: Needs to take orientation into account
             Vector2[] result = new Vector2[this.Vertices.Length];
             int found = 0;
             Vector2 intersection = new Vector2();
@@ -190,9 +218,12 @@ namespace Phantom.Shapes
             Vector2 relStart = start - this.Entity.Position;
             Vector2 relEnd = end - this.Entity.Position;
 
-            for (int i = 0; i < this.Vertices.Length; i++)
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
+
+            for (int i = 0; i < verts.Length; i++)
             {
-                if (PhantomUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], relStart, relEnd, ref intersection))
+                if (PhantomUtils.GetIntersection(verts[i], verts[(i + 1) % verts.Length], relStart, relEnd, ref intersection))
                 {
                     result[found++] = intersection + this.Entity.Position;
                 }
@@ -206,12 +237,15 @@ namespace Phantom.Shapes
         {
             int n, i, j, f;
 
-            int numVerts = this.Vertices.Length;
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
+
+            int numVerts = verts.Length;
 
             List<Vector2> vertices = new List<Vector2>();
             List<Vector2> penvertices = new List<Vector2>();
-            Vector2[] farPoint1 = new Vector2[this.Vertices.Length];
-            Vector2[] farPoint2 = new Vector2[this.Vertices.Length];
+            Vector2[] farPoint1 = new Vector2[verts.Length];
+            Vector2[] farPoint2 = new Vector2[verts.Length];
 
             bool[] facing = new bool[this.normals.Length];
             bool[] finVisible = new bool[this.normals.Length];
@@ -243,12 +277,12 @@ namespace Phantom.Shapes
             {
                 i = (n + numVerts) % numVerts;
 
-                closest = this.Vertices[i];
+                closest = verts[i];
                 closestIndex = i;
                 farthestIndex = (i + 1) % numVerts;
                 // Calculate the distance from the light source
-                delta = relOrigin - this.Vertices[closestIndex];
-                delta2 = relOrigin - this.Vertices[farthestIndex];
+                delta = relOrigin - verts[closestIndex];
+                delta2 = relOrigin - verts[farthestIndex];
 
                 deltaDist = delta.LengthSquared();
                 delta2Dist = delta.LengthSquared();
@@ -259,7 +293,7 @@ namespace Phantom.Shapes
                 {
                     closestIndex = farthestIndex;
                     farthestIndex = i;
-                    closest = this.Vertices[closestIndex];
+                    closest = verts[closestIndex];
                     delta = delta2;
                     float swap = deltaDist;
                     deltaDist = delta2Dist;
@@ -267,7 +301,7 @@ namespace Phantom.Shapes
                 }
 
                 // Determine if the edge faces the light 
-                float dot = Vector2.Dot(this.normals[i], delta);
+                float dot = Vector2.Dot(norms[i], delta);
                 facing[i] = dot > 0;
 
                 if (n > -1)
@@ -281,8 +315,8 @@ namespace Phantom.Shapes
                         float angle = (float)Math.Asin(lightRadius / Math.Sqrt(deltaDist));
                         Vector2 fin1Direction = -delta.RotateBy(angle);
                         Vector2 fin2Direction = -delta.RotateBy(-angle);
-                        float finDot1 = Vector2.Dot(this.normals[i], fin1Direction);
-                        float finDot2 = Vector2.Dot(this.normals[i], fin2Direction);
+                        float finDot1 = Vector2.Dot(norms[i], fin1Direction);
+                        float finDot2 = Vector2.Dot(norms[i], fin2Direction);
 
                         if (!finVisible[closestIndex])
                         {
@@ -312,8 +346,8 @@ namespace Phantom.Shapes
                                         angle = (float)Math.Asin(lightRadius / Math.Sqrt(delta2Dist));
                                         fin1Direction = -delta.RotateBy(angle);
                                         fin2Direction = -delta.RotateBy(-angle);
-                                        finDot1 = Vector2.Dot(this.normals[i], fin1Direction);
-                                        finDot2 = Vector2.Dot(this.normals[i], fin2Direction);
+                                        finDot1 = Vector2.Dot(norms[i], fin1Direction);
+                                        finDot2 = Vector2.Dot(norms[i], fin2Direction);
 
                                         // Determine which side of the fin is in the light (has the smaller angle to the edge normal)
                                         if (finDot1 < finDot2)
@@ -342,7 +376,7 @@ namespace Phantom.Shapes
             Vector2 backFill1;
             Vector2 backFill2;
 
-            for (i = 0; i < this.Vertices.Length; i++)
+            for (i = 0; i < verts.Length; i++)
             {
                 j = (i + 1) % numVerts;
 
@@ -350,7 +384,7 @@ namespace Phantom.Shapes
                 {
                     if(finVisible[i])
                     {
-                        closePoint = this.Vertices[i] + this.Entity.Position;
+                        closePoint = verts[i] + this.Entity.Position;
 
                         farSidePointLight = closePoint + finLightDirection[i] * maxDistance; // TODO: add umbra behind light edge points
                         farSidePointDark = closePoint + finDarkDirection[i] * maxDistance;
@@ -366,8 +400,8 @@ namespace Phantom.Shapes
 
                 if (facing[i])
                 {
-                    umbraPoint1 = this.Vertices[i] + this.Entity.Position;
-                    umbraPoint2 = this.Vertices[j] + this.Entity.Position;
+                    umbraPoint1 = verts[i] + this.Entity.Position;
+                    umbraPoint2 = verts[j] + this.Entity.Position;
 
                     if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance;
                     if (!finVisible[j] || finVisible[i]) farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
@@ -398,11 +432,11 @@ namespace Phantom.Shapes
 
         public override Vector2 EdgeIntersection(Vector2 point)
         {
-            //TODO: Needs to take orientation into account, and it doesn't work properly
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
             Vector2 intersection = new Vector2();
-            for (int i = 0; i < this.Vertices.Length; i++)
+            for (int i = 0; i < verts.Length; i++)
             {
-				if (PhantomUtils.GetIntersection(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point - this.Entity.Position, Vector2.Zero, ref intersection))
+				if (PhantomUtils.GetIntersection(verts[i], verts[(i + 1) % verts.Length], point - this.Entity.Position, Vector2.Zero, ref intersection))
                     return intersection + this.Entity.Position;
             }
 
@@ -411,13 +445,13 @@ namespace Phantom.Shapes
 
         public override Vector2 ClosestPoint(Vector2 point)
         {
-            //TODO: Needs to take orientation into account, and it doesn't work properly
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
             point -= this.Entity.Position;
             Vector2 closest = new Vector2();
             float dist = float.MaxValue;
-            for (int i = 0; i < this.Vertices.Length; i++)
+            for (int i = 0; i < verts.Length; i++)
             {
-				Vector2 v = PhantomUtils.ClosestPointOnLine(this.Vertices[i], this.Vertices[(i + 1) % this.Vertices.Length], point);
+				Vector2 v = PhantomUtils.ClosestPointOnLine(verts[i], verts[(i + 1) % verts.Length], point);
                 float d = (v-point).LengthSquared();
                 if (d < dist)
                 {
@@ -431,15 +465,17 @@ namespace Phantom.Shapes
 
         public override bool InShape(Vector2 position)
         {
-            //TODO: Needs to take orientation into account
-			Vector2 origin = Vector2.Zero;
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
+
+            Vector2 origin = Vector2.Zero;
 			if( this.Entity != null )
 				origin = this.Entity.Position;
 			Vector2 delta = position - origin;
 
             for (int i = 0; i < this.normals.Length; i++)
             {
-                float dot = Vector2.Dot(this.normals[i], delta);
+                float dot = Vector2.Dot(norms[i], delta);
                 if (dot < this.projections[i].Min || dot > this.projections[i].Max)
                     return false;
             }
@@ -448,22 +484,24 @@ namespace Phantom.Shapes
 
         public override bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            //TODO: Needs to take orientation into account
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
+
             Vector2 origin = Vector2.Zero;
             if (this.Entity != null)
                 origin = this.Entity.Position;
 
 			if (partial)
 			{
-				for (int i = 0; i < this.Vertices.Length; i++)
-					if (!(this.Vertices[i].X + origin.X < topLeft.X || this.Vertices[i].X + origin.X > bottomRight.X || this.Vertices[i].Y + origin.Y < topLeft.Y || this.Vertices[i].Y + origin.Y > bottomRight.Y))
+				for (int i = 0; i < verts.Length; i++)
+					if (!(verts[i].X + origin.X < topLeft.X || verts[i].X + origin.X > bottomRight.X || verts[i].Y + origin.Y < topLeft.Y || verts[i].Y + origin.Y > bottomRight.Y))
 						return true;
 				return false;
 			}
 			else
 			{
-				for (int i = 0; i < this.Vertices.Length; i++)
-					if (this.Vertices[i].X + origin.X < topLeft.X || this.Vertices[i].X + origin.X > bottomRight.X || this.Vertices[i].Y + origin.Y < topLeft.Y || this.Vertices[i].Y + origin.Y > bottomRight.Y)
+				for (int i = 0; i < verts.Length; i++)
+					if (verts[i].X + origin.X < topLeft.X || verts[i].X + origin.X > bottomRight.X || verts[i].Y + origin.Y < topLeft.Y || verts[i].Y + origin.Y > bottomRight.Y)
 						return false;
 				return true;
 			}
@@ -481,15 +519,17 @@ namespace Phantom.Shapes
 
         public override Vector2 ClosestVertice(Vector2 point)
         {
-            if (this.Vertices.Length == 0) return this.Entity.Position;
-            Vector2 result = this.Vertices[0] + this.Entity.Position;
-            float dist = (this.Vertices[0] + this.Entity.Position - point).LengthSquared(); 
-            for (int i = 0; i < this.Vertices.Length; i++)
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+
+            if (verts.Length == 0) return this.Entity.Position;
+            Vector2 result = verts[0] + this.Entity.Position;
+            float dist = (verts[0] + this.Entity.Position - point).LengthSquared(); 
+            for (int i = 0; i < verts.Length; i++)
             {
-                float d = (this.Vertices[i] + this.Entity.Position - point).LengthSquared();
+                float d = (verts[i] + this.Entity.Position - point).LengthSquared();
                 if (d < dist)
                 {
-                    result = this.Vertices[i] + this.Entity.Position;
+                    result = verts[i] + this.Entity.Position;
                     dist = d;
                 }
             }
