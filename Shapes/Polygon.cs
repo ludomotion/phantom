@@ -386,7 +386,7 @@ namespace Phantom.Shapes
                     {
                         closePoint = verts[i] + this.Entity.Position;
 
-                        farSidePointLight = closePoint + finLightDirection[i] * maxDistance; // TODO: add umbra behind light edge points
+                        farSidePointLight = closePoint + finLightDirection[i] * maxDistance; // TODO: add penumbra behind light edge points
                         farSidePointDark = closePoint + finDarkDirection[i] * maxDistance;
 
                         farPoint2[i] = farSidePointDark;
@@ -403,8 +403,11 @@ namespace Phantom.Shapes
                     umbraPoint1 = verts[i] + this.Entity.Position;
                     umbraPoint2 = verts[j] + this.Entity.Position;
 
-                    if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + (umbraPoint1 - origin).Normalized() * maxDistance;
-                    if (!finVisible[j] || finVisible[i]) farPoint2[i] = origin + (umbraPoint2 - origin).Normalized() * maxDistance;
+                    Vector2 diff1 = umbraPoint1 - origin;
+                    Vector2 diff2 = umbraPoint2 - origin;
+
+                    if (!finVisible[i] || finVisible[j]) farPoint1[i] = origin + diff1.Normalized() * Math.Max(diff1.Length(), maxDistance);
+                    if (!finVisible[j] || finVisible[i]) farPoint2[i] = origin + diff2.Normalized() * Math.Max(diff2.Length(), maxDistance);
 
                     backFill1 = farPoint1[i] - relOrigin.Normalized() * maxDistance;
                     backFill2 = farPoint2[i] - relOrigin.Normalized() * maxDistance;
