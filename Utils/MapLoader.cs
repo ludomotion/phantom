@@ -325,6 +325,8 @@ namespace Phantom.Utils
             PCNComponent instance = new PCNComponent(description);
             PCNComponent blueprint = EntityLists[listName][instance.Name];
             Entity entity = EntityFactory.BuildInstance(blueprint, instance, instance.Name);
+            if (entity.Properties.GetBoolean("use_blueprint", false))
+                entity.Properties.SetBoolean("use_blueprint", false);
             entities.AddComponent(entity);
         }
 
