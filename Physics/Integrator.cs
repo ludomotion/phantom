@@ -30,6 +30,9 @@ namespace Phantom.Physics
         /// </summary>
         protected List<Entity> entities;
 
+        private EntityLayer layer;
+        private EntityRenderer renderer;
+
         /// <summary>
         /// Creates a new integrator instance.
         /// </summary>
@@ -39,6 +42,13 @@ namespace Phantom.Physics
             this.physicsExecutionCount = physicsExecutionCount;
             this.entities = new List<Entity>();
             this.physicsPaused = false;
+        }
+
+        public override void OnAdd(Component parent)
+        {
+            base.OnAdd(parent);
+            this.layer = parent as EntityLayer;
+            this.renderer = this.layer.GetComponentByType<EntityRenderer>();
         }
 
         public override Component.MessageResult HandleMessage(int message, object data)
@@ -70,19 +80,31 @@ namespace Phantom.Physics
                 {
                     this.Integrate(devidedElapsed);
 
-                    int i = this.entities.Count - 1;
-                    while (i>=0) 
+                    for (int i = this.layer.AlwaysUpdate.Count - 1; i >= 0; i--)
                     {
-                        if (i>=this.entities.Count) //This might happen if a collision or another update removes two items at once the end of the stack
-                            i = this.entities.Count - 1;
-
-                        Entity e = this.entities[i];
-                        if (!e.Destroyed && !e.Ghost)
+                        if (i >= this.layer.AlwaysUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
+                            i = this.layer.AlwaysUpdate.Count - 1;
+                        Entity e = this.layer.AlwaysUpdate[i] as Entity;
+                        if (e != null && !e.Destroyed && !e.Ghost)
                         {
                             e.Integrate(devidedElapsed);
-                            CheckEntityCollision(i);
+                            CheckEntityCollision(e);
                         }
-                        i--;
+                    }
+
+                    if (this.renderer != null)
+                    {
+                        for (int i = this.layer.VisibleUpdate.Count - 1; i >= 0; i--)
+                        {
+                            if (i >= this.layer.VisibleUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
+                                i = this.layer.VisibleUpdate.Count - 1;
+                            Entity e = this.layer.VisibleUpdate[i];
+                            if (!e.Destroyed && !e.Ghost && e.Shape.InRect(this.renderer.TopLeft, this.renderer.BottomRight, true))
+                            {
+                                e.Integrate(devidedElapsed);
+                                CheckEntityCollision(e);
+                            }
+                        }
                     }
                 }
             }
@@ -94,15 +116,14 @@ namespace Phantom.Physics
         /// Checks the collisions of an entity in the integrator's entity list
         /// </summary>
         /// <param name="index">Zero based index of the entity in the integrator's entity list.</param>
-        protected virtual void CheckEntityCollision(int index)
+        protected virtual void CheckEntityCollision(Entity e)
         {
-            Entity e = this.entities[index];
             if (e.Shape == null)
                 return;
-            for (int j = 0; j < index; ++j)
+            for (int j = 0; j < this.entities.Count; ++j)
             {
                 Entity o = this.entities[j];
-                if( !o.Destroyed && o.Shape != null )
+                if( e != o && !o.Destroyed && o.Shape != null )
                     CheckCollisionBetween(e, o);
             }
 

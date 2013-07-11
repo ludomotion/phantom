@@ -154,9 +154,8 @@ namespace Phantom.Physics
         }
 
 
-        protected override void CheckEntityCollision(int index)
+        protected override void CheckEntityCollision(Entity e)
         {
-            Entity e = this.entities[index];
             if (e.Shape == null || !e.InitiateCollision)
                 return;
 
@@ -177,7 +176,7 @@ namespace Phantom.Physics
                     for (int j = tt.Entities.Count - 1; j >= 0; j--)
                     {
                         Entity o = tt.Entities[j];
-                        if (e != o &&  !o.Destroyed && o.Shape != null && (!o.InitiateCollision || e.ID > o.ID) )
+                        if (e != o &&  !o.Destroyed && o.Shape != null && (!o.InitiateCollision || e.ID > o.ID || o.UpdateBehaviour == Entity.UpdateBehaviours.NeverUpdate) )
                             this.CheckCollisionBetween(e, o);
                     }
                 }

@@ -25,8 +25,8 @@ namespace Phantom.Core
         /// </summary>
         protected Integrator integrator;
 
-        protected List<Component> AlwaysUpdate;
-        protected List<Entity> VisibleUpdate;
+        internal List<Component> AlwaysUpdate;
+        internal List<Entity> VisibleUpdate;
 
 
         /// <summary>
