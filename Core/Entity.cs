@@ -44,6 +44,11 @@ namespace Phantom.Core
             }
         }
 
+        /// <summary>
+        /// This field specifies when the entity is updated. Always, onscreen or never.
+        /// </summary>
+        public UpdateBehaviours UpdateBehaviour { get; protected set; }
+
 
         private float mass;
         internal float inverseMass;
@@ -113,6 +118,7 @@ namespace Phantom.Core
         /// <param name="mass"></param>
         public Entity(Vector2 position, float mass)
         {
+            this.UpdateBehaviour = UpdateBehaviours.Default;
             this.ID = Entity.nextID++;
             this.Position = position;
             this.Orientation = 0;
@@ -172,6 +178,15 @@ namespace Phantom.Core
             if (this.shape != null)
                 return base.ToString() + "#" + this.ID + " (shape:" + this.shape.ToString() + ")";
             return base.ToString();
+        }
+
+        public enum UpdateBehaviours
+        {
+            AlwaysUpdate,
+            UpdateWhenVisible,
+            NeverUpdate,
+
+            Default = UpdateWhenVisible
         }
     }
 }

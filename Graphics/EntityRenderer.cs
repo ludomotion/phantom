@@ -21,6 +21,9 @@ namespace Phantom.Graphics
 		private EntityLayer entityLayer;
 		private IList<Component> nonEntities;
 
+        internal Vector2 TopLeft;
+        internal Vector2 BottomRight;
+
 		public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
 			:base(passes, viewportPolicy, renderOptions)
 		{
@@ -54,9 +57,8 @@ namespace Phantom.Graphics
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-				Vector2 topleft, bottomright;
-				CreateBounds(info, out topleft, out bottomright);
-				foreach (Entity e in this.entityLayer.GetEntitiesInRect(topleft, bottomright, true))
+				CreateBounds(info, out TopLeft, out BottomRight);
+				foreach (Entity e in this.entityLayer.GetEntitiesInRect(TopLeft, BottomRight, true))
 					if (!e.Ghost)
 						e.Render(info);
 				foreach (Component c in this.nonEntities)
@@ -68,9 +70,8 @@ namespace Phantom.Graphics
 		protected override void RenderPassEndLock(RenderInfo info)
 		{
 			this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-			Vector2 topleft, bottomright;
-			CreateBounds(info, out topleft, out bottomright);
-			foreach (Entity e in this.entityLayer.GetEntitiesInRect(topleft, bottomright, true))
+            CreateBounds(info, out TopLeft, out BottomRight);
+            foreach (Entity e in this.entityLayer.GetEntitiesInRect(TopLeft, BottomRight, true))
 				if (!e.Ghost)
 					e.Render(info);
 			foreach (Component c in this.nonEntities)

@@ -25,6 +25,10 @@ namespace Phantom.Core
         /// </summary>
         protected Integrator integrator;
 
+        protected List<Component> AlwaysUpdate;
+        protected List<Entity> VisibleUpdate;
+
+
         /// <summary>
         /// Creates an entityLayer of the specified dimensions.
         /// </summary>
@@ -35,10 +39,14 @@ namespace Phantom.Core
         public EntityLayer(float width, float height, Renderer renderer, Integrator integrator)
             :base(width, height)
         {
+            this.AlwaysUpdate = new List<Component>();
+            this.VisibleUpdate = new List<Entity>();
+
             this.renderer = renderer;
             this.integrator = integrator;
             this.AddComponent(this.renderer);
             this.AddComponent(this.integrator);
+
             this.Properties = new PropertyCollection();
             //TODO: comment these (when new editor is finished)
             this.Properties.Objects["editable"] = "EntityLayer";
@@ -67,6 +75,23 @@ namespace Phantom.Core
 		{
 			this.integrator.OnComponentAddedToLayer(component);
 			this.renderer.OnComponentAddedToLayer(component);
+            Entity e = component as Entity;
+            if (e == null)
+            {
+                this.AlwaysUpdate.Add(component);
+            }
+            else
+            {
+                switch (e.UpdateBehaviour)
+                {
+                    case Entity.UpdateBehaviours.AlwaysUpdate:
+                        this.AlwaysUpdate.Add(e);
+                        break;
+                    case Entity.UpdateBehaviours.UpdateWhenVisible:
+                        this.VisibleUpdate.Add(e);
+                        break;
+                }
+            }
             base.OnComponentAdded(component);
         }
 
@@ -74,7 +99,56 @@ namespace Phantom.Core
         {
 			this.integrator.OnComponentRemovedToLayer(component);
 			this.renderer.OnComponentRemovedToLayer(component);
+            Entity e = component as Entity;
+            if (e == null)
+            {
+                this.AlwaysUpdate.Remove(component);
+            }
+            else
+            {
+                switch (e.UpdateBehaviour)
+                {
+                    case Entity.UpdateBehaviours.AlwaysUpdate:
+                        this.AlwaysUpdate.Remove(e);
+                        break;
+                    case Entity.UpdateBehaviours.UpdateWhenVisible:
+                        this.VisibleUpdate.Remove(e);
+                        break;
+                }
+            }
             base.OnComponentRemoved(component);
+        }
+
+        public override void Update(float elapsed)
+        {
+            for (int i = this.AlwaysUpdate.Count - 1; i >= 0; i--)
+            {
+                Component e = this.AlwaysUpdate[i];
+                if (!e.Ghost)
+                {
+                    e.Update(elapsed);
+                    if (e.Destroyed)
+                        this.RemoveComponent(e);
+                }
+            }
+
+            EntityRenderer r = this.renderer as EntityRenderer;
+            if (r != null)
+            {
+                for (int i = this.VisibleUpdate.Count - 1; i >= 0; i--)
+                {
+                    Entity e = this.VisibleUpdate[i];
+                    if (!e.Ghost && e.Shape.InRect(r.TopLeft, r.BottomRight, true))
+                    {
+                        e.Update(elapsed);
+                        if (e.Destroyed)
+                            this.RemoveComponent(e);
+                    }
+                }
+            }
+
+            // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!
+            //base.Update(elapsed);
         }
 
         public override void Render( RenderInfo info )
