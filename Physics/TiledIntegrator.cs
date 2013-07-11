@@ -137,6 +137,22 @@ namespace Phantom.Physics
             }
         }
 
+        internal override void OnComponentRemovedToLayer(Component component)
+        {
+
+            base.OnComponentRemovedToLayer(component);
+            Entity e = component as Entity;
+            if (e != null)
+            {
+                TilePosition tp = e.GetComponentByType<TilePosition>();
+                if (tp != null) {
+                    tp.Tile.Entities.Remove(e);
+                    this.positions.Remove(e);
+                }
+                this.positions[e] = tp;
+            }
+        }
+
 
         protected override void CheckEntityCollision(int index)
         {
