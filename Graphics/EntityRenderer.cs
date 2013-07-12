@@ -23,6 +23,8 @@ namespace Phantom.Graphics
 
         internal Vector2 TopLeft;
         internal Vector2 BottomRight;
+        public Vector2 TopLeftBounds { get { return this.TopLeft; } }
+        public Vector2 BottomRightBounds { get { return this.BottomRight; } }
 
 		public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
 			:base(passes, viewportPolicy, renderOptions)
