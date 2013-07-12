@@ -15,10 +15,12 @@ namespace Phantom.GameUI
     /// </summary>
     public class UIMouseHandler : UIBaseHandler
     {
+        public static float DragDistanceSquared = 25;
         protected MouseState previous;
         protected MouseState current;
         protected UIElement hover;
         private UIElement mouseDown;
+        private bool dragging;
         private UIContent draggingContent;
         protected Vector2 mouseDownPosition;
         protected Vector2 mousePosition;
@@ -92,32 +94,39 @@ namespace Phantom.GameUI
                 //Check which item I am hovering and select it
                 layer.SetSelected(player, hover);
 
-                //if dragging update the position
-                if (draggingContent != null)
-                {
-                    draggingContent.Position = mousePosition;
-                    draggingContent.Selected = 1;
-                }
-                else
-                {
-                    //if pressing the left button at the same location pass the info
-                    if (mouseDown != null && hover == mouseDown) 
-                    {
-                        mouseDown.MoveMouseTo(mousePosition - mouseDown.Position, player);
+                if (!dragging && (mousePosition - mouseDownPosition).LengthSquared() > DragDistanceSquared)
+                    dragging = true;
 
-                        if (hover is UICarousel)
-                            hover = ((UICarousel)hover).GetElementAt(mousePosition);
-                        //check if I can start dragging something;
-                        if (hover is UIContainer && (hover as UIContainer).GetContentAt(mousePosition) != null && hover.Enabled)
+                if (dragging)
+                {
+
+                    //if dragging update the position
+                    if (draggingContent != null)
+                    {
+                        draggingContent.Position = mousePosition;
+                        draggingContent.Selected = 1;
+                    }
+                    else
+                    {
+                        //if pressing the left button at the same location pass the info
+                        if (mouseDown != null && hover == mouseDown)
                         {
-                            layer.GetSelected(player).CancelPress(player);
-                            draggingContent = (hover as UIContainer).GetContentAt(mousePosition);
-                            draggingContent.Undock();
-                        }
-                        if (hover is UIContent && hover.Enabled)
-                        {
-                            draggingContent = hover as UIContent;
-                            draggingContent.Undock();
+                            mouseDown.MoveMouseTo(mousePosition - mouseDown.Position, player);
+
+                            if (hover is UICarousel)
+                                hover = ((UICarousel)hover).GetElementAt(mousePosition);
+                            //check if I can start dragging something;
+                            if (hover is UIContainer && (hover as UIContainer).GetContentAt(mousePosition) != null && hover.Enabled)
+                            {
+                                layer.GetSelected(player).CancelPress(player);
+                                draggingContent = (hover as UIContainer).GetContentAt(mousePosition);
+                                draggingContent.Undock();
+                            }
+                            if (hover is UIContent && hover.Enabled)
+                            {
+                                draggingContent = hover as UIContent;
+                                draggingContent.Undock();
+                            }
                         }
                     }
                 }
@@ -134,6 +143,7 @@ namespace Phantom.GameUI
                     hover.ClickAt(mousePosition - hover.Position, player);
                     mouseDown = hover;
                 }
+                dragging = false;
             }
 
             //end clicking
