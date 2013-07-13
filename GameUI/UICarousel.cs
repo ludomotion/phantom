@@ -197,37 +197,42 @@ namespace Phantom.GameUI
 
                 PhantomUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, border, 2);
 
-                
-                if (selectedElement >= 0)
-                {
-                    for (int i = VisibleOptions; i > 0; i--)
-                    {
-                        int index = selectedElement + i;
-                        if (index >= elements.Count && Wrap)
-                            index -= elements.Count;
-                        if (index < elements.Count)
-                        {
-                            elements[index].Position = this.Position + offset * i * (float)Math.Pow(fallOff, i);
-                            elements[index].Render(info);
-                        }
 
-                        index = selectedElement - i;
-                        if (index < 0 && Wrap)
-                            index += elements.Count;
-                        if (index >= 0)
-                        {
-                            elements[index].Position = this.Position - offset * i * (float)Math.Pow(fallOff, i);
-                            elements[index].Render(info);
-                        }
-                    }
-
-
-                    elements[selectedElement].Position = this.Position;
-                    elements[selectedElement].Render(info);
-                }
+                RenderElements(info);
             }
 
             //base.Render(info);
+        }
+
+        protected void RenderElements(Graphics.RenderInfo info)
+        {
+            if (selectedElement >= 0)
+            {
+                for (int i = VisibleOptions; i > 0; i--)
+                {
+                    int index = selectedElement + i;
+                    if (index >= elements.Count && Wrap)
+                        index -= elements.Count;
+                    if (index < elements.Count)
+                    {
+                        elements[index].Position = this.Position + offset * i * (float)Math.Pow(fallOff, i);
+                        elements[index].Render(info);
+                    }
+
+                    index = selectedElement - i;
+                    if (index < 0 && Wrap)
+                        index += elements.Count;
+                    if (index >= 0)
+                    {
+                        elements[index].Position = this.Position - offset * i * (float)Math.Pow(fallOff, i);
+                        elements[index].Render(info);
+                    }
+                }
+
+
+                elements[selectedElement].Position = this.Position;
+                elements[selectedElement].Render(info);
+            }
         }
 
         public override void Update(float elapsed)

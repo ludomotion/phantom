@@ -11,7 +11,7 @@ namespace Phantom.GameUI
 {
     public class UIInventory : UIContainer
     {
-        internal UIInventoryItem[,] Slots;
+        public UIInventoryItem[,] Slots;
         public readonly int Width;
         public readonly int Height;
         internal Vector2 Size;

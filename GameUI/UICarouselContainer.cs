@@ -201,33 +201,38 @@ namespace Phantom.GameUI
                 PhantomUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, border, 2);
 
 
-                if (selectedContent >= 0)
-                {
-                    for (int i = VisibleOptions; i > 0; i--)
-                    {
-                        int index = selectedContent + i;
-                        if (index >= Contents.Count && Wrap)
-                            index -= Contents.Count;
-                        if (index < Contents.Count)
-                        {
-                            Contents[index].Position = this.Position + offset * i;
-                            Contents[index].Render(info);
-                        }
+                RenderElements(info);
+            }
+        }
 
-                        index = selectedContent - i;
-                        if (index < 0 && Wrap)
-                            index += Contents.Count;
-                        if (index >= 0)
-                        {
-                            Contents[index].Position = this.Position - offset * i;
-                            Contents[index].Render(info);
-                        }
+        protected void RenderElements(Graphics.RenderInfo info)
+        {
+            if (selectedContent >= 0)
+            {
+                for (int i = VisibleOptions; i > 0; i--)
+                {
+                    int index = selectedContent + i;
+                    if (index >= Contents.Count && Wrap)
+                        index -= Contents.Count;
+                    if (index < Contents.Count)
+                    {
+                        Contents[index].Position = this.Position + offset * i;
+                        Contents[index].Render(info);
                     }
 
-
-                    Contents[selectedContent].Position = this.Position;
-                    Contents[selectedContent].Render(info);
+                    index = selectedContent - i;
+                    if (index < 0 && Wrap)
+                        index += Contents.Count;
+                    if (index >= 0)
+                    {
+                        Contents[index].Position = this.Position - offset * i;
+                        Contents[index].Render(info);
+                    }
                 }
+
+
+                Contents[selectedContent].Position = this.Position;
+                Contents[selectedContent].Render(info);
             }
         }
     }

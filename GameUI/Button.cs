@@ -54,10 +54,10 @@ namespace Phantom.GameUI
 				PhantomUtils.DrawShape(info, this.Position, this.Shape, Color.Transparent, UILayer.ColorShadow, 2);
                 float down = this.pressed > 0 ? 0 : 2;
 				PhantomUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
-                Vector2 p = Position - size * 0.25f - Vector2.One * down;
+                Vector2 p = Position - size * 0.5f - Vector2.One * down;
                 p.X = (float)Math.Round(p.X);
                 p.Y = (float)Math.Round(p.Y);
-                info.Batch.DrawString(UILayer.Font, Caption, p, text, 0, new Vector2(0,0), 0.5f, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                info.Batch.DrawString(UILayer.Font, Caption, p, text);
             }
         }
 
