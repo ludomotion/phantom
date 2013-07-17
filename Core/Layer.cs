@@ -44,7 +44,9 @@ namespace Phantom.Core
         public override void OnAncestryChanged()
         {
             base.OnAncestryChanged();
-            this.Camera = this.GetAncestor<GameState>().GetComponentByType<Camera>();
+            GameState gameState = this.GetAncestor<GameState>();
+            if (gameState!=null)
+                this.Camera = gameState.GetComponentByType<Camera>();
         }
     }
 }
