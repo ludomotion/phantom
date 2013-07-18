@@ -301,7 +301,7 @@ namespace Phantom.Utils
                 return "\"" + value + "\"";
             }
             if (value is bool)
-                return ((bool)value).ToString();
+                return ((bool)value) ? "true" : "false";
             if (value is int)
                 return ((int)value).ToString();
             if (value is Color)
