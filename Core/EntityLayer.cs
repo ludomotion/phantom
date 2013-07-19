@@ -269,5 +269,41 @@ namespace Phantom.Core
             integrator.ChangeSize(this.Bounds, true);
         }
 
+        public Component.MessageResult BroadcastMessage(int message, object data, Vector2 position, float range)
+        {
+            MessageResult result = MessageResult.IGNORED;
+
+            Vector2 topLeft = position;
+            topLeft.X -= range;
+            topLeft.Y -= range;
+            Vector2 bottomRight = position;
+            bottomRight.X += range;
+            bottomRight.Y += range;
+
+            range = range * range;
+
+            foreach (Entity entity in GetEntitiesInRect(topLeft, bottomRight, false))
+            {
+                Vector2 dist = entity.Position - position;
+                if (dist.LengthSquared() < range)
+                {
+                    MessageResult res = entity.HandleMessage(message, data);
+                    switch (res)
+                    {
+                        case MessageResult.CONSUMED:
+                            result = res;
+                            break;
+                        case MessageResult.HANDLED:
+                            if (result == MessageResult.IGNORED)
+                                result = res;
+                            break;
+                    }
+                }
+            }
+
+
+            return result;
+        }
+
     }
 }
