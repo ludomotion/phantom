@@ -57,6 +57,8 @@ namespace Phantom.Shapes
 
         public void AddShape(Vector2 offset, Shape shape)
         {
+            shape.SetStubEntity(new Entity(offset));
+
             this.shapes.Add(new Container(offset, shape));
             this.UpdateRoughRadius();
         }
