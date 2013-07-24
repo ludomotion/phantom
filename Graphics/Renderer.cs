@@ -281,6 +281,7 @@ namespace Phantom.Graphics
                 info.Canvas = this.canvas;
             }
 
+            info.RenderTarget = null;
 
             return info;
         }

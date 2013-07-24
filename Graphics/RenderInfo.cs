@@ -25,6 +25,7 @@ namespace Phantom.Graphics
         public Canvas Canvas;
         public SpriteBatch Batch;
         public GraphicsDevice GraphicsDevice;
+        public RenderTarget2D RenderTarget;
         public Camera Camera;
         public Matrix World;
         public Matrix Projection;

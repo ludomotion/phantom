@@ -122,14 +122,11 @@ namespace Phantom.Core
 
         public override void Update(float elapsed)
         {
-            DebugCounter.Create("Update", DebugCounter.Options.OutputResets|DebugCounter.Options.LimitOutput);
-
             for (int i = this.AlwaysUpdate.Count - 1; i >= 0; i--)
             {
                 Component e = this.AlwaysUpdate[i];
                 if (!e.Ghost)
                 {
-                    DebugCounter.Increment("Update");
                     e.Update(elapsed);
                     if (e.Destroyed)
                         this.RemoveComponent(e);
@@ -144,14 +141,12 @@ namespace Phantom.Core
                     Entity e = this.VisibleUpdate[i];
                     if (!e.Ghost && e.Shape.InRect(r.TopLeft, r.BottomRight, true))
                     {
-                        DebugCounter.Increment("Update");
                         e.Update(elapsed);
                         if (e.Destroyed)
                             this.RemoveComponent(e);
                     }
                 }
             }
-            DebugCounter.Reset("Update");
 
             // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!
             //base.Update(elapsed);
