@@ -61,7 +61,7 @@ namespace Phantom.Utils.Performance
             {
                 if (!c.opts.HasFlag(Options.LimitOutput) || c.outputIncrementLimit == 0)
                 {
-                    Debug.WriteLine("[C] " + name + ": " + c.value + " += " + amount + " (average: " + (c.total / c.resets) + ")");
+                    PhantomGame.Game.Console.AddLines("[C] " + name + ": " + c.value + " += " + amount + " (average: " + (c.total / c.resets) + ")");
                     c.outputIncrementLimit = OutputLimitCount;
                 }
                 c.outputIncrementLimit -= 1;
@@ -80,7 +80,7 @@ namespace Phantom.Utils.Performance
             {
                 if (!c.opts.HasFlag(Options.LimitOutput) || c.outputResetLimit == 0)
                 {
-                    Debug.WriteLine("[C] " + name + ": " + c.value + " (average: " + (c.total / c.resets) + ")");
+                    PhantomGame.Game.Console.AddLines("[C] " + name + ": " + c.value + " (average: " + (c.total / c.resets) + ")");
                     c.outputResetLimit = OutputLimitCount;
                 }
                 c.outputResetLimit -= 1;
@@ -95,7 +95,7 @@ namespace Phantom.Utils.Performance
             {
                 Count c = counts[name];
                 int average = c.resets == 0 ? 0 : c.total / c.resets;
-                Debug.WriteLine("[C] " + name + ": " + c.value + " (average: " + average + ")");
+                PhantomGame.Game.Console.AddLines("[C] " + name + ": " + c.value + " (average: " + average + ")");
             }
         }
 
