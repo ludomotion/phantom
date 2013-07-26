@@ -93,14 +93,20 @@ namespace Phantom.Shapes
             // TODO: Not tested yet
             int i, s, points = 0, curr = 0;
 
+            Matrix rot = Matrix.CreateRotationZ(this.Entity.Orientation);
+
             Vector2[][] result = new Vector2[shapes.Count][];
             for (i = 0; i < this.shapes.Count; i++)
             {
-                result[i] = shapes[i].Shape.IntersectEdgesWithLine(start - shapes[i].Offset, end - shapes[i].Offset);
-                for (s = 0; s < result[i].Length; s++)
-                {
-                    result[i][s] += shapes[i].Offset;
-                }
+                stub.Position = this.Entity.Position + Vector2.Transform(this.shapes[i].Offset, rot);
+                stub.Orientation = this.Entity.Orientation;
+                this.shapes[i].Shape.SetStubEntity(stub);
+
+                result[i] = shapes[i].Shape.IntersectEdgesWithLine(start, end);
+                //for (s = 0; s < result[i].Length; s++)
+               // {
+                //    result[i][s] += shapes[i].Offset;
+               // }
                 points += result[i].Length;
             }
 

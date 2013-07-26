@@ -6,6 +6,7 @@ using Phantom.Shapes.Visitors;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
 using Phantom.Physics;
+using System.Diagnostics;
 
 namespace Phantom.Shapes
 {
@@ -57,17 +58,39 @@ namespace Phantom.Shapes
             Vector2 relStart = start - this.Entity.Position;
             Vector2 relEnd = end - this.Entity.Position;
 
-            Vector2 closestPoint = PhantomUtils.ClosestPointOnLine(relStart, relEnd, Vector2.Zero);
-            float distance = closestPoint.Length();
+            Vector2 closest = PhantomUtils.ClosestPointOnLine(relStart, relEnd, Vector2.Zero);
+            if (closest.Length() > this.Radius)
+                return new Vector2[0];
 
-            if (distance == this.Radius) return new Vector2[] { closestPoint + this.Entity.Position };
-            if (distance < this.Radius)
-            {
-                float angle = (float)Math.Acos(Radius / distance);
+            // from http://mathworld.wolfram.com/Circle-LineIntersection.html
+            Vector2 d = relEnd - relStart; // (1), (2)
+            float dr = d.Length(); // (3)
+            float dr2 = dr * dr;
 
-                return new Vector2[] { (closestPoint.Normalized() * Radius).RotateBy(angle) + this.Entity.Position, (closestPoint.Normalized() * Radius).RotateBy(-angle) + this.Entity.Position };
+            float D = relStart.X * relEnd.Y - relEnd.X * relStart.Y; // (4) Dot?
+            float D2 = D * D;
+            
+            float r2 = this.Radius * this.Radius;
+
+            float discri = r2 * dr2 - D2;
+            if( discri < 0 ) // no intersection
+                return new Vector2[0];
+            else if( discri == 0 ) { // tangent
+                float sqrtr2dr2D2 = (float)Math.Sqrt(r2 * dr2 - D2);
+                float x1 = (float)(D * d.Y + Math.Sign(d.Y) * d.X * sqrtr2dr2D2) / dr2; // (5);
+                float y1 = (float)(-D * d.X + Math.Abs(d.Y) * sqrtr2dr2D2) / dr2; // (6);
+                return new Vector2[] { new Vector2(x1, y1) + this.Entity.Position };
+            } else { // intersection
+                float sgn = d.Y < 0 ? -1 : 1;
+                float sqrtr2dr2D2 = (float)Math.Sqrt(r2 * dr2 - D2);
+                float x1 = (float)(D * d.Y + sgn * d.X * sqrtr2dr2D2) / dr2; // (5);
+                float y1 = (float)(-D * d.X + Math.Abs(d.Y) * sqrtr2dr2D2) / dr2; // (6);
+
+                float x2 = (float)(D * d.Y - sgn * d.X * sqrtr2dr2D2) / dr2; // (5);
+                float y2 = (float)(-D * d.X - Math.Abs(d.Y) * sqrtr2dr2D2) / dr2; // (6);
+
+                return new Vector2[] { new Vector2(x1, y1) + this.Entity.Position, new Vector2(x2, y2) + this.Entity.Position };
             }
-            else return new Vector2[0];
         }
 
         public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, out Vector2[] umbra, out Vector2[] penumbra)
