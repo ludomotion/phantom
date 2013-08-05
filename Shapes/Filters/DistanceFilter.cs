@@ -33,12 +33,12 @@ namespace Phantom.Shapes.Filters
 		private bool ContainsFromPosition(Entity e)
 		{
 			float distance = (e.Position - this.Position).LengthSquared();
-			return distance < this.Distance;
+			return !e.Ghost && distance < this.Distance;
 		}
 		private bool ContainsFromEntity(Entity e)
 		{
 			float distance = (e.Position - this.Entity.Position).LengthSquared();
-			return distance < this.Distance;
+            return !e.Ghost && distance < this.Distance;
 		}
 
 		public bool Contains(Core.Entity e)
