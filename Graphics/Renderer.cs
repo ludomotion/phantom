@@ -57,6 +57,8 @@ namespace Phantom.Graphics
         protected BlendState blendState;
         private Stopwatch stopWatch;
 
+        private Matrix lastWorld;
+
         private Action<RenderInfo> activeRenderPass;
 
         private Canvas canvas;
@@ -290,6 +292,7 @@ namespace Phantom.Graphics
             info.RenderTarget = null;
 
 
+            this.lastWorld = info.World;
             return info;
         }
 
@@ -318,7 +321,7 @@ namespace Phantom.Graphics
 
         public Matrix CreateMatrix()
         {
-            return this.BuildRenderInfo().World;
+            return this.lastWorld;
         }
 
 

@@ -235,7 +235,10 @@ namespace Phantom
 				Profiler.Instance.BeginRender ();
 #endif
 
-				this.GraphicsDevice.Clear (this.BackgroundColor);
+                lock (this.GlobalRenderLock)
+                {
+                    this.GraphicsDevice.Clear(this.BackgroundColor);
+                }
 
 				for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
 					;
