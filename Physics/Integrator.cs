@@ -151,9 +151,7 @@ namespace Phantom.Physics
                 return;
             if (!a.CanCollideWith(b) || !b.CanCollideWith(a))
                 return;
-            Profiler.BeginProfiling("Collide");
             CollisionData collision = a.Shape.Collide(b.Shape);
-            Profiler.EndProfiling("Collide");
             if (collision.IsValid)
             {
                 collision.A = a;
