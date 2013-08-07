@@ -300,5 +300,38 @@ namespace Phantom.Core
             return result;
         }
 
+        public Component.MessageResult BroadcastMessageToAlwaysUpdate(int message, object data, Vector2 position, float range)
+        {
+            MessageResult result = MessageResult.IGNORED;
+
+            range = range * range;
+
+            foreach (Component component in AlwaysUpdate)
+            {
+                Entity entity = component as Entity;
+                if (entity != null)
+                {
+                    Vector2 dist = entity.Position - position;
+                    if (dist.LengthSquared() < range)
+                    {
+                        MessageResult res = entity.HandleMessage(message, data);
+                        switch (res)
+                        {
+                            case MessageResult.CONSUMED:
+                                result = res;
+                                break;
+                            case MessageResult.HANDLED:
+                                if (result == MessageResult.IGNORED)
+                                    result = res;
+                                break;
+                        }
+                    }
+                }
+            }
+
+
+            return result;
+        }
+
     }
 }
