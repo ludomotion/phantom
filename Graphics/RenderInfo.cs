@@ -30,6 +30,7 @@ namespace Phantom.Graphics
         public Matrix World;
         public Matrix Projection;
         public Vector2 Padding;
+        public float Elapsed;
 
     }
 }

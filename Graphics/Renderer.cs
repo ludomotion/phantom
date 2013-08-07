@@ -55,6 +55,7 @@ namespace Phantom.Graphics
         protected SpriteBatch batch;
         protected SpriteSortMode sortMode;
         protected BlendState blendState;
+        private Stopwatch stopWatch;
 
         private Action<RenderInfo> activeRenderPass;
 
@@ -81,6 +82,8 @@ namespace Phantom.Graphics
                 this.activeRenderPass = this.RenderPassFullLock;
             else
                 this.activeRenderPass = this.RenderPassEndLock;
+            this.stopWatch = new Stopwatch();
+            this.stopWatch.Start();
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
@@ -116,6 +119,9 @@ namespace Phantom.Graphics
                 return;
 
             info = this.BuildRenderInfo();
+
+            info.Elapsed = (float)stopWatch.Elapsed.TotalSeconds;
+            stopWatch.Restart();
 
             info.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
@@ -282,6 +288,7 @@ namespace Phantom.Graphics
             }
 
             info.RenderTarget = null;
+
 
             return info;
         }
