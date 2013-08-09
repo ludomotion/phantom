@@ -406,9 +406,11 @@ namespace Phantom.Core
             MessageResult result = MessageResult.IGNORED;
 
             range = range * range;
-
-            foreach (Component component in AlwaysUpdate)
+            
+            Component component;
+            for( int i = AlwaysUpdate.Count-1; i>=0; --i)
             {
+                component = this.AlwaysUpdate[i];
                 Entity entity = component as Entity;
                 if (entity != null)
                 {
