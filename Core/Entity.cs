@@ -182,9 +182,9 @@ namespace Phantom.Core
 
         public enum UpdateBehaviours
         {
-            AlwaysUpdate,
-            UpdateWhenVisible,
-            NeverUpdate,
+            AlwaysUpdate = 1<<1,
+            UpdateWhenVisible = 1<<2,
+            NeverUpdate = 1<<3,
 
             Default = UpdateWhenVisible
         }

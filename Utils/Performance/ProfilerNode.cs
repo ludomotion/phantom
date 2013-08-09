@@ -122,8 +122,10 @@ namespace Phantom.Utils.Performance
             batch.DrawString(font, this.Name, position, Color.White);
             Vector2 info = new Vector2(infoX, position.Y);
             batch.DrawString(font, this.Stats.Calls.ToString(), info, Color.White);
-            info.X += 100;
-            batch.DrawString(font, this.Stats.TotalTime.ToString("0.0")+"ms", info, Color.White);
+            info.X += 60;
+            batch.DrawString(font, this.Stats.TotalTime.ToString("0.0") + "ms", info, Color.White);
+            info.X += 60;
+            batch.DrawString(font, (this.Stats.TotalTime / Math.Max(1,this.Stats.Calls)).ToString("0.0") + "ms", info, Color.White);
             info.X += 80;
             batch.DrawString(font, this.Stats.Percentage.ToString("0.0") + "%", info, Color.White);
             //info.X += 40;

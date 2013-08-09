@@ -290,38 +290,6 @@ namespace Phantom.Physics
 					yield return entities[i];
         }
 
-		internal IEnumerable<Entity> GetEntitiesByFilter(Shapes.Filters.IFilter filter)
-		{
-			for (int i = 0; i < entities.Count; i++)
-				if (filter.Contains(entities[i]))
-					yield return entities[i];
-		}
-
-		internal void ExecuteInFilter(Shapes.Filters.IFilter filter, System.Action<Entity> callback)
-		{
-			for (int i = 0; i < entities.Count; i++)
-				if (filter.Contains(entities[i]))
-					callback(entities[i]);
-		}
-
-		internal void ExecuteOutFilter(Shapes.Filters.IFilter filter, System.Action<Entity> callback)
-		{
-			for (int i = 0; i < entities.Count; i++)
-				if (!filter.Contains(entities[i]))
-					callback(entities[i]);
-		}
-
-		internal void ExecuteInOutFilter(Shapes.Filters.IFilter filter, System.Action<Entity> callbackIn, System.Action<Entity> callbackOut)
-		{
-			for (int i = 0; i < entities.Count; i++)
-			{
-				if (filter.Contains(entities[i]))
-					callbackIn(entities[i]);
-				else
-					callbackOut(entities[i]);
-			}
-		}
-
         /// <summary>
         /// Called by the parents layer when its size is changed, removes or destroys the entities that are outside the new bounds.
         /// </summary>

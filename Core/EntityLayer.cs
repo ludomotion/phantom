@@ -136,10 +136,9 @@ namespace Phantom.Core
             EntityRenderer r = this.renderer as EntityRenderer;
             if (r != null)
             {
-                for (int i = this.VisibleUpdate.Count - 1; i >= 0; i--)
+                foreach( Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true) )
                 {
-                    Entity e = this.VisibleUpdate[i];
-                    if (!e.Ghost && e.Shape.InRect(r.TopLeft, r.BottomRight, true))
+                    if (!e.Ghost)
                     {
                         e.Update(elapsed);
                         if (e.Destroyed)
@@ -217,22 +216,124 @@ namespace Phantom.Core
         }
 
 
-		public IEnumerable<Entity> GetEntitiesByFilter(IFilter filter)
-		{
-			return integrator.GetEntitiesByFilter(filter);
+		public IEnumerable<Entity> GetEntitiesByFilter(IFilter filter, FilterTarget target)
+        {
+            switch (target)
+            {
+                case FilterTarget.All:
+                    for (int i = 0; i < this.Components.Count; i++)
+                        if (this.Components[i] is Entity && filter.Contains(this.Components[i] as Entity))
+                            yield return this.Components[i] as Entity;
+                    break;
+                case FilterTarget.AlwaysUpdate:
+                    for (int i = 0; i < this.AlwaysUpdate.Count; i++)
+                        if (this.AlwaysUpdate[i] is Entity && filter.Contains(this.AlwaysUpdate[i] as Entity))
+                            yield return this.Components[i] as Entity;
+                    break;
+                case FilterTarget.OnScreen:
+                    EntityRenderer r = this.renderer as EntityRenderer;
+                    if (r != null)
+                    {
+                        foreach( Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true) )
+                            if (filter.Contains(e))
+                                yield return e;
+                    }
+                    break;
+            }
 		}
 
-		public void ExecuteInFilter(IFilter filter, Action<Entity> callback)
-		{
-			integrator.ExecuteInFilter(filter, callback);
+        public void ExecuteInFilter(IFilter filter, Action<Entity> callback, FilterTarget target)
+        {
+            switch (target)
+            {
+                case FilterTarget.All:
+                    for (int i = 0; i < this.Components.Count; i++)
+                        if (this.Components[i] is Entity && filter.Contains(this.Components[i] as Entity))
+                            callback(this.Components[i] as Entity);
+                    break;
+                case FilterTarget.AlwaysUpdate:
+                    for (int i = 0; i < this.AlwaysUpdate.Count; i++)
+                        if (this.AlwaysUpdate[i] is Entity && filter.Contains(this.AlwaysUpdate[i] as Entity))
+                            callback(this.AlwaysUpdate[i] as Entity);
+                    break;
+                case FilterTarget.OnScreen:
+                    EntityRenderer r = this.renderer as EntityRenderer;
+                    if (r != null)
+                    {
+                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                            if (filter.Contains(e))
+                                callback(e);
+                    }
+                    break;
+            }
 		}
-		public void ExecuteOutFilter(IFilter filter, Action<Entity> callback)
-		{
-			integrator.ExecuteOutFilter(filter, callback);
+        public void ExecuteOutFilter(IFilter filter, Action<Entity> callback, FilterTarget target)
+        {
+            switch (target)
+            {
+                case FilterTarget.All:
+                    for (int i = 0; i < this.Components.Count; i++)
+                        if (this.Components[i] is Entity && !filter.Contains(this.Components[i] as Entity))
+                            callback(this.Components[i] as Entity);
+                    break;
+                case FilterTarget.AlwaysUpdate:
+                    for (int i = 0; i < this.AlwaysUpdate.Count; i++)
+                        if (this.AlwaysUpdate[i] is Entity && !filter.Contains(this.AlwaysUpdate[i] as Entity))
+                            callback(this.AlwaysUpdate[i] as Entity);
+                    break;
+                case FilterTarget.OnScreen:
+                    EntityRenderer r = this.renderer as EntityRenderer;
+                    if (r != null)
+                    {
+                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                            if (!filter.Contains(e))
+                                callback(e);
+                    }
+                    break;
+            }
 		}
-		public void ExecuteInOutFilter(IFilter filter, Action<Entity> callbackIn, Action<Entity> callbackOut)
-		{
-			integrator.ExecuteInOutFilter(filter, callbackIn, callbackOut);
+        public void ExecuteInOutFilter(IFilter filter, Action<Entity> callbackIn, Action<Entity> callbackOut, FilterTarget target)
+        {
+            switch (target)
+            {
+                case FilterTarget.All:
+                    for (int i = 0; i < this.Components.Count; i++)
+                    {
+                        if (this.Components[i] is Entity)
+                        {
+                            if (filter.Contains(this.Components[i] as Entity))
+                                callbackIn(this.Components[i] as Entity);
+                            else
+                                callbackOut(this.Components[i] as Entity);
+                        }
+                    }
+                    break;
+                case FilterTarget.AlwaysUpdate:
+                    for (int i = 0; i < this.AlwaysUpdate.Count; i++)
+                    {
+                        if (this.AlwaysUpdate[i] is Entity)
+                        {
+                            if (filter.Contains(this.AlwaysUpdate[i] as Entity))
+                                callbackIn(this.AlwaysUpdate[i] as Entity);
+                            else
+                                callbackOut(this.AlwaysUpdate[i] as Entity);
+                        }
+                    }
+                    break;
+                case FilterTarget.OnScreen:
+                    EntityRenderer r = this.renderer as EntityRenderer;
+                    if (r != null)
+                    {
+                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                        {
+                            if (filter.Contains(e))
+                                callbackIn(e);
+                            else
+                                callbackOut(e);
+                        }
+                    }
+                    break;
+            }
 		}
 
         /// <summary>
@@ -333,5 +434,11 @@ namespace Phantom.Core
             return result;
         }
 
+        public enum FilterTarget
+        {
+            AlwaysUpdate,
+            OnScreen,
+            All,
+        }
     }
 }

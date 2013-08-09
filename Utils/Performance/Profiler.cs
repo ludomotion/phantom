@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Phantom.Misc;
+using System.Threading;
 
 namespace Phantom.Utils.Performance
 {
@@ -16,9 +17,12 @@ namespace Phantom.Utils.Performance
 
         public static SpriteFont font = null;
 
+        public static Thread RecordingThread;
+
 		public static void Initialize(PhantomGame game, int frequency)
 		{
 			Profiler.Instance = new Profiler(frequency);
+            Profiler.RecordingThread = Thread.CurrentThread;
 			game.InsertComponent(0, Profiler.Instance);
 		}
 
@@ -179,8 +183,10 @@ namespace Phantom.Utils.Performance
 			output.Append(" - ");
 			int calls = node.Stats.Calls;
 			output.Append(calls);
-			output.Append(" - ");
-			output.Append( node.Stats.TotalTime );
+            output.Append(" - ");
+            output.Append(node.Stats.TotalTime);
+            output.Append(" - ");
+            output.Append(node.Stats.TotalTime / node.Stats.Calls);
 			output.Append(" - ");
 			output.Append(node.Stats.Percentage);
 			Debug.WriteLine(output.ToString());
@@ -192,12 +198,16 @@ namespace Phantom.Utils.Performance
 		[Conditional("DEBUG")]
 		public static void BeginProfiling(string name)
 		{
+            if (Profiler.RecordingThread != Thread.CurrentThread)
+                return;
 			Profiler.Instance.Begin(name);
 		}
 
 		[Conditional("DEBUG")]
 		public static void EndProfiling(string name)
-		{
+        {
+            if (Profiler.RecordingThread != Thread.CurrentThread)
+                return;
 			Profiler.Instance.End(name);
 		}
 	}
