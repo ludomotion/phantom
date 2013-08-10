@@ -138,7 +138,7 @@ namespace Phantom.Core
             {
                 foreach( Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true) )
                 {
-                    if (!e.Ghost)
+                    if (!e.Ghost && e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
                     {
                         e.Update(elapsed);
                         if (e.Destroyed)
