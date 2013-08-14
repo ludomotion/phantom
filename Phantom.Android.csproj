@@ -19,7 +19,7 @@
     <AndroidApplication>True</AndroidApplication>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Android' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Android'">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
@@ -31,7 +31,7 @@
     <AndroidLinkMode>None</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Android' ">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|Android'">
     <DebugType>pdbonly</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Android\Release\</OutputPath>
@@ -39,7 +39,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <ItemGroup>
@@ -136,6 +135,7 @@
     <Compile Include="Utils\PhantomComponentNotation.cs" />
     <Compile Include="Utils\TweenFunctions.cs" />
     <Compile Include="Graphics\EntityRenderer.cs" />
+    <Compile Include="Utils\Performance\DebugCounter.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />

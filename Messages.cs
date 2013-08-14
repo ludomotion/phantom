@@ -37,6 +37,7 @@ namespace Phantom
         public const int SetPlayer = 50;
 
         public const int SetPosition = 100;
+		public const int SetFrame = 101;
 
         public const int PhysicsPause = 200;
         public const int PhysicsResume = 201;

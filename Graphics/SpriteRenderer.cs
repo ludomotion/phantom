@@ -80,5 +80,15 @@ namespace Phantom.Graphics
             }
             base.Render(info);
         }
+
+		public override MessageResult HandleMessage (int message, object data)
+		{
+			if (message == Messages.SetFrame && data is int) {
+				this.animiations[this.playing][0] = (int)data;
+				return MessageResult.HANDLED;
+			}
+
+			return base.HandleMessage (message, data);
+		}
     }
 }
