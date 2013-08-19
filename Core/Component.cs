@@ -209,7 +209,9 @@ namespace Phantom.Core
             MessageResult finalResult = MessageResult.IGNORED;
             for (int i = 0; i < this.components.Count; i++)
             {
-                MessageResult result = this.components[i].HandleMessage(message, data);
+				Component component = this.components [i];
+				MessageResult result = MessageResult.IGNORED;
+				if(component != null) result = this.components[i].HandleMessage(message, data);
                 if (result == MessageResult.CONSUMED)
                     return result;
                 if (result == MessageResult.HANDLED)
@@ -227,7 +229,7 @@ namespace Phantom.Core
             for (int i = this.components.Count - 1; i >= 0; i--)
             {
                 Component component = this.components[i];
-                if (!component.Ghost)
+                if (component != null && !component.Ghost)
                 {
                     component.Update(elapsed);
                     if (component.Destroyed)
