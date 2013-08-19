@@ -235,7 +235,9 @@ namespace Phantom
 				Profiler.Instance.BeginRender ();
 #endif
 
+#if !ANDROID
                 lock (this.GlobalRenderLock)
+#endif
                 {
                     this.GraphicsDevice.Clear(this.BackgroundColor);
                 }
