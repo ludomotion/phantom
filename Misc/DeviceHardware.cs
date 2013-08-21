@@ -245,13 +245,18 @@ namespace Phantom
 			DisplayRealWidth = 2.54f * deviceScreenWidth / metrics.Xdpi;
 			DisplayRealHeight = 2.54f * deviceScreenHeight / metrics.Ydpi;
 			int shortSizeDp = (Math.Min(deviceScreenWidth, deviceScreenHeight) * (int)(DisplayMetricsDensity.Default)) / (int)metrics.DensityDpi;
-			
+
+#if OUYA
+			OS = DeviceOS.Ouya;
+			Form = DeviceForm.Console;
+#else
 			OS = DeviceOS.Android;
+			Form = shortSizeDp < 720 ? DeviceForm.Phone : DeviceForm.Tablet; // Taken from Android SystemUI (status bar) layout policy for deciding when to use Tablet UI
+#endif
 			OSVersion = Build.VERSION.Release;
 			Manufacturer = Build.Manufacturer;
 			Identifier = Build.Model;
 			Model = Build.Device;
-			Form = shortSizeDp < 720 ? DeviceForm.Phone : DeviceForm.Tablet; // Taken from Android SystemUI (status bar) layout policy for deciding when to use Tablet UI
 			ModelVersion = Build.VERSION.Incremental;
 			PPI = (metrics.Xdpi + metrics.Ydpi) / 2f;
 
@@ -476,16 +481,6 @@ namespace Phantom
 			Model = "UnknownOnLiveDevice";
 			Form = DeviceForm.Streaming;
 			ModelVersion = "UnknownOnLiveVersion";
-			PPI = 96f;
-
-#elif OUYA
-			OS = DeviceOS.Ouya;
-			OSVersion = "Unknown";
-			Manufacturer = "OUYA";
-			Identifier = "Unspecified";
-			Model = "UnknownOuyaDevice";
-			Form = DeviceForm.Console;
-			ModelVersion = "UnknownOuyaVersion";
 			PPI = 96f;
 
 #elif PS3
