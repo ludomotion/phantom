@@ -195,12 +195,15 @@ namespace Phantom.GameUI
                         //this stacks fits with the other stack
                         this.Destroyed = true;
                         other.Count = s;
+                        other.HandleMessage(Messages.ChangeStackSize, this);
                     }
                     else
                     {
                         //return any left-overs
                         other.Count = other.StackSize;
+                        other.HandleMessage(Messages.ChangeStackSize, this);
                         this.Count = s - other.StackSize;
+                        this.HandleMessage(Messages.ChangeStackSize, this);
                         if (LastContainer != null)
                             MoveTo(LastContainer);
                         else

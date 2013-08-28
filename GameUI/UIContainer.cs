@@ -89,6 +89,31 @@ namespace Phantom.GameUI
 
             if (this.content!=null) 
             {
+                //try stack
+                if (this.content.StackSize > 1 && this.content.Name == content.Name)
+                {
+                    int s = content.Count + this.content.Count;
+                    if (s <= content.StackSize)
+                    {
+                        //this stacks fits with the other stack
+                        this.content.Destroyed = true;
+                        this.content = null;
+                        content.Count = s;
+                        content.HandleMessage(Messages.ChangeStackSize, this);
+                        return true;
+                    }
+                    else
+                    {
+                        //return any left-overs
+                        content.Count = content.StackSize;
+                        this.content.Count = s - content.StackSize;
+                        content.HandleMessage(Messages.ChangeStackSize, this);
+                        this.content.HandleMessage(Messages.ChangeStackSize, this);
+
+                    }
+                }
+
+
                 //try swap
                 if (content.LastContainer != null)
                 {
