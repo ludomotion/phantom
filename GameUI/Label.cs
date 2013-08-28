@@ -10,11 +10,18 @@ namespace Phantom.GameUI
     public class Label : UIElement
     {
         private Color color;
-        public Label(string name, Vector2 position, Color color)
+        private bool centered;
+        public Label(string name, Vector2 position, Color color, bool centered)
             : base(name, position, new Circle(20))
         {
             Enabled = false;
             this.color = color;
+            this.centered = centered;
+        }
+
+        public Label(string name, Vector2 position, Color color)
+            : this(name, position, color, true)
+        {
         }
 
         public override void Render(Graphics.RenderInfo info)
@@ -23,6 +30,8 @@ namespace Phantom.GameUI
             if (Visible && UILayer.Font != null)
             {
                 Vector2 size = UILayer.Font.MeasureString(this.Name);
+                if (!this.centered)
+                    size.X = 0;
                 info.Batch.DrawString(UILayer.Font, this.Name, this.Position - size * 0.5f, color);
             }
         }
