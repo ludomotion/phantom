@@ -65,6 +65,11 @@ namespace Phantom.GameUI
             return hover;
         }
 
+        public UIContent GetDragging()
+        {
+            return draggingContent;
+        }
+
         public override void Update(float elapsed)
         {
             base.Update(elapsed);

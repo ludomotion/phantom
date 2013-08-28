@@ -15,10 +15,10 @@ namespace Phantom.GameUI
         public readonly int VisibleOptions;
         public readonly bool Wrap;
         private int selectedElement;
-        private List<UIElement> elements;
+        protected List<UIElement> elements;
         private Vector2 offset;
         private float fallOff;
-        private bool hoverCenter;
+        private UIElement hovering;
 
         public UICarousel(string name, Vector2 position, OABB shape, UIElementOrientation orientation, int visibleOptions, bool wrap, float offset, float fallOff)
             : base(name, position, shape)
@@ -29,7 +29,6 @@ namespace Phantom.GameUI
             this.fallOff = fallOff;
             elements = new List<UIElement>();
             selectedElement = -1;
-            hoverCenter = false;
             switch (orientation)
             {
                 default:
@@ -80,33 +79,64 @@ namespace Phantom.GameUI
             }
         }
 
-        public override void ClickAt(Vector2 position, int player)
+        public virtual UIElement GetElementAt(Vector2 position)
         {
             if (selectedElement >= 0)
             {
-                if (elements[selectedElement].Shape.InShape(position+this.Position))
-                    elements[selectedElement].ClickAt(position, player);
-                else
-                {
-                    switch (ElementOrientation) 
-                    {
-                        case UIElementOrientation.LeftRight:
-                            if (position.X < 0)
-                                Previous(player);
-                            else
-                                Next(player);
-                            break;
-                        case UIElementOrientation.TopDown:
-                            if (position.Y < 0)
-                                Previous(player);
-                            else
-                                Next(player);
-                            break;
-                    }
+                if (elements[selectedElement].Shape.InShape(position))
+                    return elements[selectedElement];
+            }
 
+            for (int i = 1; i <= VisibleOptions; i++)
+            {
+                int index = selectedElement + i;
+                if (index >= elements.Count && Wrap)
+                    index -= elements.Count;
+                if (index < elements.Count && elements[index].Shape.InShape(position))
+                    return elements[index];
+
+                index = selectedElement - i;
+                if (index < 0 && Wrap)
+                    index += elements.Count;
+                if (index >= 0 && elements[index].Shape.InShape(position))
+                    return elements[index];
+            }
+
+            return null;
+        }
+
+        public override void ClickAt(Vector2 position, int player)
+        {
+            if (hovering != null)
+                hovering.ClickAt(position, player);
+            else
+            {
+                switch (ElementOrientation)
+                {
+                    case UIElementOrientation.LeftRight:
+                        if (position.X < 0)
+                            Previous(player);
+                        else
+                            Next(player);
+                        break;
+                    case UIElementOrientation.TopDown:
+                        if (position.Y < 0)
+                            Previous(player);
+                        else
+                            Next(player);
+                        break;
                 }
-            } 
+
+            }
+
             base.ClickAt(position, player);
+        }
+
+        public override void Update(float elapsed)
+        {
+            base.Update(elapsed);
+            if (hovering != null)
+                hovering.Selected = this.Selected;
         }
 
         private void Previous(int player)
@@ -147,22 +177,22 @@ namespace Phantom.GameUI
 
         public override void StartPress(int player)
         {
-            if (selectedElement >= 0)
-                elements[selectedElement].StartPress(player);
+            if (hovering!=null)
+                hovering.StartPress(player);
             base.StartPress(player);
         }
 
         public override void CancelPress(int player)
         {
-            if (selectedElement >= 0)
-                elements[selectedElement].CancelPress(player);
+            if (hovering != null)
+                hovering.CancelPress(player);
             base.CancelPress(player);
         }
 
         public override void EndPress(int player)
         {
-            if (selectedElement >= 0)
-                elements[selectedElement].EndPress(player);
+            if (hovering != null)
+                hovering.EndPress(player);
             base.EndPress(player);
         }
 
@@ -177,8 +207,8 @@ namespace Phantom.GameUI
                     Previous(player);
                     break;
                 case ClickType.Select:
-                    if (selectedElement >= 0)
-                        elements[selectedElement].EndPress(player);
+                    if (hovering != null)
+                        hovering.EndPress(player);
                     break;
             }
             base.Click(type, player);
@@ -235,18 +265,18 @@ namespace Phantom.GameUI
             }
         }
 
-        public override void Update(float elapsed)
-        {
-            base.Update(elapsed);
-            if (selectedElement >= 0)
-            {
-                elements[selectedElement].Selected = this.hoverCenter ? this.Selected : 0;
-            }
-        }
+
 
         internal void UpdateMouse(Vector2 mousePosition)
         {
-            hoverCenter = (selectedElement >= 0) && elements[selectedElement].Shape.InShape(mousePosition);
+            UIElement h = GetElementAt(mousePosition);
+
+            if (h != hovering)
+            {
+                if (hovering != null)
+                    hovering.Selected = 0;
+                hovering = h;
+            }
         }
 
         public virtual void SelectionChanged()
@@ -263,13 +293,7 @@ namespace Phantom.GameUI
 
 
 
-        public UIElement GetElementAt(Vector2 mousePosition)
-        {
-            if (selectedElement >= 0 && elements[selectedElement].Shape.InShape(mousePosition))
-                return elements[selectedElement];
-            else
-                return this;
-        }
+        
 
         public void SetSelection(int index, int player)
         {
