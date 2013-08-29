@@ -9,6 +9,55 @@ using System.Reflection;
 
 namespace Phantom.Utils
 {
+    public abstract class CalculatedValue
+    {
+        protected string stringValue;
+
+        public CalculatedValue(string stringValue)
+        {
+            SetString(stringValue);
+        }
+
+        public virtual void SetString(string stringValue)
+        {
+            this.stringValue = stringValue;
+        }
+
+        public virtual object GetValue()
+        {
+            return stringValue;
+        }
+
+        public override string ToString()
+        {
+            return stringValue;
+        }
+
+        public virtual void SetValue(object value)
+        {
+        }
+
+        public abstract object Clone();
+
+        public abstract object NegativeClone();
+        public virtual void IncrementValue(object value)
+        {
+        }
+
+        public virtual void DecrementValue(object value)
+        {
+        }
+
+        public virtual void MultiplyValue(object value)
+        {
+        }
+
+        public virtual void DivideValue(object value)
+        {
+        }
+
+    }
+
     public class PCNMember
     {
         public string Name;
@@ -283,9 +332,9 @@ namespace Phantom.Utils
             }
 
             int j = 0;
-            int.TryParse(v, out j);
-            return j;
-            
+            if (int.TryParse(v, out j))
+                return j;
+            return null;
         }
 
         public static string ValueToString(object value)
@@ -295,6 +344,9 @@ namespace Phantom.Utils
 
         public static string ValueToString(object value, string format)
         {
+            if (value is CalculatedValue)
+                return ((CalculatedValue)value).ToString();
+
             if (value is string)
             {
                 //TODO escape quotes and other characters
@@ -329,6 +381,283 @@ namespace Phantom.Utils
                     return "(" + ((Vector4)value).X.ToString(format) + "," + ((Vector4)value).Y.ToString(format) + "," + ((Vector4)value).Z.ToString(format) + "," + ((Vector4)value).W.ToString(format) + ")";
             }
             return "null";
+        }
+
+        public static bool CompareValues(object value1, object value2, string oper)
+        {
+            if (value1 is CalculatedValue)
+                value1 = ((CalculatedValue)value1).GetValue();
+            if (value2 is CalculatedValue)
+                value2 = ((CalculatedValue)value2).GetValue();
+
+            switch (oper)
+            {
+                default:
+                case "==":
+                    if (value1 == null && value2 == null)
+                        return true;
+                    if (value1 is int && value2 is int)
+                        return (int)value1 == (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 == (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 == (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 == (int)value2;
+                    if (value1 is string && value2 is string)
+                        return (string)value1 == (string)value2;
+                    if (value1 is Color && value2 is Color)
+                        return (Color)value1 == (Color)value2;
+                    if (value1 is bool && value2 is bool)
+                        return (bool)value1 == (bool)value2;
+                    if (value1 is Vector2 && value2 is Vector2)
+                        return ((Vector2)value1).X == ((Vector2)value2).X && ((Vector2)value1).Y == ((Vector2)value2).Y;
+                    if (value1 is Vector3 && value2 is Vector3)
+                        return ((Vector3)value1).X == ((Vector3)value2).X && ((Vector3)value1).Y == ((Vector3)value2).Y && ((Vector3)value1).Z == ((Vector3)value2).Z;
+                    if (value1 is Vector4 && value2 is Vector4)
+                        return ((Vector4)value1).X == ((Vector4)value2).X && ((Vector4)value1).Y == ((Vector4)value2).Y && ((Vector4)value1).Z == ((Vector4)value2).Z && ((Vector4)value1).W == ((Vector4)value2).W;
+                    break;
+                case "!=":
+                    if (value1 == null && value2 == null)
+                        return false;
+                    if (value1 is int && value2 is int)
+                        return (int)value1 != (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 != (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 != (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 != (float)value2;
+                    if (value1 is string && value2 is string)
+                        return (string)value1 != (string)value2;
+                    if (value1 is Color && value2 is Color)
+                        return (Color)value1 != (Color)value2;
+                    if (value1 is bool && value2 is bool)
+                        return (bool)value1 != (bool)value2;
+                    if (value1 is Vector2 && value2 is Vector2)
+                        return ((Vector2)value1).X != ((Vector2)value2).X || ((Vector2)value1).Y != ((Vector2)value2).Y;
+                    if (value1 is Vector3 && value2 is Vector3)
+                        return ((Vector3)value1).X != ((Vector3)value2).X || ((Vector3)value1).Y != ((Vector3)value2).Y || ((Vector3)value1).Z != ((Vector3)value2).Z;
+                    if (value1 is Vector4 && value2 is Vector4)
+                        return ((Vector4)value1).X != ((Vector4)value2).X || ((Vector4)value1).Y != ((Vector4)value2).Y || ((Vector4)value1).Z != ((Vector4)value2).Z || ((Vector4)value1).W != ((Vector4)value2).W;
+                    break;
+                case ">":
+                    if (value1 is int && value2 is int)
+                        return (int)value1 > (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 > (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 > (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 > (int)value2;
+                    break;
+                case ">=":
+                    if (value1 is int && value2 is int)
+                        return (int)value1 >= (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 >= (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 >= (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 >= (int)value2;
+                    break;
+                case "<":
+                    if (value1 is int && value2 is int)
+                        return (int)value1 < (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 < (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 < (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 < (int)value2;
+                    break;
+                case "<=":
+                    if (value1 is int && value2 is int)
+                        return (int)value1 < (int)value2;
+                    if (value1 is int && value2 is float)
+                        return (int)value1 < (float)value2;
+                    if (value1 is float && value2 is float)
+                        return (float)value1 < (float)value2;
+                    if (value1 is float && value2 is int)
+                        return (float)value1 < (int)value2;
+                    break;
+            }
+            return false;
+        }
+
+        public static object TransformValue(object target, object source, string oper)
+        {
+            switch (oper)
+            {
+                default:
+                case "=":
+                    if (source is int)
+                        return (int)source;
+                    if (source is float)
+                        return (float)source;
+                    if (source is string)
+                        return (string)source;
+                    if (source is Color)
+                        return (Color)source;
+                    if (source is Vector2)
+                        return (Vector2)source;
+                    if (source is Vector3)
+                        return (Vector3)source;
+                    if (source is Vector4)
+                        return (Vector4)source;
+                    if (source is CalculatedValue)
+                        return ((CalculatedValue)source).Clone();
+                    break;
+                case "=-":
+                    if (source is int)
+                        return -(int)source;
+                    if (source is float)
+                        return -(float)source;
+                    if (source is CalculatedValue)
+                        return ((CalculatedValue)source).NegativeClone();
+                    break;
+                case "++":
+                    if (target is int)
+                        return (int)target + 1;
+                    if (target is float)
+                        return (float)target + 1;
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).IncrementValue(1);
+                        return target;
+                    }
+
+                    break;
+                case "--":
+                    if (target is int)
+                        return (int)target - 1;
+                    if (target is float)
+                        return (float)target - 1;
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).DecrementValue(1);
+                        return target;
+                    }
+                    break;
+                case "+=":
+                    if (target is int && source is int)
+                        return (int)target + (int)source;
+                    if (target is int && source is float)
+                        return (int)((int)target + (float)source);
+                    if (target is int && source is CalculatedValue)
+                        return (int)target + (int)((CalculatedValue)source).GetValue();
+                    if (target is float && source is float)
+                        return (float)target + (float)source;
+                    if (target is float && source is int)
+                        return (float)target + (int)source;
+                    if (target is float && source is CalculatedValue)
+                        return (float)target + (float)((CalculatedValue)source).GetValue();
+                    if (target is string && source is string)
+                        return (string)target + (string)source;
+                    if (target is string)
+                        return (string)target + ValueToString(source);
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).IncrementValue(source);
+                        return target;
+                    }
+                    break;
+                case "-=":
+                    if (target is int && source is int)
+                        return (int)target - (int)source;
+                    if (target is int && source is float)
+                        return (int)((int)target - (float)source);
+                    if (target is int && source is CalculatedValue)
+                        return (int)target - (int)((CalculatedValue)source).GetValue();
+                    if (target is float && source is float)
+                        return (float)target - (float)source;
+                    if (target is float && source is int)
+                        return (float)target - (int)source;
+                    if (target is float && source is CalculatedValue)
+                        return (float)target + (float)((CalculatedValue)source).GetValue();
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).DecrementValue(source);
+                        return target;
+                    }
+                    break;
+                case "*=":
+                    if (target is int && source is int)
+                        return (int)target * (int)source;
+                    if (target is int && source is float)
+                        return (int)((int)target * (float)source);
+                    if (target is int && source is CalculatedValue)
+                        return (int)target * (int)((CalculatedValue)source).GetValue();
+                    if (target is float && source is float)
+                        return (float)target * (float)source;
+                    if (target is float && source is int)
+                        return (float)target * (int)source;
+                    if (target is float && source is CalculatedValue)
+                        return (float)target * (float)((CalculatedValue)source).GetValue();
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).MultiplyValue(source);
+                        return target;
+                    }
+                    break;
+                case "/=":
+                    if (target is int && source is int)
+                        return (int)target / (int)source;
+                    if (target is int && source is float)
+                        return (int)((int)target / (float)source);
+                    if (target is int && source is CalculatedValue)
+                        return (int)target / (int)((CalculatedValue)source).GetValue();
+                    if (target is float && source is float)
+                        return (float)target / (float)source;
+                    if (target is float && source is int)
+                        return (float)target / (int)source;
+                    if (target is float && source is CalculatedValue)
+                        return (float)target / (float)((CalculatedValue)source).GetValue();
+                    if (target is CalculatedValue)
+                    {
+                        ((CalculatedValue)target).DivideValue(source);
+                        return target;
+                    }
+                    break;
+                case "%=":
+                    if (target is int && source is int)
+                        return (int)target % (int)source;
+                    if (target is int && source is float)
+                        return (int)target % (int)source;
+                    if (target is int && source is CalculatedValue)
+                        return (int)target % (int)((CalculatedValue)source).GetValue();
+                    if (target is float && source is float)
+                        return (float)target % (float)source;
+                    if (target is float && source is int)
+                        return (float)target % (int)source;
+                    break;
+                case "&=":
+                    if (target is int && source is int)
+                        return (int)target & (int)source;
+                    if (target is int && source is CalculatedValue)
+                        return (int)target & (int)((CalculatedValue)source).GetValue();
+                    if (target is bool && source is bool)
+                        return (bool)target && (bool)source;
+                    break;
+                case "|=":
+                    if (target is int && source is int)
+                        return (int)target | (int)source;
+                    if (target is int && source is CalculatedValue)
+                        return (int)target | (int)((CalculatedValue)source).GetValue();
+                    if (target is bool && source is bool)
+                        return (bool)target || (bool)source;
+                    break;
+                case "^=":
+                    if (target is int && source is int)
+                        return (int)target ^ (int)source;
+                    if (target is int && source is CalculatedValue)
+                        return (int)target ^ (int)((CalculatedValue)source).GetValue();
+                    if (target is bool && source is bool)
+                        return (bool)target ^ (bool)source;
+                    break;
+
+            }
+            return target;
         }
 
     }
