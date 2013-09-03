@@ -334,6 +334,9 @@ namespace Phantom.Utils
             int j = 0;
             if (int.TryParse(v, out j))
                 return j;
+            float fl = 0;
+            if (float.TryParse(v, out fl))
+                return fl;
             return null;
         }
 
