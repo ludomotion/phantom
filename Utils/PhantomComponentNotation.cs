@@ -443,7 +443,7 @@ namespace Phantom.Utils
                         return ((Vector3)value1).X != ((Vector3)value2).X || ((Vector3)value1).Y != ((Vector3)value2).Y || ((Vector3)value1).Z != ((Vector3)value2).Z;
                     if (value1 is Vector4 && value2 is Vector4)
                         return ((Vector4)value1).X != ((Vector4)value2).X || ((Vector4)value1).Y != ((Vector4)value2).Y || ((Vector4)value1).Z != ((Vector4)value2).Z || ((Vector4)value1).W != ((Vector4)value2).W;
-                    break;
+                    return true;
                 case ">":
                     if (value1 is int && value2 is int)
                         return (int)value1 > (int)value2;
