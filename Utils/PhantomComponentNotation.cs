@@ -663,5 +663,98 @@ namespace Phantom.Utils
             return target;
         }
 
+
+        public static bool TryParse(string value, ref float result)
+        {
+            object res = StringToValue(value);
+            if (res is float)
+            {
+                result = (float)res;
+                return true;
+            }
+            if (res is int)
+            {
+                result = (int)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref int result)
+        {
+            object res = StringToValue(value);
+            if (res is int)
+            {
+                result = (int)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref bool result)
+        {
+            object res = StringToValue(value);
+            if (res is bool)
+            {
+                result = (bool)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref string result)
+        {
+            object res = StringToValue(value);
+            if (res is string)
+            {
+                result = (string)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref Color result)
+        {
+            object res = StringToValue(value);
+            if (res is Color)
+            {
+                result = (Color)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref Vector2 result)
+        {
+            object res = StringToValue(value);
+            if (res is Vector2)
+            {
+                result = (Vector2)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref Vector3 result)
+        {
+            object res = StringToValue(value);
+            if (res is Vector3)
+            {
+                result = (Vector3)res;
+                return true;
+            }
+            return false;
+        }
+
+        public static bool TryParse(string value, ref Vector4 result)
+        {
+            object res = StringToValue(value);
+            if (res is Vector4)
+            {
+                result = (Vector4)res;
+                return true;
+            }
+            return false;
+        }
     }
 }
