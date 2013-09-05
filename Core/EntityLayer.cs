@@ -17,6 +17,19 @@ namespace Phantom.Core
     /// </summary>
     public class EntityLayer : Layer
     {
+
+        public delegate float SortFunction(Component component);
+
+        public static float SortOnY(Component component)
+        {
+            Entity e = component as Entity;
+            if (e == null)
+                return 0;
+            return e.Position.Y;
+        }
+
+        public SortFunction Sort;
+
         /// <summary>
         /// The component that renders the layer's entities. 
         /// </summary>
@@ -70,7 +83,7 @@ namespace Phantom.Core
 			if (!(renderer is EntityRenderer))
 				Debug.WriteLine("warning: Please add an EntityRenderer to an EntityLayer");
 #endif
-			}
+		}
 
         protected override void OnComponentAdded(Component component)
 		{
@@ -151,6 +164,9 @@ namespace Phantom.Core
             //base.Update(elapsed);
         }
 
+
+        
+
         public override void Render( RenderInfo info )
         {
             if( info == null )
@@ -210,9 +226,36 @@ namespace Phantom.Core
             return integrator.GetEntityCloseTo(position, distance);
         }
 
+        public IEnumerable<Entity> GetEntitiesInRectSorted(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            List<Entity> entities = new List<Entity>();
+            foreach (Entity e in integrator.GetEntitiesInRect(topLeft, bottomRight, partial))
+            {
+                float s = Sort(e);
+                int insertAt = entities.Count;
+                for (int i = entities.Count - 1; i >= 0; i--)
+                {
+                    if (Sort(entities[i]) <= s)
+                    {
+                        insertAt = i + 1;
+                        break;
+                    }
+                }
+                entities.Insert(insertAt, e);
+            }
+            for (int i = 0; i < entities.Count; i++)
+            {
+                yield return entities[i];
+            }
+        }
+
+
         public IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-			return integrator.GetEntitiesInRect(topLeft, bottomRight, partial); 
+            if (Sort != null)
+                return GetEntitiesInRectSorted(topLeft, bottomRight, partial);
+            else
+                return integrator.GetEntitiesInRect(topLeft, bottomRight, partial);
         }
 
 
