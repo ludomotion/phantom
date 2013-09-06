@@ -235,5 +235,15 @@ namespace Phantom.GameUI
                 Contents[selectedContent].Render(info);
             }
         }
+
+        public void ClearContents()
+        {
+            for (int i = Components.Count - 1; i >= 0; i--)
+            {
+                if (Components[i] is UIElement)
+                    RemoveComponent(Components[i]);
+            }
+        }
+
     }
 }
