@@ -12,13 +12,22 @@ namespace Phantom.Cameras.Components
 		private float timer;
 		private float delay;
 		private float time;
+        private float intensity;
 
 		public override Core.Component.MessageResult HandleMessage(int message, object data)
 		{
 			if (message == Messages.CameraShake)
 			{
-				float time = (float)data;
-				this.Shake(time);
+                if (data is float)
+                {
+                    float time = (float)data;
+                    this.Shake(time, 1);
+                }
+                else if (data is Vector2)
+                {
+                    Vector2 v = (Vector2)data;
+                    this.Shake(v.X, v.Y);
+                }
 			}
 			return base.HandleMessage(message, data);
 		}
@@ -34,16 +43,17 @@ namespace Phantom.Cameras.Components
 				float x = (timer - (this.time / 2));
 				float parabola = -(x * x) + this.time;
 				//noise *= parabola;
-				this.Camera.Target.X += noise * 15;
-				this.Camera.Target.Y += noise * 15;
+                this.Camera.Target.X += noise * 15 * intensity;
+                this.Camera.Target.Y += noise * 15 * intensity;
 				this.Camera.Orientation = noise * MathHelper.PiOver4 * .1f;
 			}
 			else
 				this.Camera.Orientation = 0;
 		}
 
-		private void Shake(float time)
+		private void Shake(float time, float intensity)
 		{
+            this.intensity = intensity;
 			this.delay = this.time = time;
 			this.timer = 0;
 		}
