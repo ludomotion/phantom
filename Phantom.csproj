@@ -112,8 +112,9 @@
     <Compile Include="GameUI\UIMouseEntityHandler.cs" />
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Graphics\EntityRenderer.cs" />
-    <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
+    <Compile Include="Graphics\Particles\Particle.cs" />
+    <Compile Include="Graphics\Particles\ParticlePass.cs" />
     <Compile Include="GameUI\UIContainer.cs" />
     <Compile Include="GameUI\UIContent.cs" />
     <Compile Include="GameUI\UIKeyboardHandler.cs" />
