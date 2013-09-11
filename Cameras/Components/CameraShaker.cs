@@ -39,7 +39,7 @@ namespace Phantom.Cameras.Components
 			base.Update(elapsed);
 			if (this.delay > 0)
 			{
-				float noise = (float)(Math.Cos(timer * 5) * 0.5 + Math.Cos(timer * 60) * 0.3 + Math.Cos(timer * 90) * 0.1);
+				float noise = (float)(Math.Cos(timer * 20) * 0.5 + Math.Cos(timer * 60) * 0.3 + Math.Cos(timer * 90) * 0.1);
 				float x = (timer - (this.time / 2));
 				float parabola = -(x * x) + this.time;
 				//noise *= parabola;
