@@ -135,7 +135,6 @@ namespace Phantom
             //TODO: Instruction caused an invalid operation exception indicating that memory might be corrupted. 
             //Happened when running full screen with two monitors... I think this might be the problem for Hendrik too
             this.graphics.ApplyChanges();
-            this.Resolution = new Viewport(0, 0, this.graphics.PreferredBackBufferWidth, this.graphics.PreferredBackBufferHeight);
 
 			this.states = new List<GameState>();
         }
@@ -172,6 +171,14 @@ namespace Phantom
             this.graphics.SynchronizeWithVerticalRetrace = false;
 
             this.graphics.PreferMultiSampling = false;
+
+			int w = this.graphics.PreferredBackBufferWidth;
+			int h = this.graphics.PreferredBackBufferHeight;
+			if (h > w) {
+				h = w;
+				w = this.graphics.PreferredBackBufferHeight;
+			}
+			this.Resolution = new Viewport(0, 0, w, h);
         }
 
         protected virtual void LoadContent(Content content)

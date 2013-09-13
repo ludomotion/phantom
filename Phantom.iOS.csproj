@@ -198,6 +198,30 @@
     <Compile Include="Utils\TweenFunctions.cs" />
     <Compile Include="Graphics\EntityRenderer.cs" />
     <Compile Include="Utils\Performance\DebugCounter.cs" />
+    <Compile Include="GameUI\Button.cs" />
+    <Compile Include="GameUI\Label.cs" />
+    <Compile Include="GameUI\OptionButton.cs" />
+    <Compile Include="GameUI\Slider.cs" />
+    <Compile Include="GameUI\ToggleButton.cs" />
+    <Compile Include="GameUI\ToolButton.cs" />
+    <Compile Include="GameUI\UIBaseHandler.cs" />
+    <Compile Include="GameUI\UICarousel.cs" />
+    <Compile Include="GameUI\UICarouselContainer.cs" />
+    <Compile Include="GameUI\UIContainer.cs" />
+    <Compile Include="GameUI\UIContent.cs" />
+    <Compile Include="GameUI\UIDesigner.cs" />
+    <Compile Include="GameUI\UIElement.cs" />
+    <Compile Include="GameUI\UIGamePadHandler.cs" />
+    <Compile Include="GameUI\UIInventory.cs" />
+    <Compile Include="GameUI\UIInventoryItem.cs" />
+    <Compile Include="GameUI\UIKeyboardHandler.cs" />
+    <Compile Include="GameUI\UIKeyboardShortCuts.cs" />
+    <Compile Include="GameUI\UILayer.cs" />
+    <Compile Include="GameUI\UIMouseEntityHandler.cs" />
+    <Compile Include="GameUI\UIMouseHandler.cs" />
+    <Compile Include="GameUI\UIMultiContainer.cs" />
+    <Compile Include="GameUI\UITweener.cs" />
+    <Compile Include="GameUI\UITouchHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -212,6 +236,7 @@
     <Folder Include="Utils\" />
     <Folder Include="Utils\Performance\" />
     <Folder Include="Shapes\Filters\" />
+    <Folder Include="GameUI\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
