@@ -558,7 +558,8 @@ namespace Phantom.Misc
                     }
                     catch (Exception e)
                     {
-                        this.AddLines("error executing `" + command + "': " + e.Message);
+                        this.AddLines("error executing `" + command + "': " + e.Message.Replace('\n', ' '));
+                        this.AddLines(e.StackTrace.ToString().Split('\n'));
                     }
 #endif // DEBUG
                 }
