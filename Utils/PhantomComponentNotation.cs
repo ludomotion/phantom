@@ -476,13 +476,13 @@ namespace Phantom.Utils
                     break;
                 case "<=":
                     if (value1 is int && value2 is int)
-                        return (int)value1 < (int)value2;
+                        return (int)value1 <= (int)value2;
                     if (value1 is int && value2 is float)
-                        return (int)value1 < (float)value2;
+                        return (int)value1 <= (float)value2;
                     if (value1 is float && value2 is float)
-                        return (float)value1 < (float)value2;
+                        return (float)value1 <= (float)value2;
                     if (value1 is float && value2 is int)
-                        return (float)value1 < (int)value2;
+                        return (float)value1 <= (int)value2;
                     break;
             }
             return false;
