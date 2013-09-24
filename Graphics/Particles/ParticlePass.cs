@@ -81,12 +81,15 @@ namespace Phantom.Graphics.Particles
 
         public void AddParticle(Particle p)
         {
-            if (this.particles.Count >= this.maxParticles)
+            if (p.Position.X > TopLeft.X - 50 && p.Position.Y > TopLeft.Y - 50 && p.Position.X < BottomRight.X + 50 && p.Position.Y < BottomRight.Y + 50)
             {
-                this.Bury(this.particles.First.Value);
-                this.particles.RemoveFirst();
+                if (this.particles.Count >= this.maxParticles)
+                {
+                    this.Bury(this.particles.First.Value);
+                    this.particles.RemoveFirst();
+                }
+                this.particles.AddLast(p);
             }
-            this.particles.AddLast(p);
         }
 
         private void Bury(Particle p)
