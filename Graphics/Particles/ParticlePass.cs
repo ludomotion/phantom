@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Phantom.Core;
 using System.Diagnostics;
+using Microsoft.Xna.Framework;
+using Phantom.Utils.Performance;
 
 namespace Phantom.Graphics.Particles
 {
@@ -15,6 +17,10 @@ namespace Phantom.Graphics.Particles
 
         private LinkedList<Particle> particles;
         private Dictionary<Type, Queue<Particle>> graveyard;
+
+        private Vector2 TopLeft = -Vector2.One * float.MaxValue;
+        private Vector2 BottomRight = Vector2.One * float.MaxValue;
+
 
         public ParticlePass(Sprite sprite, int maxNumberOfParticles, int renderPass, int particlePasses)
             :base()
@@ -52,11 +58,21 @@ namespace Phantom.Graphics.Particles
         {
             if (info.Pass == renderPass)
             {
+                if(info.Camera != null )
+                {
+                    // See EntityRenderer.CreateBounds()
+                    float marginTop, marginLeft, marginBottom;
+                    marginTop = marginLeft = marginBottom = 50;
+                    float marginRight = -(1280 - 720 - 50) + 50;
+				    Vector2 diagonal = new Vector2(info.Width, info.Height) * .5f * (1 / info.Camera.Zoom);
+                    TopLeft = info.Camera.Position - diagonal - new Vector2(marginLeft, marginTop);
+                    BottomRight = info.Camera.Position + diagonal + new Vector2(marginRight, marginBottom);
+                }
                 for (int i = 0; i < particlePasses; i++)
                 {
                     info.Pass = i;
                     foreach (Particle p in this.particles)
-                        if (p.Active)
+                        if (p.Active && p.Position.X > TopLeft.X && p.Position.Y > TopLeft.Y && p.Position.X < BottomRight.X && p.Position.Y < BottomRight.Y)
                             p.Render(info, this.sprite);
                 }
                 info.Pass = renderPass;
