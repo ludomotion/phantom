@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Phantom.Misc;
 using Phantom.Core;
 using System.Reflection;
+using System.Globalization;
+using System.Threading;
 
 namespace Phantom.Utils
 {
@@ -276,6 +278,7 @@ namespace Phantom.Utils
             //null
             if (v == "" || v == "null")
                 return null;
+
             //boolean: false
             if (v == "false")
                 return false;
@@ -285,7 +288,6 @@ namespace Phantom.Utils
             //string: 'XXX'
             if (v[0] == '\'' && v[v.Length - 1] == '\'')
                 return v.Substring(1, v.Length - 2);
-            //string: "XXX"
             if (v[0] == '"' && v[v.Length - 1] == '"')
                 return v.Substring(1, v.Length - 2);
             //color: #000000
@@ -299,7 +301,7 @@ namespace Phantom.Utils
             if (v[v.Length - 1] == 'f')
             {
                 float f = 0;
-                float.TryParse(v.Substring(0, v.Length - 1), out f);
+                float.TryParse(v.Substring(0, v.Length - 1), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out f);
                 return f;
             }
             //hex: 0x0
@@ -347,6 +349,7 @@ namespace Phantom.Utils
 
         public static string ValueToString(object value, string format)
         {
+            Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             if (value is CalculatedValue)
                 return ((CalculatedValue)value).ToString();
 
@@ -392,6 +395,34 @@ namespace Phantom.Utils
                 value1 = ((CalculatedValue)value1).GetValue();
             if (value2 is CalculatedValue)
                 value2 = ((CalculatedValue)value2).GetValue();
+
+            if (value1 is bool && value2 is int)
+                value2 = (bool)((int)value2 > 0);
+            if (value1 is bool && value2 is float)
+                value2 = (bool)((float)value2 > 0);
+            if (value1 is bool && value2 == null)
+                value2 = false;
+
+            if (value2 is bool && value1 is int)
+                value1 = (bool)((int)value1 > 0);
+            if (value2 is bool && value1 is float)
+                value1 = (bool)((float)value1 > 0);
+            if (value2 is bool && value1 == null)
+                value1 = false;
+
+            if (value1 == null && value2 is int)
+                value1 = 0;
+            if (value1 == null && value2 is float)
+                value1 = 0.0f;
+            if (value1 == null && value2 is bool)
+                value1 = false;
+
+            if (value2 == null && value1 is int)
+                value2 = 0;
+            if (value2 == null && value1 is float)
+                value2 = 0.0f;
+            if (value2 == null && value1 is bool)
+                value2 = false;
 
             switch (oper)
             {
@@ -509,7 +540,8 @@ namespace Phantom.Utils
                     if (source is Vector4)
                         return (Vector4)source;
                     if (source is CalculatedValue)
-                        return ((CalculatedValue)source).Clone();
+                        //return ((CalculatedValue)source).Clone();
+                        return ((CalculatedValue)source).GetValue();
                     break;
                 case "=-":
                     if (source is int)
@@ -517,7 +549,15 @@ namespace Phantom.Utils
                     if (source is float)
                         return -(float)source;
                     if (source is CalculatedValue)
-                        return ((CalculatedValue)source).NegativeClone();
+                    //return ((CalculatedValue)source).NegativeClone();
+                    {
+                        object v = ((CalculatedValue)source).GetValue();
+                        if (v is float)
+                            return (float)v * -1;
+                        if (v is int)
+                            return (int)v * -1;
+                        return v;
+                    }
                     break;
                 case "++":
                     if (target is int)
