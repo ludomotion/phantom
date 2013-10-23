@@ -273,6 +273,41 @@ namespace Phantom.Utils
             return result;
         }
 
+        public static List<object> StringToList(string v)
+        {
+            List<object> r = new List<object>();
+            if (v[0] == '[' && v[v.Length - 1] == ']')
+                v = v.Substring(1, v.Length - 2);
+            int start = 0;
+            bool quotes = false;
+            int depthP = 0;
+            int depthB = 0;
+            for (int i = 0; i < v.Length; i++)
+            {
+                if (v[i] == '"')
+                    quotes = !quotes;
+                if (!quotes)
+                {
+                    if (v[i] == '[')
+                        depthB++;
+                    if (v[i] == ']')
+                        depthB--;
+                    if (v[i] == '(')
+                        depthP++;
+                    if (v[i] == ')')
+                        depthP--;
+                    if (depthP == 0 && depthB == 0 && v[i] == ',')
+                    {
+                        r.Add(StringToValue(v.Substring(start, i - start).Trim()));
+                        start = i + 1;
+                    }
+                }
+            }
+            if (start<v.Length)
+                r.Add(StringToValue(v.Substring(start, v.Length - start).Trim()));
+            return r;
+        }
+
         public static object StringToValue(string v)
         {
             //null
@@ -290,6 +325,10 @@ namespace Phantom.Utils
                 return v.Substring(1, v.Length - 2);
             if (v[0] == '"' && v[v.Length - 1] == '"')
                 return v.Substring(1, v.Length - 2);
+            //list: [X, X, ...]
+            if (v[0] == '[' && v[v.Length - 1] == ']')
+                return StringToList(v);
+
             //color: #000000
             if (v.StartsWith("#"))
             {
@@ -352,7 +391,6 @@ namespace Phantom.Utils
             Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             if (value is CalculatedValue)
                 return ((CalculatedValue)value).ToString();
-
             if (value is string)
             {
                 //TODO escape quotes and other characters
@@ -364,6 +402,18 @@ namespace Phantom.Utils
                 return ((int)value).ToString();
             if (value is Color)
                 return "#" + ((Color)value).R.ToString("X2") + ((Color)value).G.ToString("X2") + ((Color)value).B.ToString("X2");
+            if (value is List<object>)
+            {
+                List<Object> v = value as List<object>;
+                string r = "";
+                if (v.Count > 0)
+                {
+                    r += ValueToString(v[0]);
+                }
+                for (int i = 1; i < v.Count; i++)
+                    r += ", " + ValueToString(v[i]);
+                return "[" + r + "]";
+            }
             if (format == null)
             {
                 if (value is float)
