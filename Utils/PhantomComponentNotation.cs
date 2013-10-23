@@ -565,6 +565,21 @@ namespace Phantom.Utils
                     if (value1 is float && value2 is int)
                         return (float)value1 <= (int)value2;
                     break;
+                case "&":
+                    if (value1 is List<object>)
+                    {
+                        List<object> l = (List<object>)value1;
+                        string s = ValueToString(value2);
+                        for (int i = 0; i < l.Count; i++)
+                        {
+                            if (ValueToString(l[i]) == s)
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }   
+                    break;
             }
             return false;
         }
@@ -589,6 +604,8 @@ namespace Phantom.Utils
                         return (Vector3)source;
                     if (source is Vector4)
                         return (Vector4)source;
+                    if (source is List<object>)
+                        return (List<object>)source;
                     if (source is CalculatedValue)
                         //return ((CalculatedValue)source).Clone();
                         return ((CalculatedValue)source).GetValue();
@@ -649,6 +666,12 @@ namespace Phantom.Utils
                         return (string)target + (string)source;
                     if (target is string)
                         return (string)target + ValueToString(source);
+                    if (target is List<object>)
+                    {
+                        ((List<object>)target).Add(source);
+                        return (List<object>)target;
+                    }
+
                     if (target is CalculatedValue)
                     {
                         ((CalculatedValue)target).IncrementValue(source);
@@ -668,6 +691,20 @@ namespace Phantom.Utils
                         return (float)target - (int)source;
                     if (target is float && source is CalculatedValue)
                         return (float)target + (float)((CalculatedValue)source).GetValue();
+                    if (target is List<object>)
+                    {
+                        List<object> l = (List<object>)target;
+                        string s = ValueToString(source);
+                        for (int i = 0; i < l.Count; i++)
+                        {
+                            if (ValueToString(l[i]) == s)
+                            {
+                                l.RemoveAt(i);
+                                break;
+                            }
+                        }
+                        return l;
+                    }
                     if (target is CalculatedValue)
                     {
                         ((CalculatedValue)target).DecrementValue(source);
@@ -739,6 +776,16 @@ namespace Phantom.Utils
                         return (int)target | (int)((CalculatedValue)source).GetValue();
                     if (target is bool && source is bool)
                         return (bool)target || (bool)source;
+                    if (target is List<object>)
+                    {
+                        List<object> l = (List<object>)target;
+                        string s = ValueToString(source);
+                        for (int i = 0; i < l.Count; i++)
+                            if (ValueToString(l[i]) == s)
+                                return l;
+                        l.Add(source);
+                        return l;
+                    }
                     break;
                 case "^=":
                     if (target is int && source is int)
