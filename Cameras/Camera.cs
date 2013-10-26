@@ -16,6 +16,7 @@ namespace Phantom.Cameras
 		public Vector2 Focus;
         public Vector2 Position;
         public Vector2 Target;
+        public Vector2 Offset;
 
 		public float Orientation;
         public float Zoom;
@@ -30,6 +31,7 @@ namespace Phantom.Cameras
             base.OnAdd(parent);
             this.layer = parent as Layer;
             this.Zoom = 1;
+            this.Offset= new Vector2(0,0);
         }
 
         public override void Update(float elapsed)
@@ -45,10 +47,10 @@ namespace Phantom.Cameras
             this.Bottom = this.Position.Y + res.Height * .5f / Zoom;
             this.Left = this.Position.X - res.Width * .5f / Zoom;
             /*/
-            this.Top = this.Position.Y - PhantomGame.Game.Height * .5f / Zoom;
-            this.Right = this.Position.X + PhantomGame.Game.Width * .5f / Zoom;
-            this.Bottom = this.Position.Y + PhantomGame.Game.Height * .5f / Zoom;
-            this.Left = this.Position.X - PhantomGame.Game.Width * .5f / Zoom;
+            this.Top = this.Position.Y - PhantomGame.Game.Height * .5f / Zoom + Offset.Y;
+            this.Right = this.Position.X + PhantomGame.Game.Width * .5f / Zoom + Offset.X;
+            this.Bottom = this.Position.Y + PhantomGame.Game.Height * .5f / Zoom + Offset.Y;
+            this.Left = this.Position.X - PhantomGame.Game.Width * .5f / Zoom + Offset.X;
             //*/
         }
 
@@ -57,11 +59,11 @@ namespace Phantom.Cameras
             switch (message)
             {
                 case Messages.CameraJumpTo:
-                    this.Position = this.Target = (Vector2)data;
+                    this.Position = this.Target = (Vector2)data + this.Offset;
                     this.HandleMessage(Messages.CameraStopFollowing, null);
                     return MessageResult.CONSUMED;
                 case Messages.CameraMoveTo:
-                    this.Target = (Vector2)data;
+                    this.Target = (Vector2)data + this.Offset;
                     this.HandleMessage(Messages.CameraStopFollowing, null);
                     return MessageResult.CONSUMED;
                 case Messages.CameraMoveBy:
@@ -87,5 +89,10 @@ namespace Phantom.Cameras
 			result *= Matrix.CreateTranslation(width * .5f - this.Position.X, height * .5f - this.Position.Y, 0);
 			return result;
 		}
+
+        public Vector2 GetMouseOffset()
+        {
+            return new Vector2(Left, Top) - Offset;
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace Phantom.Cameras.Components
             base.Update(elapsed);
             if (this.Camera != null && this.subject != null)
             {
-                this.Camera.Target = this.subject.Position;
+                this.Camera.Target = this.subject.Position + this.Camera.Offset;
             }
         }
 
