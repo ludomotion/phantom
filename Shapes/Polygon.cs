@@ -235,7 +235,7 @@ namespace Phantom.Shapes
 
         public override bool UmbraProjection(Vector2 origin, float maxDistance, float lightRadius, out Vector2[] umbra, out Vector2[] penumbra)
         {
-            int n, i, j, f;
+            int n, i, j;
 
             Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
             Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);

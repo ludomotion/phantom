@@ -439,7 +439,7 @@ namespace Phantom.GameUI
         {
             for (int i = Controls.Count-1; i >= 0; i--)
             {
-                if (Controls[i] != exclude && Controls[i].Shape != null)
+                if (Controls[i] != exclude && Controls[i].Visible && Controls[i].Shape != null)
                 {
                     if (Controls[i].Shape.InShape(position))
                     {
