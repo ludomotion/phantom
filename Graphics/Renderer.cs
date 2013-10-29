@@ -143,6 +143,8 @@ namespace Phantom.Graphics
         {
             lock (PhantomGame.Game.GlobalRenderLock)
             {
+                if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
+                    this.fx.Parameters["World"].SetValue(info.World);
                 this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
                 IList<Component> components = this.Parent.Components;
                 int count = components.Count;
@@ -161,6 +163,8 @@ namespace Phantom.Graphics
 
         protected virtual void RenderPassEndLock(RenderInfo info)
         {
+            if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
+                this.fx.Parameters["World"].SetValue(info.World);
             this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
             IList<Component> components = this.Parent.Components;
             int count = components.Count;
