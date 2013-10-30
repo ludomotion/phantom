@@ -26,10 +26,17 @@ namespace Phantom.Graphics
         public Vector2 TopLeftBounds { get { return this.TopLeft; } }
         public Vector2 BottomRightBounds { get { return this.BottomRight; } }
 
-		public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
+        public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
+            : this(passes, viewportPolicy, renderOptions, 0) { }
+
+		public EntityRenderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions, float margin)
 			:base(passes, viewportPolicy, renderOptions)
 		{
 			this.nonEntities = new List<Component>();
+            IncludeMarginTop = margin;
+            IncludeMarginRight = margin;
+            IncludeMarginBottom = margin;
+            IncludeMarginLeft = margin;
 		}
 
 		public override void OnAdd(Core.Component parent)

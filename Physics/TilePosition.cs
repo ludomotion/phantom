@@ -42,6 +42,15 @@ namespace Phantom.Physics
             this.SetTile(this.integrator.GetTile(this.Entity.Position));
         }
 
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            if (this.Tile != null)
+                this.Tile.Entities.Remove(this.Entity);
+            this.Tile = null;
+
+        }
+
         /// <summary>
         /// Changes the tile and updates the new and old tiles' entity list
         /// </summary>
