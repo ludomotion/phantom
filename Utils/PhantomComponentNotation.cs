@@ -586,10 +586,33 @@ namespace Phantom.Utils
 
         public static object TransformValue(object target, object source, string oper)
         {
+            if (target == null)
+            {
+                if (source is bool)
+                    target = false;
+                if (source is int)
+                    target = 0;
+                if (source is float)
+                    target = 0.0f;
+                if (source is string)
+                    target = "";
+                if (source is Color)
+                    target = Color.Transparent;
+                if (source is Vector2)
+                    target = new Vector2(0, 0);
+                if (source is Vector3)
+                    target = new Vector3(0, 0, 0);
+                if (source is Vector4)
+                    target = new Vector4(0, 0, 0, 0);
+                if (source is List<object>)
+                    target = new List<object>();
+            }
             switch (oper)
             {
                 default:
                 case "=":
+                    if (source is bool)
+                        return (bool)source;
                     if (source is int)
                         return (int)source;
                     if (source is float)
