@@ -11,6 +11,17 @@ using System.Threading;
 
 namespace Phantom.Utils
 {
+    public class PCNKeyword
+    {
+        public static string[] Keywords = new string[] { "auto" };
+
+        public string Value;
+        public PCNKeyword(string value)
+        {
+            this.Value = value;
+        }
+
+    }
     public abstract class CalculatedValue
     {
         protected string stringValue;
@@ -314,6 +325,7 @@ namespace Phantom.Utils
             if (v == "" || v == "null")
                 return null;
 
+
             //boolean: false
             if (v == "false")
                 return false;
@@ -372,6 +384,12 @@ namespace Phantom.Utils
                     return new Vector4(f[0], f[1], f[2], f[3]);
             }
 
+            //keywords
+            for (int i=0; i<PCNKeyword.Keywords.Length; i++)
+                if (PCNKeyword.Keywords[i] == v)
+                    return new PCNKeyword(v);
+
+
             int j = 0;
             if (int.TryParse(v, out j))
                 return j;
@@ -398,6 +416,8 @@ namespace Phantom.Utils
             }
             if (value is bool)
                 return ((bool)value) ? "true" : "false";
+            if (value is PCNKeyword)
+                return ((PCNKeyword)value).Value;
             if (value is int)
                 return ((int)value).ToString();
             if (value is Color)
