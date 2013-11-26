@@ -15,7 +15,7 @@ namespace Phantom.Misc.Components
         {
             this.callback = function;
         }
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             this.callback.Invoke(this, message);
             if (message.Consumed)

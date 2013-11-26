@@ -325,7 +325,7 @@ namespace Phantom
                 this.Console.AddLines(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             for (int i = 0; i < this.states.Count; i++)
             {

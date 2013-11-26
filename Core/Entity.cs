@@ -163,7 +163,7 @@ namespace Phantom.Core
             base.OnComponentRemoved(component);
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message.Is<Vector2>(Messages.SetPosition, out this.Position))
             {

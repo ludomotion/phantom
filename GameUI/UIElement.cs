@@ -125,7 +125,7 @@ namespace Phantom.GameUI
                 currentSelected -= Math.Min(currentSelected, elapsed * deselectSpeed);
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             Vector2 newPos;
             if (message.Is<Vector2>(Messages.SetPosition, out newPos))

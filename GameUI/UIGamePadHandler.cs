@@ -25,7 +25,7 @@ namespace Phantom.GameUI
             this.index = index;
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message == Messages.UIActivated)
             {

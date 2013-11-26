@@ -51,7 +51,7 @@ namespace Phantom.Physics
             this.renderer = this.layer.GetComponentByType<EntityRenderer>();
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             switch (message.Type)
             {
