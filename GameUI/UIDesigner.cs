@@ -72,16 +72,10 @@ namespace Phantom.GameUI
 #endif
         }
 
-
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
-            {
-                case (Messages.UIActivated):
-                    previous = Mouse.GetState();
-                    break;
-            }
-            return base.HandleMessage(message, data);
+            if (message == Messages.UIActivated)
+                previous = Mouse.GetState();
         }
 
         public override void Update(float elapsed)

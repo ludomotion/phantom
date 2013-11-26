@@ -43,16 +43,13 @@ namespace Phantom.GameUI
             this.renderer = layer.GetComponentByType<Renderer>();
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            if (message == Messages.UIActivated)
             {
-                case (Messages.UIActivated):
-                    current = Mouse.GetState();
-                    layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
-                    break;
+                current = Mouse.GetState();
+                layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
             }
-            return base.HandleMessage(message, data);
         }
 
         public Vector2 GetPosition()

@@ -16,12 +16,6 @@ namespace Phantom.Core
     /// </summary>
     public class Component : IDisposable
     {
-        public enum MessageResult
-        {
-            IGNORED,
-            HANDLED,
-            CONSUMED
-        }
 
         /// <summary>
         /// A uint that can be used to store arbitrary values. It has no fixed purpose but can
@@ -195,30 +189,65 @@ namespace Phantom.Core
         }
 
         /// <summary>
-        /// HandleMessage is the prefered way of communication between components. HandleMessage
-        /// processes the message and passes it to its children unless it returns MessageResult.CONSUMED 
-        /// at any point.
-        /// You are adviced to be careful with passing messages high up to component tree as by default 
-        /// all components pass messages to all their children.
+        /// HandleMessage is the prefered way of communication between components. The public HandleMessage method is used to send message to a component and the
+        /// protected HandleMessage is the method that is called through out the tree of this component. This traversing will stop when the .Consume() method is called
+        /// on the Message object.
         /// </summary>
-        /// <param name="message">Int representing the message. The Phantom Messages class contains standard messages, you are advised to create a list for messages for your projects</param>
-        /// <param name="data"></param>
-        /// <returns>Returns a MessageResult indicating the message was Ignored (no component handled it), Handled (at least one component handled it), or Consumed (one component handled it and prevented the message from being passed further along).</returns>
-        public virtual MessageResult HandleMessage( int message, object data )
+        /// <param name="message">The message object.</param>
+        protected virtual void HandleMessage(Message message)
         {
-            MessageResult finalResult = MessageResult.IGNORED;
+        }
+
+        /// <summary>
+        /// HandleMessage is the prefered way of communication between components. The public HandleMessage method is used to send message to a component and the
+        /// protected HandleMessage is the method that is called through out the tree of this component. This traversing will stop when the .Consume() method is called
+        /// on the Message object.
+        /// </summary>
+        /// <param name="type">Int representing the message. The Phantom Messages class contains standard messages, you are advised to create a list for messages for your projects</param>
+        /// <param name="data">The data passed along to the message.</param>
+        /// <param name="result">The possible initial state of the message's result value.</param>
+        /// <returns>Returns a Message object. Containing the state of the message and the possible result.</returns>
+        public Message HandleMessage(int type, object data, object result)
+        {
+            Message message = Message.Create(type, data, result);
+            this.HandleMessage(message);
+            if (message.Consumed)
+                return message;
             for (int i = 0; i < this.components.Count; i++)
             {
-				Component component = this.components [i];
-				MessageResult result = MessageResult.IGNORED;
-				if(component != null) result = this.components[i].HandleMessage(message, data);
-                if (result == MessageResult.CONSUMED)
-                    return result;
-                if (result == MessageResult.HANDLED)
-                    finalResult = result;
+                this.components[i].HandleMessage(message);
+                if (message.Consumed)
+                    return message;
             }
-            return finalResult;
+            return message;
         }
+
+        /// <summary>
+        /// HandleMessage is the prefered way of communication between components. The public HandleMessage method is used to send message to a component and the
+        /// protected HandleMessage is the method that is called through out the tree of this component. This traversing will stop when the .Consume() method is called
+        /// on the Message object.
+        /// </summary>
+        /// <param name="type">Int representing the message. The Phantom Messages class contains standard messages, you are advised to create a list for messages for your projects</param>
+        /// <param name="data">The data passed along to the message.</param>
+        /// <returns>Returns a Message object. Containing the state of the message and the possible result.</returns>
+        public Message HandleMessage(int type, object data)
+        {
+            return this.HandleMessage(type, null, null);
+        }
+
+        /// <summary>
+        /// HandleMessage is the prefered way of communication between components. The public HandleMessage method is used to send message to a component and the
+        /// protected HandleMessage is the method that is called through out the tree of this component. This traversing will stop when the .Consume() method is called
+        /// on the Message object.
+        /// </summary>
+        /// <param name="type">Int representing the message. The Phantom Messages class contains standard messages, you are advised to create a list for messages for your projects</param>
+        /// <param name="data">The data passed along to the message.</param>
+        /// <returns>Returns a Message object. Containing the state of the message and the possible result.</returns>
+        public Message HandleMessage(int type)
+        {
+            return this.HandleMessage(type, null, null);
+        }
+
 
         /// <summary>
         /// The generic Update method is called once every frame. Override this method to implement behavior that needs to be updated every frame.

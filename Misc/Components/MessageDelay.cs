@@ -22,14 +22,13 @@ namespace Phantom.Misc.Components
             this.queue = new List<Tuple<float, int, object>>();
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            if (this.messages == null || this.delayMessage(message))
+            if (this.messages == null || this.delayMessage(message.Type))
             {
-                this.queue.Add(Tuple.Create<float, int, object>(PhantomGame.Game.TotalTime, message, data));
-                return MessageResult.HANDLED;
+                this.queue.Add(Tuple.Create<float, int, object>(PhantomGame.Game.TotalTime, message.Type, message.Data));
+                message.Handle();
             }
-            return base.HandleMessage(message, data);
         }
 
         public override void Update(float elapsed)

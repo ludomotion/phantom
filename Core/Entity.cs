@@ -47,7 +47,7 @@ namespace Phantom.Core
         /// <summary>
         /// This field specifies when the entity is updated. Always, onscreen or never.
         /// </summary>
-        public UpdateBehaviours UpdateBehaviour { get; protected set; }
+        public UpdateBehaviours UpdateBehaviour;
 
 
         private float mass;
@@ -163,14 +163,12 @@ namespace Phantom.Core
             base.OnComponentRemoved(component);
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            if (message == Messages.SetPosition && data is Vector2)
+            if (message.Is<Vector2>(Messages.SetPosition, out this.Position))
             {
-                this.Position = (Vector2)data;
-                return MessageResult.CONSUMED;
+                message.Consume();
             }
-            return base.HandleMessage(message, data);
         }
 
         public override string ToString()
@@ -186,7 +184,11 @@ namespace Phantom.Core
             UpdateWhenVisible = 1<<2,
             NeverUpdate = 1<<3,
 
-            Default = UpdateWhenVisible
+
+            /// <summary>
+            /// AlwaysUpdate
+            /// </summary>
+            Default = AlwaysUpdate
         }
     }
 }

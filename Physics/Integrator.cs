@@ -51,18 +51,20 @@ namespace Phantom.Physics
             this.renderer = this.layer.GetComponentByType<EntityRenderer>();
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            switch (message.Type)
             {
                 case Messages.PhysicsPause:
                     this.physicsPaused = true;
-                    return MessageResult.HANDLED;
+                    message.Handle();
+                    break;
                 case Messages.PhysicsResume:
                     this.physicsPaused = false;
-                    return MessageResult.HANDLED;
+                    message.Handle();
+                    break;
             }
-            return base.HandleMessage(message, data);
+            base.HandleMessage(message);
         }
 
         /// <summary>

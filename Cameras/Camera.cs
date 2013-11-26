@@ -54,25 +54,27 @@ namespace Phantom.Cameras
             //*/
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            switch (message.Type)
             {
                 case Messages.CameraJumpTo:
-                    this.Position = this.Target = (Vector2)data + this.Offset;
-                    this.HandleMessage(Messages.CameraStopFollowing, null);
-                    return MessageResult.CONSUMED;
+                    this.Position = this.Target = (Vector2)message.Data + this.Offset;
+                    this.HandleMessage(Messages.CameraStopFollowing);
+                    message.Consume();
+                    break;
                 case Messages.CameraMoveTo:
-                    this.Target = (Vector2)data + this.Offset;
-                    this.HandleMessage(Messages.CameraStopFollowing, null);
-                    return MessageResult.CONSUMED;
+                    this.Target = (Vector2)message.Data + this.Offset;
+                    this.HandleMessage(Messages.CameraStopFollowing);
+                    message.Consume();
+                    break;
                 case Messages.CameraMoveBy:
-                    this.Target += (Vector2)data;
-                    this.Position += (Vector2)data;
-                    this.HandleMessage(Messages.CameraStopFollowing, null);
-                    return MessageResult.CONSUMED;
+                    this.Target += (Vector2)message.Data;
+                    this.Position += (Vector2)message.Data;
+                    this.HandleMessage(Messages.CameraStopFollowing);
+                    message.Consume();
+                    break;
             }
-            return base.HandleMessage(message, data);
         }
 
 		public Matrix CreateMatrix(float width, float height)

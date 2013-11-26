@@ -30,23 +30,23 @@ namespace Phantom.Cameras.Components
             }
         }
 
-
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            switch (message.Type)
             {
                 case Messages.CameraFollowEntity:
-                    this.subject = data as Entity;
-                    return MessageResult.CONSUMED;
+                    this.subject = message.Data as Entity;   
+                    message.Consume();
+                    break;
                 case Messages.CameraStopFollowing:
                     if (this.subject != null)
                     {
                         this.subject = null;
                         this.Camera.Target = this.Camera.Position;
                     }
-                    return MessageResult.CONSUMED;
+                    message.Consume();
+                    break;
             }
-            return base.HandleMessage(message, data);
         }
     }
 }

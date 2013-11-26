@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Phantom.Core;
 
 namespace Phantom.Cameras.Components
 {
@@ -14,23 +15,23 @@ namespace Phantom.Cameras.Components
 		private float time;
         private float intensity;
 
-		public override Core.Component.MessageResult HandleMessage(int message, object data)
-		{
-			if (message == Messages.CameraShake)
-			{
-                if (data is float)
+
+        protected override void HandleMessage(Message message)
+        {
+            if (message == Messages.CameraShake)
+            {
+                if (message.Data is float)
                 {
-                    float time = (float)data;
+                    float time = (float)message.Data;
                     this.Shake(time, 1);
                 }
-                else if (data is Vector2)
+                else if (message.Data is Vector2)
                 {
-                    Vector2 v = (Vector2)data;
+                    Vector2 v = (Vector2)message.Data;
                     this.Shake(v.X, v.Y);
                 }
-			}
-			return base.HandleMessage(message, data);
-		}
+            }
+        }
 
 		public override void Update(float elapsed)
 		{

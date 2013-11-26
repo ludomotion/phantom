@@ -6,7 +6,7 @@ using Phantom.Core;
 
 namespace Phantom.Misc.Components
 {
-    public delegate Component.MessageResult OnMessage(Component component, int message, object data);
+    public delegate void OnMessage(Component component, Message message);
 
     public class MessageDelegate : Component
     {
@@ -15,15 +15,12 @@ namespace Phantom.Misc.Components
         {
             this.callback = function;
         }
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            Component.MessageResult res = this.callback.Invoke(this, message, data);
-            if (res == MessageResult.CONSUMED)
-                return res;
-            MessageResult r2 = base.HandleMessage(message, data);
-            if (r2 != MessageResult.IGNORED)
-                res = r2;
-            return res;
+            this.callback.Invoke(this, message);
+            if (message.Consumed)
+                return;
+            base.HandleMessage(message);
         }
     }
 }

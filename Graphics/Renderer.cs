@@ -104,16 +104,12 @@ namespace Phantom.Graphics
             this.layer = this.GetAncestor<Layer>();
         }
 
-		public override Component.MessageResult HandleMessage(int message, object data)
-		{
-			if (this.Options.HasFlag(RenderOptions.ApplyEffect) && message == Messages.RenderSetEffect)
-			{
-				Effect fx = data as Effect;
-				this.fx = fx;
-			}
-
-			return base.HandleMessage(message, data);
-		}
+        protected override void HandleMessage(Message message)
+        {
+            Effect fx;
+            if (this.Options.HasFlag(RenderOptions.ApplyEffect) && message.Is<Effect>(Messages.RenderSetEffect, out fx))
+                this.fx = fx;
+        }
 
         public override void Render( RenderInfo info )
         {
