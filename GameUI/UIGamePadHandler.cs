@@ -25,18 +25,14 @@ namespace Phantom.GameUI
             this.index = index;
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            if (message == Messages.UIActivated)
             {
-                case (Messages.UIActivated):
-                    previous = GamePad.GetState(index);
-                    if (layer.GetSelected(player) == null && layer.Controls.Count > 0)
-                        layer.SetSelected(player, layer.GetFirstControl(player));
-
-                    break;
+                previous = GamePad.GetState(index);
+                if (layer.GetSelected(player) == null && layer.Controls.Count > 0)
+                    layer.SetSelected(player, layer.GetFirstControl(player));
             }
-            return base.HandleMessage(message, data);
         }
 
         public override void Update(float elapsed)

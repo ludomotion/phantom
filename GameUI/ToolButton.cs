@@ -68,15 +68,15 @@ namespace Phantom.GameUI
             }
         }
 
-        public override Core.Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Core.Message message)
         {
-            switch (message)
+            string str;
+            if (message.Is<string>(Messages.ToolSelected, out str))
             {
-                case Messages.ToolSelected:
-                    SelectedTool = ((string)data == this.Name);
-                    return MessageResult.HANDLED;
+                SelectedTool = (str == this.Name);
+                message.Handle();
             }
-            return base.HandleMessage(message, data);
         }
+
     }
 }

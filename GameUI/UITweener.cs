@@ -179,30 +179,29 @@ namespace Phantom.GameUI
             }
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            switch (message.Type)
             {
                 case Messages.SetPosition:
-                    this.positionIn = (Vector2)data;
+                    this.positionIn = (Vector2)message.Data;
                     break;
                 case Messages.TweenIn:
-                    if (data is float)
-                        TweenIn((float)data);
+                    if (message.Data is float)
+                        TweenIn((float)message.Data);
                     else
                         TweenIn();
-                    return MessageResult.HANDLED;
+                    message.Handle();
+                    break;
                 case Messages.TweenOut:
-                    if (data is float)
-                        TweenOut((float)data);
+                    if (message.Data is float)
+                        TweenOut((float)message.Data);
                     else
                         TweenOut();
-                    return MessageResult.HANDLED;
+                    message.Handle();
+                    break;
             }
-            return base.HandleMessage(message, data);
         }
-
-
 
     }
 }

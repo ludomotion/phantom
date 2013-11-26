@@ -66,28 +66,29 @@ namespace Phantom.Core
             base.Integrate(elapsed);
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            switch (message.Type)
             {
                 case Messages.MoverImpulse:
-                    if (data is Vector2)
-                        this.Velocity += (Vector2)data;
-                    else if (data is float && this.Entity != null)
-                        this.Velocity += this.Entity.Direction * (float)data;
-                    else if (data is int && this.Entity != null)
-                        this.Velocity += this.Entity.Direction * (int)data;
-                    return MessageResult.HANDLED;
+                    if (message.Data is Vector2)
+                        this.Velocity += (Vector2)message.Data;
+                    else if (message.Data is float && this.Entity != null)
+                        this.Velocity += this.Entity.Direction * (float)message.Data;
+                    else if (message.Data is int && this.Entity != null)
+                        this.Velocity += this.Entity.Direction * (int)message.Data;
+                    message.Handle();
+                    break;
                 case Messages.MoverForce:
-                    if (data is Vector2)
-                        this.Force += (Vector2)data;
-                    else if (data is float && this.Entity != null)
-                        this.Force += this.Entity.Direction * (float)data;
-                    else if (data is int && this.Entity != null)
-                        this.Force += this.Entity.Direction * (int)data;
-                    return MessageResult.HANDLED;
+                    if (message.Data is Vector2)
+                        this.Force += (Vector2)message.Data;
+                    else if (message.Data is float && this.Entity != null)
+                        this.Force += this.Entity.Direction * (float)message.Data;
+                    else if (message.Data is int && this.Entity != null)
+                        this.Force += this.Entity.Direction * (int)message.Data;
+                    message.Handle();
+                    break;
             }
-            return base.HandleMessage(message, data);
         }
 
         /// <summary>

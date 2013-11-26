@@ -325,24 +325,21 @@ namespace Phantom
                 this.Console.AddLines(string.Format("Resolution changed to: {0}x{1} {2}", width, height, (fullscreen ? "(fullscreen)" : "") ));
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            MessageResult result;
-            MessageResult finalResult = MessageResult.IGNORED;
             for (int i = 0; i < this.states.Count; i++)
             {
-                result = this.states[i].HandleMessage(message, data);
-                if (result == MessageResult.CONSUMED)
-                    return result;
-                if (result == MessageResult.HANDLED)
-                    finalResult = result;
+                Message m = this.states[i].HandleMessage(message.Type, message.Data, message.Result);
+                if (m.Consumed)
+                {
+                    message.Consume();
+                    return;
+                }
+                if (m.Handled) {
+                    message.Handle();
+                }
             }
-            result = base.HandleMessage(message, data);
-            if (result == MessageResult.CONSUMED)
-                return result;
-            if (result == MessageResult.HANDLED)
-                finalResult = result;
-            return finalResult;
+            base.HandleMessage(message);
         }
 
         public void PushState( GameState state )

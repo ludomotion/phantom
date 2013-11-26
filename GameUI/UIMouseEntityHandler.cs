@@ -131,7 +131,7 @@ namespace Phantom.GameUI
 
         private bool AddSelected(Entity entity)
         {
-            if (entity.HandleMessage(Messages.Select, this) == MessageResult.HANDLED)
+            if (entity.HandleMessage(Messages.Select, this).Handled)
             {
                 selected.Add(entity);
                 return true;
@@ -161,15 +161,14 @@ namespace Phantom.GameUI
             }
         }
 
-        public override Core.Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            string cmd;
+            if (message.Is<string>(Messages.ToolSelected, out cmd))
             {
-                case Messages.ToolSelected:
-                    Command = (string)data;
-                    return MessageResult.HANDLED;
+                this.Command = cmd;
+                message.Handle();
             }
-            return base.HandleMessage(message, data);
         }
 
     }

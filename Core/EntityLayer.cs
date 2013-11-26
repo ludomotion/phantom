@@ -391,15 +391,13 @@ namespace Phantom.Core
             }
         }
 
-        public override Component.MessageResult HandleMessage(int message, object data)
+        protected override void HandleMessage(Message message)
         {
-            switch (message)
+            if (message == Messages.PropertiesChanged)
             {
-                case Messages.PropertiesChanged:
-                    ChangeSize(Properties.GetFloat("Width", this.Bounds.X), Properties.GetFloat("Height", this.Bounds.Y));
-                    return MessageResult.HANDLED;
+                ChangeSize(Properties.GetFloat("Width", this.Bounds.X), Properties.GetFloat("Height", this.Bounds.Y));
+                message.Handle();
             }
-            return base.HandleMessage(message, data);
         }
 
         private void ChangeSize(float width, float height)
@@ -408,10 +406,8 @@ namespace Phantom.Core
             integrator.ChangeSize(this.Bounds, true);
         }
 
-        public Component.MessageResult BroadcastMessage(int message, object data, Vector2 position, float range)
+        public void BroadcastMessage(int message, object data, Vector2 position, float range)
         {
-            MessageResult result = MessageResult.IGNORED;
-
             Vector2 topLeft = position;
             topLeft.X -= range;
             topLeft.Y -= range;
@@ -426,28 +422,16 @@ namespace Phantom.Core
                 Vector2 dist = entity.Position - position;
                 if (dist.LengthSquared() < range)
                 {
-                    MessageResult res = entity.HandleMessage(message, data);
-                    switch (res)
-                    {
-                        case MessageResult.CONSUMED:
-                            result = res;
-                            break;
-                        case MessageResult.HANDLED:
-                            if (result == MessageResult.IGNORED)
-                                result = res;
-                            break;
-                    }
+                    Message res = entity.HandleMessage(message, data);
+                    if (res.Consumed)
+                        break;
                 }
             }
-
-
-            return result;
+            return;
         }
 
-        public Component.MessageResult BroadcastMessageToAlwaysUpdate(int message, object data, Vector2 position, float range)
+        public void BroadcastMessageToAlwaysUpdate(int message, object data, Vector2 position, float range)
         {
-            MessageResult result = MessageResult.IGNORED;
-
             range = range * range;
             
             Component component;
@@ -460,23 +444,14 @@ namespace Phantom.Core
                     Vector2 dist = entity.Position - position;
                     if (dist.LengthSquared() < range)
                     {
-                        MessageResult res = entity.HandleMessage(message, data);
-                        switch (res)
-                        {
-                            case MessageResult.CONSUMED:
-                                result = res;
-                                break;
-                            case MessageResult.HANDLED:
-                                if (result == MessageResult.IGNORED)
-                                    result = res;
-                                break;
-                        }
+                        Message res = entity.HandleMessage(message, data);
+                        if (res.Consumed)
+                            break;
                     }
                 }
             }
 
-
-            return result;
+            return;
         }
 
         public enum FilterTarget
