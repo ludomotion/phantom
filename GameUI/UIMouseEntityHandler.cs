@@ -163,8 +163,8 @@ namespace Phantom.GameUI
 
         public override void HandleMessage(Message message)
         {
-            string cmd;
-            if (message.Is<string>(Messages.ToolSelected, out cmd))
+            string cmd = null;
+            if (message.Is<string>(Messages.ToolSelected, ref cmd))
             {
                 this.Command = cmd;
                 message.Handle();

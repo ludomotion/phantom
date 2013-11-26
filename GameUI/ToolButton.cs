@@ -70,8 +70,8 @@ namespace Phantom.GameUI
 
         public override void HandleMessage(Core.Message message)
         {
-            string str;
-            if (message.Is<string>(Messages.ToolSelected, out str))
+            string str = null;
+            if (message.Is<string>(Messages.ToolSelected, ref str))
             {
                 SelectedTool = (str == this.Name);
                 message.Handle();

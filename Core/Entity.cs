@@ -165,7 +165,7 @@ namespace Phantom.Core
 
         public override void HandleMessage(Message message)
         {
-            if (message.Is<Vector2>(Messages.SetPosition, out this.Position))
+            if (message.Is<Vector2>(Messages.SetPosition, ref this.Position))
             {
                 message.Consume();
             }
