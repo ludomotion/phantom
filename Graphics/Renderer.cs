@@ -106,9 +106,8 @@ namespace Phantom.Graphics
 
         public override void HandleMessage(Message message)
         {
-            Effect fx;
-            if (this.Options.HasFlag(RenderOptions.ApplyEffect) && message.Is<Effect>(Messages.RenderSetEffect, out fx))
-                this.fx = fx;
+            if (this.Options.HasFlag(RenderOptions.ApplyEffect))
+                message.Is<Effect>(Messages.RenderSetEffect, ref this.fx);
         }
 
         public override void Render( RenderInfo info )

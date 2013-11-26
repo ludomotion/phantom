@@ -83,8 +83,8 @@ namespace Phantom.Graphics
 
         public override void HandleMessage(Message message)
         {
-            int frame;
-            if (message.Is<int>(Messages.SetFrame, out frame))
+            int frame = 0;
+            if (message.Is<int>(Messages.SetFrame, ref frame))
             {
                 this.animiations[this.playing][0] = frame;
                 message.Handle();

@@ -76,14 +76,13 @@ namespace Phantom.Core
         /// <param name="message">The message type to check.</param>
         /// <param name="data">The out var for the data cast.</param>
         /// <returns>Wether or not the message is valid.</returns>
-        public bool Is<T>(int message, out T data)
+        public bool Is<T>(int message, ref T data)
         {
-            if( this.Type == message && this.Data is T )
+            if (this.Type == message && this.Data is T)
             {
                 data = (T)this.Data;
                 return true;
             }
-            data = default(T);
             return false;
         }
 
