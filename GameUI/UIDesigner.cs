@@ -72,7 +72,7 @@ namespace Phantom.GameUI
 #endif
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message == Messages.UIActivated)
                 previous = Mouse.GetState();

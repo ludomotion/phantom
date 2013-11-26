@@ -81,7 +81,7 @@ namespace Phantom.Graphics
             base.Render(info);
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             int frame;
             if (message.Is<int>(Messages.SetFrame, out frame))

@@ -22,7 +22,7 @@ namespace Phantom.Misc.Components
             this.queue = new List<Tuple<float, int, object>>();
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (this.messages == null || this.delayMessage(message.Type))
             {

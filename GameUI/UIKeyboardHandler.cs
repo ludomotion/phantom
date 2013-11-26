@@ -27,7 +27,7 @@ namespace Phantom.GameUI
             KeyBindings = new Dictionary<Keys, UIElement>();
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message == Messages.UIActivated)
             {

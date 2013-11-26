@@ -68,7 +68,7 @@ namespace Phantom.GameUI
             }
         }
 
-        protected override void HandleMessage(Core.Message message)
+        public override void HandleMessage(Core.Message message)
         {
             string str;
             if (message.Is<string>(Messages.ToolSelected, out str))

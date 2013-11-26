@@ -194,7 +194,7 @@ namespace Phantom.Core
         /// on the Message object.
         /// </summary>
         /// <param name="message">The message object.</param>
-        protected virtual void HandleMessage(Message message)
+        public virtual void HandleMessage(Message message)
         {
         }
 
@@ -232,7 +232,7 @@ namespace Phantom.Core
         /// <returns>Returns a Message object. Containing the state of the message and the possible result.</returns>
         public Message HandleMessage(int type, object data)
         {
-            return this.HandleMessage(type, null, null);
+            return this.HandleMessage(type, data, null);
         }
 
         /// <summary>

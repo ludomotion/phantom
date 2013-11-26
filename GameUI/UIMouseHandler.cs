@@ -43,7 +43,7 @@ namespace Phantom.GameUI
             this.renderer = layer.GetComponentByType<Renderer>();
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message == Messages.UIActivated)
             {

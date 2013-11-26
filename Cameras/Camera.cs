@@ -52,7 +52,7 @@ namespace Phantom.Cameras
             //*/
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             switch (message.Type)
             {

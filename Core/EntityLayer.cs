@@ -391,7 +391,7 @@ namespace Phantom.Core
             }
         }
 
-        protected override void HandleMessage(Message message)
+        public override void HandleMessage(Message message)
         {
             if (message == Messages.PropertiesChanged)
             {
