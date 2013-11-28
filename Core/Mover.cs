@@ -89,6 +89,7 @@ namespace Phantom.Core
                     message.Handle();
                     break;
             }
+            base.HandleMessage(message);
         }
 
         /// <summary>

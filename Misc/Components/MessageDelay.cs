@@ -29,6 +29,7 @@ namespace Phantom.Misc.Components
                 this.queue.Add(Tuple.Create<float, int, object>(PhantomGame.Game.TotalTime, message.Type, message.Data));
                 message.Handle();
             }
+            base.HandleMessage(message);
         }
 
         public override void Update(float elapsed)

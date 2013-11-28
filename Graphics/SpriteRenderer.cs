@@ -90,6 +90,7 @@ namespace Phantom.Graphics
                 message.Handle();
             }
             base.HandleMessage(message);
+
         }
 
     }

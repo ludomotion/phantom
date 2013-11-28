@@ -128,6 +128,7 @@ namespace Phantom.GameUI
         public override void HandleMessage(Message message)
         {
             message.Is<Vector2>(Messages.SetPosition, ref this.Position);
+            base.HandleMessage(message);
         }
 
         /// <summary>

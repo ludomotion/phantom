@@ -168,7 +168,9 @@ namespace Phantom.Core
             if (message.Is<Vector2>(Messages.SetPosition, ref this.Position))
             {
                 message.Consume();
-            }
+            } 
+            else 
+                base.HandleMessage(message);
         }
 
         public override string ToString()

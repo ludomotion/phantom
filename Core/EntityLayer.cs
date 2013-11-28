@@ -398,6 +398,7 @@ namespace Phantom.Core
                 ChangeSize(Properties.GetFloat("Width", this.Bounds.X), Properties.GetFloat("Height", this.Bounds.Y));
                 message.Handle();
             }
+            base.HandleMessage(message);
         }
 
         private void ChangeSize(float width, float height)

@@ -143,6 +143,7 @@ namespace Phantom.Graphics
                     message.Handle();
                     break;
             }
+            base.HandleMessage(message);
         }
 
     }

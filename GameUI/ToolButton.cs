@@ -76,6 +76,7 @@ namespace Phantom.GameUI
                 SelectedTool = (str == this.Name);
                 message.Handle();
             }
+            base.HandleMessage(message);
         }
 
     }

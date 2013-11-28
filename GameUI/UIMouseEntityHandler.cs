@@ -169,6 +169,7 @@ namespace Phantom.GameUI
                 this.Command = cmd;
                 message.Handle();
             }
+            base.HandleMessage(message);
         }
 
     }

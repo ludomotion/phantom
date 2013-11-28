@@ -76,6 +76,7 @@ namespace Phantom.GameUI
         {
             if (message == Messages.UIActivated)
                 previous = Mouse.GetState();
+            base.HandleMessage(message);
         }
 
         public override void Update(float elapsed)

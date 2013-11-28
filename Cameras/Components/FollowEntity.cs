@@ -47,6 +47,7 @@ namespace Phantom.Cameras.Components
                     message.Consume();
                     break;
             }
+            base.HandleMessage(message);
         }
     }
 }

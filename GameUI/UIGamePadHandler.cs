@@ -33,6 +33,7 @@ namespace Phantom.GameUI
                 if (layer.GetSelected(player) == null && layer.Controls.Count > 0)
                     layer.SetSelected(player, layer.GetFirstControl(player));
             }
+            base.HandleMessage(message);
         }
 
         public override void Update(float elapsed)

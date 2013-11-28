@@ -50,6 +50,7 @@ namespace Phantom.GameUI
                 current = Mouse.GetState();
                 layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
             }
+            base.HandleMessage(message);
         }
 
         public Vector2 GetPosition()

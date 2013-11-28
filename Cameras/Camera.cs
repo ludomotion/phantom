@@ -75,6 +75,7 @@ namespace Phantom.Cameras
                     message.Consume();
                     break;
             }
+            base.HandleMessage(message);
         }
 
 		public Matrix CreateMatrix(float width, float height)

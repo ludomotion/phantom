@@ -201,6 +201,7 @@ namespace Phantom.GameUI
                     message.Handle();
                     break;
             }
+            base.HandleMessage(message);
         }
 
     }

@@ -196,6 +196,14 @@ namespace Phantom.Core
         /// <param name="message">The message object.</param>
         public virtual void HandleMessage(Message message)
         {
+            if (message.Consumed)
+                return;
+            for (int i = 0; i < this.components.Count; i++)
+            {
+                this.components[i].HandleMessage(message);
+                if (message.Consumed)
+                    return;
+            }
         }
 
         /// <summary>
@@ -211,14 +219,6 @@ namespace Phantom.Core
         {
             Message message = Message.Create(type, data, result);
             this.HandleMessage(message);
-            if (message.Consumed)
-                return message;
-            for (int i = 0; i < this.components.Count; i++)
-            {
-                this.components[i].HandleMessage(message);
-                if (message.Consumed)
-                    return message;
-            }
             return message;
         }
 

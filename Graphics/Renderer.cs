@@ -108,6 +108,7 @@ namespace Phantom.Graphics
         {
             if (this.Options.HasFlag(RenderOptions.ApplyEffect))
                 message.Is<Effect>(Messages.RenderSetEffect, ref this.fx);
+            base.HandleMessage(message);
         }
 
         public override void Render( RenderInfo info )
