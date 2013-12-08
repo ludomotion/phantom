@@ -188,6 +188,10 @@ namespace Phantom.GameUI
         {
         }
 
+        public virtual void HoverAt(Vector2 position, int player)
+        {
+        }
+
         /// <summary>
         /// Quick check if the control can be used by a player (must be enabled, visible, not tweening and the playerMask must fit)
         /// </summary>

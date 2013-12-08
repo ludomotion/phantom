@@ -92,6 +92,9 @@ namespace Phantom.GameUI
             if (hover is UICarouselContainer)
                 ((UICarouselContainer)hover).UpdateMouse(mousePosition);
 
+            if (hover != null)
+                hover.HoverAt(mousePosition, player);
+
             if (current.X != previous.X || current.Y != previous.Y)
             {
                 //Check which item I am hovering and select it
