@@ -13,7 +13,7 @@ namespace Phantom.Utils
 {
     public class PCNKeyword
     {
-        public static string[] Keywords = new string[] { "auto" };
+        public static string[] Keywords = new string[] { "auto", "even", "odd" };
 
         public string Value;
         public PCNKeyword(string value)
@@ -520,6 +520,10 @@ namespace Phantom.Utils
                         return ((Vector3)value1).X == ((Vector3)value2).X && ((Vector3)value1).Y == ((Vector3)value2).Y && ((Vector3)value1).Z == ((Vector3)value2).Z;
                     if (value1 is Vector4 && value2 is Vector4)
                         return ((Vector4)value1).X == ((Vector4)value2).X && ((Vector4)value1).Y == ((Vector4)value2).Y && ((Vector4)value1).Z == ((Vector4)value2).Z && ((Vector4)value1).W == ((Vector4)value2).W;
+                    if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "even")
+                        return ((int)value1 % 2 == 0); 
+                    if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "odd")
+                        return ((int)value1 % 2 == 1); 
                     break;
                 case "!=":
                     if (value1 == null && value2 == null)
@@ -544,6 +548,10 @@ namespace Phantom.Utils
                         return ((Vector3)value1).X != ((Vector3)value2).X || ((Vector3)value1).Y != ((Vector3)value2).Y || ((Vector3)value1).Z != ((Vector3)value2).Z;
                     if (value1 is Vector4 && value2 is Vector4)
                         return ((Vector4)value1).X != ((Vector4)value2).X || ((Vector4)value1).Y != ((Vector4)value2).Y || ((Vector4)value1).Z != ((Vector4)value2).Z || ((Vector4)value1).W != ((Vector4)value2).W;
+                    if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "even")
+                        return ((int)value1 % 2 != 0); 
+                    if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "odd")
+                        return ((int)value1 % 2 != 1); 
                     return true;
                 case ">":
                     if (value1 is int && value2 is int)
