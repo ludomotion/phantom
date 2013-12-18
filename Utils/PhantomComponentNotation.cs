@@ -13,7 +13,7 @@ namespace Phantom.Utils
 {
     public class PCNKeyword
     {
-        public static string[] Keywords = new string[] { "auto", "even", "odd" };
+        public static string[] Keywords = new string[] { "auto", "odd", "even" };
 
         public string Value;
         public PCNKeyword(string value)
@@ -68,7 +68,38 @@ namespace Phantom.Utils
         public virtual void DivideValue(object value)
         {
         }
+    }
 
+    public enum PCNOperator
+    {
+        Assign,               // =
+        NegativeAssign,       // =-
+        BitwiseAnd,           // &
+        BitwiseOr,            // |
+        BitwiseXor,           // ^
+        Modulo,               // %
+        Addition,             // +
+        Subtraction,          // -
+        Multiplication,       // *
+        Division,             // /
+        Increment,            // ++
+        Decrement,            // --
+        AdditionAssign,       // +=
+        SubtractionAssign,    // -=
+        MultiplicationAssign, // *=
+        DivisionAssign,       // /=
+        ModuloAssign,         // %=
+        BitwiseAndAssign,     // &=
+        BitwiseOrAssign,      // |=
+        BitwiseXorAssign,     // ^=
+        EqualTo,              // ==
+        NotEqualTo,           // !=
+        GreaterThan,          // >
+        GreaterThanOrEqualTo, // >=
+        LessThan,             // <
+        LessThanOrEqualTo,    // <=
+        None,                 // 
+        Unknown               // any other
     }
 
     public class PCNMember
@@ -225,6 +256,132 @@ namespace Phantom.Utils
 
     public static class PhantomComponentNotation
     {
+        public static PCNOperator StringToPCNOperator(string s)
+        {
+            switch (s)
+            {
+                case "=":
+                    return PCNOperator.Assign;               // =
+                case "=-":
+                    return PCNOperator.NegativeAssign;       // =-
+                case "&":
+                    return PCNOperator.BitwiseAnd;           // &
+                case "|":
+                    return PCNOperator.BitwiseOr;            // |
+                case "^":
+                    return PCNOperator.BitwiseXor;           // ^
+                case "%":
+                    return PCNOperator.Modulo;               // %
+                case "+":
+                    return PCNOperator.Addition;             // +
+                case "-":
+                    return PCNOperator.Subtraction;          // -
+                case "*":
+                    return PCNOperator.Multiplication;       // *
+                case "/":
+                    return PCNOperator.Division;             // /
+                case "++":
+                    return PCNOperator.Increment;            // ++
+                case "--":
+                    return PCNOperator.Decrement;            // --
+                case "+=":
+                    return PCNOperator.AdditionAssign;       // +=
+                case "-=":
+                    return PCNOperator.SubtractionAssign;    // -=
+                case "*=":
+                    return PCNOperator.MultiplicationAssign; // *=
+                case "/=":
+                    return PCNOperator.DivisionAssign;       // /=
+                case "%=":
+                    return PCNOperator.ModuloAssign;         // %=
+                case "&=":
+                    return PCNOperator.BitwiseAndAssign;     // &=
+                case "|=":
+                    return PCNOperator.BitwiseOrAssign;      // |=
+                case "^=":
+                    return PCNOperator.BitwiseXorAssign;     // ^=
+                case "==":
+                    return PCNOperator.EqualTo;              // ==
+                case "!=":
+                    return PCNOperator.NotEqualTo;           // !=
+                case ">":
+                    return PCNOperator.GreaterThan;          // >
+                case ">=":
+                    return PCNOperator.GreaterThanOrEqualTo; // >=
+                case "<":
+                    return PCNOperator.LessThan;             // <
+                case "<=":
+                    return PCNOperator.LessThanOrEqualTo;    // <=
+                case "":
+                    return PCNOperator.None;    // <=
+                default:
+                    return PCNOperator.Unknown;               // any other
+            }
+        }
+
+        public static string PCNOperatorToString(PCNOperator op)
+        {
+            switch (op)
+            {
+                case PCNOperator.Assign:
+                    return "=";               // =
+                case PCNOperator.NegativeAssign:
+                    return "=-";       // =-
+                case PCNOperator.BitwiseAnd:
+                    return "&";           // &
+                case PCNOperator.BitwiseOr:
+                    return "|";            // |
+                case PCNOperator.BitwiseXor:
+                    return "^";           // ^
+                case PCNOperator.Modulo:
+                    return "%";               // %
+                case PCNOperator.Addition:
+                    return "+";             // +
+                case PCNOperator.Subtraction:
+                    return "-";          // -
+                case PCNOperator.Multiplication:
+                    return "*";       // *
+                case PCNOperator.Division:
+                    return "/";             // /
+                case PCNOperator.Increment:
+                    return "++";            // ++
+                case PCNOperator.Decrement:
+                    return "--";            // --
+                case PCNOperator.AdditionAssign:
+                    return "+=";       // +=
+                case PCNOperator.SubtractionAssign:
+                    return "-=";    // -=
+                case PCNOperator.MultiplicationAssign:
+                    return "*="; // *=
+                case PCNOperator.DivisionAssign:
+                    return "/=";       // /=
+                case PCNOperator.ModuloAssign:
+                    return "%=";         // %=
+                case PCNOperator.BitwiseAndAssign:
+                    return "&=";     // &=
+                case PCNOperator.BitwiseOrAssign:
+                    return "|=";      // |=
+                case PCNOperator.BitwiseXorAssign:
+                    return "^=";     // ^=
+                case PCNOperator.EqualTo:
+                    return "==";              // ==
+                case PCNOperator.NotEqualTo:
+                    return "!=";           // !=
+                case PCNOperator.GreaterThan:
+                    return ">";          // >
+                case PCNOperator.GreaterThanOrEqualTo:
+                    return ">="; // >=
+                case PCNOperator.LessThan:
+                    return "<";             // <
+                case PCNOperator.LessThanOrEqualTo:
+                    return "<=";    // <=
+                case PCNOperator.None:
+                    return "";    // <=
+                default:
+                    return "??";               // any other
+            }
+        }
+
         public static string ComponentToPCNString(Component component)
         {
             string result = "";
@@ -459,7 +616,13 @@ namespace Phantom.Utils
             return "null";
         }
 
+        [Obsolete("This function will be removed in the future. Please pass the operator as a PCNOperator", false)]
         public static bool CompareValues(object value1, object value2, string oper)
+        {
+            return CompareValues(value1, value2, StringToPCNOperator(oper));
+        }
+
+        public static bool CompareValues(object value1, object value2, PCNOperator oper)
         {
             if (value1 is CalculatedValue)
                 value1 = ((CalculatedValue)value1).GetValue();
@@ -497,7 +660,7 @@ namespace Phantom.Utils
             switch (oper)
             {
                 default:
-                case "==":
+                case PCNOperator.EqualTo:
                     if (value1 == null && value2 == null)
                         return true;
                     if (value1 is int && value2 is int)
@@ -521,11 +684,12 @@ namespace Phantom.Utils
                     if (value1 is Vector4 && value2 is Vector4)
                         return ((Vector4)value1).X == ((Vector4)value2).X && ((Vector4)value1).Y == ((Vector4)value2).Y && ((Vector4)value1).Z == ((Vector4)value2).Z && ((Vector4)value1).W == ((Vector4)value2).W;
                     if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "even")
-                        return ((int)value1 % 2 == 0); 
+                        return (int)value1 % 2 == 0;
                     if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "odd")
-                        return ((int)value1 % 2 == 1); 
+                        return (int)value1 % 2 == 1;
+
                     break;
-                case "!=":
+                case PCNOperator.NotEqualTo:
                     if (value1 == null && value2 == null)
                         return false;
                     if (value1 is int && value2 is int)
@@ -549,11 +713,12 @@ namespace Phantom.Utils
                     if (value1 is Vector4 && value2 is Vector4)
                         return ((Vector4)value1).X != ((Vector4)value2).X || ((Vector4)value1).Y != ((Vector4)value2).Y || ((Vector4)value1).Z != ((Vector4)value2).Z || ((Vector4)value1).W != ((Vector4)value2).W;
                     if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "even")
-                        return ((int)value1 % 2 != 0); 
+                        return (int)value1 % 2 != 0;
                     if (value1 is int && value2 is PCNKeyword && (value2 as PCNKeyword).Value == "odd")
-                        return ((int)value1 % 2 != 1); 
+                        return (int)value1 % 2 != 1;
+
                     return true;
-                case ">":
+                case PCNOperator.GreaterThan:
                     if (value1 is int && value2 is int)
                         return (int)value1 > (int)value2;
                     if (value1 is int && value2 is float)
@@ -563,7 +728,7 @@ namespace Phantom.Utils
                     if (value1 is float && value2 is int)
                         return (float)value1 > (int)value2;
                     break;
-                case ">=":
+                case PCNOperator.GreaterThanOrEqualTo:
                     if (value1 is int && value2 is int)
                         return (int)value1 >= (int)value2;
                     if (value1 is int && value2 is float)
@@ -573,7 +738,7 @@ namespace Phantom.Utils
                     if (value1 is float && value2 is int)
                         return (float)value1 >= (int)value2;
                     break;
-                case "<":
+                case PCNOperator.LessThan:
                     if (value1 is int && value2 is int)
                         return (int)value1 < (int)value2;
                     if (value1 is int && value2 is float)
@@ -583,7 +748,7 @@ namespace Phantom.Utils
                     if (value1 is float && value2 is int)
                         return (float)value1 < (int)value2;
                     break;
-                case "<=":
+                case PCNOperator.LessThanOrEqualTo:
                     if (value1 is int && value2 is int)
                         return (int)value1 <= (int)value2;
                     if (value1 is int && value2 is float)
@@ -593,7 +758,7 @@ namespace Phantom.Utils
                     if (value1 is float && value2 is int)
                         return (float)value1 <= (int)value2;
                     break;
-                case "&":
+                case PCNOperator.BitwiseAnd:
                     if (value1 is List<object>)
                     {
                         List<object> l = (List<object>)value1;
@@ -612,7 +777,13 @@ namespace Phantom.Utils
             return false;
         }
 
+        [Obsolete("This function will be removed in the future. Please pass the operator as a PCNOperator", false)]
         public static object TransformValue(object target, object source, string oper)
+        {
+            return TransformValue(target, source, StringToPCNOperator(oper));
+        }
+        
+        public static object TransformValue(object target, object source, PCNOperator oper)
         {
             if (target == null)
             {
@@ -638,7 +809,7 @@ namespace Phantom.Utils
             switch (oper)
             {
                 default:
-                case "=":
+                case PCNOperator.Assign:
                     if (source is bool)
                         return (bool)source;
                     if (source is int)
@@ -661,7 +832,7 @@ namespace Phantom.Utils
                         //return ((CalculatedValue)source).Clone();
                         return ((CalculatedValue)source).GetValue();
                     break;
-                case "=-":
+                case PCNOperator.NegativeAssign:
                     if (source is int)
                         return -(int)source;
                     if (source is float)
@@ -677,7 +848,7 @@ namespace Phantom.Utils
                         return v;
                     }
                     break;
-                case "++":
+                case PCNOperator.Increment:
                     if (target is int)
                         return (int)target + 1;
                     if (target is float)
@@ -689,7 +860,7 @@ namespace Phantom.Utils
                     }
 
                     break;
-                case "--":
+                case PCNOperator.Decrement:
                     if (target is int)
                         return (int)target - 1;
                     if (target is float)
@@ -700,7 +871,7 @@ namespace Phantom.Utils
                         return target;
                     }
                     break;
-                case "+=":
+                case PCNOperator.AdditionAssign:
                     if (target is int && source is int)
                         return (int)target + (int)source;
                     if (target is int && source is float)
@@ -729,7 +900,7 @@ namespace Phantom.Utils
                         return target;
                     }
                     break;
-                case "-=":
+                case PCNOperator.SubtractionAssign:
                     if (target is int && source is int)
                         return (int)target - (int)source;
                     if (target is int && source is float)
@@ -762,7 +933,7 @@ namespace Phantom.Utils
                         return target;
                     }
                     break;
-                case "*=":
+                case PCNOperator.MultiplicationAssign:
                     if (target is int && source is int)
                         return (int)target * (int)source;
                     if (target is int && source is float)
@@ -781,7 +952,7 @@ namespace Phantom.Utils
                         return target;
                     }
                     break;
-                case "/=":
+                case PCNOperator.DivisionAssign:
                     if (target is int && source is int)
                         return (int)target / (int)source;
                     if (target is int && source is float)
@@ -800,7 +971,7 @@ namespace Phantom.Utils
                         return target;
                     }
                     break;
-                case "%=":
+                case PCNOperator.ModuloAssign:
                     if (target is int && source is int)
                         return (int)target % (int)source;
                     if (target is int && source is float)
@@ -812,7 +983,7 @@ namespace Phantom.Utils
                     if (target is float && source is int)
                         return (float)target % (int)source;
                     break;
-                case "&=":
+                case PCNOperator.BitwiseAndAssign:
                     if (target is int && source is int)
                         return (int)target & (int)source;
                     if (target is int && source is CalculatedValue)
@@ -820,7 +991,7 @@ namespace Phantom.Utils
                     if (target is bool && source is bool)
                         return (bool)target && (bool)source;
                     break;
-                case "|=":
+                case PCNOperator.BitwiseOrAssign:
                     if (target is int && source is int)
                         return (int)target | (int)source;
                     if (target is int && source is CalculatedValue)
@@ -838,7 +1009,7 @@ namespace Phantom.Utils
                         return l;
                     }
                     break;
-                case "^=":
+                case PCNOperator.BitwiseXorAssign:
                     if (target is int && source is int)
                         return (int)target ^ (int)source;
                     if (target is int && source is CalculatedValue)
