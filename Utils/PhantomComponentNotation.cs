@@ -698,7 +698,7 @@ namespace Phantom.Utils
                         return (int)value1 != (float)value2;
                     if (value1 is float && value2 is float)
                         return (float)value1 != (float)value2;
-                    if (value1 is float && value2 is int)
+                    if (value1 is float && value2 is float)
                         return (float)value1 != (float)value2;
                     if (value1 is string && value2 is string)
                         return (string)value1 != (string)value2;
