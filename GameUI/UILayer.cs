@@ -60,12 +60,16 @@ namespace Phantom.GameUI
         public static Color ColorFaceHighLight = Color.Yellow;
         public static Color ColorFaceDisabled = Color.Silver;
         public static Color ColorShadow = Color.Black;
-
+        public static Color ColorTextBox = Color.White;
+        public static Color ColorTextBoxHighLight = Color.White;
+        public static Color ColorTextBoxDisabled = Color.Silver;
+        
         /// <summary>
         /// All the controls added to the menu.
         /// </summary>
         public List<UIElement> Controls;
         private UIElement[] selected;
+        private UIElement focused;
         private Renderer renderer;
 
         /// <summary>
@@ -127,6 +131,49 @@ namespace Phantom.GameUI
                 base.Render(info);
             else
                 renderer.Render(null);
+        }
+
+        public void SetFocus(UIElement value)
+        {
+            if (this.focused != null)
+                this.focused.Focus = false;
+            focused = value;
+            if (this.focused != null)
+                this.focused.Focus = true;
+        }
+
+        public void FocusOnNext()
+        {
+            if (this.focused != null)
+            {
+                if (this.focused.Right != null)
+                    SetFocus(this.focused.Right);
+                else if (this.focused.Below != null)
+                    SetFocus(this.focused.Below);
+                else if (this.focused.Left != null)
+                    SetFocus(this.focused.Left);
+                else if (this.focused.Above != null)
+                    SetFocus(this.focused.Above);
+                else
+                    SetFocus(null);
+            }
+        }
+
+        public void FocusOnPrevious()
+        {
+            if (this.focused != null)
+            {
+                if (this.focused.Left != null)
+                    SetFocus(this.focused.Left);
+                else if (this.focused.Above != null)
+                    SetFocus(this.focused.Above);
+                else if (this.focused.Right != null)
+                    SetFocus(this.focused.Right);
+                else if (this.focused.Below != null)
+                    SetFocus(this.focused.Below);
+                else
+                    SetFocus(null);
+            }
         }
 
         /// <summary>

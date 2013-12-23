@@ -104,6 +104,7 @@
     <Compile Include="Core\InputComponent.cs" />
     <Compile Include="Core\Message.cs" />
     <Compile Include="Core\PropertyCollection.cs" />
+    <Compile Include="GameUI\EditBox.cs" />
     <Compile Include="GameUI\UICarousel.cs" />
     <Compile Include="GameUI\UICarouselContainer.cs" />
     <Compile Include="GameUI\UIInventory.cs" />

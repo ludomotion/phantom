@@ -28,6 +28,11 @@ namespace Phantom.GameUI
         public string Name;
 
         /// <summary>
+        /// Flag if the element has the current input focus
+        /// </summary>
+        public bool Focus;
+
+        /// <summary>
         /// A bit flag indicating which players have currently selected the control
         /// </summary>
         public int Selected;
@@ -140,6 +145,8 @@ namespace Phantom.GameUI
             int pl = 1 << player;
             if (CanUse(player))
                 pressed |= pl;
+
+            this.layer.SetFocus(this);
         }
 
         /// <summary>
