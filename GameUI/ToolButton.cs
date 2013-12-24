@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Utils;
 using Phantom.Misc;
+using Phantom.Core;
 
 namespace Phantom.GameUI
 {
@@ -23,7 +24,7 @@ namespace Phantom.GameUI
         {
             if (CanUse(player))
             {
-                UILayer layer = this.GetAncestor<UILayer>();
+                GameState layer = this.GetAncestor<GameState>();
                 if (layer != null)
                     layer.HandleMessage(Messages.ToolSelected, this.Name);
                 SelectedTool = true;

@@ -33,7 +33,7 @@ namespace Phantom.GameUI
 
 
         /// <summary>
-        /// Creates the button and sets the button's caption
+        /// Creates the editbox
         /// </summary>
         /// <param name="name"></param>
         /// <param name="position"></param>
