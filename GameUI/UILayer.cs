@@ -114,7 +114,7 @@ namespace Phantom.GameUI
         {
             base.OnComponentAdded(child);
             if (child is UIElement)
-                Controls.Add((UIElement)child);
+                Controls = GetAllComponentsByTypeAsList<UIElement>();
         }
 
         protected override void OnComponentRemoved(Component child)
@@ -488,7 +488,7 @@ namespace Phantom.GameUI
             {
                 if (Controls[i] != exclude && Controls[i].Visible && Controls[i].Shape != null)
                 {
-                    if (Controls[i].Shape.InShape(position))
+                    if (Controls[i].InControl(position))
                     {
                         return Controls[i];
                     }
@@ -521,5 +521,6 @@ namespace Phantom.GameUI
             }
             return null;
         }
+
     }
 }

@@ -162,7 +162,6 @@ namespace Phantom.Core
         /// <param name="child"></param>
         public void InsertBeforeComponent(Component other, Component child)
         {
-            // TODO: Test if the index is correct or if it needs a -1.
             this.components.Insert(this.components.IndexOf(other), child);
             this.OnComponentAdded(child);
         }

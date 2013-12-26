@@ -146,8 +146,9 @@ namespace Phantom.GameUI
                 if (hover != null)
                 {
                     hover.StartPress(player);
-                    hover.ClickAt(mousePosition - hover.Position, player);
                     mouseDown = hover;
+                    mouseDown.MouseDown(mousePosition, player);
+
                 }
                 dragging = false;
             }
@@ -174,7 +175,13 @@ namespace Phantom.GameUI
                 else
                 {
                     if (layer.GetSelected(player) != null)
+                    {
                         layer.GetSelected(player).EndPress(player);
+                        if (mouseDown!=null)
+                            mouseDown.MouseUp(mousePosition, player);
+                        if (hover == mouseDown)
+                            hover.ClickAt(mousePosition - hover.Position, player);
+                    }
                 }
                 mouseDown = null;
                 draggingContent = null;

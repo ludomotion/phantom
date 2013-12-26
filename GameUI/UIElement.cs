@@ -195,6 +195,15 @@ namespace Phantom.GameUI
         {
         }
 
+        public virtual void MouseDown(Vector2 position, int player)
+        {
+        }
+
+        public virtual void MouseUp(Vector2 position, int player)
+        {
+        }
+
+
         public virtual void HoverAt(Vector2 position, int player)
         {
         }
@@ -211,5 +220,10 @@ namespace Phantom.GameUI
 
 
 
+
+        public virtual bool InControl(Vector2 position)
+        {
+            return Shape.InShape(position);
+        }
     }
 }
