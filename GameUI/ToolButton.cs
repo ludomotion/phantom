@@ -65,7 +65,7 @@ namespace Phantom.GameUI
                 down = Math.Min(2-currentSelectedTool, down);
 				PhantomUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
 
-                info.Batch.DrawString(UILayer.Font, Caption, Position - size * 0.5f - Vector2.One * down, text);
+                info.Batch.DrawString(UILayer.Font, Caption, Position - Vector2.One * down, text, 0, size * 0.5f, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
             }
         }
 

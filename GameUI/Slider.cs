@@ -217,7 +217,9 @@ namespace Phantom.GameUI
                 info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
 
                 if (UILayer.Font != null)
-                    info.Batch.DrawString(UILayer.Font, caption, Position - rect.HalfSize, text);
+                {
+                    info.Batch.DrawString(UILayer.Font, caption, Position - rect.HalfSize, text, 0, Vector2.Zero, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                }
             }
         }
 

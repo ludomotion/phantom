@@ -52,6 +52,9 @@ namespace Phantom.GameUI
         /// A font used by the default renderers of the MenuControls
         /// </summary>
         public static SpriteFont Font;
+
+        public static float DefaultFontScale = 1f;
+
         //Default colors not the best solution but hey!
         public static Color ColorText = Color.Black;
         public static Color ColorTextHighLight = Color.Blue;

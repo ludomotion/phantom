@@ -146,10 +146,13 @@ namespace Phantom.GameUI
 
 				PhantomUtils.DrawShape(info, this.Position, this.Shape, face, Color.Transparent, 0);
 
-                size.X *= -0.5f;
-                size.Y = this.Shape.RoughWidth * 0.5f;
-                if (this.currentSelected>0.5f && Enabled) 
-                    info.Batch.DrawString(UILayer.Font, c, Position + size, text);
+                size.X *= 0.5f;
+                size.Y = -this.Shape.RoughWidth * 0.5f;
+                if (this.currentSelected > 0.5f && Enabled)
+                {
+                    info.Batch.DrawString(UILayer.Font, c, Position, text);
+                    info.Batch.DrawString(UILayer.Font, c, Position, text, 0, size, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                }
             }
         }
 

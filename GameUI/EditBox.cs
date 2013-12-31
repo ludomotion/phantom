@@ -75,7 +75,8 @@ namespace Phantom.GameUI
                 string s = Text;
                 if (timer % 0.5f > 0.2f)
                     s += "_";
-                info.Batch.DrawString(UILayer.Font, s, p, text);
+                //info.Batch.DrawString(UILayer.Font, s, p, text);
+                info.Batch.DrawString(UILayer.Font, s, p, text, 0, new Vector2(0, 0), UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
             }
         }
 
