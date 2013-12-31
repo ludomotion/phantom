@@ -177,10 +177,10 @@ namespace Phantom.GameUI
                     if (layer.GetSelected(player) != null)
                     {
                         layer.GetSelected(player).EndPress(player);
-                        if (mouseDown!=null)
-                            mouseDown.MouseUp(mousePosition, player);
                         if (hover == mouseDown)
                             hover.ClickAt(mousePosition - hover.Position, player);
+                        if (mouseDown != null)
+                            mouseDown.MouseUp(mousePosition, player);
                     }
                 }
                 mouseDown = null;
