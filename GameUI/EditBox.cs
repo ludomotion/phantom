@@ -68,7 +68,7 @@ namespace Phantom.GameUI
 				PhantomUtils.DrawShape(info, this.Position, this.Shape, face, UILayer.ColorShadow, 2);
 				//PhantomUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
                 Vector2 p = Position;
-                p.Y -= h;
+                p.Y -= h * UILayer.DefaultFontScale;
                 p.X -= w;
                 p.X = (float)Math.Round(p.X);
                 p.Y = (float)Math.Round(p.Y);
