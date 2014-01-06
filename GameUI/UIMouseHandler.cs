@@ -16,15 +16,19 @@ namespace Phantom.GameUI
     public class UIMouseHandler : UIBaseHandler
     {
         public static float DragDistanceSquared = 25;
+        public static float DoubleClickSpeed = 0.2f;
         protected MouseState previous;
         protected MouseState current;
         protected UIElement hover;
         private UIElement mouseDown;
+        private UIElement mouseDownRight;
         private bool dragging;
         private UIContent draggingContent;
         protected Vector2 mouseDownPosition;
         protected Vector2 mousePosition;
         private Renderer renderer;
+        private float doubleClickTimer;
+        private int clickTimes;
 
         public UIMouseHandler()
             : base(0) { }
@@ -151,6 +155,30 @@ namespace Phantom.GameUI
 
                 }
                 dragging = false;
+                doubleClickTimer = 0;
+                clickTimes++;
+            }
+            if (current.RightButton == ButtonState.Pressed && previous.RightButton != ButtonState.Pressed)
+            {
+                if (hover != null)
+                    mouseDownRight = hover;
+            }
+
+            if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed)
+            {
+                if (mouseDownRight == hover)
+                    mouseDownRight.Click(UIElement.ClickType.RightClick, player);
+                mouseDownRight = null;
+            }
+
+            if (doubleClickTimer > 0)
+            {
+                doubleClickTimer -= elapsed;
+                if (doubleClickTimer <= 0)
+                {
+
+                    clickTimes = 0;
+                }
             }
 
             //end clicking
@@ -178,7 +206,14 @@ namespace Phantom.GameUI
                     {
                         layer.GetSelected(player).EndPress(player);
                         if (hover == mouseDown)
-                            hover.ClickAt(mousePosition - hover.Position, player);
+                        {
+                            doubleClickTimer = DoubleClickSpeed;
+                            if (clickTimes == 1)
+                                hover.ClickAt(mousePosition - hover.Position, player);
+                            if (clickTimes == 2)
+                                hover.Click(UIElement.ClickType.DoubleClick, player);
+                        }
+
                         if (mouseDown != null)
                             mouseDown.MouseUp(mousePosition, player);
                     }

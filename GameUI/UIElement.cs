@@ -20,7 +20,7 @@ namespace Phantom.GameUI
         /// <summary>
         /// The type of click/command that was passed to the control
         /// </summary>
-        public enum ClickType { Select, NextOption, PreviousOption }
+        public enum ClickType { Select, NextOption, PreviousOption, RightClick, DoubleClick }
 
         /// <summary>
         /// The name of the control can be used to identify it in the menu
