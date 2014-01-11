@@ -65,6 +65,7 @@ namespace Phantom.GameUI
             this.options = options;
             this.step = (maxValue-minValue)/(options.Length-1);
             this.Caption = caption;
+            this.caption = caption;
             this.rect = shape;
             this.sliderOrientation = sliderOientation;
             this.snap = true;
@@ -116,11 +117,11 @@ namespace Phantom.GameUI
             this.minValue = minValue;
             this.maxValue = maxValue;
             this.step = step;
-            this.Caption = name;
+            this.Caption = caption;
             this.rect = shape;
             this.sliderOrientation = orientation;
             this.snap = snap;
-            currentValue = -1;
+            this.currentValue = -1;
             SetValue(currentValue);
         }
 
@@ -159,16 +160,25 @@ namespace Phantom.GameUI
                 return;
 
             currentValue = value;
-            
+
             if (options != null)
             {
                 caption = Caption + " " + options[(int)currentValue];
+            }
+            else
+            {
+                caption = Caption + " " + currentValue.ToString("0.0");
             }
 
             GameState state = this.GetAncestor<GameState>();
             if (state != null)
                 state.HandleMessage(Messages.UIElementValueChanged, this);
 
+        }
+
+        public float GetValue()
+        {
+            return currentValue;
         }
 
         /// <summary>
@@ -216,7 +226,7 @@ namespace Phantom.GameUI
                 info.Canvas.FillColor = face;
                 info.Canvas.FillRect(p, new Vector2(HandleWidth * 0.5f - 2, HandleHeight * 0.5f - 2), 0);
 
-                if (UILayer.Font != null)
+                if (UILayer.Font != null && caption!=null)
                 {
                     info.Batch.DrawString(UILayer.Font, caption, Position - rect.HalfSize, text, 0, Vector2.Zero, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
                 }
