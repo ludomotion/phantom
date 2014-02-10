@@ -23,7 +23,8 @@
     <MtouchDebug>True</MtouchDebug>
     <MtouchProfiling>True</MtouchProfiling>
     <MtouchLink>None</MtouchLink>
-    <MtouchI18n />
+    <MtouchI18n>
+    </MtouchI18n>
     <MtouchArch>ARMv7</MtouchArch>
     <AssemblyName>Phantom</AssemblyName>
   </PropertyGroup>
@@ -50,8 +51,10 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>True</MtouchDebug>
     <MtouchProfiling>True</MtouchProfiling>
-    <IpaPackageName />
-    <MtouchI18n />
+    <IpaPackageName>
+    </IpaPackageName>
+    <MtouchI18n>
+    </MtouchI18n>
     <MtouchArch>ARMv7</MtouchArch>
     <AssemblyName>Phantom</AssemblyName>
   </PropertyGroup>
@@ -239,7 +242,7 @@
     <Folder Include="GameUI\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
+    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
       <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
       <Name>MonoGame.Framework.iOS</Name>
     </ProjectReference>
