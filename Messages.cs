@@ -45,6 +45,8 @@ namespace Phantom
         public const int MapLoaded = 210;
         public const int MapReset = 211;
 
+		public const int LoadingProgress = 220;
+
         public const int UIActivated = 300;
         public const int UIElementClicked = 301;
         public const int UIElementValueChanged = 302;

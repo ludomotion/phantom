@@ -219,9 +219,13 @@ namespace Phantom.Core
 				{
 					if(assets[i].Contains("sound"))
 						this.LoadAffixed<SoundEffect>(assets[i]);
+					else if(assets[i].Contains("sprites"))
+						this.LoadAffixed<Texture2D>(assets[i]);
 					else
 						this.LoadAffixed<object>(assets[i]);
 				}
+
+				PhantomGame.Game.HandleMessage (Messages.LoadingProgress, (float)i / (float)assets.Count);
 #if DEBUG
                 this.loaded.Add(assets[i]);
 #endif
