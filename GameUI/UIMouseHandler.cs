@@ -83,7 +83,7 @@ namespace Phantom.GameUI
                 Matrix renderMatrix = this.renderer.CreateMatrix();
                 mousePosition = Vector2.Transform(mousePosition, Matrix.Invert(renderMatrix));
             }
-            hover = layer.GetControlAt(mousePosition, draggingContent);
+            UIElement hover = layer.GetControlAt(mousePosition, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;
             UIContent content = (hover as UIContent);
@@ -99,8 +99,20 @@ namespace Phantom.GameUI
             if (hover != null)
                 hover.HoverAt(mousePosition, player);
 
+            if (hover != this.hover)
+            {
+                if (this.hover != null && this.hover.OnMouseOut != null)
+                    this.hover.OnMouseOut(this.hover, mousePosition, UIMouseButton.None);
+                this.hover = hover;
+                if (this.hover != null && this.hover.OnMouseOver != null)
+                    this.hover.OnMouseOver(this.hover, mousePosition, UIMouseButton.None);
+            }
+
             if (current.X != previous.X || current.Y != previous.Y)
             {
+                if (this.hover != null && this.hover.OnMouseMove != null)
+                    this.hover.OnMouseMove(this.hover, mousePosition, UIMouseButton.None);
+
                 //Check which item I am hovering and select it
                 layer.SetSelected(player, hover);
 
@@ -151,7 +163,8 @@ namespace Phantom.GameUI
                 {
                     hover.StartPress(player);
                     mouseDown = hover;
-                    mouseDown.MouseDown(mousePosition, player);
+                    if (hover.OnMouseDown != null)
+                        hover.OnMouseDown(hover, mousePosition, UIMouseButton.Left);
 
                 }
                 dragging = false;
@@ -162,12 +175,20 @@ namespace Phantom.GameUI
             {
                 if (hover != null)
                     mouseDownRight = hover;
+                if (hover.OnMouseDown != null)
+                    hover.OnMouseDown(hover, mousePosition, UIMouseButton.Right);
+
             }
 
             if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed)
             {
+                if (hover.OnMouseUp != null)
+                    hover.OnMouseUp(hover, mousePosition, UIMouseButton.Right);
                 if (mouseDownRight == hover)
-                    mouseDownRight.Click(UIElement.ClickType.RightClick, player);
+                {
+                    if (mouseDownRight.OnClick != null)
+                        mouseDownRight.OnClick(mouseDownRight, mousePosition, UIMouseButton.Right);
+                }
                 mouseDownRight = null;
             }
 
@@ -176,7 +197,6 @@ namespace Phantom.GameUI
                 doubleClickTimer -= elapsed;
                 if (doubleClickTimer <= 0)
                 {
-
                     clickTimes = 0;
                 }
             }
@@ -209,13 +229,17 @@ namespace Phantom.GameUI
                         {
                             doubleClickTimer = DoubleClickSpeed;
                             if (clickTimes == 1)
+                            {
                                 hover.ClickAt(mousePosition - hover.Position, player);
-                            if (clickTimes == 2)
-                                hover.Click(UIElement.ClickType.DoubleClick, player);
+                                if (hover.OnClick != null)
+                                    hover.OnClick(hover, mousePosition, UIMouseButton.Left);
+                            }
+                            if (clickTimes == 2 && hover.OnDoubleClick!=null)
+                                hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                         }
 
-                        if (mouseDown != null)
-                            mouseDown.MouseUp(mousePosition, player);
+                        if (mouseDown != null && mouseDown.OnMouseUp!=null)
+                            mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
                     }
                 }
                 mouseDown = null;

@@ -139,10 +139,18 @@ namespace Phantom.GameUI
         public void SetFocus(UIElement value)
         {
             if (this.focused != null)
+            {
                 this.focused.Focus = false;
+                if (this.focused.OnBlur != null)
+                    this.focused.OnBlur(this.focused);
+            }
             focused = value;
             if (this.focused != null)
+            {
                 this.focused.Focus = true;
+                if (this.focused.OnFocus != null)
+                    this.focused.OnFocus(this.focused);
+            }
         }
 
         public void FocusOnNext()

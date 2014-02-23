@@ -11,16 +11,26 @@ namespace Phantom.GameUI
     public enum UIElementOrientation { LeftRight, TopDown }
 
     /// <summary>
+    /// The type of click/command that was passed to the control
+    /// </summary>
+    public enum ClickType { Select, NextOption, PreviousOption }
+
+    public enum UIMouseButton { None, Left, Right }
+
+    public delegate void UIAction(UIElement element);
+    public delegate void UIPlayerAction(UIElement element, int player);
+    public delegate void UIMouseAction(UIElement element, Vector2 mousePosition, UIMouseButton button);
+
+
+    /// <summary>
     /// The base class from which all MenuControls are derived. It implements
     /// basic behavior and sets up a few simple methods that can be overridden
     /// to create new types of controls.
     /// </summary>
     public class UIElement : Entity
     {
-        /// <summary>
-        /// The type of click/command that was passed to the control
-        /// </summary>
-        public enum ClickType { Select, NextOption, PreviousOption, RightClick, DoubleClick }
+        
+
 
         /// <summary>
         /// The name of the control can be used to identify it in the menu
@@ -102,6 +112,20 @@ namespace Phantom.GameUI
         /// </summary>
         protected float currentSelected = 0;
 
+        public UIAction OnFocus;
+        public UIAction OnBlur;
+        public UIPlayerAction OnStartPress;
+        public UIPlayerAction OnEndPress;
+        public UIPlayerAction OnCancelPress;
+        public UIPlayerAction OnActivate;
+        public UIMouseAction OnMouseOver;
+        public UIMouseAction OnMouseOut;
+        public UIMouseAction OnMouseMove;
+        public UIMouseAction OnMouseDown;
+        public UIMouseAction OnMouseUp;
+        public UIMouseAction OnClick;
+        public UIMouseAction OnDoubleClick;
+
         /// <summary>
         /// Base constructor needs a name, position and shape.
         /// </summary>
@@ -144,8 +168,12 @@ namespace Phantom.GameUI
         {
             int pl = 1 << player;
             if (CanUse(player))
+            {
                 pressed |= pl;
-
+                if (OnStartPress != null)
+                    OnStartPress(this, player);
+            }
+            
             this.layer.SetFocus(this);
         }
 
@@ -159,6 +187,8 @@ namespace Phantom.GameUI
             if ((pressed & pl) == pl)
             {
                 pressed &= 255 - pl;
+                if (OnEndPress != null)
+                    OnEndPress(this, player);
                 Click(ClickType.Select, player);
             }
         }
@@ -170,7 +200,12 @@ namespace Phantom.GameUI
         public virtual void CancelPress(int player)
         {
             int pl = 1 << player;
-            pressed &= 255-pl;
+            if ((pressed & pl) == pl)
+            {
+                pressed &= 255 - pl;
+                if (OnCancelPress != null)
+                    OnCancelPress(this, player);
+            }
         }
 
         /// <summary>
@@ -180,6 +215,8 @@ namespace Phantom.GameUI
         /// <param name="player"></param>
         public virtual void Click(ClickType type, int player)
         {
+            if (type == ClickType.Select && OnActivate != null)
+                OnActivate(this, player);
         }
 
         /// <summary>
@@ -191,19 +228,23 @@ namespace Phantom.GameUI
         {
         }
 
+
+        [Obsolete]
         public virtual void MoveMouseTo(Vector2 position, int player)
         {
         }
 
+        [Obsolete]
         public virtual void MouseDown(Vector2 position, int player)
         {
         }
 
+        [Obsolete]
         public virtual void MouseUp(Vector2 position, int player)
         {
         }
 
-
+        [Obsolete]
         public virtual void HoverAt(Vector2 position, int player)
         {
         }

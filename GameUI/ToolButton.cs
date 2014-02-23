@@ -20,7 +20,7 @@ namespace Phantom.GameUI
         {
         }
 
-        public override void Click(UIElement.ClickType type, int player)
+        public override void Click(ClickType type, int player)
         {
             if (CanUse(player))
             {
