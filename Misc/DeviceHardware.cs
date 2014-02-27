@@ -222,12 +222,19 @@ namespace Phantom
 
 		private static bool deviceInfoInitialized = false;
 
-		public static void Dump()
+		public static string Summary()
 		{
 			string info = "Starting " + PhantomGame.Game.Name + " build " + Assembly.GetExecutingAssembly().GetName().Version + " on " + DeviceHardware.Form + " device running " + DeviceHardware.OS + " " + DeviceHardware.OSVersion + "\n" +
-							"Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion + " (" + DeviceHardware.Identifier + ")\n" +
-							"Screen dimensions: " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + " pixels at " + DeviceHardware.PPcm + " pixels per centimeter (" + DeviceHardware.PPI + " ppi)\n" +
-							"Display size: " + DeviceHardware.DisplayRealWidth + "x" + DeviceHardware.DisplayRealHeight + " cm, " + DeviceHardware.DisplayDiagonal + " cm diagonal (" + DeviceHardware.DisplayDiagonal / 2.54f + "\")";
+				"Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion + " (" + DeviceHardware.Identifier + ")\n" +
+				"Screen dimensions: " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + " pixels at " + DeviceHardware.PPcm + " pixels per centimeter (" + DeviceHardware.PPI + " ppi)\n" +
+				"Display size: " + DeviceHardware.DisplayRealWidth + "x" + DeviceHardware.DisplayRealHeight + " cm, " + DeviceHardware.DisplayDiagonal + " cm diagonal (" + DeviceHardware.DisplayDiagonal / 2.54f + "\")";
+
+			return info;
+		}
+
+		public static void Dump()
+		{
+			string info = Summary ();
 
 			if (PhantomGame.Game.Console != null)
 				PhantomGame.Game.Console.AddLines (info.Split(new char[] { '\n' } ));
