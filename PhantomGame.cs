@@ -21,10 +21,6 @@ using MonoTouch.UIKit;
 using Trace = System.Console;
 #endif
 
-#if TESTFLIGHT
-using MonoTouch.TestFlight;
-#endif
-
 namespace Phantom
 {
     public class PhantomGame : Component, IDisposable
@@ -110,11 +106,6 @@ namespace Phantom
             Trace.WriteLine("Device: " + DeviceHardware.Manufacturer + " " + DeviceHardware.Model + " " + DeviceHardware.ModelVersion + " (" + DeviceHardware.Identifier + ")");
 			Trace.WriteLine("Screen dimensions: " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + " pixels at " + DeviceHardware.PPcm + " pixels per centimeter (" + DeviceHardware.PPI + " ppi)");
 			Trace.WriteLine("Display size: " + DeviceHardware.DisplayRealWidth + "x" + DeviceHardware.DisplayRealHeight + " cm, " + DeviceHardware.DisplayDiagonal + " cm diagonal (" + DeviceHardware.DisplayDiagonal / 2.54f + "\")");
-
-#if TESTFLIGHT
-			TestFlight.Log("[Start " + this.Name + "] " + DeviceHardware.Form + "; " + DeviceHardware.Manufacturer + "; " + DeviceHardware.Model + "; " + DeviceHardware.ModelVersion + "; " + DeviceHardware.Identifier + "; " + DeviceHardware.OS + "; " + DeviceHardware.OSVersion);
-			TestFlight.Log("[Screen] " + DeviceHardware.ScreenWidth + "x" + DeviceHardware.ScreenHeight + "; " + DeviceHardware.PPI + " ppi; " + DeviceHardware.DisplayDiagonal + " inch");
-#endif
 
 #if DEBUG
 			// Setup Profiler:
