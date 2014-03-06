@@ -15,7 +15,7 @@ namespace Phantom.Graphics
 {
     public class Sprite
     {
-        public readonly int FrameCount;
+        public int FrameCount { get; protected set; }
 
         public bool Flipped { get; set; }
 
@@ -215,7 +215,7 @@ namespace Phantom.Graphics
             this.RenderFrame(info, frame, position, 0);
         }
 
-        private Rectangle GetRectByFrame(int frame)
+        protected virtual Rectangle GetRectByFrame(int frame)
         {
             int x = frame % this.horizontalFramesCount;
             int y = frame / this.horizontalFramesCount;
