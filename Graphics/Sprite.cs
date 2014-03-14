@@ -30,6 +30,9 @@ namespace Phantom.Graphics
         private int horizontalFramesCount;
         private int verticalFramesCount;
 
+        private int offsetX;
+        private int offsetY;
+
 #if DEBUG
         private class RenderCallInfo 
         {
@@ -85,7 +88,7 @@ namespace Phantom.Graphics
         
 #endif
 
-        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY)
+        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY, int offsetX, int offsetY)
         {
             this.Flipped = false;
 
@@ -108,6 +111,13 @@ namespace Phantom.Graphics
             this.verticalFramesCount = texture.Height / height;
 
             this.FrameCount = this.horizontalFramesCount * this.verticalFramesCount;
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+        }
+
+        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY)
+            : this(texture, width, height, centerX, centerY, 0, 0)
+        {
         }
 
         public Sprite(Texture2D texture, int width, int height)
@@ -219,7 +229,7 @@ namespace Phantom.Graphics
         {
             int x = frame % this.horizontalFramesCount;
             int y = frame / this.horizontalFramesCount;
-            return new Rectangle(x * this.Width, y * this.Height, this.Width, this.Height);
+            return new Rectangle(x * this.Width + offsetX, y * this.Height + offsetY, this.Width, this.Height);
         }
     }
 }
