@@ -78,7 +78,7 @@ namespace Phantom.GameUI
             previous = current;
             current = Mouse.GetState();
             mousePosition = new Vector2(current.X, current.Y);
-            if (this.renderer != null)
+            if (this.renderer != null && this.layer.Camera!=null)
             {
                 Matrix renderMatrix = this.renderer.CreateMatrix();
                 mousePosition = Vector2.Transform(mousePosition, Matrix.Invert(renderMatrix));
