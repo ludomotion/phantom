@@ -174,13 +174,15 @@ namespace Phantom.GameUI
             if (current.RightButton == ButtonState.Pressed && previous.RightButton != ButtonState.Pressed)
             {
                 if (hover != null)
+                {
                     mouseDownRight = hover;
-                if (hover.OnMouseDown != null)
-                    hover.OnMouseDown(hover, mousePosition, UIMouseButton.Right);
+                    if (hover.OnMouseDown != null)
+                        hover.OnMouseDown(hover, mousePosition, UIMouseButton.Right);
+                }
 
             }
 
-            if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed)
+            if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed && hover!=null)
             {
                 if (hover.OnMouseUp != null)
                     hover.OnMouseUp(hover, mousePosition, UIMouseButton.Right);
