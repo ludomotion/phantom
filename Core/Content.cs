@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Phantom.Graphics;
 
 #if TOUCH
 using Trace = System.Console;
@@ -217,10 +218,10 @@ namespace Phantom.Core
             {
 				lock (PhantomGame.Game.GlobalRenderLock)
 				{
-					if(assets[i].Contains("sound"))
-						this.LoadAffixed<SoundEffect>(assets[i]);
-					else if(assets[i].Contains("sprites"))
-						this.LoadAffixed<Texture2D>(assets[i]);
+					if (assets [i].Contains ("sound"))
+						this.LoadAffixed<SoundEffect> (assets [i]);
+					else if (assets [i].Contains ("sprites"))
+						this.LoadAffixed<Texture2D> (assets [i]);
 					else
 						this.LoadAffixed<object>(assets[i]);
 				}
@@ -314,6 +315,10 @@ namespace Phantom.Core
 				else if(this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
 			}
 
+
+			if (Sprite.HalfScale && assetName.Contains("sprites")) {
+				assetName = assetName.Replace ("sprites", "sprites/half");
+			} 
 			return this.manager.Load<T>(assetName);
 		}
 
