@@ -15,6 +15,10 @@ namespace Phantom.Graphics
 {
     public class Sprite
     {
+		public static bool HalfScale = false;
+		public static float ScaleFactor = 1f;
+		public static float ScaleFactorInverse = 1f;
+
         public int FrameCount { get; protected set; }
 
         public bool Flipped { get; set; }
@@ -23,12 +27,15 @@ namespace Phantom.Graphics
         public readonly int Height;
         public readonly float InverseWidth;
         public readonly float InverseHeight;
-        public readonly Vector2 Size;
+		public readonly Vector2 Size;
         public readonly Texture2D Texture;
         public Vector2 Origin;
 
         private int horizontalFramesCount;
         private int verticalFramesCount;
+
+		private float scaledWidth;
+		private float scaledHeight;
 
         private int offsetX;
         private int offsetY;
@@ -95,24 +102,31 @@ namespace Phantom.Graphics
             this.Texture = texture;
             if (width <= 0 || height <= 0)
             {
-                width = texture.Width;
-                height = texture.Height;
-                centerX = width * 0.5f;
-                centerY = height * 0.5f;
-            }
-            this.Width = width;
-            this.Height = height;
-            this.InverseWidth = 1f / (float)width;
-            this.InverseHeight = 1f / (float)height;
-            this.Size = new Vector2(width, height);
-            this.Origin = new Vector2(centerX, centerY);
+				width = (int)Math.Ceiling(texture.Width * ScaleFactor);
+				height = (int)Math.Ceiling(texture.Height * ScaleFactor);
+				centerX = width * .5f;
+				centerY = height * .5f;
+			}
+			centerX *= ScaleFactorInverse;
+			centerY *= ScaleFactorInverse;
+			//centerX = (float)Math.Ceiling (centerX);
+			//centerY = (float)Math.Ceiling (centerY);
+			this.Width = width;
+			this.Height = height; 
+			this.InverseWidth = 1f / (float)(width);
+			this.InverseHeight = 1f / (float)(height);
+			this.Size = new Vector2(width, height);
+			this.Origin = new Vector2 (centerX, centerY);
 
-            this.horizontalFramesCount = texture.Width / width;
-            this.verticalFramesCount = texture.Height / height;
+			this.horizontalFramesCount = texture.Width / (int)Math.Ceiling(width * ScaleFactorInverse);
+			this.verticalFramesCount = texture.Height / (int)Math.Ceiling(height * ScaleFactorInverse);
+
+			this.scaledWidth = (width * ScaleFactorInverse);
+			this.scaledHeight = (height * ScaleFactorInverse);
 
             this.FrameCount = this.horizontalFramesCount * this.verticalFramesCount;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
+			this.offsetX = (int)Math.Floor(offsetX * ScaleFactorInverse);
+			this.offsetY = (int)Math.Floor(offsetY * ScaleFactorInverse);
         }
 
         public Sprite(Texture2D texture, int width, int height, float centerX, float centerY)
@@ -137,7 +151,7 @@ namespace Phantom.Graphics
             color.R = (byte)(color.R * alpha);
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
-            this.RenderFrame(info, frame, position, angle, scale, color);
+			this.RenderFrame(info, frame, position, angle, scale, color);
         }
 
         public void RenderFrame(RenderInfo info, int frame, Vector2 position, float angle, Vector2 scale, Color color, float alpha, bool flipHorizontal)
@@ -148,7 +162,7 @@ namespace Phantom.Graphics
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
             Rectangle source = GetRectByFrame(frame);
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale * ScaleFactor, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 
 #if DEBUG
             AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
@@ -164,7 +178,7 @@ namespace Phantom.Graphics
             color.B = (byte)(color.B * alpha);
             Rectangle source = GetRectByFrame(frame);
 			Vector2 scale = new Vector2(drawSize.X / this.Width, drawSize.Y / this.Height);
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale * ScaleFactor, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 
 #if DEBUG
             AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
@@ -176,7 +190,7 @@ namespace Phantom.Graphics
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = GetRectByFrame(frame);
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale * ScaleFactor, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
             AddCall(Texture, scale);
 #endif
@@ -188,7 +202,7 @@ namespace Phantom.Graphics
                 return;
             Rectangle source = GetRectByFrame(frame);
 			Vector2 scale = new Vector2(drawSize.X / this.Width, drawSize.Y / this.Height);
-			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale * ScaleFactor, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
 			AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
 #endif
@@ -199,7 +213,7 @@ namespace Phantom.Graphics
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = GetRectByFrame(frame);
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale * ScaleFactor, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
             AddCall(Texture, scale);
 #endif
@@ -229,7 +243,7 @@ namespace Phantom.Graphics
         {
             int x = frame % this.horizontalFramesCount;
             int y = frame / this.horizontalFramesCount;
-            return new Rectangle(x * this.Width + offsetX, y * this.Height + offsetY, this.Width, this.Height);
+			return new Rectangle((int)(x * this.scaledWidth) + offsetX, (int)(y * this.scaledHeight) + offsetY, (int)this.scaledWidth, (int)this.scaledHeight);
         }
     }
 }
