@@ -12,6 +12,7 @@
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
     <LastXamMacNagTime>1-2-2013 13:53:41</LastXamMacNagTime>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+    <newfilesearch>OnLoadAutoInsert</newfilesearch>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Mac' ">
     <DebugType>none</DebugType>
@@ -180,6 +181,8 @@
     <Compile Include="GameUI\UIMultiContainer.cs" />
     <Compile Include="GameUI\UITweener.cs" />
     <Compile Include="Core\Message.cs" />
+    <Compile Include="Misc\TouchController.cs" />
+    <Compile Include="GameUI\UITouchHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

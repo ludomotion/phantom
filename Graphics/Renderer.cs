@@ -179,7 +179,7 @@ namespace Phantom.Graphics
             }
         }
 
-        private RenderInfo BuildRenderInfo()
+		public RenderInfo BuildRenderInfo()
         {
             RenderInfo info = new RenderInfo();
             info.Renderer = this;

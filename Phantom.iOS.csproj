@@ -228,6 +228,8 @@
     <Compile Include="Core\Message.cs" />
     <Compile Include="GameUI\EditBox.cs" />
     <Compile Include="Graphics\Particles\ParticlePass.cs" />
+    <Compile Include="Misc\TouchController.cs" />
+    <Compile Include="GameUI\UITouchHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
