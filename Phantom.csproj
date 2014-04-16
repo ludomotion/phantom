@@ -112,6 +112,7 @@
     <Compile Include="GameUI\Label.cs" />
     <Compile Include="GameUI\ToolButton.cs" />
     <Compile Include="GameUI\UIMouseEntityHandler.cs" />
+    <Compile Include="GameUI\UITouchHandler.cs" />
     <Compile Include="Graphics\Canvas.cs" />
     <Compile Include="Graphics\EntityRenderer.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
@@ -145,6 +146,7 @@
     <Compile Include="Misc\PhantomUtils.Math.cs" />
     <Compile Include="Misc\PhantomUtils.Misc.cs" />
     <Compile Include="Misc\Tests\RendererCanvasTest.cs" />
+    <Compile Include="Misc\TouchController.cs" />
     <Compile Include="Misc\Triangulator.cs" />
     <Compile Include="Physics\Components\Atractor.cs" />
     <Compile Include="Core\Component.cs" />
