@@ -174,10 +174,7 @@ namespace Phantom
 
 			int w = this.graphics.PreferredBackBufferWidth;
 			int h = this.graphics.PreferredBackBufferHeight;
-			if (h > w) {
-				h = w;
-				w = this.graphics.PreferredBackBufferHeight;
-			}
+
 			this.Resolution = new Viewport(0, 0, w, h);
         }
 
