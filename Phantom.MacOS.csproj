@@ -179,6 +179,7 @@
     <Compile Include="GameUI\UIMouseHandler.cs" />
     <Compile Include="GameUI\UIMultiContainer.cs" />
     <Compile Include="GameUI\UITweener.cs" />
+    <Compile Include="Core\Message.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -209,7 +210,7 @@
     <Folder Include="GameUI\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
+    <ProjectReference Include="..\monogame\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
       <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
       <Name>MonoGame.Framework.MacOS</Name>
     </ProjectReference>

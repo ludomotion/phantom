@@ -155,7 +155,7 @@ namespace Phantom
             this.graphics.GraphicsProfile = GraphicsProfile.HiDef;
 
 #if DEBUG
-            XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
+			XnaGame.TargetElapsedTime = new TimeSpan(0, 0, 0, 0, 10);
 #endif
 #if DEBUG && !TOUCH
             this.graphics.PreferredBackBufferWidth = (int)this.Width;
@@ -232,11 +232,6 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
-#if MACOS
-			// To prevent a MonoMac bug on exit
-			if (XnaGame.IsActive) 
-				return;
-#endif
 			int startIndex;
 #if DEBUG // Update Profiler
 				Profiler.Instance.BeginRender ();
