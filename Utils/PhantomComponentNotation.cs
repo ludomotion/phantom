@@ -568,8 +568,11 @@ namespace Phantom.Utils
                 return ((CalculatedValue)value).ToString();
             if (value is string)
             {
-                //TODO escape quotes and other characters
-                return "\"" + value + "\"";
+                //TODO escape quotes and other characters better
+                if ((value as string).IndexOf('"') >= 0)
+                    return "\'" + value + "\'";
+                else
+                    return "\"" + value + "\"";
             }
             if (value is bool)
                 return ((bool)value) ? "true" : "false";

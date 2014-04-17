@@ -132,7 +132,14 @@ namespace Phantom.Graphics
                 this.activeRenderPass(info);
             }
 
-            base.Render(info);
+            lock (PhantomGame.Game.GlobalRenderLock)
+            {
+                if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
+                    this.fx.Parameters["World"].SetValue(info.World);
+                this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
+                base.Render(info);
+                this.batch.End();
+            }
         }
 
         protected virtual void RenderPassFullLock(RenderInfo info)

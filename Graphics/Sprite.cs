@@ -221,5 +221,14 @@ namespace Phantom.Graphics
             int y = frame / this.horizontalFramesCount;
             return new Rectangle(x * this.Width, y * this.Height, this.Width, this.Height);
         }
+
+        /*public void DrawToSpriteBatch(SpriteBatch batch, int frame, Color color)
+        {
+            if (frame < 0 || frame >= this.FrameCount)
+                return;
+            Rectangle source = GetRectByFrame(frame);
+            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+
+        }*/
     }
 }
