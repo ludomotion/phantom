@@ -364,10 +364,6 @@ namespace Phantom
 
 			this.touchCollection = new TouchCollection (result);
 
-			foreach (TouchLocation l in this.touchCollection) {
-				Debug.WriteLine (l);
-			}
-
 			mousePrevState = mouseState;
 			previousMouse = mouse;
 			base.Update (elapsed);
