@@ -289,13 +289,15 @@ namespace Phantom.Graphics
             this.stack.RemoveAt(0);
         }
 
+        
+
         private void FillPolygon(List<Vector2> poly, Color color)
         {
             if (poly[0] != poly[poly.Count - 1])
                 poly.Add(poly[0]);
             VertexPositionColor[] vertices = new VertexPositionColor[poly.Count];
             for (int i = 0; i < poly.Count; i++)
-                vertices[i] = new VertexPositionColor(new Vector3(poly[i],0), Color.White);
+                vertices[i] = new VertexPositionColor(new Vector3(poly[i], 0), Color.White);
             short[] indices = Triangulator.Triangulate(poly.ToArray());
 
             this.effect.World = this.info.World;
@@ -306,6 +308,125 @@ namespace Phantom.Graphics
             this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
             this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3);
+        }
+
+        public void FillFourPointGradient(Vector2 topLeftPosition, Vector2 bottomRightPosition, Color topLeft, Color topRight, Color bottomLeft, Color bottomRight)
+        {
+            List<Vector2> poly = new List<Vector2>();
+
+            this.stack.Insert(0, new CanvasAction(0, Vector2.Zero));
+
+            for (int i = 1; i < this.stack.Count; i++)
+            {
+                CanvasAction prev = this.stack[i - 1];
+                CanvasAction curr = this.stack[i];
+                switch (curr.Action)
+                {
+                    case 0:
+                        if (poly.Count != 0)
+                            FillPolygonFourPointGradient(poly, topLeftPosition, bottomRightPosition, topLeft, topRight, bottomLeft, bottomRight);
+                        poly.Clear();
+                        break;
+                    case 1:
+                        if (prev.Action == 0)
+                            poly.Add(prev.Position);
+                        poly.Add(curr.Position);
+                        break;
+                }
+            }
+            if (poly.Count != 0)
+                FillPolygonFourPointGradient(poly, topLeftPosition, bottomRightPosition, topLeft, topRight, bottomLeft, bottomRight);
+
+            this.stack.RemoveAt(0);
+        }
+
+        private void FillPolygonFourPointGradient(List<Vector2> poly, Vector2 topLeftPosition, Vector2 bottomRightPosition, Color topLeft, Color topRight, Color bottomLeft, Color bottomRight)
+        {
+            if (poly[0] != poly[poly.Count - 1])
+                poly.Add(poly[0]);
+            VertexPositionColor[] vertices = new VertexPositionColor[poly.Count];
+            float invDX = 1 / (bottomRightPosition.X - topLeftPosition.X);
+            float invDY = 1 / (bottomRightPosition.Y - topLeftPosition.Y);
+            for (int i = 0; i < poly.Count; i++)
+            {
+                float dx = MathHelper.Clamp((poly[i].X - topLeftPosition.X) * invDX, 0, 1);
+                float dy = MathHelper.Clamp((poly[i].Y - topLeftPosition.Y) * invDY, 0, 1);
+                int r = (int)((topLeft.R * (1 - dx + 1 - dy) + topRight.R * (dx + 1 - dy) + bottomLeft.R * (1 - dx + dy) + bottomRight.R * (dx + dy)))>>2;
+                int g = (int)((topLeft.G * (1 - dx + 1 - dy) + topRight.G * (dx + 1 - dy) + bottomLeft.G * (1 - dx + dy) + bottomRight.G * (dx + dy)))>>2;
+                int b = (int)((topLeft.B * (1 - dx + 1 - dy) + topRight.B * (dx + 1 - dy) + bottomLeft.B * (1 - dx + dy) + bottomRight.B * (dx + dy)))>>2;
+                Color c = new Color(r, g, b, 255);
+                vertices[i] = new VertexPositionColor(new Vector3(poly[i], 0), c);
+            }
+            short[] indices = Triangulator.Triangulate(poly.ToArray());
+
+            this.effect.World = this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = new Vector3(1, 1, 1);
+            this.effect.Alpha = 1f;
+            this.effect.VertexColorEnabled = true;
+
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3);
+            this.effect.VertexColorEnabled = false;
+            
+        }
+
+        public void FillGradient(Vector2 startPosition, Vector2 endPosition, Color startColor, Color endColor)
+        {
+            List<Vector2> poly = new List<Vector2>();
+
+            this.stack.Insert(0, new CanvasAction(0, Vector2.Zero));
+
+            for (int i = 1; i < this.stack.Count; i++)
+            {
+                CanvasAction prev = this.stack[i - 1];
+                CanvasAction curr = this.stack[i];
+                switch (curr.Action)
+                {
+                    case 0:
+                        if (poly.Count != 0)
+                            FillPolygonGradient(poly, startPosition, endPosition, startColor, endColor);
+                        poly.Clear();
+                        break;
+                    case 1:
+                        if (prev.Action == 0)
+                            poly.Add(prev.Position);
+                        poly.Add(curr.Position);
+                        break;
+                }
+            }
+            if (poly.Count != 0)
+                FillPolygonGradient(poly, startPosition, endPosition, startColor, endColor);
+
+            this.stack.RemoveAt(0);
+        }
+
+        private void FillPolygonGradient(List<Vector2> poly, Vector2 startPosition, Vector2 endPosition, Color startColor, Color endColor)
+        {
+            if (poly[0] != poly[poly.Count - 1])
+                poly.Add(poly[0]);
+            VertexPositionColor[] vertices = new VertexPositionColor[poly.Count];
+            Vector2 delta = endPosition - startPosition;
+            float length = delta.Length();
+            for (int i = 0; i < poly.Count; i++)
+            {
+                float d = MathHelper.Clamp(Vector2.Dot(poly[i] - startPosition, delta) / length, 0, 1);
+                vertices[i] = new VertexPositionColor(new Vector3(poly[i], 0), Color.Lerp(startColor, endColor, d));
+            }
+            short[] indices = Triangulator.Triangulate(poly.ToArray());
+
+            this.effect.World = this.info.World;
+            this.effect.Projection = this.info.Projection;
+            this.effect.DiffuseColor = new Vector3(1, 1, 1);
+            this.effect.Alpha = 1f;
+            this.effect.VertexColorEnabled = true;
+
+            this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
+            this.effect.CurrentTechnique.Passes[0].Apply();
+            this.device.DrawUserIndexedPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3);
+            this.effect.VertexColorEnabled = false;
+
         }
 
         public void Begin()
