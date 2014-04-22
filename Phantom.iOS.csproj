@@ -106,6 +106,7 @@
     <Reference Include="TestFlight">
       <HintPath>iOS\TestFlight.dll</HintPath>
     </Reference>
+    <Reference Include="OpenTK" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cameras\CameraComponent.cs" />
@@ -247,9 +248,9 @@
     <Folder Include="GameUI\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.iOS.csproj">
-      <Project>{DB8508BB-9849-4CC2-BC0F-8EB5DACB3C47}</Project>
-      <Name>MonoGame.Framework.iOS</Name>
+    <ProjectReference Include="..\..\lidgren-network-gen3-svn\trunk\Lidgren.Network\Lidgren.Network.Portable.csproj">
+      <Project>{A9BE542E-550D-4C0A-A837-03FCF22FD2FF}</Project>
+      <Name>Lidgren.Network.Portable</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
