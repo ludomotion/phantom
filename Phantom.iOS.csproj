@@ -248,16 +248,16 @@
     <Folder Include="GameUI\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\lidgren-network-gen3-svn\trunk\Lidgren.Network\Lidgren.Network.Portable.csproj">
-      <Project>{A9BE542E-550D-4C0A-A837-03FCF22FD2FF}</Project>
-      <Name>Lidgren.Network.Portable</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\Resource.designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Lib\Lidgren.Network\Lidgren.Network\Lidgren.Network.Portable.csproj">
+      <Project>{A9BE542E-550D-4C0A-A837-03FCF22FD2FF}</Project>
+      <Name>Lidgren.Network.Portable</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
