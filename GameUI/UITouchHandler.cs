@@ -64,7 +64,7 @@ namespace Phantom.GameUI
 						if (focus.OnMouseDown != null)
 							focus.OnMouseDown(focus, l.Position, UIMouseButton.Left);
 					}
-				} else if (l.State == TouchLocationState.Released) {
+				} else if (l.State == TouchLocationState.Released && touchmap.ContainsKey(l.Id)) {
 					UIElement started = touchmap [l.Id];
 					touchmap.Remove (l.Id);
 					if (layer.GetSelected (player) != null) {
