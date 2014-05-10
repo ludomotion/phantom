@@ -35,18 +35,18 @@ namespace Phantom.Cameras.Components
 
 		public override void Update(float elapsed)
 		{
-			this.delay -= elapsed;
 			this.timer += elapsed;
 			base.Update(elapsed);
 			if (this.delay > 0)
 			{
-				float noise = (float)(Math.Cos(timer * 20) * 0.5 + Math.Cos(timer * 60) * 0.3 + Math.Cos(timer * 90) * 0.1);
-				float x = (timer - (this.time / 2));
+                this.delay -= elapsed;
+                float noiseX = (float)(Math.Cos(timer * 20) * 0.5 + Math.Cos(timer * 60) * 0.3 + Math.Cos(timer * 90) * 0.1);
+                float noiseY = (float)(Math.Sin(timer * 18) * 0.5 + Math.Cos(timer * 65) * 0.3 + Math.Sin(timer * 92) * 0.1);
+                float x = (timer - (this.time / 2));
 				float parabola = -(x * x) + this.time;
-				//noise *= parabola;
-                this.Camera.Target.X += noise * 15 * intensity;
-                this.Camera.Target.Y += noise * 15 * intensity;
-				this.Camera.Orientation = noise * MathHelper.PiOver4 * .1f;
+                this.Camera.Target.X += noiseX * intensity * delay/time;
+                this.Camera.Target.Y += noiseY * intensity * delay/time;
+				//this.Camera.Orientation = noise * MathHelper.PiOver4 * .1f;
 			}
 			else
 				this.Camera.Orientation = 0;
