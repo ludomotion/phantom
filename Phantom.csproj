@@ -92,6 +92,8 @@
     <Compile Include="Cameras\Components\CameraEase.cs" />
     <Compile Include="Cameras\Components\CameraOffset.cs" />
     <Compile Include="Cameras\Components\CameraShaker.cs" />
+    <Compile Include="Cameras\Components\CameraZoomShaker.cs" />
+    <Compile Include="Cameras\Components\FixedTarget.cs" />
     <Compile Include="Cameras\Components\RestrictCamera.cs" />
     <Compile Include="Cameras\Components\SinoidZoom.cs" />
     <Compile Include="Cameras\Components\LinearLerp.cs" />
