@@ -58,6 +58,26 @@ namespace Phantom.GameUI
 
 				UIElement focus = layer.GetControlAt (l.Position);
 
+                bool swiped = false;
+                //swipes
+                if (l.State == TouchLocationState.Pressed)
+                {
+                    swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
+                }
+                else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
+                {
+                    Vector3 swipe = swipemap[l.Id];
+                    swipe.X = l.Position.X - swipe.X;
+                    swipe.Y = l.Position.Y - swipe.Y;
+                    swipe.Z = time - swipe.Z;
+
+                    if (Math.Abs(swipe.X) > 20 || Math.Abs(swipe.Y) > 20)
+                    {
+                        swiped = true;
+                        GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
+                    }
+                }
+
                 //elements
 				if (l.State == TouchLocationState.Pressed) {
 					touchmap [l.Id] = focus;
@@ -71,27 +91,19 @@ namespace Phantom.GameUI
 				} else if (l.State == TouchLocationState.Released && touchmap.ContainsKey(l.Id)) {
 					UIElement started = touchmap [l.Id];
 					touchmap.Remove (l.Id);
-					if (layer.GetSelected (player) != null) {
-						layer.GetSelected (player).EndPress (player);
+					if (layer.GetSelected (player) != null) 
+                    {
+                        if (swiped)
+						    layer.GetSelected (player).CancelPress (player);
+                        else
+                            layer.GetSelected(player).EndPress(player);
 					}
-					if (focus == started && focus != null) {
+					if (focus == started && focus != null && !swiped) {
 						focus.ClickAt (l.Position, player);
 					}
 				}
 
-                //swipes
-                if (l.State == TouchLocationState.Pressed)
-                {
-                    swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
-                }
-                else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
-                {
-                    Vector3 swipe = swipemap[l.Id];
-                    swipe.X = l.Position.X - swipe.X;
-                    swipe.Y = l.Position.Y - swipe.Y;
-                    swipe.Z = time - swipe.Z;
-                    GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
-                }
+                
 			}
 		}
 	}
