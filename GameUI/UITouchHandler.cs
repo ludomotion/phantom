@@ -20,13 +20,19 @@ namespace Phantom.GameUI
 		private Dictionary<int, UIElement> touchmap = new Dictionary<int, UIElement> ();
         private Dictionary<int, Vector3> swipemap = new Dictionary<int, Vector3>();
         private float time = 0;
+        private bool doSwipes;
 
 		public UITouchHandler()
-			: base(0) { }
+			: this(0, false) { }
 
 		public UITouchHandler(int player)
-			: base(player) { }
+			: this(player, false) { }
 
+        public UITouchHandler(int player, bool activateSwipes)
+            : base(player) 
+        {
+            this.doSwipes = activateSwipes;
+        }
 
 		public override void OnAdd(Component parent)
 		{
@@ -60,21 +66,24 @@ namespace Phantom.GameUI
 
                 bool swiped = false;
                 //swipes
-                if (l.State == TouchLocationState.Pressed)
+                if (doSwipes)
                 {
-                    swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
-                }
-                else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
-                {
-                    Vector3 swipe = swipemap[l.Id];
-                    swipe.X = l.Position.X - swipe.X;
-                    swipe.Y = l.Position.Y - swipe.Y;
-                    swipe.Z = time - swipe.Z;
-
-                    if (Math.Abs(swipe.X) > 20 || Math.Abs(swipe.Y) > 20)
+                    if (l.State == TouchLocationState.Pressed)
                     {
-                        swiped = true;
-                        GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
+                        swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
+                    }
+                    else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
+                    {
+                        Vector3 swipe = swipemap[l.Id];
+                        swipe.X = l.Position.X - swipe.X;
+                        swipe.Y = l.Position.Y - swipe.Y;
+                        swipe.Z = time - swipe.Z;
+
+                        if (Math.Abs(swipe.X) > 20 || Math.Abs(swipe.Y) > 20)
+                        {
+                            swiped = true;
+                            GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
+                        }
                     }
                 }
 
