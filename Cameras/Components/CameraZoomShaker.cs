@@ -40,7 +40,7 @@ namespace Phantom.Cameras.Components
 			base.Update(elapsed);
 			if (this.delay > 0)
 			{
-                this.delay -= elapsed;
+                this.delay -= Math.Min(elapsed, delay);
                 float d = delay / time;
                 Camera.Zoom = this.originalZoom * (1-(float)Math.Sin(d * MathHelper.Pi * 0.75f)*intensity*0.005f);  
 				//this.Camera.Orientation = noise * MathHelper.PiOver4 * .1f;

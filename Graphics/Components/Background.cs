@@ -55,17 +55,20 @@ namespace Phantom.Graphics.Components
 
         public override void Render(RenderInfo info)
         {
-            this.effect.Projection = Matrix.CreateOrthographicOffCenter(
-                -1, 1, 1, -1,
-                0, 1);
-            PhantomGame.Game.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            if (info.Pass == 0)
             {
-                pass.Apply();
-                PhantomGame.Game.GraphicsDevice.SetVertexBuffer(this.vertex);
-                PhantomGame.Game.GraphicsDevice.Indices = this.index;
-                PhantomGame.Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, this.numVertices, 0, this.numIndexes / 3);
+                this.effect.Projection = Matrix.CreateOrthographicOffCenter(
+                    -1, 1, 1, -1,
+                    0, 1);
+                PhantomGame.Game.GraphicsDevice.BlendState = BlendState.NonPremultiplied;
+
+                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    PhantomGame.Game.GraphicsDevice.SetVertexBuffer(this.vertex);
+                    PhantomGame.Game.GraphicsDevice.Indices = this.index;
+                    PhantomGame.Game.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, this.numVertices, 0, this.numIndexes / 3);
+                }
             }
             base.Render(info);
         }
