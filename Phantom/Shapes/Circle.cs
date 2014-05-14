@@ -172,7 +172,7 @@ namespace Phantom.Shapes
 
 		public override CollisionData Collide(Shape other)
 		{
-			#if IOS
+			#if PLATFORM_IOS
 			// Generic Virtual Methods cannot be called in iOS, due to iOS not allowing JIT-compiling
 			if(other is Circle)
 				return CollisionChecks.CircleCircle(this, (Circle)other);

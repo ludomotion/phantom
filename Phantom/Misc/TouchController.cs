@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if WINDOWS
+#if PLATFORM_WINDOWS
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public enum TouchLocationState
@@ -325,7 +325,7 @@ namespace Phantom
 
 		public override void Update (float elapsed)
 		{
-#if WINDOWS
+#if PLATFORM_WINDOWS
             this.touchCollection = new TouchCollection();
 #else
 			this.touchCollection = TouchPanel.GetState ();

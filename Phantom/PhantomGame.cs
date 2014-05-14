@@ -12,9 +12,9 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using Phantom.Graphics;
 using Phantom.Utils.Performance;
-#if IOS
+#if PLATFORM_IOS
 using MonoTouch.UIKit;
-#elif ANDROID
+#elif PLATFORM_ANDROID
 #endif
 
 #if TOUCH
@@ -123,7 +123,7 @@ namespace Phantom
 
             XnaGame = new Microsoft.Xna.Framework.Game();
             XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
-#if !ANDROID
+#if !PLATFORM_ANDROID
             XnaGame.Window.Title = this.Name;
 #endif
             XnaGame.Content.RootDirectory = "Content";
@@ -234,7 +234,7 @@ namespace Phantom
 				Profiler.Instance.BeginRender ();
 #endif
 
-#if !ANDROID
+#if !PLATFORM_ANDROID
                 lock (this.GlobalRenderLock)
 #endif
                 {
@@ -470,7 +470,9 @@ namespace Phantom
 
         public void Exit()
         {
+#if !PLATFORM_IOS
             XnaGame.Exit();
+#endif
         }
 
 

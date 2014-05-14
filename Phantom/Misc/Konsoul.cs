@@ -51,7 +51,7 @@ namespace Phantom.Misc
         private static string WELCOME = " enter command here - type `help' for information";
         private static string HELP = @"no help yet, survive by your self for now...";
 
-#if !XBOX
+#if !PLATFORM_XBOX
         /**
          * Needed to receive debug output. (from `Debug.WriteLine' etc)
          */
@@ -71,7 +71,7 @@ namespace Phantom.Misc
                 this.console.WriteLine(message);
             }
         }
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
 
         public bool Visible;
 
@@ -90,7 +90,7 @@ namespace Phantom.Misc
         private KeyboardState previousKeyboardState;
         private KeyMap keyMap;
 
-#if !XBOX
+#if !PLATFORM_XBOX
         private readonly KonsoulTraceListener listener;
 #endif
         private SpriteFont font;
@@ -147,7 +147,7 @@ namespace Phantom.Misc
 
             this.echoQueue = new Queue<EchoLine>(this.settings.EchoLines);
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             try
             {
                 this.history = new List<string>(System.IO.File.ReadAllLines("konsoul.dat"));
@@ -164,11 +164,11 @@ namespace Phantom.Misc
             {
                 this.AddLines("failed to load history: " + e.Message);
             }
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 			Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
             this.SetupVertices();
             this.SetupDefaultCommands();
             this.lines.Add("] Konsoul Initialized");
@@ -181,11 +181,11 @@ namespace Phantom.Misc
 
         public override void Dispose()
         {
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 			Trace.Listeners.Remove(this.listener);
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             while (this.history.Count > 0 && this.history[this.history.Count - 1].Trim().ToLower() == "quit")
                 this.history.RemoveAt(this.history.Count - 1);
             try
@@ -196,7 +196,7 @@ namespace Phantom.Misc
             catch (Exception)
             {
             }
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             base.Dispose();
         }
 
@@ -247,7 +247,7 @@ namespace Phantom.Misc
                     maxWidth = Math.Max(k.Length, maxWidth);
                 foreach (string k in this.commands.Keys)
                 {
-#if XBOX
+#if PLATFORM_XBOX
                     builder.Remove(0, builder.Length);
 #else
                     builder.Clear();
@@ -291,7 +291,7 @@ namespace Phantom.Misc
                 }
             });
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             this.Register("dump", "write console scrollback to a file.", delegate(string[] argv)
             {
                 string filename = "dump-" + DateTime.Now.ToString("yyyyMMdd") + ".log";
@@ -307,7 +307,7 @@ namespace Phantom.Misc
                     this.lines.Add(argv[0] + ": failed to write file: " + e.Message);
                 }
             });
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
         }
 
         private void SetupVertices()
@@ -711,7 +711,7 @@ namespace Phantom.Misc
                     trimmed.RemoveAt(trimmed.Count - 1);
                 while (trimmed.Count > 0 && trimmed[0].Length == 0)
                     trimmed.RemoveAt(0);
-#if XBOX
+#if PLATFORM_XBOX
                 documentation = string.Join("\n", trimmed.ToArray());
 #else
                 documentation = string.Join("\n", trimmed);
@@ -752,7 +752,7 @@ namespace Phantom.Misc
             this.nolineBuffer += message;
             while (this.nolineBuffer.Contains("\n"))
             {
-#if XBOX
+#if PLATFORM_XBOX
                 // TODO: Not tested.
                 int ix = this.nolineBuffer.IndexOf('\n');
                 this.AddLines(this.nolineBuffer.Substring(0, ix));

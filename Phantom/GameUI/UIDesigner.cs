@@ -61,7 +61,7 @@ namespace Phantom.GameUI
             }
             Trace.WriteLine("*** End code ***");
 
-#if WINDOWS
+#if PLATFORM_WINDOWS
             Thread thread = new Thread(new ThreadStart(() =>
             {
                 System.Windows.Forms.Clipboard.SetText(code);

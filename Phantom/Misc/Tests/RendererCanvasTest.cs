@@ -270,7 +270,7 @@ namespace Phantom.Misc.Tests
 
         private void NextViewportPolicy()
         {
-#if !XBOX
+#if !PLATFORM_XBOX
             this.policy = (Renderer.ViewportPolicy)((int)(this.policy + 1) % Enum.GetNames(typeof(Renderer.ViewportPolicy)).Length);
             Trace.WriteLine("Changed ViewportPolicy to: " + this.policy);
             this.renderer.ChangeOptions(this.policy, this.renderOptions);
