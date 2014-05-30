@@ -7,13 +7,14 @@ using Phantom.Core;
 
 namespace Phantom.Cameras.Components
 {
-	public class CameraShaker : CameraComponent
+	public class CameraZoomShaker : CameraComponent
 	{
 
 		private float timer;
 		private float delay;
 		private float time;
 		private float intensity;
+		private float originalZoom;
 
 
 		public override void HandleMessage(Message message)
@@ -39,13 +40,9 @@ namespace Phantom.Cameras.Components
 			base.Update(elapsed);
 			if (this.delay > 0)
 			{
-				this.delay -= elapsed;
-				float noiseX = (float)(Math.Cos(timer * 20) * 0.5 + Math.Cos(timer * 60) * 0.3 + Math.Cos(timer * 90) * 0.1);
-				float noiseY = (float)(Math.Sin(timer * 18) * 0.5 + Math.Cos(timer * 65) * 0.3 + Math.Sin(timer * 92) * 0.1);
-				float x = (timer - (this.time / 2));
-				float parabola = -(x * x) + this.time;
-				this.Camera.Target.X += noiseX * intensity * delay/time;
-				this.Camera.Target.Y += noiseY * intensity * delay/time;
+				this.delay -= Math.Min(elapsed, delay);
+				float d = delay / time;
+				Camera.Zoom = this.originalZoom * (1-(float)Math.Sin(d * MathHelper.Pi * 0.75f)*intensity*0.005f);  
 				//this.Camera.Orientation = noise * MathHelper.PiOver4 * .1f;
 			}
 			else
@@ -54,6 +51,8 @@ namespace Phantom.Cameras.Components
 
 		private void Shake(float time, float intensity)
 		{
+			if (delay<=0)
+				this.originalZoom = this.Camera.Zoom;
 			this.intensity = intensity;
 			this.delay = this.time = time;
 			this.timer = 0;
