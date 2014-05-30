@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Name="Phantom" Path="Phantom" Type="Library">
   <References>
     <Reference Include="mscorlib" />
@@ -16,18 +16,14 @@
     </Reference>
   </References>
   <Properties>
-
     <NoWarn>1591,0436</NoWarn>
-
     <RootNamespace>Phantom</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
-
     <CustomDefinitions>
       <Platform Name="Android">TOUCH;PLATFORM_ANDROID</Platform>
       <Platform Name="iOS">TOUCH;PLATFORM_IOS</Platform>
       <Platform Name="WindowsPhone">TOUCH;PLATFORM_WINDOWSPHONE</Platform>
     </CustomDefinitions>
-
   </Properties>
   <Platform Type="Android">
     <AndroidApplication>False</AndroidApplication>
@@ -38,7 +34,9 @@
     <Compile Include="Cameras\Components\CameraEase.cs" />
     <Compile Include="Cameras\Components\CameraOffset.cs" />
     <Compile Include="Cameras\Components\CameraShaker.cs" />
+    <Compile Include="Cameras\Components\CameraZoomShaker.cs" />
     <Compile Include="Cameras\Components\DeadZone.cs" />
+    <Compile Include="Cameras\Components\FixedTarget.cs" />
     <Compile Include="Cameras\Components\FollowEntity.cs" />
     <Compile Include="Cameras\Components\LinearLerp.cs" />
     <Compile Include="Cameras\Components\LinearZoom.cs" />
@@ -89,8 +87,8 @@
     <Compile Include="Graphics\Particles\Particle.cs" />
     <Compile Include="Graphics\Particles\ParticleLayer.cs" />
     <Compile Include="Graphics\Particles\ParticlePass.cs" />
-    <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\Renderer.cs" />
+    <Compile Include="Graphics\RenderInfo.cs" />
     <Compile Include="Graphics\ShapeRenderer.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\SpriteRenderer.cs" />
@@ -118,8 +116,8 @@
     <Compile Include="Physics\Components\PushAwayFromBoundaries.cs" />
     <Compile Include="Physics\Components\Rotator.cs" />
     <Compile Include="Physics\Integrator.cs" />
-    <Compile Include="Physics\TilePosition.cs" />
     <Compile Include="Physics\TiledIntegrator.cs" />
+    <Compile Include="Physics\TilePosition.cs" />
     <Compile Include="Shapes\Circle.cs" />
     <Compile Include="Shapes\CompoundShape.cs" />
     <Compile Include="Shapes\Filters\AllFlagsFilter.cs" />

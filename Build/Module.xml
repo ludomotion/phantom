@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModuleInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Name>Phantom</Name>
-  <DefaultAction>generate</DefaultAction>
+  <DefaultAction>resync</DefaultAction>
   <ModuleAssemblies />
-  <DisableSynchronisation>true</DisableSynchronisation>
 </ModuleInfo>
