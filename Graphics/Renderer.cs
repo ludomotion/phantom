@@ -56,6 +56,7 @@ namespace Phantom.Graphics
         protected SpriteSortMode sortMode;
         protected BlendState blendState;
         private Stopwatch stopWatch;
+		private float overscan = 0f;
 
         private Matrix lastWorld;
 
@@ -64,13 +65,14 @@ namespace Phantom.Graphics
         private Canvas canvas;
         protected Effect fx;
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
+		public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions, float overscan)
         {
             this.Passes = passes;
             this.Policy = viewportPolicy;
             this.Options = renderOptions;
             this.sortMode = Renderer.ToSortMode(renderOptions);
             this.blendState = Renderer.ToBlendState(renderOptions);
+			this.overscan = overscan;
 
             // Doing a GlobalRenderLock because Renderer objects might be constructed in different threads.
 			lock (PhantomGame.Game.GlobalRenderLock)
@@ -86,12 +88,17 @@ namespace Phantom.Graphics
                 this.activeRenderPass = this.RenderPassEndLock;
             this.stopWatch = new Stopwatch();
             this.stopWatch.Start();
-        }
+		}
 
-        public Renderer(int passes, ViewportPolicy viewportPolicy)
-            : this(passes, viewportPolicy, RenderOptions.None)
-        {
-        }
+		public Renderer(int passes, ViewportPolicy viewportPolicy, RenderOptions renderOptions)
+			: this(passes, viewportPolicy, renderOptions, 0)
+		{
+		}
+
+		public Renderer(int passes, ViewportPolicy viewportPolicy)
+			: this(passes, viewportPolicy, RenderOptions.None)
+		{
+		}
 
         public Renderer(int passes)
             :this(passes, default(ViewportPolicy))
@@ -111,7 +118,9 @@ namespace Phantom.Graphics
 				Effect fx = data as Effect;
 				this.fx = fx;
 			}
-
+			if (message == Messages.RenderSetOverscan) {
+				this.overscan = (float)data;
+			}
 			return base.HandleMessage(message, data);
 		}
 
@@ -200,19 +209,28 @@ namespace Phantom.Graphics
             float paddingX = (resolution.Width - width) * .5f;
             float paddingY = (resolution.Height - height) * .5f;
 
+			float overscanX = width * this.overscan;
+			float overscanY = height * this.overscan;
+			if (this.Policy == ViewportPolicy.Fit) {
+				width -= overscanX;
+				height -= overscanY;
+				paddingX += overscanX * .5f;
+				paddingY += overscanY * .5f;
+			}
+
             Viewport fit, fill;
             if (resolution.AspectRatio > designRatio)
             {
-                fit = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
-                fill = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
-                info.Padding = new Vector2(paddingX * designSize.Y / resolution.Height, 0);
+				fit = new Viewport((int)paddingX, (int)paddingY, (int)width, (int)(resolution.Height-overscanY));
+				fill = new Viewport(0, (int)paddingY, (int)(resolution.Width), (int)height);
+				info.Padding = new Vector2(paddingX * designSize.Y / resolution.Height, (int)paddingY);
 
             }
             else
             {
-                fit = new Viewport(0, (int)paddingY, resolution.Width, (int)height);
-                fill = new Viewport((int)paddingX, 0, (int)width, resolution.Height);
-                info.Padding = new Vector2(0, paddingY * designSize.X / resolution.Width );
+				fit = new Viewport((int)paddingX, (int)paddingY, (int)(resolution.Width-overscanX), (int)height);
+				fill = new Viewport((int)paddingX, 0, (int)width, (int)(resolution.Height));
+				info.Padding = new Vector2((int)paddingX, paddingY * designSize.X / resolution.Width );
             }
 
             switch (this.Policy)
@@ -275,7 +293,7 @@ namespace Phantom.Graphics
                     }
                     break;
                 case ViewportPolicy.Fit:
-                    if (resolution.Width != designSize.X || resolution.Height != designSize.Y)
+					if (resolution.Width != designSize.X || resolution.Height != designSize.Y || overscan != 0)
                     {
                         Matrix scale = Matrix.CreateScale(
                             fit.Width / designSize.X,

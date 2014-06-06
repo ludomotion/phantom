@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
+using System.Diagnostics;
+
+
 #if TOUCH
 using Microsoft.Xna.Framework.Input.Touch;
 #endif
@@ -67,8 +70,8 @@ namespace Phantom.Core
 
             this.CurrentKeyboardState = Keyboard.GetState();
             this.CurrentMouseState = Mouse.GetState();
-            for (int i = 0; i < 4; i++)
-                this.CurrentGamePadStates[i] = GamePad.GetState((PlayerIndex)i);
+			for (int i = 0; i < 4; i++)
+				this.CurrentGamePadStates [i] = GamePad.GetState ((PlayerIndex)i);
 #if TOUCH
 			this.CurrentTouchState = TouchPanel.GetState();
 #endif

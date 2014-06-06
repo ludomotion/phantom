@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">Mac</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3B666D28-C9F8-42CB-804E-8E7C6127132E}</ProjectGuid>
     <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -13,6 +13,7 @@
     <LastXamMacNagTime>1-2-2013 13:53:41</LastXamMacNagTime>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
     <AssemblyName>Phantom</AssemblyName>
+    <ReleaseVersion>1.0.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Mac' ">
     <DebugType>none</DebugType>
@@ -194,11 +195,5 @@
     <Folder Include="Utils\" />
     <Folder Include="Utils\Performance\" />
     <Folder Include="GameUI\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.MacOS.csproj">
-      <Project>{36C538E6-C32A-4A8D-A39C-566173D7118E}</Project>
-      <Name>MonoGame.Framework.MacOS</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

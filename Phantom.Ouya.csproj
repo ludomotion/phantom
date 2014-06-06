@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">Android</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{3B666D28-C9F8-42CB-804E-8E7C61271341}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -19,6 +19,7 @@
     <AndroidApplication>True</AndroidApplication>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <TargetFrameworkVersion>v4.1</TargetFrameworkVersion>
+    <ReleaseVersion>1.0.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|Android'">
     <DebugSymbols>True</DebugSymbols>
@@ -168,10 +169,6 @@
     <ProjectReference Include="..\..\MonoGame\ThirdParty\Lidgren.Network\Lidgren.Network.Android.csproj">
       <Project>{565129E0-4EE5-4F6F-B403-C3484C9740BE}</Project>
       <Name>Lidgren.Network.Android</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\MonoGame\MonoGame.Framework\MonoGame.Framework.Ouya.csproj">
-      <Project>{8BEA875D-66D2-4A5F-B137-83D262A3851D}</Project>
-      <Name>MonoGame.Framework.Ouya</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

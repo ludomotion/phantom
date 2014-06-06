@@ -33,6 +33,7 @@ namespace Phantom
 		public const int RenderSetEffect = 40;
         public const int FillColor = 41;
         public const int StrokeColor = 42;
+		public const int RenderSetOverscan = 43;
 
         public const int SetPlayer = 50;
 

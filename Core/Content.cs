@@ -197,7 +197,9 @@ namespace Phantom.Core
                     assets = this.contexts[this.activeContexts[j]];
                     for (int i = 0; i < assets.Count; i++)
                     {
+						#if !ANDROID
 						lock (PhantomGame.Game.GlobalRenderLock)
+						#endif
 						{
 							object o;
 							if(assets[i].Contains("sound"))
@@ -216,7 +218,9 @@ namespace Phantom.Core
             assets = this.contexts[contextName];
             for (int i = 0; i < assets.Count; i++)
             {
+				#if !ANDROID
 				lock (PhantomGame.Game.GlobalRenderLock)
+				#endif
 				{
 					if (assets [i].Contains ("sound"))
 						this.LoadAffixed<SoundEffect> (assets [i]);
