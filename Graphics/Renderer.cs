@@ -221,16 +221,16 @@ namespace Phantom.Graphics
             Viewport fit, fill;
             if (resolution.AspectRatio > designRatio)
             {
-				fit = new Viewport((int)paddingX, (int)paddingY, (int)width, (int)(resolution.Height-overscanY));
+				fit = new Viewport((int)paddingX, (int)(overscanY*.5f), (int)width, (int)(resolution.Height-overscanY));
 				fill = new Viewport(0, (int)paddingY, (int)(resolution.Width), (int)height);
-				info.Padding = new Vector2(paddingX * designSize.Y / resolution.Height, (int)paddingY);
+				info.Padding = new Vector2(paddingX * designSize.Y / resolution.Height, (int)(overscanY*.5f));
 
             }
             else
             {
-				fit = new Viewport((int)paddingX, (int)paddingY, (int)(resolution.Width-overscanX), (int)height);
+				fit = new Viewport((int)(overscanX * .5f), (int)paddingY, (int)(resolution.Width-overscanX), (int)height);
 				fill = new Viewport((int)paddingX, 0, (int)width, (int)(resolution.Height));
-				info.Padding = new Vector2((int)paddingX, paddingY * designSize.X / resolution.Width );
+				info.Padding = new Vector2((int)(overscanX * .5f), paddingY * designSize.X / resolution.Width );
             }
 
             switch (this.Policy)
