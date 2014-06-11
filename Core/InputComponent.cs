@@ -92,8 +92,9 @@ namespace Phantom.Core
 
         public InputComponent(PlayerIndex gamePadIndex, bool messageAllKeys)
         {
-            this.index = gamePadIndex;
+			this.index = (PlayerIndex)Math.Min ((int)gamePadIndex, 3);
             this.messages = messageAllKeys;
+
 
             this.keybinds = new Dictionary<Keys, BindAction>();
             this.mousebinds = new Dictionary<int, BindAction>();
