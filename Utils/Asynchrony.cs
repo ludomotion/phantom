@@ -19,7 +19,7 @@ namespace Phantom.Utils
     /// <exmaple>
     /// Just add an instance of this class to your PhantomGame:
     /// <code>
-    /// PhantomGame.Game.AddComponent(new Asynchrony());
+	/// PhantomGame.Game.AddComponent(Asynchrony.Instance);
     /// </code>
     /// Then you can start creating tasks:
     /// <code>
@@ -76,6 +76,9 @@ namespace Phantom.Utils
     {
         /// <summary>Quick access to the Asynchrony instance.</summary>
         public static Asynchrony Instance { get; private set; }
+		static Asynchrony() {
+			Asynchrony.Instance = new Asynchrony();
+		}
 
         /// <summary>
         /// This List contains all tasks as ITaskTester. This contruction
@@ -88,9 +91,8 @@ namespace Phantom.Utils
         /// Nothing to configure, just add an instance of this class to 
         /// the PhantomGame.
         /// </summary>
-        public Asynchrony()
+		private Asynchrony()
         {
-            Asynchrony.Instance = this;
             this.tasks = new List<ITaskTester>();
         }
 
