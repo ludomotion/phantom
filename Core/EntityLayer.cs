@@ -234,7 +234,7 @@ namespace Phantom.Core
         /// <returns></returns>
         public List<Entity> GetEntitiesCloseTo(Vector2 position, float distance)
         {
-            return integrator.GetEntitiesCloseTo(position, distance);
+            return new List<Entity>(integrator.GetEntitiesCloseTo(position, distance));
         }
 
         public IEnumerable<Entity> GetEntitiesInRectSorted(Vector2 topLeft, Vector2 bottomRight, bool partial)
