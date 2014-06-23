@@ -226,6 +226,17 @@ namespace Phantom.Core
             return integrator.GetEntityCloseTo(position, distance);
         }
 
+        /// <summary>
+        /// Returns all entities that are at or closer than the specified distance to the specified location.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public List<Entity> GetEntitiesCloseTo(Vector2 position, float distance)
+        {
+            return integrator.GetEntitiesCloseTo(position, distance);
+        }
+
         public IEnumerable<Entity> GetEntitiesInRectSorted(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             List<Entity> entities = new List<Entity>();

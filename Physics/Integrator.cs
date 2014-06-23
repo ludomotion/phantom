@@ -280,6 +280,19 @@ namespace Phantom.Physics
         }
 
         /// <summary>
+        /// Returns all entities that are on the indicated position or within the indicated distance.
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
+        public virtual IEnumerable<Entity> GetEntitiesCloseTo(Vector2 position, float distance)
+        {
+            for (int i = 0; i < entities.Count; i++)
+                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.DistanceTo(position).LengthSquared() < distance * distance)
+                    yield return entities[i];
+        }
+
+        /// <summary>
         /// Returns all entities in the indicated rectangle
         /// </summary>
         /// <param name="topLeft"></param>
