@@ -55,7 +55,7 @@ namespace Phantom.Graphics.Components
 
         public override void Render(RenderInfo info)
         {
-            if (info.Pass == 0)
+            if (info!=null && info.Pass == 0)
             {
                 this.effect.Projection = Matrix.CreateOrthographicOffCenter(
                     -1, 1, 1, -1,
