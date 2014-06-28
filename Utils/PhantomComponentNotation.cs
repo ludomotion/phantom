@@ -13,7 +13,7 @@ namespace Phantom.Utils
 {
     public class PCNKeyword
     {
-        public static string[] Keywords = new string[] { "auto", "odd", "even" };
+        public static string[] Keywords = new string[] { "auto", "odd", "even", "mapWidth", "mapHeight", "symbolCount" };
 
         public string Value;
         public PCNKeyword(string value)
@@ -659,6 +659,7 @@ namespace Phantom.Utils
                 value2 = 0.0f;
             if (value2 == null && value1 is bool)
                 value2 = false;
+
 
             switch (oper)
             {
