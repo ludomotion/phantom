@@ -318,30 +318,55 @@ namespace Phantom.Physics
 
         public override Entity GetEntityCloseTo(Vector2 position, float distance)
         {
-            int tX = (int)(position.X / this.tileSize);
-            int tY = (int)(position.Y / this.tileSize);
-            int minX = Math.Max(tX - 1, 0);
-            int maxX = Math.Min(tX + 1, this.tilesX - 1);
-            int minY = Math.Max(tY - 1, 0);
-            int maxY = Math.Min(tY + 1, this.tilesY - 1);
+            int tX1 = (int)((position.X - distance) / this.tileSize);
+            int tY1 = (int)((position.Y - distance) / this.tileSize);
+            int tX2 = (int)((position.X + distance) / this.tileSize);
+            int tY2 = (int)((position.Y + distance) / this.tileSize);
+            int minX = Math.Max(tX1 - 1, 0);
+            int maxX = Math.Min(tX2 + 1, this.tilesX - 1);
+            int minY = Math.Max(tY1 - 1, 0);
+            int maxY = Math.Min(tY2 + 1, this.tilesY - 1);
 
-            for (int i = 0; i < neighbors.Length; i += 2)
+            for (int y = minY; y <= maxY; y++)
             {
-                int x = tX + neighbors[i];
-                int y = tY + neighbors[i + 1];
-                if (x >= minX && x <= maxX && y >= minY && y <= maxY)
+                for (int x = minX; x <= maxX; x++)
                 {
                     Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+                    for (int m = tt.Entities.Count - 1; m >= 0; m--)
                     {
-                        Entity o = tt.Entities[j];
+                        Entity o = tt.Entities[m];
                         if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
                             return o;
                     }
                 }
-
             }
             return null;
+        }
+
+        public override IEnumerable<Entity> GetEntitiesCloseTo(Vector2 position, float distance)
+        {
+            int tX1 = (int)((position.X - distance) / this.tileSize);
+            int tY1 = (int)((position.Y - distance) / this.tileSize);
+            int tX2 = (int)((position.X + distance) / this.tileSize);
+            int tY2 = (int)((position.Y + distance) / this.tileSize);
+            int minX = Math.Max(tX1 - 1, 0);
+            int maxX = Math.Min(tX2 + 1, this.tilesX - 1);
+            int minY = Math.Max(tY1 - 1, 0);
+            int maxY = Math.Min(tY2 + 1, this.tilesY - 1);
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Tile tt = this.tiles[y * this.tilesX + x];
+                    for (int m = tt.Entities.Count - 1; m >= 0; m--)
+                    {
+                        Entity o = tt.Entities[m];
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
+                            yield return o;
+                    }
+                }
+            }
         }
 
     }
