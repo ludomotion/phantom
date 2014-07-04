@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input.Touch;
 
-#if PLATFORM_WINDOWS
+#if WINDOWS
 namespace Microsoft.Xna.Framework.Input.Touch
 {
     public enum TouchLocationState
@@ -43,7 +43,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         /// </summary>
         internal static readonly TouchLocation Invalid = new TouchLocation();
 
-        #region Properties
+#region Properties
 
         internal Vector2 PressPosition
         {
@@ -99,7 +99,7 @@ namespace Microsoft.Xna.Framework.Input.Touch
         
         #endregion
         
-        #region Constructors
+#region Constructors
 
         public TouchLocation(int id, TouchLocationState state, Vector2 position)
             : this(id, state, position, TouchLocationState.Invalid, Vector2.Zero)
@@ -321,12 +321,16 @@ namespace Phantom
 		{
 			this.ViewportPolicy = viewportPolicy;
 			previousMouse = Mouse.GetState ();
+#if WINDOWS
+            this.touchCollection = new TouchCollection();
+#else
 			this.touchCollection = TouchPanel.GetState ();
+#endif
 		}
 
 		public override void Update (float elapsed)
 		{
-#if PLATFORM_WINDOWS
+#if WINDOWS
             this.touchCollection = new TouchCollection();
 #else
 			this.touchCollection = TouchPanel.GetState ();
