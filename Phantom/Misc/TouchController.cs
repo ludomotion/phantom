@@ -321,6 +321,7 @@ namespace Phantom
 		{
 			this.ViewportPolicy = viewportPolicy;
 			previousMouse = Mouse.GetState ();
+			this.touchCollection = TouchPanel.GetState ();
 		}
 
 		public override void Update (float elapsed)

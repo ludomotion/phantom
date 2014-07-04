@@ -31,3 +31,4 @@ publish
 *_i.c
 *_p.c
 *TemporaryKey.pfx
+*.speccache
