@@ -24,6 +24,7 @@
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <CustomDefinitions>
       <Platform Name="Windows">PLATFORM_WINDOWS</Platform>
+      <Platform Name="WindowsGL">PLATFORM_WINDOWS</Platform>
       <Platform Name="Android">TOUCH;PLATFORM_ANDROID</Platform>
       <Platform Name="iOS">TOUCH;PLATFORM_IOS</Platform>
       <Platform Name="WindowsPhone">TOUCH;PLATFORM_WINDOWSPHONE</Platform>
@@ -33,6 +34,10 @@
     <AndroidApplication>False</AndroidApplication>
   </Platform>
   <Files>
+    <Compile Include="Audio\Audio.cs" />
+    <Compile Include="Audio\AudioInfo.cs" />
+    <Compile Include="Audio\Music.cs" />
+    <Compile Include="Audio\Sound.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\CameraComponent.cs" />
     <Compile Include="Cameras\Components\CameraEase.cs" />
