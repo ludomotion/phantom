@@ -57,6 +57,7 @@ namespace Phantom.Audio
 
         public override void Update(float elapsed)
         {
+#if !NOAUDIO
             for (int i = this.handles.Count - 1; i >= 0; --i)
             {
                 var handle = this.handles[i];
@@ -86,12 +87,13 @@ namespace Phantom.Audio
                     }
                 }
             }
-
+#endif
             base.Update(elapsed);
         }
 
         public static void RegisterSound(string context, string asset, float volume=-1, int limit=-1)
         {
+#if !NOAUDIO
             PhantomGame.Game.Content.Register(context, asset);
             string name = Path.GetFileNameWithoutExtension(asset);
             Instance.audiolist.Add(name, new AudioInfo
@@ -102,10 +104,12 @@ namespace Phantom.Audio
                 DefaultVolume = volume,
                 Limit = limit
             });
+#endif
         }
 
         public static void RegisterMusic(string context, string asset, float volume=-1)
         {
+#if !NOAUDIO
             PhantomGame.Game.Content.Register(context, asset);
             string name = Path.GetFileNameWithoutExtension(asset);
             Instance.audiolist.Add(name, new AudioInfo
@@ -116,6 +120,7 @@ namespace Phantom.Audio
                 DefaultVolume = volume,
                 Limit = 1
             }); 
+#endif
         }
 
         public static void StopAllAudio()

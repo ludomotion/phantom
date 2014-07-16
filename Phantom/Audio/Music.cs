@@ -25,6 +25,7 @@ namespace Phantom.Audio
 
         public static void Start(string name, bool looped=true)
         {
+#if !NOAUDIO
             name = name.Trim().ToLower();
 
             Stop();
@@ -52,11 +53,12 @@ namespace Phantom.Audio
 
             Audio.Instance.AddHandle(handle);
             current = handle;
-            return;
+#endif
         }
 
         public static void Stop()
         {
+#if !NOAUDIO
             if (current != null && current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing)
             {
                 if (Music.FadeTime != 0)
@@ -72,6 +74,7 @@ namespace Phantom.Audio
                 }
             }
             current = null;
+#endif
         }
     }
 }

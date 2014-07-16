@@ -15,6 +15,7 @@ namespace Phantom.Audio
     {
         public static Audio.Handle Play(string sound, float volume=-1f, float panning=0f)
         {
+#if !NOAUDIO
             sound = sound.Trim().ToLower();
 
             var info = Audio.Instance.audiolist[sound];
@@ -49,10 +50,14 @@ namespace Phantom.Audio
             };
             Audio.Instance.AddHandle(handle);
             return handle;
+#else
+            return default(Audio.Handle);
+#endif
         }
 
         public static Audio.Handle FadeIn(string sound, bool looped, float duration, TweenFunction function = null, float volume = -1)
         {
+#if !NOAUDIO
             sound = sound.Trim().ToLower();
             if (function == null)
                 function = TweenFunctions.Linear;
@@ -70,30 +75,39 @@ namespace Phantom.Audio
             handle.FadeVolume = Audio.Volume(volume, info);
 
             return handle;
+#else
+            return default(Audio.Handle);
+#endif
         }
 
         public static void FadeOut(Audio.Handle handle, float duration, TweenFunction function = null)
         {
+#if !NOAUDIO
             if (function == null)
                 function = TweenFunctions.Linear;
             handle.FadeState = -1;
             handle.FadeDuration = handle.FadeTimer = duration;
             handle.FadeFunction = function;
             handle.FadeVolume = handle.Instance.Volume;
+#endif
         }
 
         public static void Stop(string sound)
         {
+#if !NOAUDIO
             if (!Audio.Instance.handlesMap.ContainsKey(sound))
                 return;
             for (int i = Audio.Instance.handlesMap[sound].Count - 1; i >= 0; --i)
                 Stop(Audio.Instance.handlesMap[sound][i]);
+#endif
         }
 
         public static void Stop(Audio.Handle sound)
         {
+#if !NOAUDIO
             sound.Instance.IsLooped = false;
             sound.Instance.Stop();
+#endif
         }
 
 

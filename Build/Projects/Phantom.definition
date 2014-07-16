@@ -23,7 +23,7 @@
     <RootNamespace>Phantom</RootNamespace>
     <PlatformSpecificOutputFolder>True</PlatformSpecificOutputFolder>
     <CustomDefinitions>
-      <Platform Name="Windows">PLATFORM_WINDOWS</Platform>
+      <Platform Name="Windows">PLATFORM_WINDOWS;NOAUDIO</Platform>
       <Platform Name="WindowsGL">PLATFORM_WINDOWS</Platform>
       <Platform Name="Android">TOUCH;PLATFORM_ANDROID</Platform>
       <Platform Name="iOS">TOUCH;PLATFORM_IOS</Platform>
