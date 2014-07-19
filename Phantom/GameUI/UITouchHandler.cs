@@ -90,22 +90,24 @@ namespace Phantom.GameUI
                 //elements
 				if (l.State == TouchLocationState.Pressed) {
 					touchmap [l.Id] = focus;
-					this.layer.SetSelected(player, focus);
+                    this.layer.SetSelected(player, focus);
 					if (focus != null)
 					{
 						focus.StartPress(player);
-						if (focus.OnMouseDown != null)
-							focus.OnMouseDown(focus, l.Position, UIMouseButton.Left);
+                        if (focus.OnMouseDown != null)
+                        {
+                            focus.OnMouseDown(focus, l.Position, UIMouseButton.Left);
+                        }
 					}
 				} else if (l.State == TouchLocationState.Released && touchmap.ContainsKey(l.Id)) {
 					UIElement started = touchmap [l.Id];
 					touchmap.Remove (l.Id);
 					if (layer.GetSelected (player) != null) 
                     {
-                        if (swiped)
-						    layer.GetSelected (player).CancelPress (player);
-                        else
+                        if (focus == started && focus != null && !swiped)
                             layer.GetSelected(player).EndPress(player);
+                        else
+						    layer.GetSelected (player).CancelPress (player);
 					}
 					if (focus == started && focus != null && !swiped) {
 						focus.ClickAt (l.Position, player);
