@@ -34,7 +34,11 @@ namespace Phantom.Audio
             var effect = Audio.Instance.Load(info.Asset);
             var instance = effect.CreateInstance();
 
-            instance.Volume = Volume;
+            instance.Volume = Volume * Sound.MasterVolume;
+
+            if (instance.Volume <= 0)
+                return;
+
             instance.IsLooped = looped;
             instance.Play();
 

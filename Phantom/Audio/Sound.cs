@@ -13,7 +13,10 @@ namespace Phantom.Audio
 {
     public class Sound
     {
-        public static Audio.Handle Play(string sound, float volume=-1f, float panning=0f)
+        public static float MasterVolume = 1f;
+        public static float FXVolume = 1f;
+
+        public static Audio.Handle Play(string sound, float volume = -1f, float panning = 0f)
         {
 #if !NOAUDIO
             sound = sound.Trim().ToLower();
@@ -28,7 +31,7 @@ namespace Phantom.Audio
             }
 
             // Don't play if volume is off:
-            volume = Audio.Volume(volume, info);
+            volume = Audio.Volume(volume, info) * MasterVolume * FXVolume;
             if (volume <= 0)
                 return default(Audio.Handle);
 
