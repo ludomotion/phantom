@@ -162,8 +162,14 @@ namespace Phantom
             this.graphics.PreferredBackBufferHeight = (int)this.Height;
             this.graphics.IsFullScreen = false;
 #else
+
+			#if PLATFORM_ANDROID
+			this.graphics.PreferredBackBufferWidth = DeviceHardware.ScreenWidth;
+			this.graphics.PreferredBackBufferHeight = DeviceHardware.ScreenHeight;
+			#else
             this.graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             this.graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+			#endif
             this.graphics.IsFullScreen = true;
 
 			this.graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
