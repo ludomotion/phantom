@@ -19,6 +19,7 @@ namespace Phantom.GameUI
 		private TouchController touch;
 		private Dictionary<int, UIElement> touchmap = new Dictionary<int, UIElement> ();
         private Dictionary<int, Vector3> swipemap = new Dictionary<int, Vector3>();
+        private Dictionary<int, Vector3> dragmap = new Dictionary<int, Vector3>();
         private float time = 0;
         private bool doSwipes;
 
@@ -71,6 +72,7 @@ namespace Phantom.GameUI
                     if (l.State == TouchLocationState.Pressed)
                     {
                         swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
+                        dragmap[l.Id] = new Vector3(l.Position.X, l.Position.Y, 0);
                     }
                     else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
                     {
@@ -85,7 +87,27 @@ namespace Phantom.GameUI
                             GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
                         }
                     }
+                    
+                    if (l.State == TouchLocationState.Moved && dragmap.ContainsKey(l.Id))
+                    {
+                        Vector3 drag = dragmap[l.Id];
+
+                        Vector2 dragDelta = new Vector2();
+                        dragDelta.X = l.Position.X - drag.X;
+                        dragDelta.Y = l.Position.Y - drag.Y;
+
+                        if (drag.Z > 0 || dragDelta.Length() > 20)
+                        {
+                            drag.X = l.Position.X;
+                            drag.Y = l.Position.Y;
+                            drag.Z = 1;
+                            dragmap[l.Id] = drag;
+                            GetAncestor<UILayer>().Parent.HandleMessage(Messages.UIDrag, dragDelta);
+                        }
+                    }
                 }
+
+
 
                 //elements
 				if (l.State == TouchLocationState.Pressed) {
