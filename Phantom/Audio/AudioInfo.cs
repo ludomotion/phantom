@@ -11,6 +11,7 @@ namespace Phantom.Audio
         public string Asset;
         public string Name;
         public float DefaultVolume;
-        public int Limit;
+		public int Limit;
+		public float Duration;
     }
 }

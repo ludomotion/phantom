@@ -49,7 +49,8 @@ namespace Phantom.Audio
                 Success = true,
                 Instance = instance,
                 Name = info.Name,
-                Type = Audio.Type.Sound
+                Type = Audio.Type.Sound,
+				Looped = false
             };
             Audio.Instance.AddHandle(handle);
             return handle;

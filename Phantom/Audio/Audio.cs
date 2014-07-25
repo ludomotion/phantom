@@ -6,6 +6,8 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Audio;
 using System.IO;
 using Phantom.Utils;
+using Microsoft.Xna.Framework.Media;
+using System.Threading;
 
 namespace Phantom.Audio
 {
@@ -16,8 +18,13 @@ namespace Phantom.Audio
         {
             public bool Success;
             public Audio.Type Type;
-            public string Name;
-            public SoundEffectInstance Instance;
+			public string Name;
+			public SoundEffectInstance Instance;
+			public Song SongInstance;
+			public Thread Thread;
+			public bool Looped;
+
+			public float Position;
 
             internal int FadeState;
             internal float FadeDuration;
@@ -61,7 +68,8 @@ namespace Phantom.Audio
             for (int i = this.handles.Count - 1; i >= 0; --i)
             {
                 var handle = this.handles[i];
-                if (handle.Instance.State == SoundState.Stopped)
+				var info = this.audiolist[handle.Name];
+				if (handle.Instance != null && handle.Instance.State == SoundState.Stopped)
                 {
                     RemoveHandle(handle);
                     continue;
@@ -70,20 +78,38 @@ namespace Phantom.Audio
                 {
                     handle.FadeTimer -= elapsed;
                     if (handle.FadeTimer <= 0)
-                    {
-                        handle.Instance.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
-                        if (handle.FadeState == -1)
-                            handle.Instance.Stop();
+					{
+						if(handle.Type == Audio.Type.Music) {
+							MediaPlayer.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
+	                        if (handle.FadeState == -1)
+							{
+								handle.Thread.Abort();
+								MediaPlayer.Stop();
+							}
+						} else {
+							handle.Instance.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
+							if (handle.FadeState == -1)
+							{
+								handle.Instance.Stop();
+							}
+						}
                         handle.FadeState = 0;
                         handle.FadeTimer = 0;
                     }
                     else
                     {
-                        float t = handle.FadeTimer / handle.FadeDuration;
-                        if (handle.FadeState == 1) // fade in
-                            handle.Instance.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
-                        else // fade out
-                            handle.Instance.Volume = Math.Max(0, Math.Min(handle.FadeFunction(t) * handle.FadeVolume, 1)); 
+						float t = handle.FadeTimer / handle.FadeDuration;
+						if(handle.Type == Audio.Type.Music) {
+							if (handle.FadeState == 1) // fade in
+								MediaPlayer.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
+							else // fade out
+								MediaPlayer.Volume = Math.Max(0, Math.Min(handle.FadeFunction(t) * handle.FadeVolume, 1)); 
+						} else {
+	                        if (handle.FadeState == 1) // fade in
+	                            handle.Instance.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
+	                        else // fade out
+	                            handle.Instance.Volume = Math.Max(0, Math.Min(handle.FadeFunction(t) * handle.FadeVolume, 1)); 
+						}
                     }
                 }
             }
@@ -107,10 +133,10 @@ namespace Phantom.Audio
 #endif
         }
 
-        public static void RegisterMusic(string context, string asset, float volume=-1)
+		public static void RegisterMusic(string context, string asset, float volume=-1, float duration=-1)
         {
 #if !NOAUDIO
-            PhantomGame.Game.Content.Register(context, asset);
+//            PhantomGame.Game.Content.Register(context, asset);
             string name = Path.GetFileNameWithoutExtension(asset);
             Instance.audiolist.Add(name, new AudioInfo
             {
@@ -118,7 +144,8 @@ namespace Phantom.Audio
                 Name = name,
                 Asset = asset,
                 DefaultVolume = volume,
-                Limit = 1
+                Limit = 1,
+				Duration = duration
             }); 
 #endif
         }
@@ -129,10 +156,15 @@ namespace Phantom.Audio
             Music.Stop();
         }
 
-        internal SoundEffect Load(string asset)
-        {
-            return game.Content.Load<SoundEffect>(asset);
-        }
+		internal SoundEffect Load(string asset)
+		{
+			return game.Content.Load<SoundEffect>(asset);
+		}
+
+		internal Song LoadSong(string asset)
+		{
+			return game.Content.Load<Song>(asset);
+		}
 
         internal void AddHandle(Audio.Handle handle)
         {

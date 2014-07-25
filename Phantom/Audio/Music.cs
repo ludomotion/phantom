@@ -5,6 +5,8 @@ using System.Text;
 using Phantom.Core;
 using System.Diagnostics;
 using Phantom.Utils;
+using Microsoft.Xna.Framework.Media;
+using System.Threading;
 
 namespace Phantom.Audio
 {
@@ -28,32 +30,47 @@ namespace Phantom.Audio
 #if !NOAUDIO
             name = name.Trim().ToLower();
 
-            Stop();
+			MediaPlayer.Stop();
 
             var info = Audio.Instance.audiolist[name];
-            var effect = Audio.Instance.Load(info.Asset);
-            var instance = effect.CreateInstance();
+            var song = Audio.Instance.LoadSong(info.Asset);
 
-            instance.Volume = Volume * Sound.MasterVolume;
+			float duration = info.Duration > 0 ? info.Duration : (float)song.Duration.TotalSeconds;
 
-            if (instance.Volume <= 0)
+			var volume = (info.DefaultVolume > 0 ? info.DefaultVolume * Music.Volume : Music.Volume) * Sound.MasterVolume;
+			MediaPlayer.Volume = volume;
+
+			if (MediaPlayer.Volume <= 0)
                 return;
 
-            instance.IsLooped = looped;
-            instance.Play();
+			if(FadeTime >0)
+				MediaPlayer.Volume = 0;
+
+			var t = new Thread(new ThreadStart(delegate() {
+				do {
+					MediaPlayer.Play(song);
+					Thread.Sleep((int)(duration * 1000f));
+					//MediaPlayer.Stop();
+				} while( looped );
+			}));
+			t.Start();
 
             var handle = new Audio.Handle
             {
                 Success = true,
-                Instance = instance,
+				SongInstance = song,
                 Name = info.Name,
-                Type = Audio.Type.Music
+                Type = Audio.Type.Music,
+				Thread = t,
+				Looped = looped,
+				Position = 0
             };
 
             handle.FadeState = 1;
             handle.FadeDuration = handle.FadeTimer = Music.FadeTime;
             handle.FadeFunction = TweenFunctions.Linear;
-            handle.FadeVolume = info.DefaultVolume > 0 ? info.DefaultVolume * Music.Volume : Music.Volume;
+			handle.FadeVolume = volume;
+
 
             Audio.Instance.AddHandle(handle);
             current = handle;
@@ -63,18 +80,20 @@ namespace Phantom.Audio
         public static void Stop()
         {
 #if !NOAUDIO
-            if (current != null && current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing)
+			if (current != null && ((current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing) || current.SongInstance != null))
             {
                 if (Music.FadeTime != 0)
-                {
+				{
+					current.Thread.Abort();
                     current.FadeState = -1;
                     current.FadeDuration = current.FadeTimer = Music.FadeTime;
                     current.FadeFunction = TweenFunctions.Linear;
-                    current.FadeVolume = current.Instance.Volume;
+					current.FadeVolume = current.Instance != null ?  current.Instance.Volume : MediaPlayer.Volume;
                 }
                 else
                 {
-                    current.Instance.Stop();
+					current.Thread.Abort();
+					MediaPlayer.Stop();
                 }
             }
             current = null;
