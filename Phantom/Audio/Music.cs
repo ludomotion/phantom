@@ -77,12 +77,12 @@ namespace Phantom.Audio
 #endif
         }
 
-        public static void Stop()
+		public static void Stop(bool now=false)
         {
 #if !NOAUDIO
 			if (current != null && ((current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing) || current.SongInstance != null))
             {
-                if (Music.FadeTime != 0)
+				if (Music.FadeTime != 0 && !now)
 				{
 					current.Thread.Abort();
                     current.FadeState = -1;
