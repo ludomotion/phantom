@@ -69,7 +69,13 @@ namespace Phantom
         public float MinimalRendering
         {
             get { return minimalRendering; }
-            set { minimalRendering = Math.Max(minimalRendering, value); }
+            set { 
+                minimalRendering = Math.Max(minimalRendering, value);
+#if DEBUG
+                if (minimalRendering >= 0)
+                    XnaGame.Window.Title = "RENDERING...";
+#endif
+            }
         }
 #endif
 
@@ -247,8 +253,14 @@ namespace Phantom
 #if MINIMALRENDERING
             if (minimalRendering == 0)
                 return;
-            else if (minimalRendering>0)
+            else if (minimalRendering > 0)
+            {
                 minimalRendering -= Math.Min((float)gameTime.ElapsedGameTime.TotalSeconds, minimalRendering);
+#if DEBUG
+                if (minimalRendering == 0)
+                    XnaGame.Window.Title = "NOT RENDERING!";
+#endif
+            }
 #endif
 
 			int startIndex;
