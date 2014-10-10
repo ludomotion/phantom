@@ -27,10 +27,14 @@ namespace Phantom.Audio
 
         public static void Start(string name, bool looped=true)
         {
+			Debug.WriteLine ("[Music] Start " + name + (looped ? " (looped)" : ""));
 #if !NOAUDIO
             name = name.Trim().ToLower();
 
 			MediaPlayer.Stop();
+			if(current != null && current.Thread != null) {
+				current.Thread.Abort();
+			}
 
             var info = Audio.Instance.audiolist[name];
             var song = Audio.Instance.LoadSong(info.Asset);
@@ -38,6 +42,7 @@ namespace Phantom.Audio
 			float duration = info.Duration > 0 ? info.Duration : (float)song.Duration.TotalSeconds;
 
 			var volume = (info.DefaultVolume > 0 ? info.DefaultVolume * Music.Volume : Music.Volume) * Sound.MasterVolume;
+			Debug.WriteLine("[Music] volume is " + volume);
 			MediaPlayer.Volume = volume;
 
 			if (MediaPlayer.Volume <= 0)
@@ -47,11 +52,15 @@ namespace Phantom.Audio
 				MediaPlayer.Volume = 0;
 
 			var t = new Thread(new ThreadStart(delegate() {
+				var tlooped = looped;
+				var tsong = song;
+				var tduration = duration;
 				do {
-					MediaPlayer.Play(song);
-					Thread.Sleep((int)(duration * 1000f));
+					Debug.WriteLine("[Music] (re)starting music in it's thread " + tsong.Name + name);
+					MediaPlayer.Play(tsong);
+					Thread.Sleep((int)(tduration * 1000f));
 					//MediaPlayer.Stop();
-				} while( looped );
+				} while( tlooped );
 			}));
 			t.Start();
 
@@ -78,7 +87,8 @@ namespace Phantom.Audio
         }
 
 		public static void Stop(bool now=false)
-        {
+		{
+			Debug.WriteLine ("[Music] Stop " + (now ? " (now)" : ""));
 #if !NOAUDIO
 			if (current != null && ((current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing) || current.SongInstance != null))
             {
@@ -92,6 +102,7 @@ namespace Phantom.Audio
                 }
                 else
                 {
+					Debug.WriteLine("[Music] Actually stopping music");
 					current.Thread.Abort();
 					MediaPlayer.Stop();
                 }
