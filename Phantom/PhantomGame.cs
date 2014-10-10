@@ -64,6 +64,15 @@ namespace Phantom
         public Content Content { get; private set; }
 
         private float multiplier;
+#if MINIMALRENDERING
+        private float minimalRendering = -1;
+        public float MinimalRendering
+        {
+            get { return minimalRendering; }
+            set { minimalRendering = Math.Max(minimalRendering, value); }
+        }
+#endif
+
 
         private IList<GameState> states;
         public GameState CurrentState
@@ -235,6 +244,13 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
+#if MINIMALRENDERING
+            if (minimalRendering == 0)
+                return;
+            else if (minimalRendering>0)
+                minimalRendering -= Math.Min((float)gameTime.ElapsedGameTime.TotalSeconds, minimalRendering);
+#endif
+
 			int startIndex;
 #if DEBUG // Update Profiler
 				Profiler.Instance.BeginRender ();
@@ -491,5 +507,18 @@ namespace Phantom
             }
             return null;
         }
+
+#if MINIMALRENDERING
+        public void DisableMinimalRendering()
+        {
+            minimalRendering = -1;
+        }
+
+        public void PauseMinimalRendering()
+        {
+            minimalRendering = 0;
+        }
+#endif
+
     }
 }
