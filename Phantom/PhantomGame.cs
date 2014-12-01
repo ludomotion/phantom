@@ -80,7 +80,7 @@ namespace Phantom
 #endif
 
 
-        private IList<GameState> states;
+        protected IList<GameState> states;
         public GameState CurrentState
         {
             get
@@ -197,6 +197,8 @@ namespace Phantom
 			int h = this.graphics.PreferredBackBufferHeight;
 
 			this.Resolution = new Viewport(0, 0, w, h);
+
+            XnaGame.Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         protected virtual void LoadContent(Content content)
@@ -332,8 +334,35 @@ namespace Phantom
             {
                 Profiler.Instance.Visible = !Profiler.Instance.Visible;
             });
+            this.Console.Register("fullscreen", "Toggles fullscreen mode", delegate(string[] argv)
+            {
+                this.graphics.IsFullScreen = !this.graphics.IsFullScreen;
+                XnaGame.Window.ClientSizeChanged -= Window_ClientSizeChanged;
+                Window_ClientSizeChanged(null, null);
+            });
 #endif
 
+        }
+
+        private void Window_ClientSizeChanged(object sender, EventArgs e)
+        {
+            XnaGame.Window.ClientSizeChanged -= Window_ClientSizeChanged;
+
+            Viewport previous = this.Resolution;
+            int width = 0;
+            int height = 0;
+
+            if (!this.graphics.IsFullScreen)
+            {
+                width = XnaGame.Window.ClientBounds.Width;
+                height = XnaGame.Window.ClientBounds.Height;
+            }
+
+            this.SetResolution(width, height, this.graphics.IsFullScreen);
+            foreach (GameState state in this.states)
+                state.ViewportChanged(previous, this.Resolution);
+
+            XnaGame.Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         public void SetResolution(int width, int height, bool fullscreen)
