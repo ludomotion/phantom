@@ -136,7 +136,8 @@ namespace Phantom.GameUI
             : base (position)
         {
             this.Name = name;
-            AddComponent(shape);
+            if (shape!=null)
+                AddComponent(shape);
         }
 
         public override void OnAncestryChanged()
