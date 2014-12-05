@@ -359,8 +359,9 @@ namespace Phantom
             }
 
             this.SetResolution(width, height, this.graphics.IsFullScreen);
-            foreach (GameState state in this.states)
-                state.ViewportChanged(previous, this.Resolution);
+            if(this.states != null)
+                foreach (GameState state in this.states)
+                    state.ViewportChanged(previous, this.Resolution);
 
             XnaGame.Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
