@@ -63,6 +63,8 @@ namespace Phantom
 
         public Content Content { get; private set; }
 
+        protected Action PreRender;
+
         private float multiplier;
 #if MINIMALRENDERING
         private float minimalRendering = -1;
@@ -265,29 +267,37 @@ namespace Phantom
             }
 #endif
 
-			int startIndex;
-#if DEBUG // Update Profiler
-				Profiler.Instance.BeginRender ();
+
+#if DEBUG
+            // Update Profiler
+            Profiler.Instance.BeginRender();
 #endif
 
 #if !PLATFORM_ANDROID
-                lock (this.GlobalRenderLock)
+            lock (this.GlobalRenderLock)
 #endif
-                {
-                    this.GraphicsDevice.Clear(this.BackgroundColor);
-                }
+            {
+                this.GraphicsDevice.Clear(this.BackgroundColor);
+            }
 
-				for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
-					;
-				for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
-					if (!this.states [i].OnlyOnTop || i == this.states.Count - 1)
-						this.states [i].Render (null);
-				this.Render (null);
+            if (PreRender != null)
+            {
+                PreRender.Invoke();
+            }
 
-#if DEBUG // Update Profiler
-				Profiler.Instance.EndRender ();
+            int startIndex;
+            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
+                ;
+            for (int i = Math.Max(0, startIndex); i < this.states.Count; i++)
+                if (!this.states[i].OnlyOnTop || i == this.states.Count - 1)
+                    this.states[i].Render(null);
+            this.Render(null);
+
+#if DEBUG
+            // Update Profiler
+            Profiler.Instance.EndRender();
 #endif
-		}
+        }
 
         protected override void OnComponentAdded(Component component)
         {
