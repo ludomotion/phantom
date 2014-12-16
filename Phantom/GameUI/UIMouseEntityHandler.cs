@@ -69,7 +69,7 @@ namespace Phantom.GameUI
                 mousePosition = new Vector2(current.X, current.Y);
             }
 
-            if (hover == null)
+            if (Hover == null)
             {
                 //not hovering over anything
                 if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)

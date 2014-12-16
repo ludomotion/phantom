@@ -19,7 +19,7 @@ namespace Phantom.GameUI
         public static float DoubleClickSpeed = 0.2f;
         protected MouseState previous;
         protected MouseState current;
-        protected UIElement hover;
+        public UIElement Hover;
         private UIElement mouseDown;
         private UIElement mouseDownRight;
         private bool dragging;
@@ -64,7 +64,7 @@ namespace Phantom.GameUI
 
         public UIElement GetHoverElement()
         {
-            return hover;
+            return Hover;
         }
 
         public UIContent GetDragging()
@@ -99,19 +99,19 @@ namespace Phantom.GameUI
             if (hover != null)
                 hover.HoverAt(mousePosition, player);
 
-            if (hover != this.hover)
+            if (hover != this.Hover)
             {
-                if (this.hover != null && this.hover.OnMouseOut != null)
-                    this.hover.OnMouseOut(this.hover, mousePosition, UIMouseButton.None);
-                this.hover = hover;
-                if (this.hover != null && this.hover.OnMouseOver != null)
-                    this.hover.OnMouseOver(this.hover, mousePosition, UIMouseButton.None);
+                if (this.Hover != null && this.Hover.OnMouseOut != null)
+                    this.Hover.OnMouseOut(this.Hover, mousePosition, UIMouseButton.None);
+                this.Hover = hover;
+                if (this.Hover != null && this.Hover.OnMouseOver != null)
+                    this.Hover.OnMouseOver(this.Hover, mousePosition, UIMouseButton.None);
             }
 
             if (current.X != previous.X || current.Y != previous.Y)
             {
-                if (this.hover != null && this.hover.OnMouseMove != null)
-                    this.hover.OnMouseMove(this.hover, mousePosition, UIMouseButton.None);
+                if (this.Hover != null && this.Hover.OnMouseMove != null)
+                    this.Hover.OnMouseMove(this.Hover, mousePosition, UIMouseButton.None);
 
                 //Check which item I am hovering and select it
                 layer.SetSelected(player, hover);
