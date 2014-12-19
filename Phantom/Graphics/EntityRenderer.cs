@@ -92,13 +92,13 @@ namespace Phantom.Graphics
 			}
 		}
 
-		internal override void OnComponentAddedToLayer(Component component)
+		public override void OnComponentAddedToLayer(Component component)
 		{
 			if (!(component is Entity))
 				this.nonEntities.Add(component);
 		}
 
-		internal override void OnComponentRemovedToLayer(Component component)
+        public override void OnComponentRemovedToLayer(Component component)
 		{
 			this.nonEntities.Remove(component);
 		}
