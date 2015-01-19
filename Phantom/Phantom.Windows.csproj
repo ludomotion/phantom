@@ -21,7 +21,7 @@
     <OutputPath>bin\Windows\AnyCPU\Debug</OutputPath>
     <IntermediateOutputPath>obj\Windows\AnyCPU\Debug</IntermediateOutputPath>
     <DocumentationFile>bin\Windows\AnyCPU\Debug\Phantom.xml</DocumentationFile>
-    <DefineConstants>DEBUG;PLATFORM_WINDOWS;NOAUDIO</DefineConstants>
+    <DefineConstants>DEBUG;PLATFORM_WINDOWS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
