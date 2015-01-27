@@ -29,9 +29,6 @@ namespace Phantom.GameUI
     /// </summary>
     public class UIElement : Entity
     {
-        
-
-
         /// <summary>
         /// The name of the control can be used to identify it in the menu
         /// </summary>
@@ -112,6 +109,11 @@ namespace Phantom.GameUI
         /// </summary>
         protected float currentSelected = 0;
 
+        /// <summary>
+        /// Set this string to add a tool tip to the element.
+        /// </summary>
+        public string ToolTipText = "";
+
         public UIAction OnFocus;
         public UIAction OnBlur;
         public UIPlayerAction OnStartPress;
@@ -158,6 +160,15 @@ namespace Phantom.GameUI
         public override void HandleMessage(Message message)
         {
             message.Is<Vector2>(Messages.SetPosition, ref this.Position);
+            if (message.Type == Messages.UIShowToolTip && this.ToolTipText!="")
+            {
+                ToolTip t = (ToolTip)Activator.CreateInstance(ToolTip.ToolTipType);
+                t.SetText(this.ToolTipText);
+                t.SetPosition((Vector2)message.Data);
+                this.Parent.AddComponent(t);
+                message.Data = t;
+                message.Handle();
+            }
             base.HandleMessage(message);
         }
 

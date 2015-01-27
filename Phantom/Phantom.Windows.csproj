@@ -88,6 +88,7 @@
     <Compile Include="GameUI\Slider.cs" />
     <Compile Include="GameUI\ToggleButton.cs" />
     <Compile Include="GameUI\ToolButton.cs" />
+    <Compile Include="GameUI\ToolTip.cs" />
     <Compile Include="GameUI\UIBaseHandler.cs" />
     <Compile Include="GameUI\UICarousel.cs" />
     <Compile Include="GameUI\UICarouselContainer.cs" />

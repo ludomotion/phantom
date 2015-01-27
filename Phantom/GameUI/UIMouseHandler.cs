@@ -15,6 +15,7 @@ namespace Phantom.GameUI
     /// </summary>
     public class UIMouseHandler : UIBaseHandler
     {
+        public static float ToolTipTime = 0.5f;
         public static float DragDistanceSquared = 25;
         public static float DoubleClickSpeed = 0.2f;
         protected MouseState previous;
@@ -29,6 +30,8 @@ namespace Phantom.GameUI
         private Renderer renderer;
         private float doubleClickTimer;
         private int clickTimes;
+        private float notMovedTimer = 0;
+        private ToolTip toolTip;
 
         public UIMouseHandler()
             : base(0) { }
@@ -110,6 +113,13 @@ namespace Phantom.GameUI
 
             if (current.X != previous.X || current.Y != previous.Y)
             {
+                notMovedTimer = 0;
+                if (toolTip != null)
+                {
+                    toolTip.Destroyed = true;
+                    toolTip = null;
+                }
+
                 if (this.Hover != null && this.Hover.OnMouseMove != null)
                     this.Hover.OnMouseMove(this.Hover, mousePosition, UIMouseButton.None);
 
@@ -152,6 +162,17 @@ namespace Phantom.GameUI
                         }
                     }
                 }
+            }
+            else
+            {
+                //not moved
+                notMovedTimer += elapsed;
+                if (notMovedTimer > ToolTipTime && notMovedTimer - elapsed <= ToolTipTime && this.Hover != null)
+                {
+                    Message m = this.Hover.HandleMessage(Messages.UIShowToolTip, mousePosition);
+                    this.toolTip = m.Data as ToolTip;
+                }
+                
             }
 
             //Start clicking
