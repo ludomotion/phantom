@@ -56,7 +56,8 @@ namespace Phantom.GameUI
         {
             base.Update(elapsed);
             this.Visible = Owner.Visible;
-            this.Destroyed = Owner.Destroyed;
+            if (!this.Destroyed)
+                this.Destroyed = Owner.Destroyed;
         }
     }
 }
