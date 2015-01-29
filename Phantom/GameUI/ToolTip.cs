@@ -8,11 +8,13 @@ namespace Phantom.GameUI
 {
     public class ToolTip : UIElement
     {
+        public static float ToolTipTime = 0.5f;
         public static Type ToolTipType = typeof(ToolTip);
         public static float FontScale = 1f;
         public static float Offset = 40f;
         protected string label;
         protected Vector2 size;
+        public UIElement Owner;
         public ToolTip()
             : base("ToolTip", new Vector2(0,0), null)
         {}
@@ -48,6 +50,13 @@ namespace Phantom.GameUI
                 info.Canvas.FillRect(this.Position, size * 0.5f, 0);
                 info.Batch.DrawString(UILayer.Font, label, this.Position, Color.White, 0, size * 0.5f, 1, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
             }
+        }
+
+        public override void Update(float elapsed)
+        {
+            base.Update(elapsed);
+            this.Visible = Owner.Visible;
+            this.Destroyed = Owner.Destroyed;
         }
     }
 }

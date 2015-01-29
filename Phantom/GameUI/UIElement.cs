@@ -165,6 +165,7 @@ namespace Phantom.GameUI
                 ToolTip t = (ToolTip)Activator.CreateInstance(ToolTip.ToolTipType);
                 t.SetText(this.ToolTipText);
                 t.SetPosition((Vector2)message.Data);
+                t.Owner = this;
                 this.Parent.AddComponent(t);
                 message.Data = t;
                 message.Handle();

@@ -15,7 +15,6 @@ namespace Phantom.GameUI
     /// </summary>
     public class UIMouseHandler : UIBaseHandler
     {
-        public static float ToolTipTime = 0.5f;
         public static float DragDistanceSquared = 25;
         public static float DoubleClickSpeed = 0.2f;
         protected MouseState previous;
@@ -167,7 +166,7 @@ namespace Phantom.GameUI
             {
                 //not moved
                 notMovedTimer += elapsed;
-                if (notMovedTimer > ToolTipTime && notMovedTimer - elapsed <= ToolTipTime && this.Hover != null)
+                if (notMovedTimer > ToolTip.ToolTipTime && notMovedTimer - elapsed <= ToolTip.ToolTipTime && this.Hover != null)
                 {
                     Message m = this.Hover.HandleMessage(Messages.UIShowToolTip, mousePosition);
                     this.toolTip = m.Data as ToolTip;
