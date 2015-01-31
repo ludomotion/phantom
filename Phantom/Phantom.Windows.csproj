@@ -61,6 +61,7 @@
     <Compile Include="Cameras\Components\CameraShaker.cs" />
     <Compile Include="Cameras\Components\CameraZoomShaker.cs" />
     <Compile Include="Cameras\Components\DeadZone.cs" />
+    <Compile Include="Cameras\Components\DynamicZoom.cs" />
     <Compile Include="Cameras\Components\FixedTarget.cs" />
     <Compile Include="Cameras\Components\FollowEntity.cs" />
     <Compile Include="Cameras\Components\LinearLerp.cs" />

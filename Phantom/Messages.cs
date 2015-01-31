@@ -29,6 +29,7 @@ namespace Phantom
 		public const int CameraStopFollowing = 33;
 		public const int CameraShake = 34;
         public const int CameraMoveBy = 35;
+        public const int CameraSetZoom = 36;
         
 		public const int RenderSetEffect = 40;
         public const int FillColor = 41;
