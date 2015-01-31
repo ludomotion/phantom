@@ -19,17 +19,17 @@ namespace Phantom.Cameras.Components
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (this.Camera.Target.X - this.Camera.Position.X >= width)
-                this.Camera.Target.X -= width;
-            else if (this.Camera.Target.X - this.Camera.Position.X <= -width)
-                this.Camera.Target.X += width;
+            if (this.Camera.Target.X - this.Camera.Position.X >= width / this.Camera.Zoom)
+                this.Camera.Target.X -= width / this.Camera.Zoom;
+            else if (this.Camera.Target.X - this.Camera.Position.X <= -width / this.Camera.Zoom)
+                this.Camera.Target.X += width / this.Camera.Zoom;
             else
                 this.Camera.Target.X = this.Camera.Position.X;
 
-            if (this.Camera.Target.Y - this.Camera.Position.Y >= height)
-                this.Camera.Target.Y -= height;
-            else if (this.Camera.Target.Y - this.Camera.Position.Y <= -height)
-                this.Camera.Target.Y += height;
+            if (this.Camera.Target.Y - this.Camera.Position.Y >= height / this.Camera.Zoom)
+                this.Camera.Target.Y -= height / this.Camera.Zoom;
+            else if (this.Camera.Target.Y - this.Camera.Position.Y <= -height / this.Camera.Zoom)
+                this.Camera.Target.Y += height / this.Camera.Zoom;
             else
                 this.Camera.Target.Y = this.Camera.Position.Y;
         }
