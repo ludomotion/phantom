@@ -18,14 +18,21 @@ namespace Phantom.Core
     public class EntityLayer : Layer
     {
 
-        public delegate float SortFunction(Component component);
+        public delegate float SortFunction(Entity entity);
 
-        public static float SortOnY(Component component)
+        public static float SortOnY(Entity e)
         {
-            Entity e = component as Entity;
-            if (e == null)
-                return 0;
             return e.Position.Y;
+        }
+
+        public static float SortOnSortValue(Entity e)
+        {
+            return e.SortValue;
+        }
+
+        public static float SortOnYPlusSortValue(Entity e)
+        {
+            return e.Position.Y + e.SortValue;
         }
 
         public SortFunction Sort;
@@ -231,11 +238,11 @@ namespace Phantom.Core
             List<Entity> entities = new List<Entity>();
             foreach (Entity e in integrator.GetEntitiesInRect(topLeft, bottomRight, partial))
             {
-                float s = Sort(e);
-                int insertAt = entities.Count;
+                e.CalculatedSortValue = Sort(e);
+                int insertAt = 0;
                 for (int i = entities.Count - 1; i >= 0; i--)
                 {
-                    if (Sort(entities[i]) <= s)
+                    if (entities[i].CalculatedSortValue <= e.CalculatedSortValue)
                     {
                         insertAt = i + 1;
                         break;
