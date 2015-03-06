@@ -45,7 +45,7 @@ namespace Phantom.GameUI
             current = Mouse.GetState();
             layer = parent as UILayer;
             if (layer == null)
-                throw new Exception("MenuMouseKeyboard can only be added to a Menu component.");
+                throw new Exception("UIMouseHandler can only be added to a UILayer.");
             this.renderer = layer.GetComponentByType<Renderer>();
         }
 
@@ -175,97 +175,100 @@ namespace Phantom.GameUI
             }
 
             //Start clicking
-            if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
+            if (PhantomGame.XnaGame.IsActive)
             {
-                mouseDownPosition = mousePosition;
-                layer.SetSelected(player, hover);
-                if (hover != null)
+                if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
                 {
-                    hover.StartPress(player);
-                    mouseDown = hover;
-                    if (hover.OnMouseDown != null)
-                        hover.OnMouseDown(hover, mousePosition, UIMouseButton.Left);
-
-                }
-                dragging = false;
-                doubleClickTimer = 0;
-                clickTimes++;
-            }
-            if (current.RightButton == ButtonState.Pressed && previous.RightButton != ButtonState.Pressed)
-            {
-                if (hover != null)
-                {
-                    mouseDownRight = hover;
-                    if (hover.OnMouseDown != null)
-                        hover.OnMouseDown(hover, mousePosition, UIMouseButton.Right);
-                }
-
-            }
-
-            if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed && hover!=null)
-            {
-                if (hover.OnMouseUp != null)
-                    hover.OnMouseUp(hover, mousePosition, UIMouseButton.Right);
-                if (mouseDownRight == hover)
-                {
-                    if (mouseDownRight.OnClick != null)
-                        mouseDownRight.OnClick(mouseDownRight, mousePosition, UIMouseButton.Right);
-                }
-                mouseDownRight = null;
-            }
-
-            if (doubleClickTimer > 0)
-            {
-                doubleClickTimer -= elapsed;
-                if (doubleClickTimer <= 0)
-                {
-                    clickTimes = 0;
-                }
-            }
-
-            //end clicking
-            if (current.LeftButton != ButtonState.Pressed && previous.LeftButton == ButtonState.Pressed)
-            {
-                if (draggingContent != null)
-                {
-                    //end drag
-                    if (hover is UICarousel)
-                        hover = ((UICarousel)hover).GetElementAt(mousePosition);
-                    UIContainer container = hover as UIContainer;
-                    if (container != null)
+                    mouseDownPosition = mousePosition;
+                    layer.SetSelected(player, hover);
+                    if (hover != null)
                     {
-                        draggingContent.Dock(container);
+                        hover.StartPress(player);
+                        mouseDown = hover;
+                        if (hover.OnMouseDown != null)
+                            hover.OnMouseDown(hover, mousePosition, UIMouseButton.Left);
+
+                    }
+                    dragging = false;
+                    doubleClickTimer = 0;
+                    clickTimes++;
+                }
+                if (current.RightButton == ButtonState.Pressed && previous.RightButton != ButtonState.Pressed)
+                {
+                    if (hover != null)
+                    {
+                        mouseDownRight = hover;
+                        if (hover.OnMouseDown != null)
+                            hover.OnMouseDown(hover, mousePosition, UIMouseButton.Right);
+                    }
+
+                }
+
+                if (current.RightButton != ButtonState.Pressed && previous.RightButton == ButtonState.Pressed && hover != null)
+                {
+                    if (hover.OnMouseUp != null)
+                        hover.OnMouseUp(hover, mousePosition, UIMouseButton.Right);
+                    if (mouseDownRight == hover)
+                    {
+                        if (mouseDownRight.OnClick != null)
+                            mouseDownRight.OnClick(mouseDownRight, mousePosition, UIMouseButton.Right);
+                    }
+                    mouseDownRight = null;
+                }
+
+                if (doubleClickTimer > 0)
+                {
+                    doubleClickTimer -= elapsed;
+                    if (doubleClickTimer <= 0)
+                    {
+                        clickTimes = 0;
+                    }
+                }
+
+                //end clicking
+                if (current.LeftButton != ButtonState.Pressed && previous.LeftButton == ButtonState.Pressed)
+                {
+                    if (draggingContent != null)
+                    {
+                        //end drag
+                        if (hover is UICarousel)
+                            hover = ((UICarousel)hover).GetElementAt(mousePosition);
+                        UIContainer container = hover as UIContainer;
+                        if (container != null)
+                        {
+                            draggingContent.Dock(container);
+                        }
+                        else
+                        {
+                            draggingContent.DropAt(mousePosition);
+                        }
+
                     }
                     else
                     {
-                        draggingContent.DropAt(mousePosition);
-                    }
-
-                }
-                else
-                {
-                    if (layer.GetSelected(player) != null)
-                    {
-                        layer.GetSelected(player).EndPress(player);
-                        if (hover == mouseDown)
+                        if (layer.GetSelected(player) != null)
                         {
-                            doubleClickTimer = DoubleClickSpeed;
-                            if (clickTimes == 1)
+                            layer.GetSelected(player).EndPress(player);
+                            if (hover == mouseDown)
                             {
-                                hover.ClickAt(mousePosition - hover.Position, player);
-                                if (hover.OnClick != null)
-                                    hover.OnClick(hover, mousePosition, UIMouseButton.Left);
+                                doubleClickTimer = DoubleClickSpeed;
+                                if (clickTimes == 1)
+                                {
+                                    hover.ClickAt(mousePosition - hover.Position, player);
+                                    if (hover.OnClick != null)
+                                        hover.OnClick(hover, mousePosition, UIMouseButton.Left);
+                                }
+                                if (clickTimes == 2 && hover.OnDoubleClick != null)
+                                    hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                             }
-                            if (clickTimes == 2 && hover.OnDoubleClick!=null)
-                                hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
-                        }
 
-                        if (mouseDown != null && mouseDown.OnMouseUp!=null)
-                            mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
+                            if (mouseDown != null && mouseDown.OnMouseUp != null)
+                                mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
+                        }
                     }
+                    mouseDown = null;
+                    draggingContent = null;
                 }
-                mouseDown = null;
-                draggingContent = null;
             }
         }
     }
