@@ -27,7 +27,7 @@ namespace Phantom.Misc
             do
             {
                 //create a list of the reflex points
-                List<int> reflexPoints = new List<int>();
+                //List<int> reflexPoints = new List<int>();
                 //JORIS: Disabled the reflexPoint calculation as it leads to a bug with voronoi cells.
                 //All points were somehow marked as reflex points which caused the triangulator never to get out of this do while loop
                 //This fix seems to work as long as you are sure the vertices define a convex polygon.
@@ -80,8 +80,8 @@ namespace Phantom.Misc
                 for (short i = 0; i < points.Count; i++)
                 {
                     //make sure this point is not a reflex point
-                    if (reflexPoints.Contains(i))
-                        continue;
+                    //if (reflexPoints.Contains(i))
+                    //    continue;
 
                     //get the vertex indices
                     short pim1, pi, pip1;
@@ -125,7 +125,7 @@ namespace Phantom.Misc
                         points.RemoveAt(i);
 
                         //we have to exit this loop so we can recalculate reflex angles
-                        break;
+                        //break;
                     }
                 }
             } while (points.Count >= 3);
