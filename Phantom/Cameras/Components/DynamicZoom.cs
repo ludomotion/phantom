@@ -10,7 +10,6 @@ namespace Phantom.Cameras.Components
     public class DynamicZoom : CameraComponent
     {
         private float startzoom;
-        private float targetzoom;
 
         private float duration;
         private float transition;
@@ -27,7 +26,7 @@ namespace Phantom.Cameras.Components
         public override void OnAdd(Core.Component parent)
         {
             base.OnAdd(parent);
-            this.startzoom = this.targetzoom = this.Camera.Zoom;
+            this.startzoom = this.Camera.TargetZoom = this.Camera.Zoom;
             this.transition = 0;
         }
 
@@ -36,7 +35,7 @@ namespace Phantom.Cameras.Components
             if (transition > 0)
             {
                 transition -= Math.Min(transition, elapsed * speed);
-                this.Camera.Zoom = MathHelper.Lerp(targetzoom, startzoom, tweenFunction(transition));
+                this.Camera.Zoom = MathHelper.Lerp(this.Camera.TargetZoom, startzoom, tweenFunction(transition));
             }
 
             base.Update(elapsed);
@@ -50,11 +49,11 @@ namespace Phantom.Cameras.Components
                 case Messages.CameraSetZoom:
                     this.startzoom = this.Camera.Zoom;
                     if (message.Data is float)
-                        this.targetzoom = (float)message.Data;
+                        this.Camera.TargetZoom = (float)message.Data;
                     else if (message.Data is int)
-                        this.targetzoom = (int)message.Data;
+                        this.Camera.TargetZoom = (int)message.Data;
                     else 
-                        this.targetzoom = 1;
+                        this.Camera.TargetZoom = 1;
 
                     this.transition = 1;
                     break;

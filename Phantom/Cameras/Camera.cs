@@ -20,6 +20,7 @@ namespace Phantom.Cameras
 
 		public float Orientation;
         public float Zoom;
+        public float TargetZoom;
 
         public float Top { get; private set; }
         public float Right { get; private set; }
@@ -30,7 +31,7 @@ namespace Phantom.Cameras
         {
             base.OnAdd(parent);
             this.layer = parent as Layer;
-            this.Zoom = 1;
+            this.TargetZoom = this.Zoom = 1;
             this.Offset= new Vector2(0,0);
         }
 
