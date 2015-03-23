@@ -217,7 +217,7 @@ namespace Phantom.Core
             assets = this.contexts[contextName];
             for (int i = 0; i < assets.Count; i++)
 			{
-				#if !PLATFORM_ANDROID
+				#if !PLATFORM_ANDROID && !FNA
 				lock (PhantomGame.Game.GlobalRenderLock)
 				#endif
 				{

@@ -72,7 +72,8 @@ namespace Phantom
         {
             get { return minimalRendering; }
             set { 
-                minimalRendering = Math.Max(minimalRendering, value);
+                if(minimalRendering != -1)
+                    minimalRendering = Math.Max(minimalRendering, value);
 #if DEBUG
                 if (minimalRendering >= 0)
                     XnaGame.Window.Title = "RENDERING...";
@@ -273,7 +274,7 @@ namespace Phantom
             Profiler.Instance.BeginRender();
 #endif
 
-#if !PLATFORM_ANDROID
+#if !PLATFORM_ANDROID && !FNA
             lock (this.GlobalRenderLock)
 #endif
             {

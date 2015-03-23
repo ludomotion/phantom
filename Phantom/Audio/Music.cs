@@ -43,14 +43,23 @@ namespace Phantom.Audio
 
 			var volume = (info.DefaultVolume > 0 ? info.DefaultVolume * Music.Volume : Music.Volume) * Sound.MasterVolume;
 			Debug.WriteLine("[Music] volume is " + volume);
-			MediaPlayer.Volume = volume;
 
-			if (MediaPlayer.Volume <= 0)
+			if (volume <= 0)
                 return;
 
-			if(FadeTime >0)
-				MediaPlayer.Volume = 0;
+            var fadeVolume = volume;
 
+			if(FadeTime >0)
+				volume = 0;
+
+#if FNA
+            Thread t = null;
+            var instance = song.CreateInstance();
+            instance.IsLooped = looped;
+            instance.Volume = volume;
+            instance.Play();
+
+#else
 			var t = new Thread(new ThreadStart(delegate() {
 				var tlooped = looped;
 				var tsong = song;
@@ -58,16 +67,22 @@ namespace Phantom.Audio
 				do {
 					Debug.WriteLine("[Music] (re)starting music in it's thread " + tsong.Name + name);
 					MediaPlayer.Play(tsong);
+                    
 					Thread.Sleep((int)(tduration * 1000f));
 					//MediaPlayer.Stop();
 				} while( tlooped );
 			}));
 			t.Start();
+#endif
 
             var handle = new Audio.Handle
             {
                 Success = true,
+#if FNA
+                SongInstance = instance,
+#else
 				SongInstance = song,
+#endif
                 Name = info.Name,
                 Type = Audio.Type.Music,
 				Thread = t,
@@ -78,7 +93,7 @@ namespace Phantom.Audio
             handle.FadeState = 1;
             handle.FadeDuration = handle.FadeTimer = Music.FadeTime;
             handle.FadeFunction = TweenFunctions.Linear;
-			handle.FadeVolume = volume;
+            handle.FadeVolume = fadeVolume;
 
 
             Audio.Instance.AddHandle(handle);
@@ -94,17 +109,25 @@ namespace Phantom.Audio
             {
 				if (Music.FadeTime != 0 && !now)
 				{
+#if FNA
+                    current.SongInstance.Stop();
+#else
 					current.Thread.Abort();
+#endif
                     current.FadeState = -1;
                     current.FadeDuration = current.FadeTimer = Music.FadeTime;
                     current.FadeFunction = TweenFunctions.Linear;
-					current.FadeVolume = current.Instance != null ?  current.Instance.Volume : MediaPlayer.Volume;
+                    current.FadeVolume = current.SongInstance.Volume;
                 }
                 else
                 {
 					Debug.WriteLine("[Music] Actually stopping music");
+#if FNA
+                    current.SongInstance.Stop();
+#else
 					current.Thread.Abort();
 					MediaPlayer.Stop();
+#endif
                 }
             }
             current = null;

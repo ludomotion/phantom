@@ -20,7 +20,11 @@ namespace Phantom.Audio
             public Audio.Type Type;
 			public string Name;
 			public SoundEffectInstance Instance;
+#if FNA
+            public SoundEffectInstance SongInstance;
+#else
 			public Song SongInstance;
+#endif
 			public Thread Thread;
 			public bool Looped;
 
@@ -80,12 +84,20 @@ namespace Phantom.Audio
                     if (handle.FadeTimer <= 0)
 					{
 						if(handle.Type == Audio.Type.Music) {
+#if FNA
+                            handle.SongInstance.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
+                            if (handle.FadeState == -1)
+                            {
+                                handle.SongInstance.Stop();
+                            }
+#else
 							MediaPlayer.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
 	                        if (handle.FadeState == -1)
 							{
 								handle.Thread.Abort();
 								MediaPlayer.Stop();
 							}
+#endif
 						} else {
 							handle.Instance.Volume = handle.FadeState == 1 ? handle.FadeVolume : 0;
 							if (handle.FadeState == -1)
@@ -100,11 +112,18 @@ namespace Phantom.Audio
                     {
 						float t = handle.FadeTimer / handle.FadeDuration;
 						if(handle.Type == Audio.Type.Music) {
+#if FNA
+							if (handle.FadeState == 1) // fade in
+								handle.SongInstance.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
+							else // fade out
+                                handle.SongInstance.Volume = Math.Max(0, Math.Min(handle.FadeFunction(t) * handle.FadeVolume, 1));
+#else
 							if (handle.FadeState == 1) // fade in
 								MediaPlayer.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
 							else // fade out
 								MediaPlayer.Volume = Math.Max(0, Math.Min(handle.FadeFunction(t) * handle.FadeVolume, 1)); 
-						} else {
+#endif
+                        } else {
 	                        if (handle.FadeState == 1) // fade in
 	                            handle.Instance.Volume = Math.Max(0, Math.Min((1 - handle.FadeFunction(t)) * handle.FadeVolume, 1));
 	                        else // fade out
@@ -161,10 +180,17 @@ namespace Phantom.Audio
 			return game.Content.Load<SoundEffect>(asset);
 		}
 
+#if FNA
+		internal SoundEffect LoadSong(string asset)
+		{
+            return game.Content.Load<SoundEffect>(asset);
+		}
+#else
 		internal Song LoadSong(string asset)
 		{
 			return game.Content.Load<Song>(asset);
 		}
+#endif
 
         internal void AddHandle(Audio.Handle handle)
         {

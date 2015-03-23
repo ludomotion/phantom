@@ -5,7 +5,7 @@ bin
 obj
 publish
 *.cachefile
-*.csproj
+#*.csproj
 *.ilk
 *.meta
 *.nupkg
