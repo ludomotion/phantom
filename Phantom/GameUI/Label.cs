@@ -32,7 +32,7 @@ namespace Phantom.GameUI
                 Vector2 size = UILayer.Font.MeasureString(this.Name);
                 if (!this.centered)
                     size.X = 0;
-                info.Batch.DrawString(UILayer.Font, this.Name, this.Position, color, 0, size*0.5f, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                UILayer.Font.DrawString(info, this.Name, this.Position, color, UILayer.DefaultFontScale, 0, size * 0.5f);
             }
         }
     }

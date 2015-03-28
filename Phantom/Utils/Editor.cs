@@ -10,10 +10,10 @@ using System.Diagnostics;
 using Phantom;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
-using Phantom.UI;
 using System.Globalization;
 using System.IO;
 using Phantom.Cameras.Components;
+using Phantom.GameUI;
 
 namespace Phantom.Utils
 {
@@ -53,7 +53,7 @@ namespace Phantom.Utils
             }
         }
 
-        private static SpriteFont font;
+        private static Phont font;
 
         public GameState Editing;
         private List<EditorLayer> layers;
@@ -73,18 +73,17 @@ namespace Phantom.Utils
         private Vector2 mouseOffset;
         private KeyboardState previousKeyboard = Keyboard.GetState();
 
-        private PhWindow layerWindow;
-        private PhWindow propertiesWindow;
-        private PhWindow entitiesWindow;
-        private PhWindow main;
-        private PhControl windows;
+        private Window layerWindow;
+        private Window propertiesWindow;
+        private Window entitiesWindow;
+        private Window main;
+        private UILayer windows;
         private Component propertiesWindowTarget;
 
 
-        public static void Initialize(SpriteFont font)
+        public static void Initialize(Phont font)
         {
             MapLoader.Initialize();
-            GUISettings.Initialize(font);
             PhantomGame.Game.Console.Register("editor", "Opens editor window.", delegate(string[] argv)
             {
                 if (!(PhantomGame.Game.CurrentState is EditorState))
@@ -160,39 +159,38 @@ namespace Phantom.Utils
 
         private void CreateWindows()
         {
-            windows = new PhControl(0, 0, PhantomGame.Game.Resolution.Width, PhantomGame.Game.Resolution.Height);
+            windows = new UILayer(new Renderer(1, Renderer.ViewportPolicy.None, Renderer.RenderOptions.Canvas), 1);
             windows.Ghost = true;
             AddComponent(windows);
 
-            main = new PhWindow(100, 100, 500, 500, "Main Menu");
-            main.Ghost = true;
-            int y = 30;
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Layers", StartSelectLayer));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Entities", StartSelectEntity));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Clear Map", ClearMap));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Save Map", SaveMap));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Open Map", OpenMap));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Close Menu", CloseMenu));
-            main.AddComponent(new PhButton(10, y += 32, 480, 24, "Close Editor", CloseEditor));
+            main = new Window(100, 100, 500, 500, "Main Menu");
+            int y = 130;
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Layers", StartSelectLayer));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Entities", StartSelectEntity));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Clear Map", ClearMap));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Save Map", SaveMap));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Open Map", OpenMap));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Close Menu", CloseMenu));
+            main.AddComponent(new Button(110, y += 32, 480, 24, "Close Editor", CloseEditor));
             windows.AddComponent(main);
 
-            layerWindow = new PhWindow(100, 100, 500, 500, "Layers");
+            layerWindow = new Window(100, 100, 500, 500, "Layers");
             layerWindow.Ghost = true;
             for (int i = 0; i < layers.Count; i++)
-                layerWindow.AddComponent(new PhButton(10, 30+i*32, 480, 24, layers[i].Name, SelectLayer));
+                layerWindow.AddComponent(new Button(110, 130+i*32, 480, 24, layers[i].Name, SelectLayer));
             windows.AddComponent(layerWindow);
         }
 
         private int numberOfEntities = 13 * 3;
         private int firstEntity = 0;
-        private PhWindow BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, string name, int first)
+        private Window BuildEntitiesWindow(Dictionary<string, PCNComponent> entityList, string name, int first)
         {
             int buttonWidth = 160;
             int buttonHeight = 24;
             int spacing = 8;
             int width = buttonWidth * 3 + spacing * 4;
             int height = 500;
-            entitiesWindow = new PhWindow(100, 100, width, height, name);
+            entitiesWindow = new Window(100, 100, width, height, name);
             entitiesWindow.Ghost = true;
             int x = spacing;
             int y = 20 + spacing;
@@ -200,7 +198,7 @@ namespace Phantom.Utils
             bool buttons = false;
             if (first == -1)
             {
-                entitiesWindow.AddComponent(new PhButton(x, y, buttonWidth, buttonHeight, "<none>", SelectEntity));
+                entitiesWindow.AddComponent(new Button(x, y, buttonWidth, buttonHeight, "<none>", SelectEntity));
                 y += buttonHeight + spacing;
                 first++;
                 buttons = true;
@@ -216,7 +214,7 @@ namespace Phantom.Utils
                 else
                 {
                     buttons = true;
-                    entitiesWindow.AddComponent(new PhButton(x, y, buttonWidth, buttonHeight, entity.Key, SelectEntity));
+                    entitiesWindow.AddComponent(new Button(100+x, 100+y, buttonWidth, buttonHeight, entity.Key, SelectEntity));
                     y += buttonHeight + spacing;
                     if (y > height - 2 * (buttonHeight + spacing))
                     {
@@ -233,9 +231,9 @@ namespace Phantom.Utils
             }
 
             if (first != 0)
-                entitiesWindow.AddComponent(new PhButton(spacing, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Previous", SelectPreviousEntities));
+                entitiesWindow.AddComponent(new Button(spacing, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Previous", SelectPreviousEntities));
             if (next)
-                entitiesWindow.AddComponent(new PhButton(width - spacing - buttonWidth, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Next", SelectNextEntities));
+                entitiesWindow.AddComponent(new Button(width - spacing - buttonWidth, height - spacing - buttonHeight, buttonWidth, buttonHeight, "Next", SelectNextEntities));
 
             entitiesWindow.OnClose = CloseEntityWindow;
 
@@ -248,7 +246,7 @@ namespace Phantom.Utils
                 return entitiesWindow;
         }
 
-        private void CloseEntityWindow(PhControl sender)
+        private void CloseEntityWindow(UIElement sender)
         {
             if (entitiesWindow != null)
             {
@@ -257,42 +255,42 @@ namespace Phantom.Utils
             }
         }
 
-        private void SelectNextEntities(PhControl sender)
+        private void SelectNextEntities(UIElement sender, int player)
         {
             CloseEntityWindow(sender);
             firstEntity += numberOfEntities;
-            StartSelectEntity(sender);
+            StartSelectEntity(sender, player);
         }
 
-        private void SelectPreviousEntities(PhControl sender)
+        private void SelectPreviousEntities(UIElement sender, int player)
         {
             CloseEntityWindow(sender);
             firstEntity -= numberOfEntities;
-            StartSelectEntity(sender);
+            StartSelectEntity(sender, player);
         }
 
-        private void StartSelectEntity(PhControl sender)
+        private void StartSelectEntity(UIElement sender, int player)
         {
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
-                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Tiles", firstEntity-1);
+                Window window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Tiles", firstEntity-1);
                 windows.AddComponent(window);
                 window.Show();
             }
             if (layers[currentLayer].Type == LayerType.Entities)
             {
-                PhWindow window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Entities", firstEntity);
+                Window window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Entities", firstEntity);
                 windows.AddComponent(window);
                 window.Show();
             }
         }
 
-        private void StartSelectLayer(PhControl sender)
+        private void StartSelectLayer(UIElement sender, int player)
         {
             layerWindow.Show();
         }
 
-        private void ClearMap(PhControl sender)
+        private void ClearMap(UIElement sender, int player)
         {
             for (int i = 0; i < layers.Count; i++)
             {
@@ -304,7 +302,7 @@ namespace Phantom.Utils
             main.Hide();
         }
 
-        private void SaveMap(PhControl sender)
+        private void SaveMap(UIElement sender, int player)
         {
             string filename = "";
             if (Editing.Properties != null)
@@ -329,62 +327,62 @@ namespace Phantom.Utils
                 }
             }
 #endif
-            windows.AddComponent(new PhInputDialog(100, 100, "Save Map", "Filename:", filename, ConfirmSave));
+            windows.AddComponent(new InputDialog(100, 100, "Save Map", "Filename:", filename, ConfirmSave));
         }
 
-        private void ConfirmSave(PhControl sender)
+        private void ConfirmSave(UIElement sender)
         {
-            MapLoader.SaveMap((sender as PhInputDialog).Result);
+            MapLoader.SaveMap((sender as EditBox).Text);
         }
-        
 
-        private void OpenMap(PhControl sender)
+
+        private void OpenMap(UIElement sender, int player)
         {
             string filename = "";
             if (Editing.Properties != null)
                 filename = Editing.Properties.GetString("filename", "");
-            windows.AddComponent(new PhInputDialog(100, 100, "Open Map", "Filename:", filename, ConfirmOpen));
+            windows.AddComponent(new InputDialog(100, 100, "Open Map", "Filename:", filename, ConfirmOpen));
         }
 
-        private void ConfirmOpen(PhControl sender)
+        private void ConfirmOpen(UIElement sender)
         {
-            MapLoader.OpenMap((sender as PhInputDialog).Result);
+            MapLoader.OpenMap((sender as EditBox).Text);
             if (Editing.Camera != null)
                 this.Editing.Camera.HandleMessage(Messages.CameraStopFollowing, null);
         }
 
-        private void CloseMenu(PhControl sender)
+        private void CloseMenu(UIElement sender, int player)
         {
             main.Hide();
         }
 
 
-        private void SelectEntity(PhControl sender)
+        private void SelectEntity(UIElement sender, int player)
         {
-            PhButton button = sender as PhButton;
+            Button button = sender as Button;
             if (layers[currentLayer].EntityList != null)
             {
                 drawingType = null;
                 drawingEntity = null;
-                if (layers[currentLayer].EntityList.ContainsKey(button.Text))
+                if (layers[currentLayer].EntityList.ContainsKey(button.Name))
                 {
-                    drawingType = layers[currentLayer].EntityList[button.Text];
-                    drawingEntity = EntityFactory.AssembleEntity(drawingType, button.Text);
+                    drawingType = layers[currentLayer].EntityList[button.Name];
+                    drawingEntity = EntityFactory.AssembleEntity(drawingType, button.Name);
                     drawingEntity.Position = mousePosition;
                 }
             }
-            (button.Parent as PhWindow).Hide();
+            button.GetAncestor<Window>().Hide();
         }
 
-        private void SelectLayer(PhControl sender)
+        private void SelectLayer(UIElement sender, int player)
         {
             layerWindow.Hide();
-            PhButton button = sender as PhButton;
+            Button button = sender as Button;
             if (button != null)
             {
                 for (int i = 0; i < layers.Count; i++)
                 {
-                    if (button.Text == layers[i].Name)
+                    if (button.Name == layers[i].Name)
                     {
                         switch (layers[i].Type)
                         {
@@ -428,117 +426,108 @@ namespace Phantom.Utils
 
             MouseState currentMouse = Mouse.GetState();
 
-            if (windows.DoMouseMove(currentMouse.X, currentMouse.Y)!=null)
+
+            if (Editing.Camera != null)
             {
-                if (currentMouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released)
-                    windows.DoMouseDown();
-                if (currentMouse.LeftButton == ButtonState.Released && previousMouse.LeftButton == ButtonState.Pressed)
-                    windows.DoMouseUp();
+                mousePosition.X = currentMouse.X + Editing.Camera.Left;
+                mousePosition.Y = currentMouse.Y + Editing.Camera.Top;
             }
             else
             {
-                if (Editing.Camera != null)
-                {
-                    mousePosition.X = currentMouse.X + Editing.Camera.Left;
-                    mousePosition.Y = currentMouse.Y + Editing.Camera.Top;
-                }
-                else
-                {
-                    mousePosition.X = currentMouse.X;
-                    mousePosition.Y = currentMouse.Y;
-                }
-
-                switch (layers[currentLayer].Type)
-                {
-                    case LayerType.Tiles:
-                        if (drawingEntity != null)
-                            drawingEntity.Position = SnapPosition(mousePosition);
-                        if (currentMouse.LeftButton == ButtonState.Pressed)
-                            MouseLeftDownTiles();
-                        if (currentMouse.RightButton == ButtonState.Pressed && previousMouse.RightButton == ButtonState.Released)
-                            MouseRightDownTiles();
-                        break;
-                    case LayerType.Entities:
-                        if (drawingEntity != null)
-                            drawingEntity.Position = mousePosition;
-                        if (currentMouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released)
-                            MouseLeftDownEntities();
-                        MouseMoveEntities(currentMouse.LeftButton == ButtonState.Pressed);
-                        if (currentMouse.RightButton == ButtonState.Pressed && previousMouse.RightButton == ButtonState.Released)
-                            MouseRightDownEntities();
-                        int delta = currentMouse.ScrollWheelValue - previousMouse.ScrollWheelValue;
-                        if (previousKeyboard.IsKeyDown(Keys.LeftShift) || previousKeyboard.IsKeyDown(Keys.RightShift))
-                            delta *= 10;
-                        MouseWheelEntities(delta);
-
-                        break;
-                }
+                mousePosition.X = currentMouse.X;
+                mousePosition.Y = currentMouse.Y;
             }
+
+            switch (layers[currentLayer].Type)
+            {
+                case LayerType.Tiles:
+                    if (drawingEntity != null)
+                        drawingEntity.Position = SnapPosition(mousePosition);
+                    if (currentMouse.LeftButton == ButtonState.Pressed)
+                        MouseLeftDownTiles();
+                    if (currentMouse.RightButton == ButtonState.Pressed && previousMouse.RightButton == ButtonState.Released)
+                        MouseRightDownTiles();
+                    break;
+                case LayerType.Entities:
+                    if (drawingEntity != null)
+                        drawingEntity.Position = mousePosition;
+                    if (currentMouse.LeftButton == ButtonState.Pressed && previousMouse.LeftButton == ButtonState.Released)
+                        MouseLeftDownEntities();
+                    MouseMoveEntities(currentMouse.LeftButton == ButtonState.Pressed);
+                    if (currentMouse.RightButton == ButtonState.Pressed && previousMouse.RightButton == ButtonState.Released)
+                        MouseRightDownEntities();
+                    int delta = currentMouse.ScrollWheelValue - previousMouse.ScrollWheelValue;
+                    if (previousKeyboard.IsKeyDown(Keys.LeftShift) || previousKeyboard.IsKeyDown(Keys.RightShift))
+                        delta *= 10;
+                    MouseWheelEntities(delta);
+
+                    break;
+            }
+
 
             previousMouse = currentMouse;
 
             KeyboardState currentKeyboard = Keyboard.GetState();
-            if (windows.Ghost && !(windows.Focus is PhTextEdit))
+
+
+            if (Editing.Camera != null)
             {
+                Editing.Camera.Update(elapsed);
+                Vector2 camMove = new Vector2();
+                if (currentKeyboard.IsKeyDown(Keys.Left))
+                    camMove.X -= elapsed * 500;
+                if (currentKeyboard.IsKeyDown(Keys.Right))
+                    camMove.X += elapsed * 500;
+                if (currentKeyboard.IsKeyDown(Keys.Up))
+                    camMove.Y -= elapsed * 500;
+                if (currentKeyboard.IsKeyDown(Keys.Down))
+                    camMove.Y += elapsed * 500;
 
-                if (Editing.Camera != null)
-                {
-                    Editing.Camera.Update(elapsed);
-                    Vector2 camMove = new Vector2();
-                    if (currentKeyboard.IsKeyDown(Keys.Left))
-                        camMove.X -= elapsed * 500;
-                    if (currentKeyboard.IsKeyDown(Keys.Right))
-                        camMove.X += elapsed * 500;
-                    if (currentKeyboard.IsKeyDown(Keys.Up))
-                        camMove.Y -= elapsed * 500;
-                    if (currentKeyboard.IsKeyDown(Keys.Down))
-                        camMove.Y += elapsed * 500;
+                if (camMove.LengthSquared() > 0)
+                    Editing.Camera.HandleMessage(Messages.CameraMoveBy, camMove);
+            }
 
-                    if (camMove.LengthSquared() > 0)
-                        Editing.Camera.HandleMessage(Messages.CameraMoveBy, camMove);
-                }
-
-                if ((currentKeyboard.IsKeyDown(Keys.Delete) && previousKeyboard.IsKeyUp(Keys.Delete)) || (currentKeyboard.IsKeyDown(Keys.Back) && previousKeyboard.IsKeyUp(Keys.Back)))
+            if ((currentKeyboard.IsKeyDown(Keys.Delete) && previousKeyboard.IsKeyUp(Keys.Delete)) || (currentKeyboard.IsKeyDown(Keys.Back) && previousKeyboard.IsKeyUp(Keys.Back)))
+            {
+                if (selectedEntity != null)
                 {
-                    if (selectedEntity != null)
-                    {
-                        selectedEntity.Destroyed = true;
-                        layers[currentLayer].Layer.RemoveComponent(selectedEntity);
-                        selectedEntity = null;
-                    }
-                }
-                if (currentKeyboard.IsKeyDown(Keys.L) && previousKeyboard.IsKeyUp(Keys.L))
-                {
-                    if (layerWindow.Ghost)
-                        layerWindow.Show();
-                    else 
-                        layerWindow.Hide();
-                }
-                if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
-                {
-                    if (entitiesWindow == null)
-                        StartSelectEntity(null);
-                    else
-                        entitiesWindow.Hide();
-                }
-                if (currentKeyboard.IsKeyDown(Keys.Escape) && previousKeyboard.IsKeyUp(Keys.Escape))
-                {
-                    CloseEditor(null);
-                }
-                if (currentKeyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space))
-                {
-                    main.Show();
+                    selectedEntity.Destroyed = true;
+                    layers[currentLayer].Layer.RemoveComponent(selectedEntity);
+                    selectedEntity = null;
                 }
             }
+            if (currentKeyboard.IsKeyDown(Keys.L) && previousKeyboard.IsKeyUp(Keys.L))
+            {
+                if (layerWindow.Ghost)
+                    layerWindow.Show();
+                else
+                    layerWindow.Hide();
+            }
+            if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
+            {
+                if (entitiesWindow == null)
+                    StartSelectEntity(null, 0);
+                else
+                    entitiesWindow.Hide();
+            }
+            if (currentKeyboard.IsKeyDown(Keys.Escape) && previousKeyboard.IsKeyUp(Keys.Escape))
+            {
+                CloseEditor(null, 0);
+            }
+            if (currentKeyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space))
+            {
+                main.Show();
+            }
+
 
             previousKeyboard = currentKeyboard;
 
 
         }
 
-        
 
-        private void CloseEditor(PhControl sender)
+
+        private void CloseEditor(UIElement sender, int player)
         {
             Editing.HandleMessage(Messages.MapLoaded, null);
             PhantomGame.Game.PopState();
@@ -663,20 +652,22 @@ namespace Phantom.Utils
         private void CreatePropertiesWindow(string name, Component component)
         {
             propertiesWindowTarget = component;
-            propertiesWindow = new PhWindow(100, 100, 500, 500, name+ " Properties");
+            propertiesWindow = new Window(100, 100, 500, 500, name+ " Properties");
 
-            propertiesWindow.AddComponent(new PhButton(300, 450, 80, 32, "OK", SaveProperties));
-            propertiesWindow.AddComponent(new PhButton(400, 450, 80, 32, "Cancel", CloseProperties));
+            propertiesWindow.AddComponent(new Button(100 + 300, 100 + 450, 80, 32, "OK", SaveProperties));
+            propertiesWindow.AddComponent(new Button(100 + 400, 100 + 450, 80, 32, "Cancel", CloseProperties));
+
+
 
             int x = 100;
             int y = 30;
             if (component is Entity)
             {
-                propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, (component as Entity).Position.X.ToString(), "X", PhTextEdit.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.X.ToString(), "X", EditBox.ValueType.Float, null, null));
                 y += 24;
-                propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, (component as Entity).Position.Y.ToString(), "Y", PhTextEdit.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.Y.ToString(), "Y", EditBox.ValueType.Float, null, null));
                 y += 24;
-                propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, MathHelper.ToDegrees((component as Entity).Orientation).ToString(), "Orientation", PhTextEdit.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, MathHelper.ToDegrees((component as Entity).Orientation).ToString(), "Orientation", EditBox.ValueType.Float, null, null));
                 y += 24;
             }
 
@@ -684,7 +675,7 @@ namespace Phantom.Utils
             {
                 if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
                 {
-                    propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, property.Value.ToString(), property.Key, PhTextEdit.ValueType.Int, null, null));
+                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Int, null, null));
                     y+=24;
                     if (y>500-30) {
                         y = 30;
@@ -697,7 +688,7 @@ namespace Phantom.Utils
             {
                 if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
                 {
-                    propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, property.Value.ToString(), property.Key, PhTextEdit.ValueType.Float, null, null));
+                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Float, null, null));
                     y += 24;
                     if (y > 500 - 30)
                     {
@@ -712,13 +703,13 @@ namespace Phantom.Utils
                 {
                     if (property.Value is string)
                     {
-                        propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, property.Value as String, property.Key, PhTextEdit.ValueType.String, null, null));
+                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value as String, property.Key, EditBox.ValueType.String, null, null));
                         y += 24;
                     }
                     if (property.Value is Color)
                     {
                         string hex = "#" + ((Color)property.Value).A.ToString("X2") + ((Color)property.Value).R.ToString("X2") + ((Color)property.Value).G.ToString("X2") + ((Color)property.Value).B.ToString("X2");
-                        propertiesWindow.AddComponent(new PhTextEdit(x, y, 100, 20, hex, property.Key, PhTextEdit.ValueType.Color, null, null));
+                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, hex, property.Key, EditBox.ValueType.Color, null, null));
                         y += 24;
                     }
                     if (y > 500 - 30)
@@ -729,10 +720,10 @@ namespace Phantom.Utils
                 }
             }
 
-            windows.AddComponent(propertiesWindow);
+            propertiesWindow.Show();
         }
 
-        private void SaveProperties(PhControl sender)
+        private void SaveProperties(UIElement sender, int player)
         {
             Component selectedComponent = propertiesWindowTarget;
             Entity selectedEntity = selectedComponent as Entity;
@@ -740,7 +731,7 @@ namespace Phantom.Utils
                 return;
             foreach (Component c in propertiesWindow.Components)
             {
-                PhTextEdit edit = c as PhTextEdit;
+                EditBox edit = c as EditBox;
                 if (edit != null)
                 {
                     if (edit.Caption == "X" && selectedEntity!=null)
@@ -763,20 +754,20 @@ namespace Phantom.Utils
 
                         switch (edit.Type)
                         {
-                            case PhTextEdit.ValueType.String:
+                            case EditBox.ValueType.String:
                                 selectedComponent.Properties.Objects[edit.Caption] = edit.Text;
                                 break;
-                            case PhTextEdit.ValueType.Int:
+                            case EditBox.ValueType.Int:
                                 int i = 0;
                                 int.TryParse(edit.Text, out i);
                                 selectedComponent.Properties.Ints[edit.Caption] = i;
                                 break;
-                            case PhTextEdit.ValueType.Color:
+                            case EditBox.ValueType.Color:
                                 int col = 0;
                                 int.TryParse(edit.Text.Substring(1), NumberStyles.HexNumber, null, out col);
                                 selectedComponent.Properties.Objects[edit.Caption] = col.ToColor();
                                 break;
-                            case PhTextEdit.ValueType.Float:
+                            case EditBox.ValueType.Float:
                                 float f = 0;
                                 float.TryParse(edit.Text, out f);
                                 selectedComponent.Properties.Floats[edit.Caption] = f;
@@ -795,7 +786,7 @@ namespace Phantom.Utils
             propertiesWindow = null;
         }
 
-        private void CloseProperties(PhControl sender)
+        private void CloseProperties(UIElement sender, int player)
         {
             propertiesWindow.Hide();
             windows.RemoveComponent(propertiesWindow);
@@ -875,8 +866,7 @@ namespace Phantom.Utils
             if (layers[currentLayer].Layer is EntityLayer)
                 DrawEntities(info, layers[currentLayer].Layer as EntityLayer);
 
-            info.Batch.DrawString(font, layers[currentLayer].Name, new Vector2(11, PhantomGame.Game.Resolution.Height - 29), Color.Black);
-            info.Batch.DrawString(font, layers[currentLayer].Name, new Vector2(10, PhantomGame.Game.Resolution.Height - 30), Color.White);
+            font.DrawString(info, layers[currentLayer].Name, new Vector2(10, PhantomGame.Game.Resolution.Height - 30), Color.White);
             base.Render(info);
             
         }
@@ -911,13 +901,13 @@ namespace Phantom.Utils
                         {
                             string name = selectedEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, entity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
-                            info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Yellow);
+                            font.DrawString(info, name, entity.Position - topLeft - size * 0.5f, Color.Yellow);
                         }
                         else if (entity == hoveringEntity)
                         {
                             string name = hoveringEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, hoveringEntity.GetType().Name);
                             Vector2 size = font.MeasureString(name);
-                            info.Batch.DrawString(font, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
+                            font.DrawString(info, name, entity.Position - topLeft - size * 0.5f, Color.Cyan);
                         }
                     }
                 }
@@ -932,7 +922,7 @@ namespace Phantom.Utils
                     DrawEntity(info, topLeft, drawingEntity);
                     string name = drawingEntity.Properties.GetString(EntityFactory.PROPERTY_NAME_BLUEPRINT, drawingEntity.GetType().Name); ;
                     Vector2 size = font.MeasureString(name);
-                    info.Batch.DrawString(font, name, drawingEntity.Position - topLeft - size * 0.5f, Color.Red);
+                    font.DrawString(info, name, drawingEntity.Position - topLeft - size * 0.5f, Color.Red);
                 }
                 else if (layers[currentLayer].Type == LayerType.Tiles)
                 {

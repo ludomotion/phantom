@@ -51,7 +51,7 @@ namespace Phantom.GameUI
         /// <summary>
         /// A font used by the default renderers of the MenuControls
         /// </summary>
-        public static SpriteFont Font;
+        public static Phont Font;
 
         public static float DefaultFontScale = 1f;
 
@@ -63,6 +63,7 @@ namespace Phantom.GameUI
         public static Color ColorFaceHighLight = Color.Yellow;
         public static Color ColorFaceDisabled = Color.Silver;
         public static Color ColorShadow = Color.Black;
+        public static Color ColorHighLight = Color.Silver;
         public static Color ColorTextBox = Color.White;
         public static Color ColorTextBoxHighLight = Color.White;
         public static Color ColorTextBoxDisabled = Color.Silver;
@@ -141,6 +142,7 @@ namespace Phantom.GameUI
             if (this.focused != null)
             {
                 this.focused.Focus = false;
+                this.focused.LoseFocus();
                 if (this.focused.OnBlur != null)
                     this.focused.OnBlur(this.focused);
             }
@@ -148,6 +150,7 @@ namespace Phantom.GameUI
             if (this.focused != null)
             {
                 this.focused.Focus = true;
+                this.focused.GainFocus();
                 if (this.focused.OnFocus != null)
                     this.focused.OnFocus(this.focused);
             }

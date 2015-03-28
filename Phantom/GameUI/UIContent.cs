@@ -150,8 +150,8 @@ namespace Phantom.GameUI
                 size.Y = -this.Shape.RoughWidth * 0.5f;
                 if (this.currentSelected > 0.5f && Enabled)
                 {
-                    info.Batch.DrawString(UILayer.Font, c, Position, text);
-                    info.Batch.DrawString(UILayer.Font, c, Position, text, 0, size, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                    UILayer.Font.DrawString(info, c, Position, text);
+                    UILayer.Font.DrawString(info, c, Position, text, UILayer.DefaultFontScale, 0, size);
                 }
             }
         }

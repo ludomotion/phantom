@@ -25,12 +25,27 @@ namespace Phantom.GameUI
         /// Creates the button and sets the button's caption
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="caption"></param>
         /// <param name="position"></param>
         /// <param name="shape"></param>
         public Button(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
         {
             this.Caption = caption;
+        }
+
+        public Button(string name, string caption, Vector2 position, Shape shape, UIPlayerAction onActivate)
+            : base(name, position, shape)
+        {
+            this.Caption = caption;
+            this.OnActivate = onActivate;
+        }
+
+        public Button(int x, int y, int width, int height, string caption, UIPlayerAction onActivate)
+            : base(caption, new Vector2(x+width*0.5f, y+height*0.5f), new OABB(new Vector2(width*0.5f, height*0.5f)))
+        {
+            this.Caption = caption;
+            this.OnActivate = onActivate;
         }
 
         /// <summary>
@@ -57,7 +72,7 @@ namespace Phantom.GameUI
                 Vector2 p = Position - Vector2.One * down;
                 p.X = (float)Math.Round(p.X);
                 p.Y = (float)Math.Round(p.Y);
-                info.Batch.DrawString(UILayer.Font, Caption, p, text, 0, size*0.5f, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                UILayer.Font.DrawString(info, Caption, p, text, UILayer.DefaultFontScale, 0, size * 0.5f);
             }
         }
 

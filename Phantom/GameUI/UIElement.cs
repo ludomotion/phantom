@@ -279,5 +279,15 @@ namespace Phantom.GameUI
         {
             return Shape.InShape(position);
         }
+
+        internal virtual void GainFocus()
+        {
+            
+        }
+
+        internal virtual void LoseFocus()
+        {
+            
+        }
     }
 }

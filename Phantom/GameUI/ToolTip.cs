@@ -48,7 +48,7 @@ namespace Phantom.GameUI
             {
                 info.Canvas.FillColor = Color.Black;
                 info.Canvas.FillRect(this.Position, size * 0.5f, 0);
-                info.Batch.DrawString(UILayer.Font, label, this.Position, Color.White, 0, size * 0.5f, 1, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                UILayer.Font.DrawString(info, label, this.Position, Color.White, 1, 0, size * 0.5f);
             }
         }
 
