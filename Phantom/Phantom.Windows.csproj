@@ -100,6 +100,8 @@
     <Compile Include="GameUI\EditBox.cs" />
     <Compile Include="GameUI\Label.cs" />
     <Compile Include="GameUI\OptionButton.cs" />
+    <Compile Include="GameUI\InputDialog.cs" />
+    <Compile Include="GameUI\Window.cs" />
     <Compile Include="GameUI\Slider.cs" />
     <Compile Include="GameUI\ToggleButton.cs" />
     <Compile Include="GameUI\ToolButton.cs" />
@@ -177,12 +179,6 @@
     <Compile Include="Shapes\ShapeVisitor.cs" />
     <Compile Include="Shapes\Visitors\CircleVisitor.cs" />
     <Compile Include="Shapes\Visitors\PolygonVisitor.cs" />
-    <Compile Include="UI\GUISettings.cs" />
-    <Compile Include="UI\PhButton.cs" />
-    <Compile Include="UI\PhControl.cs" />
-    <Compile Include="UI\PhInputDialog.cs" />
-    <Compile Include="UI\PhTextEdit.cs" />
-    <Compile Include="UI\PhWindow.cs" />
     <Compile Include="Utils\Asynchrony.cs" />
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityFactory.cs" />

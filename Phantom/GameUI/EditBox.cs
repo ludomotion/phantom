@@ -17,6 +17,8 @@ namespace Phantom.GameUI
     /// </summary>
     public class EditBox : UIElement
     {
+        public enum ValueType { String, Int, Float, Color }
+
         /// <summary>
         /// The buttons visible caption
         /// </summary>
@@ -31,6 +33,20 @@ namespace Phantom.GameUI
 
         private KeyboardState previous;
 
+        private UIAction OnChange;
+        public Vector2 CaptionPosition;
+        public String Caption;
+
+
+        public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit)
+            : this(caption, text, new Vector2(left + width * 0.5f, top + height * 0.5f), new OABB(new Vector2(width * 0.5f, height * 0.5f)), 99)
+        {
+            this.OnChange = onChange;
+            this.OnBlur = onExit;
+            this.Caption = caption;
+            this.CaptionPosition = new Vector2(-80, 0);
+            this.Type = type; 
+        }
 
         /// <summary>
         /// Creates the editbox
@@ -76,9 +92,15 @@ namespace Phantom.GameUI
                 if (timer % 0.5f > 0.2f)
                     s += "_";
                 //info.Batch.DrawString(UILayer.Font, s, p, text);
-                info.Batch.DrawString(UILayer.Font, s, p, text, 0, new Vector2(0, 0), UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                UILayer.Font.DrawString(info, s, p, text, UILayer.DefaultFontScale, 0, new Vector2(0, 0));
+
+                if (Caption != null)
+                {
+                    UILayer.Font.DrawString(info, Caption, p+CaptionPosition, text, UILayer.DefaultFontScale, 0, new Vector2(0, 0));
+                }
             }
         }
+
 
         public override void Update(float elapsed)
         {
@@ -100,6 +122,8 @@ namespace Phantom.GameUI
                     if (c != '\0')
                     {
                         this.Text = this.Text.Insert(this.cursor++, c.ToString());
+                        if (this.OnChange != null)
+                            this.OnChange(this);
                         this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                     }
                 }
@@ -107,11 +131,15 @@ namespace Phantom.GameUI
                 {
                     this.Text = this.Text.Remove(this.cursor - 1, 1);
                     this.cursor = (int)MathHelper.Clamp(this.cursor - 1, 0, this.Text.Length);
+                    if (this.OnChange != null)
+                        this.OnChange(this);
                     this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                 }
                 if (current.IsKeyDown(Keys.Delete) && !previous.IsKeyDown(Keys.Delete) && this.cursor < this.Text.Length)
                 {
                     this.Text = this.Text.Remove(this.cursor, 1);
+                    if (this.OnChange != null)
+                        this.OnChange(this);
                     this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                     //lastCursor = -1; // force reblink
                 }
@@ -138,5 +166,13 @@ namespace Phantom.GameUI
             }
             base.Update(elapsed);
         }
+
+        internal override void GainFocus()
+        {
+            this.cursor = this.Text.Length;
+            base.GainFocus();
+        }
+
+        public ValueType Type { get; set; }
     }
 }

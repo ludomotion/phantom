@@ -48,7 +48,7 @@ namespace Phantom.GameUI
 
                 size.X *= 0.5f;
                 size.Y = -this.Shape.RoughWidth * 0.5f;
-                info.Batch.DrawString(UILayer.Font, Caption, Position, text, 0, size, UILayer.DefaultFontScale, Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 0);
+                UILayer.Font.DrawString(info, Caption, Position, text, UILayer.DefaultFontScale, 0, size);
 
                 for (int y = 0; y < this.Height; y++)
                 {
