@@ -77,7 +77,6 @@ namespace Phantom.Utils
         private Window propertiesWindow;
         private Window entitiesWindow;
         private Window main;
-        private UILayer windows;
         private Component propertiesWindowTarget;
 
 
@@ -159,9 +158,6 @@ namespace Phantom.Utils
 
         private void CreateWindows()
         {
-            windows = new UILayer(new Renderer(1, Renderer.ViewportPolicy.None, Renderer.RenderOptions.Canvas), 1);
-            windows.Ghost = true;
-            AddComponent(windows);
 
             main = new Window(100, 100, 500, 500, "Main Menu");
             int y = 130;
@@ -172,13 +168,11 @@ namespace Phantom.Utils
             main.AddComponent(new Button(110, y += 32, 480, 24, "Open Map", OpenMap));
             main.AddComponent(new Button(110, y += 32, 480, 24, "Close Menu", CloseMenu));
             main.AddComponent(new Button(110, y += 32, 480, 24, "Close Editor", CloseEditor));
-            windows.AddComponent(main);
 
             layerWindow = new Window(100, 100, 500, 500, "Layers");
             layerWindow.Ghost = true;
             for (int i = 0; i < layers.Count; i++)
                 layerWindow.AddComponent(new Button(110, 130+i*32, 480, 24, layers[i].Name, SelectLayer));
-            windows.AddComponent(layerWindow);
         }
 
         private int numberOfEntities = 13 * 3;
@@ -198,7 +192,7 @@ namespace Phantom.Utils
             bool buttons = false;
             if (first == -1)
             {
-                entitiesWindow.AddComponent(new Button(x, y, buttonWidth, buttonHeight, "<none>", SelectEntity));
+                entitiesWindow.AddComponent(new Button(100+x, 100+y, buttonWidth, buttonHeight, "<none>", SelectEntity));
                 y += buttonHeight + spacing;
                 first++;
                 buttons = true;
@@ -250,7 +244,6 @@ namespace Phantom.Utils
         {
             if (entitiesWindow != null)
             {
-                windows.RemoveComponent(entitiesWindow);
                 entitiesWindow = null;
             }
         }
@@ -274,13 +267,11 @@ namespace Phantom.Utils
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
                 Window window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Tiles", firstEntity-1);
-                windows.AddComponent(window);
                 window.Show();
             }
             if (layers[currentLayer].Type == LayerType.Entities)
             {
                 Window window = BuildEntitiesWindow(layers[currentLayer].EntityList, "Entities", firstEntity);
-                windows.AddComponent(window);
                 window.Show();
             }
         }
@@ -327,7 +318,7 @@ namespace Phantom.Utils
                 }
             }
 #endif
-            windows.AddComponent(new InputDialog(100, 100, "Save Map", "Filename:", filename, ConfirmSave));
+            new InputDialog(100, 100, "Save Map", "Filename:", filename, ConfirmSave).Show();
         }
 
         private void ConfirmSave(UIElement sender)
@@ -341,7 +332,7 @@ namespace Phantom.Utils
             string filename = "";
             if (Editing.Properties != null)
                 filename = Editing.Properties.GetString("filename", "");
-            windows.AddComponent(new InputDialog(100, 100, "Open Map", "Filename:", filename, ConfirmOpen));
+            new InputDialog(100, 100, "Open Map", "Filename:", filename, ConfirmOpen).Show();
         }
 
         private void ConfirmOpen(UIElement sender)
@@ -372,11 +363,13 @@ namespace Phantom.Utils
                 }
             }
             button.GetAncestor<Window>().Hide();
+            main.Hide();
         }
 
         private void SelectLayer(UIElement sender, int player)
         {
             layerWindow.Hide();
+            main.Hide();
             Button button = sender as Button;
             if (button != null)
             {
@@ -782,14 +775,12 @@ namespace Phantom.Utils
                 selectedEntity.Integrate(0);
             selectedComponent.HandleMessage(Messages.PropertiesChanged, null);
             propertiesWindow.Hide();
-            windows.RemoveComponent(propertiesWindow);
             propertiesWindow = null;
         }
 
         private void CloseProperties(UIElement sender, int player)
         {
             propertiesWindow.Hide();
-            windows.RemoveComponent(propertiesWindow);
             propertiesWindow = null;
         }
 
@@ -895,7 +886,7 @@ namespace Phantom.Utils
                     info.Canvas.LineWidth = 2;
                     topLeft = DrawEntity(info, topLeft, entity);
 
-                    if (windows.Ghost)
+                    if (info.IsTopState)
                     {
                         if (entity == selectedEntity)
                         {
@@ -913,7 +904,7 @@ namespace Phantom.Utils
                 }
             }
 
-            if (windows.Ghost)
+            if (info.IsTopState)
             {
                 info.Canvas.StrokeColor = Color.Red;
                 info.Canvas.LineWidth = 2;

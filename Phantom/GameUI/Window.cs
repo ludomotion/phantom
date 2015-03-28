@@ -99,7 +99,8 @@ namespace Phantom.GameUI
             if (OnClose != null)
                 OnClose(null);
 
-            PhantomGame.Game.PopState();
+            if(PhantomGame.Game.CurrentState == this)
+                PhantomGame.Game.PopState();
         }
     }
 }
