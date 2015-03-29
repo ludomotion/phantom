@@ -514,10 +514,27 @@ namespace Phantom.Utils
                 main.Show();
             }
 
+            //TEMP TEST CODE
+            if ((currentKeyboard.IsKeyDown(Keys.T) && previousKeyboard.IsKeyUp(Keys.T)))
+            {
+                Window t = new Window(100, 100, 500, 500, "Test Window");
+                string st = "Test text, this is a test text. [C2]This is a piece in red. [C0]And now it its [C1]BLACK [C0]again... This should be a link[LINK] and this shouled be one too.[LINKTOO]    I hope it all works out as planned...[PLANNED]";
+                TextArea ta = new TextArea("test", new Vector2(110, 140), new Vector2(480, 400), UILayer.Font, st, 1.5f, 1f, new Color[] { Color.Black, Color.Blue, Color.Red });
+                t.AddComponent(ta);
+                ta.OnLinkClicked = LinkClicked;
+                t.Show();
+            }
+
 
             previousKeyboard = currentKeyboard;
 
 
+        }
+
+        //TEMP TEST CODE
+        private void LinkClicked(UIElement element, string reference)
+        {
+            Trace.WriteLine("Clicked link " + reference);
         }
 
 
