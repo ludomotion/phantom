@@ -47,13 +47,13 @@ namespace Phantom
         public const int MapReset = 211;
 
         public const int UIActivated = 300;
-        public const int UIElementClicked = 301;
-        public const int UIElementValueChanged = 302;
-        public const int ChangeStackSize = 303;
-        public const int UIElementEnter = 304;
+        //public const int UIElementClicked = 301;
+        //public const int UIElementValueChanged = 302;
+        //public const int ChangeStackSize = 303;
+        //public const int UIElementEnter = 304;
         public const int UISwipe = 305;
         public const int UIDrag = 306;
-        public const int UIShowToolTip = 306;
+        //public const int UIShowToolTip = 306;
         public const int Select = 310;
         public const int Deselect = 311;
         public const int DoMouseCommand = 312;

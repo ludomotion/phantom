@@ -100,7 +100,7 @@ namespace Phantom.GameUI
                         this.content.Destroyed = true;
                         this.content = null;
                         content.Count = s;
-                        content.HandleMessage(Messages.ChangeStackSize, this);
+                        content.StackSizeChanged();
                         return true;
                     }
                     else
@@ -108,8 +108,8 @@ namespace Phantom.GameUI
                         //return any left-overs
                         content.Count = content.StackSize;
                         this.content.Count = s - content.StackSize;
-                        content.HandleMessage(Messages.ChangeStackSize, this);
-                        this.content.HandleMessage(Messages.ChangeStackSize, this);
+                        content.StackSizeChanged();
+                        this.content.StackSizeChanged();
 
                     }
                 }

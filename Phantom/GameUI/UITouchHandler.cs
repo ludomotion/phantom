@@ -132,7 +132,7 @@ namespace Phantom.GameUI
 						    layer.GetSelected (player).CancelPress (player);
 					}
 					if (focus == started && focus != null && !swiped) {
-						focus.ClickAt (l.Position, player);
+						focus.ClickAt (l.Position, player, UIMouseButton.Left);
 					}
 				}
 

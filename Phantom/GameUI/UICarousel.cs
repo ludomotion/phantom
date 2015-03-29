@@ -105,31 +105,31 @@ namespace Phantom.GameUI
             return null;
         }
 
-        public override void ClickAt(Vector2 position, int player)
+        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
         {
             if (hovering != null)
-                hovering.ClickAt(position, player);
+                hovering.ClickAt(position, player, button);
             else
             {
                 switch (ElementOrientation)
                 {
                     case UIElementOrientation.LeftRight:
                         if (position.X < 0)
-                            Previous(player);
+                            PreviousOption(player);
                         else
-                            Next(player);
+                            NextOption(player);
                         break;
                     case UIElementOrientation.TopDown:
                         if (position.Y < 0)
-                            Previous(player);
+                            PreviousOption(player);
                         else
-                            Next(player);
+                            NextOption(player);
                         break;
                 }
 
             }
 
-            base.ClickAt(position, player);
+            base.ClickAt(position, player, button);
         }
 
         public override void Update(float elapsed)
@@ -139,7 +139,7 @@ namespace Phantom.GameUI
                 hovering.Selected = this.Selected;
         }
 
-        private void Previous(int player)
+        public override void PreviousOption(int player)
         {
             if (selectedElement < 0)
                 return;
@@ -157,7 +157,7 @@ namespace Phantom.GameUI
             SelectionChanged();
         }
 
-        private void Next(int player)
+        public override void NextOption(int player)
         {
             if (selectedElement < 0)
                 return;
@@ -196,22 +196,11 @@ namespace Phantom.GameUI
             base.EndPress(player);
         }
 
-        public override void Click(ClickType type, int player)
+        public override void Activate(int player)
         {
-            switch (type)
-            {
-                case ClickType.NextOption:
-                    Next(player);
-                    break;
-                case ClickType.PreviousOption:
-                    Previous(player);
-                    break;
-                case ClickType.Select:
-                    if (hovering != null)
-                        hovering.EndPress(player);
-                    break;
-            }
-            base.Click(type, player);
+            if (hovering != null)
+                hovering.EndPress(player);
+            base.Activate(player);
         }
 
         public override void Render(Graphics.RenderInfo info)

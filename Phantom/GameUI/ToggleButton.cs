@@ -31,7 +31,7 @@ namespace Phantom.GameUI
 
 
         public ToggleButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, string option0, string option1)
-            : base (name, caption, position, shape)
+            : base (name, caption, position, shape, null)
         {
             prefix = caption;
             options = new string[2] { option0, option1 };
@@ -46,16 +46,14 @@ namespace Phantom.GameUI
             option = value;
             Caption = prefix + " " + options[option];
 
-            GameState state = this.GetAncestor<GameState>();
-            if (state != null)
-                state.HandleMessage(Messages.UIElementValueChanged, this);
+            if (OnChange != null)
+                OnChange(this);
         }
 
-        public override void Click(ClickType type, int player)
+        public override void Activate(int player)
         {
-            base.Click(type, player);
-            if (type == ClickType.Select)
-                Option = 1 - Option;
+            Option = 1 - Option;
+            base.Activate(player);
         }
     }
 }

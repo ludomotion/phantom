@@ -133,16 +133,17 @@ namespace Phantom.GameUI
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, SliderOrientation.Horizontal, false) { }
 
-        public override void Click(ClickType type, int player)
+        
+        public override void NextOption(int player)
         {
-            if (Enabled && (PlayerMask & (1 << player)) > 0)
-            {
-                base.Click(type, player);
-                if (type == ClickType.NextOption)
-                    SetValue(currentValue + step);
-                if (type == ClickType.PreviousOption)
-                    SetValue(currentValue - step);
-            }
+            if (CanUse(player))
+                SetValue(currentValue + step);
+        }
+
+        public override void PreviousOption(int player)
+        {
+            if (CanUse(player))
+                SetValue(currentValue - step);
         }
 
         private void SetValue(float value)
@@ -170,9 +171,8 @@ namespace Phantom.GameUI
                 caption = Caption + " " + currentValue.ToString("0.0");
             }
 
-            GameState state = this.GetAncestor<GameState>();
-            if (state != null)
-                state.HandleMessage(Messages.UIElementValueChanged, this);
+            if (OnChange != null)
+                OnChange(this);
 
         }
 
@@ -233,11 +233,11 @@ namespace Phantom.GameUI
             }
         }
 
-        public override void ClickAt(Vector2 position, int player)
+        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
         {
             if (CanUse(player))
             {
-                base.ClickAt(position, player);
+                base.ClickAt(position, player, button);
                 float rel = 0;
                 if (sliderOrientation == SliderOrientation.Horizontal)
                 {

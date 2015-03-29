@@ -21,19 +21,6 @@ namespace Phantom.GameUI
         /// </summary>
         public string Caption;
 
-        /// <summary>
-        /// Creates the button and sets the button's caption
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="caption"></param>
-        /// <param name="position"></param>
-        /// <param name="shape"></param>
-        public Button(string name, string caption, Vector2 position, Shape shape)
-            : base(name, position, shape)
-        {
-            this.Caption = caption;
-        }
-
         public Button(string name, string caption, Vector2 position, Shape shape, UIPlayerAction onActivate)
             : base(name, position, shape)
         {
@@ -76,16 +63,6 @@ namespace Phantom.GameUI
             }
         }
 
-        public override void Click(ClickType type, int player)
-        {
-            if (CanUse(player))
-            {
-                GameState state = this.GetAncestor<GameState>();
-                if (state!=null)
-                    state.HandleMessage(Messages.UIElementClicked, this);
-            }
-            base.Click(type, player);
-        }
 
 
     }
