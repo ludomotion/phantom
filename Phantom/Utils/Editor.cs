@@ -248,21 +248,21 @@ namespace Phantom.Utils
             }
         }
 
-        private void SelectNextEntities(UIElement sender, int player)
+        private void SelectNextEntities(UIElement sender)
         {
             CloseEntityWindow(sender);
             firstEntity += numberOfEntities;
-            StartSelectEntity(sender, player);
+            StartSelectEntity(sender);
         }
 
-        private void SelectPreviousEntities(UIElement sender, int player)
+        private void SelectPreviousEntities(UIElement sender)
         {
             CloseEntityWindow(sender);
             firstEntity -= numberOfEntities;
-            StartSelectEntity(sender, player);
+            StartSelectEntity(sender);
         }
 
-        private void StartSelectEntity(UIElement sender, int player)
+        private void StartSelectEntity(UIElement sender)
         {
             if (layers[currentLayer].Type == LayerType.Tiles)
             {
@@ -276,12 +276,12 @@ namespace Phantom.Utils
             }
         }
 
-        private void StartSelectLayer(UIElement sender, int player)
+        private void StartSelectLayer(UIElement sender)
         {
             layerWindow.Show();
         }
 
-        private void ClearMap(UIElement sender, int player)
+        private void ClearMap(UIElement sender)
         {
             for (int i = 0; i < layers.Count; i++)
             {
@@ -293,7 +293,7 @@ namespace Phantom.Utils
             main.Hide();
         }
 
-        private void SaveMap(UIElement sender, int player)
+        private void SaveMap(UIElement sender)
         {
             string filename = "";
             if (Editing.Properties != null)
@@ -327,7 +327,7 @@ namespace Phantom.Utils
         }
 
 
-        private void OpenMap(UIElement sender, int player)
+        private void OpenMap(UIElement sender)
         {
             string filename = "";
             if (Editing.Properties != null)
@@ -342,13 +342,13 @@ namespace Phantom.Utils
                 this.Editing.Camera.HandleMessage(Messages.CameraStopFollowing, null);
         }
 
-        private void CloseMenu(UIElement sender, int player)
+        private void CloseMenu(UIElement sender)
         {
             main.Hide();
         }
 
 
-        private void SelectEntity(UIElement sender, int player)
+        private void SelectEntity(UIElement sender)
         {
             Button button = sender as Button;
             if (layers[currentLayer].EntityList != null)
@@ -366,7 +366,7 @@ namespace Phantom.Utils
             main.Hide();
         }
 
-        private void SelectLayer(UIElement sender, int player)
+        private void SelectLayer(UIElement sender)
         {
             layerWindow.Hide();
             main.Hide();
@@ -499,13 +499,13 @@ namespace Phantom.Utils
             if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
             {
                 if (entitiesWindow == null)
-                    StartSelectEntity(null, 0);
+                    StartSelectEntity(null);
                 else
                     entitiesWindow.Hide();
             }
             if (currentKeyboard.IsKeyDown(Keys.Escape) && previousKeyboard.IsKeyUp(Keys.Escape))
             {
-                CloseEditor(null, 0);
+                CloseEditor(null);
             }
             if (currentKeyboard.IsKeyDown(Keys.Space) && previousKeyboard.IsKeyUp(Keys.Space))
             {
@@ -520,7 +520,7 @@ namespace Phantom.Utils
 
 
 
-        private void CloseEditor(UIElement sender, int player)
+        private void CloseEditor(UIElement sender)
         {
             Editing.HandleMessage(Messages.MapLoaded, null);
             PhantomGame.Game.PopState();
@@ -656,11 +656,11 @@ namespace Phantom.Utils
             int y = 30;
             if (component is Entity)
             {
-                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.X.ToString(), "X", EditBox.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.X.ToString(), "X", EditBox.ValueType.Float, null, null, null));
                 y += 24;
-                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.Y.ToString(), "Y", EditBox.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, (component as Entity).Position.Y.ToString(), "Y", EditBox.ValueType.Float, null, null, null));
                 y += 24;
-                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, MathHelper.ToDegrees((component as Entity).Orientation).ToString(), "Orientation", EditBox.ValueType.Float, null, null));
+                propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, MathHelper.ToDegrees((component as Entity).Orientation).ToString(), "Orientation", EditBox.ValueType.Float, null, null, null));
                 y += 24;
             }
 
@@ -668,7 +668,7 @@ namespace Phantom.Utils
             {
                 if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
                 {
-                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Int, null, null));
+                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Int, null, null, null));
                     y+=24;
                     if (y>500-30) {
                         y = 30;
@@ -681,7 +681,7 @@ namespace Phantom.Utils
             {
                 if (property.Key[0] >= 'A' && property.Key[0] <= 'Z')
                 {
-                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Float, null, null));
+                    propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value.ToString(), property.Key, EditBox.ValueType.Float, null, null, null));
                     y += 24;
                     if (y > 500 - 30)
                     {
@@ -696,13 +696,13 @@ namespace Phantom.Utils
                 {
                     if (property.Value is string)
                     {
-                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value as String, property.Key, EditBox.ValueType.String, null, null));
+                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, property.Value as String, property.Key, EditBox.ValueType.String, null, null, null));
                         y += 24;
                     }
                     if (property.Value is Color)
                     {
                         string hex = "#" + ((Color)property.Value).A.ToString("X2") + ((Color)property.Value).R.ToString("X2") + ((Color)property.Value).G.ToString("X2") + ((Color)property.Value).B.ToString("X2");
-                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, hex, property.Key, EditBox.ValueType.Color, null, null));
+                        propertiesWindow.AddComponent(new EditBox(100 + x, 100 + y, 100, 20, hex, property.Key, EditBox.ValueType.Color, null, null, null));
                         y += 24;
                     }
                     if (y > 500 - 30)
@@ -716,7 +716,7 @@ namespace Phantom.Utils
             propertiesWindow.Show();
         }
 
-        private void SaveProperties(UIElement sender, int player)
+        private void SaveProperties(UIElement sender)
         {
             Component selectedComponent = propertiesWindowTarget;
             Entity selectedEntity = selectedComponent as Entity;
@@ -778,7 +778,7 @@ namespace Phantom.Utils
             propertiesWindow = null;
         }
 
-        private void CloseProperties(UIElement sender, int player)
+        private void CloseProperties(UIElement sender)
         {
             propertiesWindow.Hide();
             propertiesWindow = null;

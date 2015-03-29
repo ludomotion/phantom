@@ -20,7 +20,7 @@ namespace Phantom.GameUI
         private float threshold = 0.8f;
 
         public UIGamePadHandler(PlayerIndex index)
-            : base((int)index)
+            : base((int)index + 2)
         {
             this.index = index;
         }

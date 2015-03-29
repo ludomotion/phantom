@@ -16,23 +16,26 @@ namespace Phantom.GameUI
 	/// </summary>
 	public class UITouchHandler : UIBaseHandler
 	{
+        public delegate void UITouchAction(UITouchHandler handler, int touchID, Vector3 data);
+
 		private TouchController touch;
-		private Dictionary<int, UIElement> touchmap = new Dictionary<int, UIElement> ();
+		private Dictionary<int, UIElement> touchmap = new Dictionary<int, UIElement>();
         private Dictionary<int, Vector3> swipemap = new Dictionary<int, Vector3>();
         private Dictionary<int, Vector3> dragmap = new Dictionary<int, Vector3>();
         private float time = 0;
-        private bool doSwipes;
+        //private bool doSwipes;
+
+        public UITouchAction OnSwipe;
+        public UITouchAction OnDrag;
 
 		public UITouchHandler()
-			: this(0, false) { }
+			: this(null, null) { }
 
-		public UITouchHandler(int player)
-			: this(player, false) { }
-
-        public UITouchHandler(int player, bool activateSwipes)
-            : base(player) 
+        public UITouchHandler(UITouchAction onSwipe, UITouchAction onDrag)
+            : base(0) 
         {
-            this.doSwipes = activateSwipes;
+            this.OnSwipe = onSwipe;
+            this.OnDrag = onDrag;
         }
 
 		public override void OnAdd(Component parent)
@@ -40,7 +43,7 @@ namespace Phantom.GameUI
 			base.OnAdd(parent);
 			layer = parent as UILayer;
 			if (layer == null)
-				throw new Exception("UITouchHandler can only be added to a Menu component.");
+				throw new Exception("UITouchHandler can only be added to a UILayer instance.");
 		}
 
 		public override void OnAncestryChanged ()
@@ -67,12 +70,11 @@ namespace Phantom.GameUI
 
                 bool swiped = false;
                 //swipes
-                if (doSwipes)
+                if (OnSwipe!=null)
                 {
                     if (l.State == TouchLocationState.Pressed)
                     {
                         swipemap[l.Id] = new Vector3(l.Position.X, l.Position.Y, time);
-                        dragmap[l.Id] = new Vector3(l.Position.X, l.Position.Y, 0);
                     }
                     else if (l.State == TouchLocationState.Released && swipemap.ContainsKey(l.Id))
                     {
@@ -84,17 +86,27 @@ namespace Phantom.GameUI
                         if (Math.Abs(swipe.X) > 20 || Math.Abs(swipe.Y) > 20)
                         {
                             swiped = true;
-                            GetAncestor<UILayer>().Parent.HandleMessage(Messages.UISwipe, swipe);
+                            OnSwipe(this, l.Id, swipe);
                         }
                     }
-                    
+                }
+
+                //drags
+                if (OnDrag != null)
+                {
+                    if (l.State == TouchLocationState.Pressed)
+                    {
+                        dragmap[l.Id] = new Vector3(l.Position.X, l.Position.Y, 0);
+                    }
+
                     if (l.State == TouchLocationState.Moved && dragmap.ContainsKey(l.Id))
                     {
                         Vector3 drag = dragmap[l.Id];
 
-                        Vector2 dragDelta = new Vector2();
+                        Vector3 dragDelta = new Vector3();
                         dragDelta.X = l.Position.X - drag.X;
                         dragDelta.Y = l.Position.Y - drag.Y;
+                        dragDelta.Z = 0;
 
                         if (drag.Z > 0 || dragDelta.Length() > 20)
                         {
@@ -102,7 +114,7 @@ namespace Phantom.GameUI
                             drag.Y = l.Position.Y;
                             drag.Z = 1;
                             dragmap[l.Id] = drag;
-                            GetAncestor<UILayer>().Parent.HandleMessage(Messages.UIDrag, dragDelta);
+                            OnDrag(this, l.Id, dragDelta);
                         }
                     }
                 }
@@ -113,7 +125,7 @@ namespace Phantom.GameUI
 				if (l.State == TouchLocationState.Pressed) {
 					touchmap [l.Id] = focus;
                     this.layer.SetSelected(player, focus);
-					if (focus != null)
+                    if (focus != null && focus.CanUse(player))
 					{
 						focus.StartPress(player);
                         if (focus.OnMouseDown != null)
@@ -124,15 +136,16 @@ namespace Phantom.GameUI
 				} else if (l.State == TouchLocationState.Released && touchmap.ContainsKey(l.Id)) {
 					UIElement started = touchmap [l.Id];
 					touchmap.Remove (l.Id);
-					if (layer.GetSelected (player) != null) 
+                    UIElement element = layer.GetSelected(player);
+					if (element != null && element.CanUse(player)) 
                     {
                         if (focus == started && focus != null && !swiped)
-                            layer.GetSelected(player).EndPress(player);
+                            element.EndPress(player);
                         else
-						    layer.GetSelected (player).CancelPress (player);
+                            element.CancelPress(player);
 					}
 					if (focus == started && focus != null && !swiped) {
-						focus.ClickAt (l.Position, player, UIMouseButton.Left);
+						focus.ClickAt (l.Position, UIMouseButton.Left);
 					}
 				}
 

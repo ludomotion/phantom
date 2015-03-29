@@ -19,10 +19,7 @@ namespace Phantom.GameUI
         public Dictionary<Keys, UIElement> KeyBindings;
 
         public UIKeyboardHandler()
-            : this(0) { }
-
-        public UIKeyboardHandler(int player)
-            : base(player) 
+            : base(1) 
         {
             KeyBindings = new Dictionary<Keys, UIElement>();
         }

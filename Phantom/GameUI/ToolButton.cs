@@ -15,19 +15,15 @@ namespace Phantom.GameUI
         public bool SelectedTool = false;
         private float currentSelectedTool = 0;
 
-        public ToolButton(string name, string caption, Vector2 position, Shape shape, UIPlayerAction onActivate)
+        public ToolButton(string name, string caption, Vector2 position, Shape shape, UIAction onActivate)
             : base(name, caption, position, shape, onActivate)
         {
         }
 
-        public override void Activate(int player)
+        public override void Activate()
         {
-            if (CanUse(player))
-            {
-                SelectedTool = true;
-                if (OnActivate != null)
-                    OnActivate(this, player);
-            }
+            SelectedTool = true;
+            base.Activate();
         }
 
         public override void Update(float elapsed)

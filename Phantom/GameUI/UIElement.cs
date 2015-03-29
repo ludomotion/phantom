@@ -12,7 +12,6 @@ namespace Phantom.GameUI
     public enum UIMouseButton { None, Left, Right }
 
     public delegate void UIAction(UIElement element);
-    public delegate void UIPlayerAction(UIElement element, int player);
     public delegate void UIMouseAction(UIElement element, Vector2 mousePosition, UIMouseButton button);
 
 
@@ -111,10 +110,10 @@ namespace Phantom.GameUI
         public UIAction OnFocus;
         public UIAction OnBlur;
         public UIAction OnChange;
-        public UIPlayerAction OnStartPress;
-        public UIPlayerAction OnEndPress;
-        public UIPlayerAction OnCancelPress;
-        public UIPlayerAction OnActivate;
+        public UIAction OnStartPress;
+        public UIAction OnEndPress;
+        public UIAction OnCancelPress;
+        public UIAction OnActivate;
         public UIMouseAction OnMouseOver;
         public UIMouseAction OnMouseOut;
         public UIMouseAction OnMouseMove;
@@ -178,15 +177,23 @@ namespace Phantom.GameUI
         /// <param name="player"></param>
         public virtual void StartPress(int player) 
         {
-            int pl = 1 << player;
-            if (CanUse(player))
+            if (player < 0)
             {
+                pressed = 255;
+                if (OnStartPress != null)
+                    OnStartPress(this);
+
+                this.layer.SetFocus(this);
+            }
+            else
+            {
+                int pl = 1 << player;
                 pressed |= pl;
                 if (OnStartPress != null)
-                    OnStartPress(this, player);
+                    OnStartPress(this);
+
+                this.layer.SetFocus(this);
             }
-            
-            this.layer.SetFocus(this);
         }
 
         /// <summary>
@@ -195,13 +202,28 @@ namespace Phantom.GameUI
         /// <param name="player"></param>
         public virtual void EndPress(int player)
         {
-            int pl = 1 << player;
-            if ((pressed & pl) == pl)
+            if (player < 0)
             {
-                pressed &= 255 - pl;
-                if (OnEndPress != null)
-                    OnEndPress(this, player);
-                Activate(player);
+                if (pressed > 0)
+                {
+                    pressed = 0;
+                    if (OnEndPress != null)
+                        OnEndPress(this);
+                    if (this.Enabled)
+                        Activate();
+                }
+            }
+            else
+            {
+                int pl = 1 << player;
+                if ((pressed & pl) == pl)
+                {
+                    pressed &= 255 - pl;
+                    if (OnEndPress != null)
+                        OnEndPress(this);
+                    if (this.Enabled)
+                        Activate();
+                }
             }
         }
 
@@ -211,32 +233,39 @@ namespace Phantom.GameUI
         /// <param name="player"></param>
         public virtual void CancelPress(int player)
         {
-            int pl = 1 << player;
-            if ((pressed & pl) == pl)
+            if (player < 0)
             {
-                pressed &= 255 - pl;
-                if (OnCancelPress != null)
-                    OnCancelPress(this, player);
+                if (pressed > 0)
+                {
+                    pressed = 0;
+                    if (OnCancelPress != null)
+                        OnCancelPress(this);
+                }
+            }
+            else
+            {
+                int pl = 1 << player;
+                if ((pressed & pl) == pl)
+                {
+                    pressed &= 255 - pl;
+                    if (OnCancelPress != null)
+                        OnCancelPress(this);
+                }
             }
         }
 
-        /// <summary>
-        /// Override this function to implement click behavior
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="player"></param>
-        public virtual void Activate(int player)
+        public virtual void Activate()
         {
-            if (CanUse(player) && OnActivate != null)
-                OnActivate(this, player);
+            if (OnActivate != null)
+                OnActivate(this);
         }
 
-        public virtual void NextOption(int player)
+        public virtual void NextOption()
         {
 
         }
 
-        public virtual void PreviousOption(int player)
+        public virtual void PreviousOption()
         {
 
         }
@@ -247,9 +276,10 @@ namespace Phantom.GameUI
         /// </summary>
         /// <param name="position"></param>
         /// <param name="player"></param>
-        public virtual void ClickAt(Vector2 position, int player, UIMouseButton button)
+        /// <param name="button"></param>
+        public virtual void ClickAt(Vector2 position, UIMouseButton button)
         {
-            if (CanUse(player) && OnClick != null)
+            if (CanUse(0) && OnClick != null)
                 OnClick(this, position, button);
         }
 
@@ -263,8 +293,6 @@ namespace Phantom.GameUI
         {
             return (Enabled && Visible && !Tweening && ((PlayerMask & 1 << player) > 0));
         }
-
-
 
 
         public virtual bool InControl(Vector2 position)

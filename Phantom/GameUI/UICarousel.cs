@@ -105,31 +105,31 @@ namespace Phantom.GameUI
             return null;
         }
 
-        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
+        public override void ClickAt(Vector2 position, UIMouseButton button)
         {
             if (hovering != null)
-                hovering.ClickAt(position, player, button);
+                hovering.ClickAt(position, button);
             else
             {
                 switch (ElementOrientation)
                 {
                     case UIElementOrientation.LeftRight:
                         if (position.X < 0)
-                            PreviousOption(player);
+                            PreviousOption();
                         else
-                            NextOption(player);
+                            NextOption();
                         break;
                     case UIElementOrientation.TopDown:
                         if (position.Y < 0)
-                            PreviousOption(player);
+                            PreviousOption();
                         else
-                            NextOption(player);
+                            NextOption();
                         break;
                 }
 
             }
 
-            base.ClickAt(position, player, button);
+            base.ClickAt(position, button);
         }
 
         public override void Update(float elapsed)
@@ -139,11 +139,11 @@ namespace Phantom.GameUI
                 hovering.Selected = this.Selected;
         }
 
-        public override void PreviousOption(int player)
+        public override void PreviousOption()
         {
             if (selectedElement < 0)
                 return;
-            elements[selectedElement].CancelPress(player);
+            elements[selectedElement].CancelPress(-1);
             elements[selectedElement].Selected = 0;
             selectedElement--;
             if (selectedElement < 0)
@@ -157,11 +157,11 @@ namespace Phantom.GameUI
             SelectionChanged();
         }
 
-        public override void NextOption(int player)
+        public override void NextOption()
         {
             if (selectedElement < 0)
                 return;
-            elements[selectedElement].CancelPress(player);
+            elements[selectedElement].CancelPress(-1);
             elements[selectedElement].Selected = 0;
             selectedElement++;
             if (selectedElement >= elements.Count)
@@ -196,11 +196,11 @@ namespace Phantom.GameUI
             base.EndPress(player);
         }
 
-        public override void Activate(int player)
+        public override void Activate()
         {
             if (hovering != null)
-                hovering.EndPress(player);
-            base.Activate(player);
+                hovering.EndPress(-1);
+            base.Activate();
         }
 
         public override void Render(Graphics.RenderInfo info)
