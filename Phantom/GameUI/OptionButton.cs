@@ -41,7 +41,7 @@ namespace Phantom.GameUI
         /// <param name="wrap">Indicates whether the options cycle</param>
         /// <param name="selectedOption"></param>
         /// <param name="options"></param>
-        public OptionButton(string name, string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
+        public OptionButton(string name, string caption, Vector2 position, Shape shape, UIAction onChange, bool wrap, int selectedOption, params string[] options)
             : base (name, caption, position, shape, null)
         {
             prefix = caption;
@@ -49,10 +49,11 @@ namespace Phantom.GameUI
             option = -1;
             Option = selectedOption;
             this.wrap = wrap;
+            this.OnChange = onChange;
         }
 
-        public OptionButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, params string[] options)
-            : this (name, caption, position, shape, true, selectedOption, options) { }
+        public OptionButton(string name, string caption, Vector2 position, Shape shape, UIAction onChange, int selectedOption, params string[] options)
+            : this (name, caption, position, shape, onChange, true, selectedOption, options) { }
 
         protected void SetOption(int value)
         {
@@ -76,16 +77,14 @@ namespace Phantom.GameUI
                 OnChange(this);
         }
 
-        public override void NextOption(int player)
+        public override void NextOption()
         {
-            if (CanUse(player))
-                SetOption(option + 1);
+            SetOption(option + 1);
         }
 
-        public override void PreviousOption(int player)
+        public override void PreviousOption()
         {
-            if (CanUse(player))
-                SetOption(option -1);
+            SetOption(option -1);
         }
     
     }

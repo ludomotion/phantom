@@ -11,6 +11,10 @@ namespace Phantom.GameUI
     {
         private Color color;
         private bool centered;
+
+        public Label(string name, Vector2 position, Color color)
+            : this(name, position, color, true) { }
+
         public Label(string name, Vector2 position, Color color, bool centered)
             : base(name, position, new Circle(20))
         {
@@ -19,10 +23,6 @@ namespace Phantom.GameUI
             this.centered = centered;
         }
 
-        public Label(string name, Vector2 position, Color color)
-            : this(name, position, color, true)
-        {
-        }
 
         public override void Render(Graphics.RenderInfo info)
         {

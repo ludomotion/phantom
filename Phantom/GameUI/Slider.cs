@@ -57,7 +57,7 @@ namespace Phantom.GameUI
         /// <param name="currentValue"></param>
         /// <param name="sliderOientation"></param>
         /// <param name="options">The preset options</param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, SliderOrientation sliderOientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, UIAction onChange, SliderOrientation sliderOientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -71,6 +71,7 @@ namespace Phantom.GameUI
             this.snap = true;
             currentValue = -1;
             SetValue(currentValue);
+            this.OnChange = onChange;
         }
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace Phantom.GameUI
         /// <param name="currentOption"></param>
         /// <param name="orientation"></param>
         /// <param name="options"></param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, SliderOrientation orientation, params string[] options)
+        public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, UIAction onChange, SliderOrientation orientation, params string[] options)
             : base(name, position, shape)
         {
             this.minValue = 0;
@@ -96,6 +97,7 @@ namespace Phantom.GameUI
             this.snap = true;
             currentValue = -1;
             SetValue(currentValue);
+            this.OnChange = onChange;
         }
 
         /// <summary>
@@ -111,7 +113,7 @@ namespace Phantom.GameUI
         /// <param name="step"></param>
         /// <param name="orientation"></param>
         /// <param name="snap">The value always snaps to the indicated steps</param>
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, SliderOrientation orientation, bool snap)
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange, SliderOrientation orientation, bool snap)
             : base(name, position, shape)
         {
             this.minValue = minValue;
@@ -123,27 +125,26 @@ namespace Phantom.GameUI
             this.snap = snap;
             this.currentValue = -1;
             SetValue(currentValue);
+            this.OnChange = onChange;
         }
 
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, SliderOrientation orientation)
-            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, orientation, false) { }
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step)
-            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, SliderOrientation.Horizontal, false) { }
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange, SliderOrientation orientation)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, onChange, orientation, false) { }
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, step, onChange, SliderOrientation.Horizontal, false) { }
 
-        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue)
-            : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, SliderOrientation.Horizontal, false) { }
+        public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, UIAction onChange)
+            : this(name, caption, position, shape, minValue, maxValue, currentValue, (maxValue - minValue) * 0.1f, onChange, SliderOrientation.Horizontal, false) { }
 
         
-        public override void NextOption(int player)
+        public override void NextOption()
         {
-            if (CanUse(player))
-                SetValue(currentValue + step);
+            SetValue(currentValue + step);
         }
 
-        public override void PreviousOption(int player)
+        public override void PreviousOption()
         {
-            if (CanUse(player))
-                SetValue(currentValue - step);
+            SetValue(currentValue - step);
         }
 
         private void SetValue(float value)
@@ -233,24 +234,20 @@ namespace Phantom.GameUI
             }
         }
 
-        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
+        public override void ClickAt(Vector2 position, UIMouseButton button)
         {
-            if (CanUse(player))
+            base.ClickAt(position, button);
+            float rel = 0;
+            if (sliderOrientation == SliderOrientation.Horizontal)
             {
-                base.ClickAt(position, player, button);
-                float rel = 0;
-                if (sliderOrientation == SliderOrientation.Horizontal)
-                {
-                    rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
-                }
-                else
-                {
-                    rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
-                }
-                rel = MathHelper.Clamp(rel, 0, 1);
-                SetValue(minValue + (maxValue - minValue) * rel);
+                rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
             }
-
+            else
+            {
+                rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
+            }
+            rel = MathHelper.Clamp(rel, 0, 1);
+            SetValue(minValue + (maxValue - minValue) * rel);
         }
     }
 }

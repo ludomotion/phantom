@@ -30,13 +30,14 @@ namespace Phantom.GameUI
 
 
 
-        public ToggleButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, string option0, string option1)
+        public ToggleButton(string name, string caption, Vector2 position, Shape shape, int selectedOption, string option0, string option1, UIAction onChange)
             : base (name, caption, position, shape, null)
         {
             prefix = caption;
             options = new string[2] { option0, option1 };
             option = -1;
             SetOption(selectedOption);
+            this.OnChange = onChange;
         }
 
         protected void SetOption(int value)
@@ -50,10 +51,10 @@ namespace Phantom.GameUI
                 OnChange(this);
         }
 
-        public override void Activate(int player)
+        public override void Activate()
         {
             Option = 1 - Option;
-            base.Activate(player);
+            base.Activate();
         }
     }
 }

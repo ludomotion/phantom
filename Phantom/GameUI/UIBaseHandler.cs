@@ -65,8 +65,8 @@ namespace Phantom.GameUI
                     selected = current;
                 layer.SetSelected(player, selected);
             }
-            else if (selected != null)
-                selected.PreviousOption(player);
+            else if (selected != null && selected.CanUse(player))
+                selected.PreviousOption();
             else 
                 layer.SetSelected(player, layer.GetFirstControl(player));
         }
@@ -91,8 +91,8 @@ namespace Phantom.GameUI
                     selected = current;
                 layer.SetSelected(player, selected);
             }
-            else if (selected != null)
-                selected.NextOption(player);
+            else if (selected != null && selected.CanUse(player))
+                selected.NextOption();
             else
                 layer.SetSelected(player, layer.GetFirstControl(player));
 
@@ -117,8 +117,8 @@ namespace Phantom.GameUI
                     selected = current;
                 layer.SetSelected(player, selected);
             }
-            else if (selected != null)
-                selected.NextOption(player);
+            else if (selected != null && selected.CanUse(player))
+                selected.NextOption();
             else
                 layer.SetSelected(player, layer.GetFirstControl(player));
         }
@@ -143,8 +143,8 @@ namespace Phantom.GameUI
                     selected = current;
                 layer.SetSelected(player, selected);
             }
-            else if (selected != null)
-                selected.PreviousOption(player);
+            else if (selected != null && selected.CanUse(player))
+                selected.PreviousOption();
             else if (layer.Controls.Count > 0)
                 layer.SetSelected(player, layer.Controls[0]);
         }
@@ -152,14 +152,14 @@ namespace Phantom.GameUI
         protected void StartPress()
         {
             UIElement selected = layer.GetSelected(player);
-            if (selected != null)
+            if (selected != null && selected.CanUse(player))
                 selected.StartPress(player);
         }
 
         protected void EndPress()
         {
             UIElement selected = layer.GetSelected(player);
-            if (selected != null)
+            if (selected != null && selected.CanUse(player))
                 selected.EndPress(player);
         }
 

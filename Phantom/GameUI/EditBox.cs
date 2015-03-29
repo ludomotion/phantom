@@ -29,8 +29,6 @@ namespace Phantom.GameUI
         private float timer = 0;
         private int cursor;
         private Konsoul.KeyMap keyMap;
-
-
         private KeyboardState previous;
 
         public Vector2 CaptionPosition;
@@ -38,26 +36,21 @@ namespace Phantom.GameUI
         public UIAction OnEnter;
 
 
-        public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit)
-            : this(caption, text, new Vector2(left + width * 0.5f, top + height * 0.5f), new OABB(new Vector2(width * 0.5f, height * 0.5f)), 99)
+        public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit, UIAction onEnter)
+            : this(caption, text, new Vector2(left + width * 0.5f, top + height * 0.5f), new OABB(new Vector2(width * 0.5f, height * 0.5f)), 99, onChange, onExit, onEnter)
         {
-            this.OnChange = onChange;
-            this.OnBlur = onExit;
             this.Caption = caption;
             this.CaptionPosition = new Vector2(-80, 0);
             this.Type = type; 
         }
 
-        /// <summary>
-        /// Creates the editbox
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="position"></param>
-        /// <param name="shape"></param>
-        public EditBox(string name, string text, Vector2 position, OABB shape, int textLength)
+        public EditBox(string name, string text, Vector2 position, OABB shape, int textLength, UIAction onChange, UIAction onExit, UIAction onEnter)
             : base(name, position, shape)
         {
-            this.Text= text;
+            this.OnChange = onChange;
+            this.OnBlur = onExit;
+            this.OnEnter = onEnter;
+            this.Text = text;
             this.w = shape.HalfSize.X - 4;
             this.h = UILayer.Font.LineSpacing * 0.5f;
             this.TextLength = textLength;

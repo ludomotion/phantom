@@ -35,10 +35,6 @@ namespace Phantom.GameUI
         public UIMouseHandler()
             : base(0) { }
 
-        public UIMouseHandler(int player)
-            : base(player) { }
-
-
         public override void OnAdd(Component parent)
         {
             base.OnAdd(parent);
@@ -175,7 +171,7 @@ namespace Phantom.GameUI
                 {
                     mouseDownPosition = mousePosition;
                     layer.SetSelected(player, hover);
-                    if (hover != null)
+                    if (hover != null && hover.CanUse(player))
                     {
                         hover.StartPress(player);
                         mouseDown = hover;
@@ -240,14 +236,15 @@ namespace Phantom.GameUI
                     }
                     else
                     {
-                        if (layer.GetSelected(player) != null)
+                        UIElement element = layer.GetSelected(player);
+                        if (element != null && element.CanUse(player))
                         {
-                            layer.GetSelected(player).EndPress(player);
+                            element.EndPress(player);
                             if (hover == mouseDown)
                             {
                                 doubleClickTimer = DoubleClickSpeed;
                                 if (clickTimes == 1)
-                                    hover.ClickAt(mousePosition - hover.Position, player, UIMouseButton.Left);
+                                    hover.ClickAt(mousePosition - hover.Position, UIMouseButton.Left);
                                 if (clickTimes == 2 && hover.OnDoubleClick != null)
                                     hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                             }

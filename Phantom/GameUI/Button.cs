@@ -21,14 +21,14 @@ namespace Phantom.GameUI
         /// </summary>
         public string Caption;
 
-        public Button(string name, string caption, Vector2 position, Shape shape, UIPlayerAction onActivate)
+        public Button(string name, string caption, Vector2 position, Shape shape, UIAction onActivate)
             : base(name, position, shape)
         {
             this.Caption = caption;
             this.OnActivate = onActivate;
         }
 
-        public Button(int x, int y, int width, int height, string caption, UIPlayerAction onActivate)
+        public Button(int x, int y, int width, int height, string caption, UIAction onActivate)
             : base(caption, new Vector2(x+width*0.5f, y+height*0.5f), new OABB(new Vector2(width*0.5f, height*0.5f)))
         {
             this.Caption = caption;

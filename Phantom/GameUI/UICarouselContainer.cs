@@ -112,34 +112,34 @@ namespace Phantom.GameUI
 
         }
 
-        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
+        public override void ClickAt(Vector2 position, UIMouseButton button)
         {
             if (hovering != null)
-                hovering.ClickAt(position, player, button);
+                hovering.ClickAt(position, button);
             else
             {
                 switch (ElementOrientation)
                 {
                     case UIElementOrientation.LeftRight:
                         if (position.X < 0)
-                            Previous(player);
+                            Previous();
                         else
-                            Next(player);
+                            Next();
                         break;
                     case UIElementOrientation.TopDown:
                         if (position.Y < 0)
-                            Previous(player);
+                            Previous();
                         else
-                            Next(player);
+                            Next();
                         break;
                 }
 
             }
             
-            base.ClickAt(position, player, button);
+            base.ClickAt(position, button);
         }
 
-        private void Previous(int player)
+        private void Previous()
         {
             if (selectedContent < 0)
                 return;
@@ -153,7 +153,7 @@ namespace Phantom.GameUI
             }
         }
 
-        private void Next(int player)
+        private void Next()
         {
             if (selectedContent < 0)
                 return;

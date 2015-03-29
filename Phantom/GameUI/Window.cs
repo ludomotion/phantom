@@ -70,7 +70,7 @@ namespace Phantom.GameUI
         }
 
 
-        private void DoX(UIElement sender, int player)
+        private void DoX(UIElement sender)
         {
             Hide();
         }

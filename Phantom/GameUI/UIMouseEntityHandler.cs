@@ -44,7 +44,7 @@ namespace Phantom.GameUI
         public string Command = "";
 
         public UIMouseEntityHandler(EntityLayer entityLayer)
-            : base(0)
+            : base()
         {
             this.entityLayer = entityLayer;
             selecting = false;
