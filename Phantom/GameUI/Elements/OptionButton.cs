@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Core;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     /// <summary>
     /// A simple menu button that can be clicked to change between a number of options.

@@ -9,7 +9,7 @@ using Phantom.Core;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Input;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     /// <summary>
     /// A simple menu button that can be clicked to throw MenuClicked messages in the menu.

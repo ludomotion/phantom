@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     /// <summary>
     /// The base class from which different input handlers are derived
     /// </summary>
-    public class UIBaseHandler : Component
+    public class BaseInputHandler : Component
     {
         /// <summary>
         /// A reference to the menu
@@ -20,7 +21,7 @@ namespace Phantom.GameUI
         private float keyTimeOut = 0.4f;
         protected int player;
 
-        public UIBaseHandler(int player)
+        public BaseInputHandler(int player)
         {
             this.player = player;
         }

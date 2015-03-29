@@ -6,8 +6,10 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Graphics;
+using Phantom.GameUI.Elements;
+using Phantom.GameUI.Handlers;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Windows
 {
     public class Window : GameState
     {
@@ -53,7 +55,7 @@ namespace Phantom.GameUI
             : base()
         {
             AddComponent(ui = new UILayer(new Renderer(1, Renderer.ViewportPolicy.None, Renderer.RenderOptions.Canvas), 1));
-            ui.AddComponent(new UIMouseHandler());
+            ui.AddComponent(new MouseHandler());
             //ui.AddComponent(new UIKeyboardHandler());
             ui.AddComponent(new WindowBackground(new Vector2(left+width*0.5f, top + height*0.5f), new Vector2(width*0.5f, height*0.5f), text));
             ui.AddComponent(new Button("close", "x", new Vector2(left + width - 9, top + 9), new OABB(new Vector2(8, 8)), DoX));

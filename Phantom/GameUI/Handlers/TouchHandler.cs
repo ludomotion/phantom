@@ -8,15 +8,16 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using Phantom.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
 	/// <summary>
 	/// Implements mouse input for menu controls. 
 	/// </summary>
-	public class UITouchHandler : UIBaseHandler
+	public class TouchHandler : BaseInputHandler
 	{
-        public delegate void UITouchAction(UITouchHandler handler, int touchID, Vector3 data);
+        public delegate void UITouchAction(TouchHandler handler, int touchID, Vector3 data);
 
 		private TouchController touch;
 		private Dictionary<int, UIElement> touchmap = new Dictionary<int, UIElement>();
@@ -28,10 +29,10 @@ namespace Phantom.GameUI
         public UITouchAction OnSwipe;
         public UITouchAction OnDrag;
 
-		public UITouchHandler()
+		public TouchHandler()
 			: this(null, null) { }
 
-        public UITouchHandler(UITouchAction onSwipe, UITouchAction onDrag)
+        public TouchHandler(UITouchAction onSwipe, UITouchAction onDrag)
             : base(0) 
         {
             this.OnSwipe = onSwipe;

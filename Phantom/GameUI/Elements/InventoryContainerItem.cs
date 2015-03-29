@@ -6,17 +6,17 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using System.Diagnostics;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
-    public class UIInventoryItem : UIContent
+    public class InventoryContainerItem : ContainerItem
     {
-        protected UIInventory Inventory;
+        protected InventoryContainer Inventory;
         public int InventoryX;
         public int InventoryY;
         internal int Width;
         internal int Height;
 
-        public UIInventoryItem(string name, string caption, Vector2 position, int width, int height, float slotSize, int inventoryX, int inventoryY)
+        public InventoryContainerItem(string name, string caption, Vector2 position, int width, int height, float slotSize, int inventoryX, int inventoryY)
             : base(name, caption, position, new OABB(new Vector2(width*slotSize*0.5f, height*slotSize*0.5f)))
         {
             this.Inventory = null;
@@ -26,7 +26,7 @@ namespace Phantom.GameUI
             this.Height = height;
         }
 
-        public UIInventoryItem(string name, string caption, int width, int height, float slotSize)
+        public InventoryContainerItem(string name, string caption, int width, int height, float slotSize)
             : base(name, caption, new Vector2(float.NaN, float.NaN), new OABB(new Vector2(width * slotSize * 0.5f, height * slotSize * 0.5f)))
         {
             this.Inventory = null;
@@ -37,7 +37,7 @@ namespace Phantom.GameUI
         }
 
 
-        public UIInventoryItem(string name, string caption, int width, int height, float slotSize, int inventoryX, int inventoryY)
+        public InventoryContainerItem(string name, string caption, int width, int height, float slotSize, int inventoryX, int inventoryY)
             : this(name, caption, new Vector2(float.NaN, float.NaN), width, height, slotSize, inventoryX, inventoryY) { }
 
         public override void Update(float elapsed)
@@ -52,11 +52,11 @@ namespace Phantom.GameUI
             base.Update(elapsed);
         }
 
-        public override void Dock(UIContainer container)
+        public override void Dock(Container container)
         {
-            if (container is UIInventory)
+            if (container is InventoryContainer)
             {
-                UIInventory inv = (UIInventory)container;
+                InventoryContainer inv = (InventoryContainer)container;
                 if ((float.IsNaN(this.Position.X) || float.IsNaN(this.Position.Y)) && InventoryX >= 0 && InventoryY >= 0)
                     this.Position = inv.GetPositionInInventory(this);
                 
@@ -71,7 +71,7 @@ namespace Phantom.GameUI
                 base.Dock(container);
         }
 
-        private void DockAtLocation(UIInventory inv)
+        private void DockAtLocation(InventoryContainer inv)
         {
             if (!CanDockAt(inv) || !inv.CanAccept(this))
             {
@@ -82,7 +82,7 @@ namespace Phantom.GameUI
                 return;
             }
             inv.GetInventoryPosition(this, ref InventoryX, ref InventoryY);
-            UIInventoryItem other = inv.Slots[InventoryX, InventoryY];
+            InventoryContainerItem other = inv.Slots[InventoryX, InventoryY];
             if (other != null)
             {
                 //its not empty, check if it is the same and then try to stack
@@ -122,7 +122,7 @@ namespace Phantom.GameUI
             this.Position.Y = inv.Position.Y + (-0.5f * inv.Height + 0.5f * this.Height + this.InventoryY) * inv.SlotSize.Y;
         }
 
-        private void AddToInventory(UIInventory inv)
+        private void AddToInventory(InventoryContainer inv)
         {
             if (!CanDockAt(inv) || !inv.FindEmptySpotFor(this))
             {
@@ -143,12 +143,12 @@ namespace Phantom.GameUI
             this.Position.Y = inv.Position.Y + (-0.5f * inv.Height + 0.5f * this.Height + this.InventoryY) * inv.SlotSize.Y;
         }
 
-        public override void MoveTo(UIContainer container)
+        public override void MoveTo(Container container)
         {
             base.MoveTo(container);
-            if (container is UIInventory)
+            if (container is InventoryContainer)
             {
-                UIInventory inv = (UIInventory)container;
+                InventoryContainer inv = (InventoryContainer)container;
                 this.targetPosition.X = inv.Position.X + (-0.5f * inv.Width + 0.5f * this.Width + this.InventoryX) * inv.SlotSize.X;
                 this.targetPosition.Y = inv.Position.Y + (-0.5f * inv.Height + 0.5f * this.Height + this.InventoryY) * inv.SlotSize.Y;
 

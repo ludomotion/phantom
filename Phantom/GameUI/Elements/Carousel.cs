@@ -7,9 +7,9 @@ using Phantom.Shapes;
 using Phantom.Misc;
 using System.Diagnostics;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
-    public class UICarousel : UIElement
+    public class Carousel : UIElement
     {
         public readonly UIElementOrientation ElementOrientation;
         public readonly int VisibleOptions;
@@ -20,7 +20,7 @@ namespace Phantom.GameUI
         private float fallOff;
         private UIElement hovering;
 
-        public UICarousel(string name, Vector2 position, OABB shape, UIElementOrientation orientation, int visibleOptions, bool wrap, float offset, float fallOff)
+        public Carousel(string name, Vector2 position, OABB shape, UIElementOrientation orientation, int visibleOptions, bool wrap, float offset, float fallOff)
             : base(name, position, shape)
         {
             this.ElementOrientation = orientation;

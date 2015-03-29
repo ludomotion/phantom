@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     public class Label : UIElement
     {

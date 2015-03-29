@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Phantom.GameUI.Elements;
 using Phantom.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Windows
 {
     public class InputDialog : Window
     {

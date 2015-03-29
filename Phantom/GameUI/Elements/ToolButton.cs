@@ -8,7 +8,7 @@ using Phantom.Utils;
 using Phantom.Misc;
 using Phantom.Core;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     public class ToolButton : Button
     {

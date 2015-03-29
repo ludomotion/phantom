@@ -6,24 +6,24 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Misc;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
-    public class UICarouselContainer : UIContainer
+    public class CarouselContainer : Container
     {
         public readonly UIElementOrientation ElementOrientation;
         public readonly int VisibleOptions;
         public readonly bool Wrap;
         public int Capacity;
-        public List<UIContent> Contents {get; private set;}
+        public List<ContainerItem> Contents {get; private set;}
         private int selectedContent;
         private Vector2 offset;
-        private UIContent hovering;
+        private ContainerItem hovering;
 
-        public UICarouselContainer(string name, string caption, Vector2 position, OABB shape, int capacity, UIElementOrientation orientation, int visibleOptions, bool wrap, float offset)
+        public CarouselContainer(string name, string caption, Vector2 position, OABB shape, int capacity, UIElementOrientation orientation, int visibleOptions, bool wrap, float offset)
             : base(name, caption, position, shape)
         {
             this.ElementOrientation = orientation;
-            this.Contents = new List<UIContent>();
+            this.Contents = new List<ContainerItem>();
             this.Capacity = capacity;
             this.VisibleOptions = visibleOptions;
             this.Wrap = wrap;
@@ -42,7 +42,7 @@ namespace Phantom.GameUI
             }
         }
 
-        public override bool CanAccept(UIContent content)
+        public override bool CanAccept(ContainerItem content)
         {
             if (!this.Enabled)
                 return false;
@@ -53,7 +53,7 @@ namespace Phantom.GameUI
             return true;
         }
 
-        public override UIContent GetContentAt(Vector2 position)
+        public override ContainerItem GetContentAt(Vector2 position)
         {
             if (selectedContent >= 0)
             {
@@ -82,13 +82,13 @@ namespace Phantom.GameUI
         protected override void OnComponentAdded(Core.Component component)
         {
             base.OnComponentAdded(component);
-            if (component is UIContent)
+            if (component is ContainerItem)
             {
                 if (selectedContent < Contents.Count - 1)
-                    Contents.Insert(selectedContent, component as UIContent);
+                    Contents.Insert(selectedContent, component as ContainerItem);
                 else
                 {
-                    Contents.Add(component as UIContent);
+                    Contents.Add(component as ContainerItem);
                     selectedContent++;
                 }
             }
@@ -97,9 +97,9 @@ namespace Phantom.GameUI
         protected override void OnComponentRemoved(Core.Component component)
         {
             base.OnComponentRemoved(component);
-            if (component is UIContent)
+            if (component is ContainerItem)
             {
-                int index = Contents.IndexOf(component as UIContent);
+                int index = Contents.IndexOf(component as ContainerItem);
                 if (index >= 0)
                 {
                     Contents.RemoveAt(index);
@@ -170,7 +170,7 @@ namespace Phantom.GameUI
 
         internal void UpdateMouse(Vector2 mousePosition)
         {
-            UIContent h = GetContentAt(mousePosition);
+            ContainerItem h = GetContentAt(mousePosition);
 
             if (h != hovering)
             {
