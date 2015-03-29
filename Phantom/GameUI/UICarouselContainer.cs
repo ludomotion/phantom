@@ -112,10 +112,10 @@ namespace Phantom.GameUI
 
         }
 
-        public override void ClickAt(Vector2 position, int player)
+        public override void ClickAt(Vector2 position, int player, UIMouseButton button)
         {
             if (hovering != null)
-                hovering.ClickAt(position, player);
+                hovering.ClickAt(position, player, button);
             else
             {
                 switch (ElementOrientation)
@@ -136,7 +136,7 @@ namespace Phantom.GameUI
 
             }
             
-            base.ClickAt(position, player);
+            base.ClickAt(position, player, button);
         }
 
         private void Previous(int player)

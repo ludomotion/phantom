@@ -66,7 +66,7 @@ namespace Phantom.GameUI
                 layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.PreviousOption, player);
+                selected.PreviousOption(player);
             else 
                 layer.SetSelected(player, layer.GetFirstControl(player));
         }
@@ -92,7 +92,7 @@ namespace Phantom.GameUI
                 layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.NextOption, player);
+                selected.NextOption(player);
             else
                 layer.SetSelected(player, layer.GetFirstControl(player));
 
@@ -118,7 +118,7 @@ namespace Phantom.GameUI
                 layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.NextOption, player);
+                selected.NextOption(player);
             else
                 layer.SetSelected(player, layer.GetFirstControl(player));
         }
@@ -144,7 +144,7 @@ namespace Phantom.GameUI
                 layer.SetSelected(player, selected);
             }
             else if (selected != null)
-                selected.Click(ClickType.PreviousOption, player);
+                selected.PreviousOption(player);
             else if (layer.Controls.Count > 0)
                 layer.SetSelected(player, layer.Controls[0]);
         }

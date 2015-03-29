@@ -9,12 +9,6 @@ using Phantom.Shapes;
 namespace Phantom.GameUI
 {
     public enum UIElementOrientation { LeftRight, TopDown }
-
-    /// <summary>
-    /// The type of click/command that was passed to the control
-    /// </summary>
-    public enum ClickType { Select, NextOption, PreviousOption }
-
     public enum UIMouseButton { None, Left, Right }
 
     public delegate void UIAction(UIElement element);
@@ -116,6 +110,7 @@ namespace Phantom.GameUI
 
         public UIAction OnFocus;
         public UIAction OnBlur;
+        public UIAction OnChange;
         public UIPlayerAction OnStartPress;
         public UIPlayerAction OnEndPress;
         public UIPlayerAction OnCancelPress;
@@ -160,17 +155,21 @@ namespace Phantom.GameUI
         public override void HandleMessage(Message message)
         {
             message.Is<Vector2>(Messages.SetPosition, ref this.Position);
-            if (message.Type == Messages.UIShowToolTip && this.ToolTipText!="")
+            base.HandleMessage(message);
+        }
+
+        public virtual ToolTip ShowToolTip(Vector2 position)
+        {
+            if (this.ToolTipText != "")
             {
                 ToolTip t = (ToolTip)Activator.CreateInstance(ToolTip.ToolTipType);
                 t.SetText(this.ToolTipText);
-                t.SetPosition((Vector2)message.Data);
+                t.SetPosition(position);
                 t.Owner = this;
                 this.Parent.AddComponent(t);
-                message.Data = t;
-                message.Handle();
+                return t;
             }
-            base.HandleMessage(message);
+            return null;
         }
 
         /// <summary>
@@ -202,7 +201,7 @@ namespace Phantom.GameUI
                 pressed &= 255 - pl;
                 if (OnEndPress != null)
                     OnEndPress(this, player);
-                Click(ClickType.Select, player);
+                Activate(player);
             }
         }
 
@@ -226,41 +225,34 @@ namespace Phantom.GameUI
         /// </summary>
         /// <param name="type"></param>
         /// <param name="player"></param>
-        public virtual void Click(ClickType type, int player)
+        public virtual void Activate(int player)
         {
-            if (type == ClickType.Select && OnActivate != null)
+            if (CanUse(player) && OnActivate != null)
                 OnActivate(this, player);
         }
+
+        public virtual void NextOption(int player)
+        {
+
+        }
+
+        public virtual void PreviousOption(int player)
+        {
+
+        }
+
 
         /// <summary>
         /// Override this function to implement behavior to respond to mouse and touch clicks at a specific location
         /// </summary>
         /// <param name="position"></param>
         /// <param name="player"></param>
-        public virtual void ClickAt(Vector2 position, int player)
+        public virtual void ClickAt(Vector2 position, int player, UIMouseButton button)
         {
+            if (CanUse(player) && OnClick != null)
+                OnClick(this, position, button);
         }
 
-
-        [Obsolete]
-        public virtual void MoveMouseTo(Vector2 position, int player)
-        {
-        }
-
-        [Obsolete]
-        public virtual void MouseDown(Vector2 position, int player)
-        {
-        }
-
-        [Obsolete]
-        public virtual void MouseUp(Vector2 position, int player)
-        {
-        }
-
-        [Obsolete]
-        public virtual void HoverAt(Vector2 position, int player)
-        {
-        }
 
         /// <summary>
         /// Quick check if the control can be used by a player (must be enabled, visible, not tweening and the playerMask must fit)

@@ -33,9 +33,9 @@ namespace Phantom.GameUI
 
         private KeyboardState previous;
 
-        private UIAction OnChange;
         public Vector2 CaptionPosition;
         public String Caption;
+        public UIAction OnEnter;
 
 
         public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit)
@@ -124,7 +124,6 @@ namespace Phantom.GameUI
                         this.Text = this.Text.Insert(this.cursor++, c.ToString());
                         if (this.OnChange != null)
                             this.OnChange(this);
-                        this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                     }
                 }
                 if (current.IsKeyDown(Keys.Back) && !previous.IsKeyDown(Keys.Back) && this.cursor > 0)
@@ -133,20 +132,19 @@ namespace Phantom.GameUI
                     this.cursor = (int)MathHelper.Clamp(this.cursor - 1, 0, this.Text.Length);
                     if (this.OnChange != null)
                         this.OnChange(this);
-                    this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                 }
                 if (current.IsKeyDown(Keys.Delete) && !previous.IsKeyDown(Keys.Delete) && this.cursor < this.Text.Length)
                 {
                     this.Text = this.Text.Remove(this.cursor, 1);
                     if (this.OnChange != null)
                         this.OnChange(this);
-                    this.GetAncestor<GameState>().HandleMessage(Messages.UIElementValueChanged, this);
                     //lastCursor = -1; // force reblink
                 }
 
                 if (current.IsKeyDown(Keys.Enter) && !previous.IsKeyDown(Keys.Enter))
                 {
-                    this.GetAncestor<GameState>().HandleMessage(Messages.UIElementEnter, this);
+                    if (OnEnter != null)
+                        OnEnter(this);
                     this.layer.FocusOnNext();
                 }
 

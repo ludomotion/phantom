@@ -198,15 +198,16 @@ namespace Phantom.GameUI
                         //this stacks fits with the other stack
                         this.Destroyed = true;
                         other.Count = s;
-                        other.HandleMessage(Messages.ChangeStackSize, this);
+                        other.StackSizeChanged();
                     }
                     else
                     {
                         //return any left-overs
                         other.Count = other.StackSize;
-                        other.HandleMessage(Messages.ChangeStackSize, this);
+                        other.StackSizeChanged();
                         this.Count = s - other.StackSize;
-                        this.HandleMessage(Messages.ChangeStackSize, this);
+                        this.StackSizeChanged();
+
                         if (LastContainer != null)
                             MoveTo(LastContainer);
                         else
@@ -281,6 +282,15 @@ namespace Phantom.GameUI
         public virtual bool CanDockAt(UIContainer container)
         {
             return container.Enabled;
+        }
+
+        /// <summary>
+        /// Override this function if you want to react to changes in stack size
+        /// </summary>
+        public virtual void StackSizeChanged()
+        {
+            if (OnChange != null)
+                OnChange(this);
         }
     }
 }

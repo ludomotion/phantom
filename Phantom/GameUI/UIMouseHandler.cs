@@ -98,9 +98,6 @@ namespace Phantom.GameUI
             if (hover is UICarouselContainer)
                 ((UICarouselContainer)hover).UpdateMouse(mousePosition);
 
-            if (hover != null)
-                hover.HoverAt(mousePosition, player);
-
             if (hover != this.Hover)
             {
                 if (this.Hover != null && this.Hover.OnMouseOut != null)
@@ -142,8 +139,6 @@ namespace Phantom.GameUI
                         //if pressing the left button at the same location pass the info
                         if (mouseDown != null && hover == mouseDown)
                         {
-                            mouseDown.MoveMouseTo(mousePosition - mouseDown.Position, player);
-
                             if (hover is UICarousel)
                                 hover = ((UICarousel)hover).GetElementAt(mousePosition);
                             //check if I can start dragging something;
@@ -168,8 +163,7 @@ namespace Phantom.GameUI
                 notMovedTimer += elapsed;
                 if (notMovedTimer > ToolTip.ToolTipTime && notMovedTimer - elapsed <= ToolTip.ToolTipTime && this.Hover != null)
                 {
-                    Message m = this.Hover.HandleMessage(Messages.UIShowToolTip, mousePosition);
-                    this.toolTip = m.Data as ToolTip;
+                    this.toolTip = this.Hover.ShowToolTip(mousePosition);
                 }
                 
             }
@@ -253,11 +247,7 @@ namespace Phantom.GameUI
                             {
                                 doubleClickTimer = DoubleClickSpeed;
                                 if (clickTimes == 1)
-                                {
-                                    hover.ClickAt(mousePosition - hover.Position, player);
-                                    if (hover.OnClick != null)
-                                        hover.OnClick(hover, mousePosition, UIMouseButton.Left);
-                                }
+                                    hover.ClickAt(mousePosition - hover.Position, player, UIMouseButton.Left);
                                 if (clickTimes == 2 && hover.OnDoubleClick != null)
                                     hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                             }

@@ -42,7 +42,7 @@ namespace Phantom.GameUI
         /// <param name="selectedOption"></param>
         /// <param name="options"></param>
         public OptionButton(string name, string caption, Vector2 position, Shape shape, bool wrap, int selectedOption, params string[] options)
-            : base (name, caption, position, shape)
+            : base (name, caption, position, shape, null)
         {
             prefix = caption;
             this.options = options;
@@ -72,21 +72,20 @@ namespace Phantom.GameUI
             option = value;
             Caption = prefix + " " + options[option];
 
-            GameState state = this.GetAncestor<GameState>();
-            if (state != null)
-                state.HandleMessage(Messages.UIElementValueChanged, this);
+            if (OnChange != null)
+                OnChange(this);
         }
 
-        public override void Click(ClickType type, int player)
+        public override void NextOption(int player)
         {
             if (CanUse(player))
-            {
-                base.Click(type, player);
-                if (type == ClickType.NextOption || type == ClickType.Select)
-                    SetOption(option + 1);
-                if (type == ClickType.PreviousOption)
-                    SetOption(option - 1);
-            }
+                SetOption(option + 1);
+        }
+
+        public override void PreviousOption(int player)
+        {
+            if (CanUse(player))
+                SetOption(option -1);
         }
     
     }
