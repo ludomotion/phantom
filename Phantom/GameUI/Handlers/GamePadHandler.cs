@@ -6,20 +6,20 @@ using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     /// <summary>
     /// Implements the control for a GamePad. The DPad and sticks can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The A button is used to click buttons. Back calls the menu Back method
     /// </summary>
-    public class UIGamePadHandler : UIBaseHandler
+    public class GamePadHandler : BaseInputHandler
     {
         private GamePadState previous;
         private PlayerIndex index;
         private float threshold = 0.8f;
 
-        public UIGamePadHandler(PlayerIndex index)
+        public GamePadHandler(PlayerIndex index)
             : base((int)index + 2)
         {
             this.index = index;

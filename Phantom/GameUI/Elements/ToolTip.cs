@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     public class ToolTip : UIElement
     {

@@ -6,11 +6,11 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     public enum UIElementOrientation { LeftRight, TopDown }
     public enum UIMouseButton { None, Left, Right }
-
+    
     public delegate void UIAction(UIElement element);
     public delegate void UIMouseAction(UIElement element, Vector2 mousePosition, UIMouseButton button);
 

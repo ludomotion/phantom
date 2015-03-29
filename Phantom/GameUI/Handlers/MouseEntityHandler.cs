@@ -6,7 +6,7 @@ using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     public struct MouseCommand
     {
@@ -33,7 +33,7 @@ namespace Phantom.GameUI
         }
 
     }
-    public class UIMouseEntityHandler : UIMouseHandler
+    public class MouseEntityHandler : MouseHandler
     {
         
         private EntityLayer entityLayer;
@@ -43,7 +43,7 @@ namespace Phantom.GameUI
         public int Capacity = -1;
         public string Command = "";
 
-        public UIMouseEntityHandler(EntityLayer entityLayer)
+        public MouseEntityHandler(EntityLayer entityLayer)
             : base()
         {
             this.entityLayer = entityLayer;

@@ -4,21 +4,22 @@ using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     /// <summary>
     /// Implements the control for keyboard. The arrow keys can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The space bar or enter key is used to click buttons. Escape calls the menu Back method.
     /// </summary>
-    public class UIKeyboardHandler : UIBaseHandler
+    public class KeyboardHandler : BaseInputHandler
     {
         private KeyboardState previous;
 
         public Dictionary<Keys, UIElement> KeyBindings;
 
-        public UIKeyboardHandler()
+        public KeyboardHandler()
             : base(1) 
         {
             KeyBindings = new Dictionary<Keys, UIElement>();

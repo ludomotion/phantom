@@ -7,8 +7,9 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using System.Threading;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Utils
 {
     /// <summary>
     /// A component that allows you to drag menu controls and report on their current location when added to a menu.

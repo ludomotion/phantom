@@ -5,8 +5,9 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Utils;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Utils
 {
     public class UITweener : Component
     {

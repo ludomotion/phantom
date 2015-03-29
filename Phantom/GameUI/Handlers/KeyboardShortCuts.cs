@@ -4,24 +4,25 @@ using System.Linq;
 using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework.Input;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     /// <summary>
     /// Implements only keyboard shortcuts. The arrow keys can be used to move the 
     /// selected control, or change values of sliders and optio buttons.
     /// The space bar or enter key is used to click buttons. Escape calls the menu Back method.
     /// </summary>
-    public class UIKeyboardShortCuts : UIBaseHandler
+    public class KeyboardShortCuts : BaseInputHandler
     {
         private KeyboardState previous;
 
         public Dictionary<Keys, UIElement> KeyBindings;
 
-        public UIKeyboardShortCuts()
+        public KeyboardShortCuts()
             : this(0) { }
 
-        public UIKeyboardShortCuts(int player)
+        public KeyboardShortCuts(int player)
             : base(player) 
         {
             KeyBindings = new Dictionary<Keys, UIElement>();

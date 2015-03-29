@@ -7,13 +7,14 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using Phantom.Graphics;
+using Phantom.GameUI.Elements;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Handlers
 {
     /// <summary>
     /// Implements mouse input for menu controls. 
     /// </summary>
-    public class UIMouseHandler : UIBaseHandler
+    public class MouseHandler : BaseInputHandler
     {
         public static float DragDistanceSquared = 25;
         public static float DoubleClickSpeed = 0.2f;
@@ -23,7 +24,7 @@ namespace Phantom.GameUI
         private UIElement mouseDown;
         private UIElement mouseDownRight;
         private bool dragging;
-        private UIContent draggingContent;
+        private ContainerItem draggingContent;
         protected Vector2 mouseDownPosition;
         protected Vector2 mousePosition;
         private Renderer renderer;
@@ -32,7 +33,7 @@ namespace Phantom.GameUI
         private float notMovedTimer = 0;
         private ToolTip toolTip;
 
-        public UIMouseHandler()
+        public MouseHandler()
             : base(0) { }
 
         public override void OnAdd(Component parent)
@@ -65,7 +66,7 @@ namespace Phantom.GameUI
             return Hover;
         }
 
-        public UIContent GetDragging()
+        public ContainerItem GetDragging()
         {
             return draggingContent;
         }
@@ -84,15 +85,15 @@ namespace Phantom.GameUI
             UIElement hover = layer.GetControlAt(mousePosition, draggingContent);
             if (hover != null && (hover.PlayerMask & (1 << player)) == 0)
                 hover = null;
-            UIContent content = (hover as UIContent);
+            ContainerItem content = (hover as ContainerItem);
             if (content != null && content.Container != null)
                 hover = content.Container;
-            if (hover is UIInventory)
-                ((UIInventory)hover).UpdateMouse(mousePosition);
-            if (hover is UICarousel)
-                ((UICarousel)hover).UpdateMouse(mousePosition);
-            if (hover is UICarouselContainer)
-                ((UICarouselContainer)hover).UpdateMouse(mousePosition);
+            if (hover is InventoryContainer)
+                ((InventoryContainer)hover).UpdateMouse(mousePosition);
+            if (hover is Carousel)
+                ((Carousel)hover).UpdateMouse(mousePosition);
+            if (hover is CarouselContainer)
+                ((CarouselContainer)hover).UpdateMouse(mousePosition);
 
             if (hover != this.Hover)
             {
@@ -135,18 +136,18 @@ namespace Phantom.GameUI
                         //if pressing the left button at the same location pass the info
                         if (mouseDown != null && hover == mouseDown)
                         {
-                            if (hover is UICarousel)
-                                hover = ((UICarousel)hover).GetElementAt(mousePosition);
+                            if (hover is Carousel)
+                                hover = ((Carousel)hover).GetElementAt(mousePosition);
                             //check if I can start dragging something;
-                            if (hover is UIContainer && (hover as UIContainer).GetContentAt(mousePosition) != null && hover.Enabled)
+                            if (hover is Container && (hover as Container).GetContentAt(mousePosition) != null && hover.Enabled)
                             {
                                 layer.GetSelected(player).CancelPress(player);
-                                draggingContent = (hover as UIContainer).GetContentAt(mousePosition);
+                                draggingContent = (hover as Container).GetContentAt(mousePosition);
                                 draggingContent.Undock();
                             }
-                            if (hover is UIContent && hover.Enabled)
+                            if (hover is ContainerItem && hover.Enabled)
                             {
-                                draggingContent = hover as UIContent;
+                                draggingContent = hover as ContainerItem;
                                 draggingContent.Undock();
                             }
                         }
@@ -221,9 +222,9 @@ namespace Phantom.GameUI
                     if (draggingContent != null)
                     {
                         //end drag
-                        if (hover is UICarousel)
-                            hover = ((UICarousel)hover).GetElementAt(mousePosition);
-                        UIContainer container = hover as UIContainer;
+                        if (hover is Carousel)
+                            hover = ((Carousel)hover).GetElementAt(mousePosition);
+                        Container container = hover as Container;
                         if (container != null)
                         {
                             draggingContent.Dock(container);

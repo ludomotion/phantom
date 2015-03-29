@@ -14,6 +14,8 @@ using System.Globalization;
 using System.IO;
 using Phantom.Cameras.Components;
 using Phantom.GameUI;
+using Phantom.GameUI.Windows;
+using Phantom.GameUI.Elements;
 
 namespace Phantom.Utils
 {

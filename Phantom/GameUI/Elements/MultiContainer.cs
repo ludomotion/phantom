@@ -5,25 +5,25 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
-    public class UIMultiContainer : UIContainer
+    public class MultiContainer : Container
     {
         public int Capacity;
-        public List<UIContent> Contents {get; private set;}
+        public List<ContainerItem> Contents {get; private set;}
 
-        public UIMultiContainer(string name, string caption, Vector2 position, Shape shape, int capacity)
+        public MultiContainer(string name, string caption, Vector2 position, Shape shape, int capacity)
             : base(name, caption, position, shape)
         {
-            this.Contents = new List<UIContent>();
+            this.Contents = new List<ContainerItem>();
             this.Capacity = capacity;
         }
 
-        public override bool CanAccept(UIContent content)
+        public override bool CanAccept(ContainerItem content)
         {
             if (!this.Enabled)
                 return false;
-            UIContent currentContent = GetContentAt(content.Position);
+            ContainerItem currentContent = GetContentAt(content.Position);
 
             if (currentContent != null && content.LastContainer != this && Contents.Count == Capacity)
             {
@@ -46,7 +46,7 @@ namespace Phantom.GameUI
             return true;
         }
 
-        public override UIContent GetContentAt(Vector2 position)
+        public override ContainerItem GetContentAt(Vector2 position)
         {
             for (int i = Contents.Count - 1; i >= 0; i--)
             {
@@ -59,15 +59,15 @@ namespace Phantom.GameUI
         protected override void OnComponentAdded(Core.Component component)
         {
             base.OnComponentAdded(component);
-            if (component is UIContent)
-                Contents.Add(component as UIContent);
+            if (component is ContainerItem)
+                Contents.Add(component as ContainerItem);
         }
 
         protected override void OnComponentRemoved(Core.Component component)
         {
             base.OnComponentRemoved(component);
-            if (component is UIContent)
-                Contents.Remove(component as UIContent);
+            if (component is ContainerItem)
+                Contents.Remove(component as ContainerItem);
 
         }
     }

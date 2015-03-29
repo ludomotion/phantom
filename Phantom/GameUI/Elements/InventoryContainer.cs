@@ -7,18 +7,18 @@ using Phantom.Shapes;
 using Phantom.Misc;
 using System.Diagnostics;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
-    public class UIInventory : UIContainer
+    public class InventoryContainer : Container
     {
-        public UIInventoryItem[,] Slots;
+        public InventoryContainerItem[,] Slots;
         public readonly int Width;
         public readonly int Height;
         internal Vector2 Size;
         internal Vector2 SlotSize;
-        internal UIInventoryItem Hovering;
+        internal InventoryContainerItem Hovering;
 
-        public UIInventory(string name, string caption, Vector2 position, OABB shape, int width, int height)
+        public InventoryContainer(string name, string caption, Vector2 position, OABB shape, int width, int height)
             : base(name, caption, position, shape)
         {
             this.Width = Math.Max(1, width);
@@ -28,7 +28,7 @@ namespace Phantom.GameUI
             SlotSize.X /= this.Width;
             SlotSize.Y /= this.Height;
 
-            Slots = new UIInventoryItem[this.Width, this.Height];
+            Slots = new InventoryContainerItem[this.Width, this.Height];
             for (int y = 0; y < this.Height; y++)
                 for (int x = 0; x < this.Width; x++)
                     Slots[x, y] = null;
@@ -82,7 +82,7 @@ namespace Phantom.GameUI
             info.Canvas.FillRect(position, s, 0);
         }
 
-        public Vector2 GetPositionInInventory(UIInventoryItem item)
+        public Vector2 GetPositionInInventory(InventoryContainerItem item)
         {
             Vector2 result = new Vector2(item.InventoryX * SlotSize.X, item.InventoryY * SlotSize.Y);
             result.X += item.Width * SlotSize.X * 0.5f;
@@ -93,7 +93,7 @@ namespace Phantom.GameUI
             return result;
         }
 
-        public void GetInventoryPosition(UIInventoryItem item, ref int x, ref int y)
+        public void GetInventoryPosition(InventoryContainerItem item, ref int x, ref int y)
         {
             //determine the inventory position;
             Vector2 delta = item.Position - this.Position;
@@ -117,13 +117,13 @@ namespace Phantom.GameUI
             y = (int)Math.Round(delta.Y / SlotSize.Y);
         }
 
-        public override bool CanAccept(UIContent content)
+        public override bool CanAccept(ContainerItem content)
         {
             if (!this.Enabled) 
                 return false;
-            if (!(content is UIInventoryItem)) 
+            if (!(content is InventoryContainerItem)) 
                 return false;
-            UIInventoryItem item = (UIInventoryItem)content;
+            InventoryContainerItem item = (InventoryContainerItem)content;
 
             int invX = -1;
             int invY = -1;
@@ -144,7 +144,7 @@ namespace Phantom.GameUI
             return true;
         }
 
-        public bool FindEmptySpotFor(UIInventoryItem item)
+        public bool FindEmptySpotFor(InventoryContainerItem item)
         {
             if (!this.Enabled)
                 return false;
@@ -174,7 +174,7 @@ namespace Phantom.GameUI
         }
 
 
-        public override UIContent GetContentAt(Vector2 position)
+        public override ContainerItem GetContentAt(Vector2 position)
         {
             int x = -1;
             int y = -1;
@@ -187,9 +187,9 @@ namespace Phantom.GameUI
         protected override void OnComponentRemoved(Core.Component component)
         {
             base.OnComponentRemoved(component);
-            if (component is UIInventoryItem)
+            if (component is InventoryContainerItem)
             {
-                UIInventoryItem item = (UIInventoryItem)component;
+                InventoryContainerItem item = (InventoryContainerItem)component;
                 if (item.InventoryX >= 0 && item.InventoryY >= 0)
                     for (int y = item.InventoryY; y < item.InventoryY + item.Height; y++)
                         for (int x = item.InventoryX; x < item.InventoryX + item.Width; x++)

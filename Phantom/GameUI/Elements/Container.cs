@@ -7,12 +7,12 @@ using Phantom.Shapes;
 using Phantom.Utils;
 using Phantom.Misc;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     /// <summary>
     /// A Menu Control that can hold MenuContainerContent instances. Useful for inventory or draggable options
     /// </summary>
-    public class UIContainer : UIElement
+    public class Container : UIElement
     {
         /// <summary>
         /// The control's visible caption
@@ -22,9 +22,9 @@ namespace Phantom.GameUI
         /// <summary>
         /// The container's current content
         /// </summary>
-        private UIContent content;
+        private ContainerItem content;
 
-        public UIContainer(string name, string caption, Vector2 position, Shape shape)
+        public Container(string name, string caption, Vector2 position, Shape shape)
             : base(name, position, shape)
         {
             this.Caption = caption;
@@ -33,9 +33,9 @@ namespace Phantom.GameUI
         protected override void OnComponentAdded(Core.Component component)
         {
             base.OnComponentAdded(component);
-            if (component is UIContent)
+            if (component is ContainerItem)
             {
-                this.content = component as UIContent;
+                this.content = component as ContainerItem;
                 this.content.Position = this.Position;
             }
         }
@@ -84,7 +84,7 @@ namespace Phantom.GameUI
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        public virtual bool CanAccept(UIContent content)
+        public virtual bool CanAccept(ContainerItem content)
         {
             if (!this.Enabled) return false;
 
@@ -135,7 +135,7 @@ namespace Phantom.GameUI
             return true;
         }
 
-        public virtual UIContent GetContentAt(Vector2 position)
+        public virtual ContainerItem GetContentAt(Vector2 position)
         {
             return content;
         }

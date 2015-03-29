@@ -6,6 +6,9 @@ using Phantom.Core;
 using Phantom.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Phantom.GameUI.Elements;
+using Phantom.GameUI.Utils;
+using Phantom.GameUI.Handlers;
 
 namespace Phantom.GameUI
 {
@@ -95,7 +98,7 @@ namespace Phantom.GameUI
                 {
                     for (int i = 0; i < this.Components.Count; i++)
                     {
-                        if (Components[i] is UIMouseHandler)
+                        if (Components[i] is MouseHandler)
                             RemoveComponent(Components[i]);
                     }
                     this.AddComponent(new UIDesigner());

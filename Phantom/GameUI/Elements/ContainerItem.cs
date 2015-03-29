@@ -8,14 +8,14 @@ using Phantom.Utils;
 using Phantom.Misc;
 using System.Diagnostics;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     public enum UIContentState { Docked, Dragged, Moving, Floating }
 
     /// <summary>
     /// A draggable object that can be moved between to MenuContainers
     /// </summary>
-    public class UIContent : UIElement
+    public class ContainerItem : UIElement
     {
         /// <summary>
         /// The default move speed between locations
@@ -34,19 +34,19 @@ namespace Phantom.GameUI
         /// <summary>
         /// The component's last location (used for dragging)
         /// </summary>
-        public UIContainer LastContainer {get; private set;}
+        public Container LastContainer {get; private set;}
 
         public Vector2 LastPosition { get; private set; }
 
         /// <summary>
         /// The component's current location
         /// </summary>
-        public UIContainer Container {get; protected set;}
+        public Container Container {get; protected set;}
 
         /// <summary>
         /// The target of location (used for auto moves)
         /// </summary>
-        private UIContainer targetContainer;
+        private Container targetContainer;
 
         protected Vector2 targetPosition;
 
@@ -79,7 +79,7 @@ namespace Phantom.GameUI
         /// </summary>
         public UIContentState State { get; protected set; }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape, int stackSize, int count)
+        public ContainerItem(string name, string caption, Vector2 position, Shape shape, int stackSize, int count)
             : base(name, position, shape)
         
         {
@@ -89,16 +89,16 @@ namespace Phantom.GameUI
             this.State = UIContentState.Floating;
         }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape, int stackSize)
+        public ContainerItem(string name, string caption, Vector2 position, Shape shape, int stackSize)
             : this(name, caption, position, shape, stackSize, 1) { }
 
-        public UIContent(string name, string caption, Vector2 position, Shape shape)
+        public ContainerItem(string name, string caption, Vector2 position, Shape shape)
             : this(name, caption, position, shape, 1, 1) { }
 
         public override void Update(float elapsed)
         {
             base.Update(elapsed);
-            if (State == UIContentState.Docked && Container != null && !(Container is UIInventory) && !(Container is UICarouselContainer))
+            if (State == UIContentState.Docked && Container != null && !(Container is InventoryContainer) && !(Container is CarouselContainer))
             {
                 Selected = Container.Selected;
                 Enabled = Container.Enabled;
@@ -176,7 +176,7 @@ namespace Phantom.GameUI
         /// Dock the content at a container
         /// </summary>
         /// <param name="container"></param>
-        public virtual void Dock(UIContainer container)
+        public virtual void Dock(Container container)
         {
             if (!CanDockAt(container) || !container.CanAccept(this))
             {
@@ -186,7 +186,7 @@ namespace Phantom.GameUI
                     MoveTo(LastPosition);
                 return;
             }
-            UIContent other = container.GetContentAt(this.Position);
+            ContainerItem other = container.GetContentAt(this.Position);
             if (other != null)
             {
                 //its not empty, check if it is the same and then try to stack
@@ -228,7 +228,7 @@ namespace Phantom.GameUI
         /// Move the content to a specific target container
         /// </summary>
         /// <param name="container"></param>
-        public virtual void MoveTo(UIContainer container)
+        public virtual void MoveTo(Container container)
         {
             if (this.Container!= null)
                 Undock();
@@ -279,7 +279,7 @@ namespace Phantom.GameUI
         /// </summary>
         /// <param name="container"></param>
         /// <returns></returns>
-        public virtual bool CanDockAt(UIContainer container)
+        public virtual bool CanDockAt(Container container)
         {
             return container.Enabled;
         }

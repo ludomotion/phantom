@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes;
 using Phantom.Core;
 
-namespace Phantom.GameUI
+namespace Phantom.GameUI.Elements
 {
     /// <summary>
     /// A menu slider control which can be used to control float values or lists of options.
