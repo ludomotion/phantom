@@ -100,6 +100,7 @@
     <Compile Include="GameUI\Elements\EditBox.cs" />
     <Compile Include="GameUI\Elements\Label.cs" />
     <Compile Include="GameUI\Elements\OptionButton.cs" />
+    <Compile Include="GameUI\Elements\TextArea.cs" />
     <Compile Include="GameUI\Windows\InputDialog.cs" />
     <Compile Include="GameUI\Windows\Window.cs" />
     <Compile Include="GameUI\Elements\Slider.cs" />
