@@ -41,6 +41,7 @@ namespace Phantom.GameUI.Elements
         public UILinkAction OnLinkClicked;
         private int hoveringLink = -1;
         public float Height;
+        public float MaxWidth;
         public Vector2 HalfSize;
         public static Sprite Rect;
 
@@ -55,6 +56,7 @@ namespace Phantom.GameUI.Elements
             this.text = new List<TextSegment>();
             Height = SetText(text, relativeSize, relativeLineSpacing);
             this.OnMouseMove = DoMouseMove;
+            this.OnMouseOut = DoMouseOut;
         }
 
         public float SetText(string text)
@@ -64,6 +66,8 @@ namespace Phantom.GameUI.Elements
 
         public float SetText(string text, float relativeSize, float relativeLineSpacing)
         {
+            this.hoveringLink = -1;
+            this.MaxWidth = 0;
             this.text.Clear();
             this.relativeSize = relativeSize;
             this.relativeLineSpacing = relativeLineSpacing;
@@ -121,6 +125,7 @@ namespace Phantom.GameUI.Elements
             Vector2 pos = new Vector2(position.X, position.Y);
             this.text.Add(new TextSegment(currentSegment, color, pos, size, reference));
             position.X += size.X;
+            MaxWidth = Math.Max(position.X, MaxWidth);
         }
 
         private void AddWord(string sub, float width, ref Vector2 position, ref int currentColor, ref string currentSegment)
@@ -208,6 +213,11 @@ namespace Phantom.GameUI.Elements
                 if (text[i].Reference.Length>0)
                     Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X*0.5f, text[i].Size.Y*0.9f)*scale, new Vector2(text[i].Size.X*scale, 2), 0, c);
             }
+        }
+
+        private void DoMouseOut(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            this.hoveringLink = -1;
         }
 
         private void DoMouseMove(UIElement element, Vector2 mousePosition, UIMouseButton button)
