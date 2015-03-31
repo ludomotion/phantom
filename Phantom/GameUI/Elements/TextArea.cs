@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Phantom.Graphics;
+using Phantom.Misc;
 using Phantom.Shapes;
 using System;
 using System.Collections.Generic;
@@ -39,19 +40,29 @@ namespace Phantom.GameUI.Elements
 
         public UILinkAction OnLinkClicked;
         private int hoveringLink = -1;
+        public float Height;
+        public Vector2 HalfSize;
+        public static Sprite Rect;
+
 
 
         public TextArea(string name, Vector2 position, Vector2 size, Phont font, string text, float relativeSize, float relativeLineSpacing, Color[] colors)
             : base(name, position + size * 0.5f, new OABB(size * 0.5f))
         {
+            this.HalfSize = size * 0.5f;
             this.font = font;
             this.colors = colors;
             this.text = new List<TextSegment>();
-            SetText(text, relativeSize, relativeLineSpacing);
+            Height = SetText(text, relativeSize, relativeLineSpacing);
             this.OnMouseMove = DoMouseMove;
         }
 
-        private float SetText(string text, float relativeSize, float relativeLineSpacing)
+        public float SetText(string text)
+        {
+            return this.SetText(text, relativeSize, relativeLineSpacing);
+        }
+
+        public float SetText(string text, float relativeSize, float relativeLineSpacing)
         {
             this.text.Clear();
             this.relativeSize = relativeSize;
@@ -87,7 +98,19 @@ namespace Phantom.GameUI.Elements
             AddWord(lastSub, width, ref position, ref currentColor, ref currentSegment);
             FinishSegment(currentSegment, ref position, colors[currentColor], "");
 
-            return Position.Y * relativeSize;
+            float max = 0;
+            for (int i = 0; i < this.text.Count; i++)
+                max = Math.Max(max, position.Y);
+            max += font.LineSpacing * relativeLineSpacing;
+            max *= relativeSize;
+
+            return max;
+        }
+
+        public void AdjustSize()
+        {
+            HalfSize = new Vector2(HalfSize.X, this.Height * 0.5f);
+            AddComponent(new OABB(HalfSize));
         }
 
         private void FinishSegment(string currentSegment, ref Vector2 position, Color color, string reference)
@@ -166,15 +189,24 @@ namespace Phantom.GameUI.Elements
             base.Render(info);
             if (info.Pass == 0)
             {
-                Vector2 hs = (Shape as OABB).HalfSize;
-                for (int i = 0; i < text.Count; i++)
-                {
-                    Vector2 p = this.Position - hs + text[i].Position * this.relativeSize;
-                    if (i == hoveringLink)
-                        font.DrawString(info, text[i].Text, p, colors[Math.Min(2, colors.Length-1)], this.relativeSize);
-                    else
-                        font.DrawString(info, text[i].Text, p, text[i].Color, this.relativeSize);
-                }
+                RenderAt(info, this.Position - HalfSize, this.relativeSize, 0);
+            }
+        }
+
+        public void RenderAt(RenderInfo info, Vector2 position, float scale, float orientation)
+        {
+            //if (Rect != null)
+            //    Rect.RenderFrame(info, 0, position + HalfSize * scale / this.relativeSize, new Vector2(HalfSize.X * 2, HalfSize.Y * 2 - 2) * scale / this.relativeSize, 0, Color.Yellow);
+
+            for (int i = 0; i < text.Count; i++)
+            {
+                Vector2 p = position + text[i].Position.RotateBy(orientation) * scale;
+                Color c = text[i].Color;
+                if (i == hoveringLink)
+                    c = colors[Math.Min(2, colors.Length - 1)];
+                font.DrawString(info, text[i].Text, p, c, scale, orientation);
+                if (text[i].Reference.Length>0)
+                    Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X*0.5f, text[i].Size.Y*0.9f)*scale, new Vector2(text[i].Size.X*scale, 2), 0, c);
             }
         }
 
