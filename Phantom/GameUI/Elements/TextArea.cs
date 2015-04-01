@@ -130,8 +130,7 @@ namespace Phantom.GameUI.Elements
 
         private void AddWord(string sub, float width, ref Vector2 position, ref int currentColor, ref string currentSegment)
         {
-            Vector2 subSize = font.MeasureString(sub);
-            float space = font.SpaceWidth;
+            float space = font.SpaceWidth * 1.5f;
             string reference = "";
             
             if (sub.StartsWith("[C"))
@@ -154,6 +153,7 @@ namespace Phantom.GameUI.Elements
                 {
                     reference = sub.Substring(p + 1, sub.Length - p - 2);
                     sub = sub.Substring(0, p);
+                    sub = sub.Replace('_', ' ');
                 }
                 if (reference != "")
                 {
@@ -164,6 +164,7 @@ namespace Phantom.GameUI.Elements
 
             }
 
+            Vector2 subSize = font.MeasureString(sub);
             Vector2 lineSize = font.MeasureString(currentSegment);
 
             if (position.X + lineSize.X + subSize.X +space < width)
