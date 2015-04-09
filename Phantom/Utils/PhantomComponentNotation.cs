@@ -775,7 +775,22 @@ namespace Phantom.Utils
                             }
                         }
                         return false;
-                    }   
+                    }
+                    break;
+                case PCNOperator.BitwiseXor:
+                    if (value1 is List<object>)
+                    {
+                        List<object> l = (List<object>)value1;
+                        string s = ValueToString(value2);
+                        for (int i = 0; i < l.Count; i++)
+                        {
+                            if (ValueToString(l[i]) == s)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
                     break;
             }
             return false;
@@ -831,7 +846,13 @@ namespace Phantom.Utils
                     if (source is Vector4)
                         return (Vector4)source;
                     if (source is List<object>)
-                        return (List<object>)source;
+                    {
+                        List<Object> list = source as List<Object>;
+                        List<Object> result = new List<Object>();
+                        for (int i = 0; i < list.Count; i++)
+                            result.Add(list[i]);
+                        return result;
+                    }
                     if (source is CalculatedValue)
                         //return ((CalculatedValue)source).Clone();
                         return ((CalculatedValue)source).GetValue();
