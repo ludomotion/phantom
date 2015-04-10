@@ -31,6 +31,10 @@ namespace Phantom.Audio
 #if !NOAUDIO
             name = name.Trim().ToLower();
 
+            if (current != null && current.SongInstance != null)
+            {
+                current.SongInstance.Stop();
+            }
 			MediaPlayer.Stop();
 			if(current != null && current.Thread != null) {
 				current.Thread.Abort();
