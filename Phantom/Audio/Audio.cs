@@ -78,6 +78,13 @@ namespace Phantom.Audio
                     RemoveHandle(handle);
                     continue;
                 }
+#if FNA
+                if (handle.SongInstance != null && handle.SongInstance.State == SoundState.Stopped)
+                {
+                    RemoveHandle(handle);
+                    continue;
+                }
+#endif
                 if (handle.FadeState != 0 && handle.FadeTimer > 0)
                 {
                     handle.FadeTimer -= elapsed;
