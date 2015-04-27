@@ -27,6 +27,7 @@ namespace Phantom.Graphics
         public readonly float InverseHeight;
         public readonly Vector2 Size;
         public readonly Texture2D Texture;
+        public readonly int Spacing;
         private readonly Rectangle[] rects;
         public Vector2 Origin;
 
@@ -88,7 +89,18 @@ namespace Phantom.Graphics
         
 #endif
 
-        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY, int offsetX, int offsetY)
+        /// <summary>
+        /// Load a texture and cut it into frames.
+        /// </summary>
+        /// <param name="texture">The texture to load</param>
+        /// <param name="width">Width of one frame</param>
+        /// <param name="height">Height of one frame</param>
+        /// <param name="centerX">Center of each frame (default middle)</param>
+        /// <param name="centerY">Center of each frame (default center)</param>
+        /// <param name="offsetX">X offset within the entire texture</param>
+        /// <param name="offsetY">Y offset within the entire texture</param>
+        /// <param name="spacing">Number of pixel between each frame (default 0)</param>
+        public Sprite(Texture2D texture, int width, int height, float centerX, float centerY, int offsetX, int offsetY, int spacing=0)
         {
             this.Flipped = false;
 
@@ -109,9 +121,10 @@ namespace Phantom.Graphics
             this.InverseHeight = 1f / (float)height;
             this.Size = new Vector2(width, height);
             this.Origin = new Vector2(centerX, centerY);
+            this.Spacing = spacing;
 
-            this.horizontalFramesCount = (texture.Width - offsetX) / width;
-            this.verticalFramesCount = (texture.Height - offsetY) / height;
+            this.horizontalFramesCount = (texture.Width - offsetX) / (width+spacing);
+            this.verticalFramesCount = (texture.Height - offsetY) / (height+spacing);
 
             this.FrameCount = this.horizontalFramesCount * this.verticalFramesCount;
 
@@ -123,9 +136,12 @@ namespace Phantom.Graphics
 
         public Sprite(Texture2D texture, int width, int height, float centerX, float centerY)
             : this(texture, width, height, centerX, centerY, 0, 0) { }
-
+        
         public Sprite(Texture2D texture, int width, int height)
             :this(texture, width, height, width*0.5f, height*0.5f, 0, 0) { }
+
+        public Sprite(Texture2D texture, int width, int height, int spacing)
+            : this(texture, width, height, width * 0.5f, height * 0.5f, 0, 0, spacing) { }
 
         public Sprite(Texture2D tex)
             :this(tex,0,0) { }
@@ -229,7 +245,7 @@ namespace Phantom.Graphics
         {
             int x = frame % this.horizontalFramesCount;
             int y = frame / this.horizontalFramesCount;
-            return new Rectangle(x * this.Width + offsetX, y * this.Height + offsetY, this.Width, this.Height);
+            return new Rectangle(x * (this.Width+this.Spacing) + offsetX, y * (this.Height+this.Spacing) + offsetY, this.Width, this.Height);
         }
 
         /*public void DrawToSpriteBatch(SpriteBatch batch, int frame, Color color)
