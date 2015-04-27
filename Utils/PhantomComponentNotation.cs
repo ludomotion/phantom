@@ -792,21 +792,6 @@ namespace Phantom.Utils
                         return true;
                     }
                     break;
-                case PCNOperator.BitwiseXor:
-                    if (value1 is List<object>)
-                    {
-                        List<object> l = (List<object>)value1;
-                        string s = ValueToString(value2);
-                        for (int i = 0; i < l.Count; i++)
-                        {
-                            if (ValueToString(l[i]) == s)
-                            {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                    break;
             }
             return false;
         }
