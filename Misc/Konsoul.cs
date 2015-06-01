@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Phantom.Core;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Phantom.Assets;
+using Phantom.Core;
+using Phantom.Graphics;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 #if TOUCH
 using Trace = System.Console;
@@ -32,6 +34,7 @@ namespace Phantom.Misc
         public int EchoLines = 0;
 #endif
         public TimeSpan EchoDuration = TimeSpan.FromSeconds(5);
+        public BlendState FontBlendState = BlendState.NonPremultiplied;
     }
 
     struct EchoLine
@@ -75,7 +78,7 @@ namespace Phantom.Misc
 
         public bool Visible;
 
-        public SpriteFont Font
+        public Phont Font
         {
             get
             {
@@ -93,7 +96,7 @@ namespace Phantom.Misc
 #if !PLATFORM_XBOX
         private readonly KonsoulTraceListener listener;
 #endif
-        private SpriteFont font;
+        private Phont font;
         private SpriteBatch batch;
         private BasicEffect effect;
 
@@ -120,8 +123,10 @@ namespace Phantom.Misc
 
         private Queue<EchoLine> echoQueue;
 
-        public Konsoul(SpriteFont font, KonsoulSettings settings)
+        public Konsoul(Phont font, KonsoulSettings settings)
         {
+            if (font == null)
+                font = PhantomAssets.Courier20Bold;
             this.Visible = false;
             this.font = font;
             this.settings = settings;
@@ -174,8 +179,12 @@ namespace Phantom.Misc
             this.lines.Add("] Konsoul Initialized");
         }
 
-        public Konsoul(SpriteFont font)
+        public Konsoul(Phont font = null)
             : this(font, new KonsoulSettings())
+        {
+        }
+        public Konsoul(KonsoulSettings settings)
+            : this(null, settings)
         {
         }
 
@@ -402,7 +411,7 @@ namespace Phantom.Misc
             if (ctrl && current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
                 this.settings.LineCount = Math.Max(0, this.settings.LineCount - (shift ? 5 : 1));
             if (ctrl && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
-                this.settings.LineCount = Math.Min(resolution.Height / this.font.LineSpacing - 1, this.settings.LineCount + (shift ? 5 : 1));
+                this.settings.LineCount = Math.Min(resolution.Height / (int)this.font.LineSpacing - 1, this.settings.LineCount + (shift ? 5 : 1));
 
             // Cursor control:
             int lastCursor = this.cursor;
@@ -570,6 +579,9 @@ namespace Phantom.Misc
 
         public override void Render(Graphics.RenderInfo info)
         {
+            info = new RenderInfo();
+            info.Batch = this.batch;
+
             float padding = this.settings.Padding;
             Color color = this.settings.Color;
             float lineSpace = this.font.LineSpacing;
@@ -579,13 +591,13 @@ namespace Phantom.Misc
                 if (this.echoQueue.Count > 0)
                 {
                     float ey = padding;
-                    this.batch.Begin();
+                    this.batch.Begin(SpriteSortMode.Deferred, settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
                     lock (this.echoQueue)
                     {
                         foreach (EchoLine echo in this.echoQueue)
                         {
-                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
-                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey), color);
+                            this.font.DrawString(info, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
+                            this.font.DrawString(info, echo.Line, new Vector2(padding, ey), color);
                             ey += lineSpace;
                         }
                     }
@@ -613,11 +625,11 @@ namespace Phantom.Misc
             graphicsDevice.Indices = this.backgroundIndex;
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
 
-            this.batch.Begin();
+            this.batch.Begin(SpriteSortMode.Deferred, settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             float y = height * transitionScale - padding - lineSpace;
-            this.batch.DrawString(this.font, this.settings.Prompt + this.input, new Vector2(padding, y), color);
+            this.font.DrawString(info, this.settings.Prompt + this.input, new Vector2(padding, y), color);
             if (this.input.Length == 0)
-                this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
+                this.font.DrawString(info, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
             y -= lineSpace;
 
             int count = this.lines.Count;
@@ -631,7 +643,7 @@ namespace Phantom.Misc
                     IList<string> chunks = WordWrap(line, resolution.Width - padding * 2);
                     for (int i = 0; i < chunks.Count; i++)
                     {
-                        this.batch.DrawString(this.font, chunks[i], new Vector2(padding, y), color);
+                        this.font.DrawString(info, chunks[i], new Vector2(padding, y), color);
                         y -= lineSpace;
                     }
                 }
@@ -667,7 +679,7 @@ namespace Phantom.Misc
         private IList<string> WordWrap(string text, float widthInPixels)
         {
             this.wrapBuffer.Clear();
-            float wide = this.font.MeasureString("W").X + this.font.Spacing;
+            float wide = this.font.MeasureString("W").X + this.font.CharacterSpacing;
             int guess = (int)(Math.Ceiling(widthInPixels / wide) + 5);
 
             while (text.Length > 0)

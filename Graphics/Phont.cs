@@ -10,15 +10,23 @@ namespace Phantom.Graphics
 {
     public class Phont
     {
-        private Sprite sprite;
-        private float[] kerningTopLeft;
-        private float[] kerningTopRight;
-        private float[] kerningCenterRight;
-        private float[] kerningCenterLeft;
-        private float[] kerningBottomLeft;
-        private float[] kerningBottomRight;
-        private float kTop;
-        private float kBottom;
+        public Texture2D Texture
+        {
+            get
+            {
+                return this.sprite.Texture;
+            }
+        }
+
+        protected Sprite sprite;
+        protected float[] kerningTopLeft;
+        protected float[] kerningTopRight;
+        protected float[] kerningCenterRight;
+        protected float[] kerningCenterLeft;
+        protected float[] kerningBottomLeft;
+        protected float[] kerningBottomRight;
+        protected float kTop;
+        protected float kBottom;
         public float CharacterSpacing;
         public float SpaceWidth;
         public float LineSpacing;
@@ -47,6 +55,11 @@ namespace Phantom.Graphics
             kerningCenterRight = new float[8 * 16];
             kerningTopLeft = new float[8 * 16];
             kerningTopRight = new float[8 * 16];
+
+            Rectangle sourceRectangle = new Rectangle(0, 0, sprite.Width * 16, sprite.Height * 8);
+            Color[] retrievedColor = new Color[sprite.Width * 16 * sprite.Height * 16];
+            sprite.Texture.GetData<Color>(0, sourceRectangle, retrievedColor, 0, sprite.Width * 16 * sprite.Height * 16);
+
             float f = 1f / 255f;
             for (int y = 0; y < 8; y++)
             {
@@ -61,18 +74,17 @@ namespace Phantom.Graphics
                         bool empty = true;
                         for (int py = 0; py < sprite.Height; py++)
                         {
-                            Rectangle sourceRectangle = new Rectangle(x * sprite.Width + px, y * sprite.Height + py, 1, 1);
-                            Color[] retrievedColor = new Color[1];
-                            sprite.Texture.GetData<Color>(0, sourceRectangle, retrievedColor, 0, 1);
-                            if (retrievedColor[0].A > 0)
+                            int colorIndex = x * sprite.Width + px + (y * sprite.Height + py) * (16 * sprite.Width);
+                            float alpha = retrievedColor[colorIndex].A * f;
+                            if (alpha > 0)
                             {
                                 empty = false;
                                 if (py < topHeight)
-                                    kt = Math.Max(kt, d + retrievedColor[0].A * f);
+                                    kt = Math.Max(kt, d + alpha);
                                 else if (py < bottomHeight)
-                                    kc = Math.Max(kc, d + retrievedColor[0].A * f);
+                                    kc = Math.Max(kc, d + alpha);
                                 else
-                                    kb = Math.Max(kb, d + retrievedColor[0].A * f);
+                                    kb = Math.Max(kb, d + alpha);
                             }
                         }
                         if (empty)
@@ -93,18 +105,17 @@ namespace Phantom.Graphics
                         bool empty = true;
                         for (int py = 0; py < sprite.Height; py++)
                         {
-                            Rectangle sourceRectangle = new Rectangle(x * sprite.Width + px, y * sprite.Height + py, 1, 1);
-                            Color[] retrievedColor = new Color[1];
-                            sprite.Texture.GetData<Color>(0, sourceRectangle, retrievedColor, 0, 1);
-                            if (retrievedColor[0].A > 0)
+                            int colorIndex = x * sprite.Width + px + (y * sprite.Height + py) * (16 * sprite.Width);
+                            float alpha = retrievedColor[colorIndex].A * f;
+                            if (alpha > 0)
                             {
                                 empty = false;
                                 if (py < topHeight)
-                                    kt = Math.Max(kt, d + retrievedColor[0].A * f);
+                                    kt = Math.Max(kt, d + alpha);
                                 else if (py < bottomHeight)
-                                    kc = Math.Max(kc, d + retrievedColor[0].A * f);
+                                    kc = Math.Max(kc, d + alpha);
                                 else
-                                    kb = Math.Max(kb, d + retrievedColor[0].A * f);
+                                    kb = Math.Max(kb, d + alpha);
                             }
                         }
                         if (empty)
@@ -189,6 +200,10 @@ namespace Phantom.Graphics
             {
                 int index = (int)s[i] - 32;
                 if (index == '\r' - 32)
+                {
+                    continue;
+                }
+                else if (index == '\n' - 32)
                 {
                     kerningTop = -1;
                     p -= u * r;
@@ -276,6 +291,10 @@ namespace Phantom.Graphics
                 int index = (int)s[i] - 32;
                 if (index == '\r' - 32)
                 {
+                    continue;
+                }
+                else if (index == '\n' - 32)
+                {
                     kerningTop = -1;
                     p -= u * r;
                     p.Y += u.X * LineSpacing * scale;
@@ -362,6 +381,10 @@ namespace Phantom.Graphics
                 int index = (int)s[i] - 32;
                 if (index == '\r' - 32)
                 {
+                    continue;
+                }
+                else if (index == '\n' - 32)
+                {
                     kerningTop = -1;
                     p -= u * r;
                     p.Y += u.X * LineSpacing * scale;
@@ -415,6 +438,10 @@ namespace Phantom.Graphics
                 int index = (int)s[i] - 32;
                 if (index == '\r' - 32)
                 {
+                    continue;
+                }
+                else if (index == '\n' - 32)
+                {
                     kerningTop = -1;
                     rw += Math.Max(kerningBottom, Math.Max(kerningCenter, kerningTop));
                     r.X = Math.Max(rw, r.X);
@@ -452,5 +479,24 @@ namespace Phantom.Graphics
         }
         
 
+    }
+
+    public class PhontMono : Phont
+    {
+        public PhontMono(Texture2D tex, float lineSpacing)
+            : base(tex, 0, 0, 0, 0, 0, lineSpacing)
+        {
+            float kern = this.sprite.Width * .25f;
+            for (int i = 0; i < 8 * 16; i++)
+            {
+                kerningBottomLeft[i] = kern;
+                kerningBottomRight[i] = kern;
+                kerningCenterLeft[i] = kern;
+                kerningCenterRight[i] = kern;
+                kerningTopLeft[i] = kern;
+                kerningTopRight[i] = kern;
+            }
+            this.SpaceWidth = kern * 2;
+        }
     }
 }

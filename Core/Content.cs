@@ -201,7 +201,7 @@ namespace Phantom.Core
 						#endif
 						{
 							object o;
-							if(assets[i].Contains("sound"))
+							if(assets[i].ToLower().Contains("sound"))
 								o = this.LoadAffixed<SoundEffect>(assets[i]);
 							else
 								o = this.LoadAffixed<object>(assets[i]);
@@ -221,7 +221,7 @@ namespace Phantom.Core
 				lock (PhantomGame.Game.GlobalRenderLock)
 				#endif
 				{
-					if(assets[i].Contains("sound"))
+					if(assets[i].ToLower().Contains("sound"))
 						this.LoadAffixed<SoundEffect>(assets[i]);
 					else
 						this.LoadAffixed<object>(assets[i]);

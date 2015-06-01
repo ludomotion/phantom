@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\PhantomAssets.cs" />
     <Compile Include="Audio\Audio.cs" />
     <Compile Include="Audio\AudioInfo.cs" />
     <Compile Include="Audio\Music.cs" />
@@ -178,9 +179,16 @@
     <Compile Include="Utils\PhantomComponentNotation.cs" />
     <Compile Include="Utils\TweenFunctions.cs" />
   </ItemGroup>
-  <ItemGroup />
-  <ItemGroup />
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\sans16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\courier20bold.png" />
+    <EmbeddedResource Include="Assets\white.png" />
+  </ItemGroup>
   <ItemGroup />
   <ItemGroup />
   <ItemGroup />
