@@ -199,7 +199,7 @@ namespace Phantom.Graphics
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = rects[Math.Max(Math.Min(frame, this.FrameCount - 1), 0)];
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            info.Batch.Draw(this.Texture, position, source, color, angle, flipHorizontal ? new Vector2(Width-Origin.X, Origin.Y) : Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 #if DEBUG
             AddCall(Texture, scale);
 #endif
