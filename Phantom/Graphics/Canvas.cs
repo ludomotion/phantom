@@ -351,9 +351,9 @@ namespace Phantom.Graphics
             {
                 float dx = MathHelper.Clamp((poly[i].X - topLeftPosition.X) * invDX, 0, 1);
                 float dy = MathHelper.Clamp((poly[i].Y - topLeftPosition.Y) * invDY, 0, 1);
-                int r = (int)((topLeft.R * (1 - dx + 1 - dy) + topRight.R * (dx + 1 - dy) + bottomLeft.R * (1 - dx + dy) + bottomRight.R * (dx + dy)))>>2;
-                int g = (int)((topLeft.G * (1 - dx + 1 - dy) + topRight.G * (dx + 1 - dy) + bottomLeft.G * (1 - dx + dy) + bottomRight.G * (dx + dy)))>>2;
-                int b = (int)((topLeft.B * (1 - dx + 1 - dy) + topRight.B * (dx + 1 - dy) + bottomLeft.B * (1 - dx + dy) + bottomRight.B * (dx + dy)))>>2;
+                int r = (int)((topLeft.R * (1 - dx) * (1 - dy) + topRight.R * dx * (1 - dy) + bottomLeft.R * (1 - dx) * dy + bottomRight.R * dx * dy));
+                int g = (int)((topLeft.G * (1 - dx) * (1 - dy) + topRight.G * dx * (1 - dy) + bottomLeft.G * (1 - dx) * dy + bottomRight.G * dx * dy));
+                int b = (int)((topLeft.B * (1 - dx) * (1 - dy) + topRight.B * dx * (1 - dy) + bottomLeft.B * (1 - dx) * dy + bottomRight.B * dx * dy));
                 Color c = new Color(r, g, b, 255);
                 vertices[i] = new VertexPositionColor(new Vector3(poly[i], 0), c);
             }
