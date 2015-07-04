@@ -147,7 +147,7 @@ namespace Phantom.GameUI.Elements
             SetValue(currentValue - step);
         }
 
-        private void SetValue(float value)
+        public void SetValue(float value)
         {
             value = MathHelper.Clamp(value, minValue, maxValue);
             if (snap)

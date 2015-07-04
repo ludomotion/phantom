@@ -13,6 +13,7 @@ namespace Phantom.GameUI.Elements
     
     public delegate void UIAction(UIElement element);
     public delegate void UIMouseAction(UIElement element, Vector2 mousePosition, UIMouseButton button);
+    public delegate void UIScrollWheelAction(UIElement element, Vector2 mousePosition, int delta);
 
 
     /// <summary>
@@ -121,6 +122,7 @@ namespace Phantom.GameUI.Elements
         public UIMouseAction OnMouseUp;
         public UIMouseAction OnClick;
         public UIMouseAction OnDoubleClick;
+        public UIScrollWheelAction OnScrollWheel;
 
         /// <summary>
         /// Base constructor needs a name, position and shape.
