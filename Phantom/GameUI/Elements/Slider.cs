@@ -126,10 +126,14 @@ namespace Phantom.GameUI.Elements
             this.currentValue = -1;
             SetValue(currentValue);
             this.OnChange = onChange;
+            OnMouseDown = DoMouseDown;
+            OnMouseUp = DoMouseUp;
+            OnMouseMove = DoMouseMove;
         }
 
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange, SliderOrientation orientation)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, step, onChange, orientation, false) { }
+
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange)
             : this(name, caption, position, shape, minValue, maxValue, currentValue, step, onChange, SliderOrientation.Horizontal, false) { }
 
@@ -169,7 +173,7 @@ namespace Phantom.GameUI.Elements
             }
             else
             {
-                caption = Caption + " " + currentValue.ToString("0.0");
+                caption = Caption + " " + currentValue.ToString("0.00");
             }
 
             if (OnChange != null)
@@ -229,7 +233,7 @@ namespace Phantom.GameUI.Elements
 
                 if (UILayer.Font != null && caption!=null)
                 {
-                    UILayer.Font.DrawString(info, caption, Position - rect.HalfSize, text, UILayer.DefaultFontScale, 0, Vector2.Zero);
+                    UILayer.Font.DrawString(info, caption, Position - rect.HalfSize - new Vector2(0, UILayer.Font.LineSpacing), text, UILayer.DefaultFontScale, 0, Vector2.Zero);
                 }
             }
         }
@@ -237,7 +241,7 @@ namespace Phantom.GameUI.Elements
         public override void ClickAt(Vector2 position, UIMouseButton button)
         {
             base.ClickAt(position, button);
-            float rel = 0;
+            /*float rel = 0;
             if (sliderOrientation == SliderOrientation.Horizontal)
             {
                 rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
@@ -247,7 +251,42 @@ namespace Phantom.GameUI.Elements
                 rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
             }
             rel = MathHelper.Clamp(rel, 0, 1);
-            SetValue(minValue + (maxValue - minValue) * rel);
+            SetValue(minValue + (maxValue - minValue) * rel);*/
         }
-    }
+
+        private void DoMouseMove(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (buttonDown)
+            {
+                Vector2 position = mousePosition-this.Position;
+                float rel = 0;
+                if (sliderOrientation == SliderOrientation.Horizontal)
+                {
+                    rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
+                }
+                else
+                {
+                    rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
+                }
+                rel = MathHelper.Clamp(rel, 0, 1);
+                SetValue(minValue + (maxValue - minValue) * rel);
+            }
+        }
+
+        private void DoMouseUp(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (button == UIMouseButton.Left)
+                buttonDown=false;
+        }
+
+        private void DoMouseDown(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (button == UIMouseButton.Left)
+                buttonDown=true;
+
+        }
+
+
+    
+public  bool buttonDown { get; set; }}
 }

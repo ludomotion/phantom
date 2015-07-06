@@ -115,6 +115,8 @@ namespace Phantom.GameUI.Handlers
 
                 if (this.Hover != null && this.Hover.OnMouseMove != null)
                     this.Hover.OnMouseMove(this.Hover, mousePosition, UIMouseButton.None);
+                if (this.mouseDown != null && this.mouseDown.OnMouseMove != null)
+                    this.mouseDown.OnMouseMove(this.Hover, mousePosition, UIMouseButton.None);
 
                 //Check which item I am hovering and select it
                 layer.SetSelected(player, hover);
