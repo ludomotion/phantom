@@ -16,9 +16,6 @@ namespace Phantom.Graphics
     public class Sprite
     {
         public readonly int FrameCount;
-
-        public bool Flipped { get; set; }
-
         private readonly int offsetX;
         private readonly int offsetY;
         public readonly int Width;
@@ -90,8 +87,6 @@ namespace Phantom.Graphics
 
         public Sprite(Texture2D texture, int width, int height, float centerX, float centerY, int offsetX, int offsetY)
         {
-            this.Flipped = false;
-
             this.offsetX = offsetX;
             this.offsetY = offsetY;
 
@@ -148,7 +143,7 @@ namespace Phantom.Graphics
             color.G = (byte)(color.G * alpha);
             color.B = (byte)(color.B * alpha);
             Rectangle source = rects[Math.Max(Math.Min(frame, this.FrameCount-1), 0)];
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            info.Batch.Draw(this.Texture, position, source, color, angle, flipHorizontal ? new Vector2(Width - Origin.X, Origin.Y) : Origin, scale, flipHorizontal ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
 
 #if DEBUG
             AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
@@ -176,7 +171,7 @@ namespace Phantom.Graphics
             if (frame < 0 || frame >= this.FrameCount)
                 return;
             Rectangle source = rects[Math.Max(Math.Min(frame, this.FrameCount - 1), 0)];
-            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+            info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, SpriteEffects.None, 0);
 #if DEBUG
             AddCall(Texture, scale);
 #endif
@@ -188,7 +183,7 @@ namespace Phantom.Graphics
                 return;
             Rectangle source = rects[Math.Max(Math.Min(frame, this.FrameCount - 1), 0)];
             Vector2 scale = new Vector2(drawSize.X / this.Width, drawSize.Y / this.Height);
-			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, Flipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+			info.Batch.Draw(this.Texture, position, source, color, angle, Origin, scale, SpriteEffects.None, 0);
 #if DEBUG
 			AddCall(Texture, scale.X * 0.5f + scale.Y * 0.5f);
 #endif
