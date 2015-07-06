@@ -257,9 +257,9 @@ namespace Phantom.GameUI.Handlers
                                     hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                             }
 
-                            if (mouseDown != null && mouseDown.OnMouseUp != null)
-                                mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
                         }
+                        if (mouseDown != null && mouseDown.OnMouseUp != null)
+                            mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
                     }
                     mouseDown = null;
                     draggingContent = null;
