@@ -212,7 +212,7 @@ namespace Phantom.GameUI.Elements
                     c = colors[Math.Min(2, colors.Length - 1)];
                 font.DrawString(info, text[i].Text, p, c, scale, orientation);
                 if (text[i].Reference.Length>0)
-                    Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X*0.5f, text[i].Size.Y*0.9f)*scale, new Vector2(text[i].Size.X*scale, 2), 0, c);
+                    Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X*0.5f, text[i].Size.Y*0.9f)*scale, new Vector2(text[i].Size.X*scale, 1), 0, c);
             }
         }
 
