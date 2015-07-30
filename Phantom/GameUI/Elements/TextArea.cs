@@ -125,7 +125,7 @@ namespace Phantom.GameUI.Elements
             Vector2 pos = new Vector2(position.X, position.Y);
             this.text.Add(new TextSegment(currentSegment, color, pos, size, reference));
             position.X += size.X;
-            MaxWidth = Math.Max(position.X, MaxWidth);
+            MaxWidth = Math.Max(position.X * relativeSize, MaxWidth);
         }
 
         private void AddWord(string sub, float width, ref Vector2 position, ref int currentColor, ref string currentSegment)
