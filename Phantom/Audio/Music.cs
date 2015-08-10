@@ -29,6 +29,9 @@ namespace Phantom.Audio
         {
 			Debug.WriteLine ("[Music] Start " + name + (looped ? " (looped)" : ""));
 #if !NOAUDIO
+            if (!Sound.HasAudio)
+                return;
+
             name = name.Trim().ToLower();
 
             if (current != null && current.SongInstance != null)
@@ -109,6 +112,9 @@ namespace Phantom.Audio
 		{
 			Debug.WriteLine ("[Music] Stop " + (now ? " (now)" : ""));
 #if !NOAUDIO
+            if (!Sound.HasAudio)
+                return;
+
 			if (current != null && ((current.Instance != null && current.Instance.State == Microsoft.Xna.Framework.Audio.SoundState.Playing) || current.SongInstance != null))
             {
 				if (Music.FadeTime != 0 && !now)

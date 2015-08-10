@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Phantom.Audio;
 
 #if TOUCH
 using Trace = System.Console;
@@ -221,10 +222,22 @@ namespace Phantom.Core
 				lock (PhantomGame.Game.GlobalRenderLock)
 				#endif
 				{
-					if(assets[i].Contains("sound"))
-						this.LoadAffixed<SoundEffect>(assets[i]);
-					else
-						this.LoadAffixed<object>(assets[i]);
+                    if (assets[i].ToLower().Contains("sound"))
+                    {
+                        if (Sound.HasAudio)
+                        {
+                            try
+                            {
+                                this.LoadAffixed<SoundEffect>(assets[i]);
+                            }
+                            catch (NoAudioHardwareException e)
+                            {
+                                Sound.HasAudio = false;
+                            }
+                        }
+                    }
+                    else
+                        this.LoadAffixed<object>(assets[i]);
 				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
