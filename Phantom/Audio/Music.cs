@@ -16,7 +16,7 @@ namespace Phantom.Audio
         public static float Volume = 1f;
 
         private static Audio.Handle current;
-
+        
         public static string Current
         {
             get
