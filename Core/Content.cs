@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Phantom.Audio;
 
 #if TOUCH
 using Trace = System.Console;
@@ -222,9 +223,21 @@ namespace Phantom.Core
 				#endif
 				{
 					if(assets[i].ToLower().Contains("sound"))
-						this.LoadAffixed<SoundEffect>(assets[i]);
-					else
-						this.LoadAffixed<object>(assets[i]);
+                    {
+                        if (Sound.HasAudio)
+                        {
+                            try
+                            {
+                                this.LoadAffixed<SoundEffect>(assets[i]);
+                            }
+                            catch (NoAudioHardwareException e)
+                            {
+                                Sound.HasAudio = false;
+                            }
+                        }
+                    }
+                    else
+                        this.LoadAffixed<object>(assets[i]);
 				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
@@ -313,6 +326,7 @@ namespace Phantom.Core
 				}
 				else if(this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
 			}
+
 
 			return this.manager.Load<T>(assetName);
 		}

@@ -13,12 +13,15 @@ namespace Phantom.Audio
 {
     public class Sound
     {
+        public static bool HasAudio = true;
         public static float MasterVolume = 1f;
         public static float FXVolume = 1f;
 
         public static Audio.Handle Play(string sound, float volume = -1f, float panning = 0f)
         {
 #if !NOAUDIO
+            if (!HasAudio)
+                return null;
             sound = sound.Trim().ToLower();
 
             var info = Audio.Instance.audiolist[sound];
@@ -62,6 +65,8 @@ namespace Phantom.Audio
         public static Audio.Handle FadeIn(string sound, bool looped, float duration, TweenFunction function = null, float volume = -1)
         {
 #if !NOAUDIO
+            if (!HasAudio)
+                return null;
             sound = sound.Trim().ToLower();
             if (function == null)
                 function = TweenFunctions.Linear;
