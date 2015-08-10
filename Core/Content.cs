@@ -222,7 +222,7 @@ namespace Phantom.Core
 				lock (PhantomGame.Game.GlobalRenderLock)
 				#endif
 				{
-					if(assets[i].ToLower().Contains("sound"))
+                    if (assets[i].ToLower().Contains("sound"))
                     {
                         if (Sound.HasAudio)
                         {

@@ -139,5 +139,6 @@ namespace Phantom.Audio
             for (int i = Audio.Instance.handles.Count - 1; i >= 0; --i)
                 Sound.FadeOut(Audio.Instance.handles[i], duration, function);
         }
+
     }
 }
