@@ -141,6 +141,7 @@ namespace Phantom
 
             XnaGame = new Microsoft.Xna.Framework.Game();
             XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
+            XnaGame.Deactivated += new EventHandler<EventArgs>(this.OnDeactivate);
 #if !PLATFORM_ANDROID
             XnaGame.Window.Title = this.Name;
 #endif
@@ -535,6 +536,11 @@ namespace Phantom
             }
             return false;
         }
+
+        protected virtual void OnDeactivate(object sender, EventArgs e)
+        {
+        }
+
 
         protected virtual void OnExit(object sender, EventArgs e)
         {
