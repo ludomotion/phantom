@@ -168,6 +168,11 @@ namespace Phantom.GameUI.Handlers
             //Start clicking
             if (PhantomGame.XnaGame.IsActive)
             {
+                if (current.ScrollWheelValue != previous.ScrollWheelValue && hover != null && hover.CanUse(player) && hover.OnScrollWheel != null)
+                {
+                    hover.OnScrollWheel(hover, mousePosition, current.ScrollWheelValue - previous.ScrollWheelValue);
+                }
+
                 if (current.LeftButton == ButtonState.Pressed && previous.LeftButton != ButtonState.Pressed)
                 {
                     mouseDownPosition = mousePosition;
@@ -250,9 +255,9 @@ namespace Phantom.GameUI.Handlers
                                     hover.OnDoubleClick(hover, mousePosition, UIMouseButton.Left);
                             }
 
-                            if (mouseDown != null && mouseDown.OnMouseUp != null)
-                                mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
                         }
+                        if (mouseDown != null && mouseDown.OnMouseUp != null)
+                            mouseDown.OnMouseUp(mouseDown, mousePosition, UIMouseButton.Left);
                     }
                     mouseDown = null;
                     draggingContent = null;

@@ -411,7 +411,7 @@ namespace Phantom.Misc
             if (ctrl && current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
                 this.Settings.LineCount = Math.Max(0, this.Settings.LineCount - (shift ? 5 : 1));
             if (ctrl && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
-                this.settings.LineCount = Math.Min(resolution.Height / (int)this.font.LineSpacing - 1, this.settings.LineCount + (shift ? 5 : 1));
+                this.Settings.LineCount = Math.Min(resolution.Height / (int)this.font.LineSpacing - 1, this.Settings.LineCount + (shift ? 5 : 1));
 
             // Cursor control:
             int lastCursor = this.cursor;
@@ -582,6 +582,9 @@ namespace Phantom.Misc
             info = new RenderInfo();
             info.Batch = this.batch;
 
+            float padding = this.Settings.Padding;
+            Color color = this.Settings.Color;
+
             float lineSpace = this.font.LineSpacing;
 
             if (!this.Visible && this.transition <= 0)
@@ -589,7 +592,7 @@ namespace Phantom.Misc
                 if (this.echoQueue.Count > 0)
                 {
                     float ey = padding;
-                    this.batch.Begin(SpriteSortMode.Deferred, settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+                    this.batch.Begin(SpriteSortMode.Deferred, Settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
                     lock (this.echoQueue)
                     {
                         foreach (EchoLine echo in this.echoQueue)
@@ -623,11 +626,11 @@ namespace Phantom.Misc
             graphicsDevice.Indices = this.backgroundIndex;
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
 
-            this.batch.Begin(SpriteSortMode.Deferred, settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
+            this.batch.Begin(SpriteSortMode.Deferred, Settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             float y = height * transitionScale - padding - lineSpace;
-            this.font.DrawString(info, this.settings.Prompt + this.input, new Vector2(padding, y), color);
+            this.font.DrawString(info, this.Settings.Prompt + this.input, new Vector2(padding, y), color);
             if (this.input.Length == 0)
-                this.font.DrawString(info, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
+                this.font.DrawString(info, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.Settings.Alpha * .5f));
             y -= lineSpace;
 
             int count = this.lines.Count;

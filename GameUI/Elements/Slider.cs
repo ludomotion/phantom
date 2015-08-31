@@ -28,6 +28,9 @@ namespace Phantom.GameUI.Elements
         private bool snap;
         private string[] options;
 
+        private bool buttonDown;
+
+
         /// <summary>
         /// The default width for the sliders handle. Used to determine the visual range in which the slider can be moved
         /// </summary>
@@ -126,6 +129,9 @@ namespace Phantom.GameUI.Elements
             this.currentValue = -1;
             SetValue(currentValue);
             this.OnChange = onChange;
+            OnMouseDown = DoMouseDown;
+            OnMouseUp = DoMouseUp;
+            OnMouseMove = DoMouseMove;
         }
 
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange, SliderOrientation orientation)
@@ -147,7 +153,7 @@ namespace Phantom.GameUI.Elements
             SetValue(currentValue - step);
         }
 
-        private void SetValue(float value)
+        public void SetValue(float value)
         {
             value = MathHelper.Clamp(value, minValue, maxValue);
             if (snap)
@@ -169,7 +175,7 @@ namespace Phantom.GameUI.Elements
             }
             else
             {
-                caption = Caption + " " + currentValue.ToString("0.0");
+                caption = Caption + " " + currentValue.ToString("0.00");
             }
 
             if (OnChange != null)
@@ -237,7 +243,7 @@ namespace Phantom.GameUI.Elements
         public override void ClickAt(Vector2 position, UIMouseButton button)
         {
             base.ClickAt(position, button);
-            float rel = 0;
+            /*float rel = 0;
             if (sliderOrientation == SliderOrientation.Horizontal)
             {
                 rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
@@ -247,7 +253,41 @@ namespace Phantom.GameUI.Elements
                 rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
             }
             rel = MathHelper.Clamp(rel, 0, 1);
-            SetValue(minValue + (maxValue - minValue) * rel);
+            SetValue(minValue + (maxValue - minValue) * rel);*/
         }
+        private void DoMouseMove(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (buttonDown)
+            {
+                Vector2 position = mousePosition-this.Position;
+                float rel = 0;
+                if (sliderOrientation == SliderOrientation.Horizontal)
+                {
+                    rel = (position.X / (rect.HalfSize.X - HandleWidth * 0.5f)) * 0.5f + 0.5f;
+                }
+                else
+                {
+                    rel = (position.Y / (rect.HalfSize.Y - HandleHeight * 0.5f)) * -0.5f + 0.5f;
+                }
+                rel = MathHelper.Clamp(rel, 0, 1);
+                SetValue(minValue + (maxValue - minValue) * rel);
+            }
+        }
+
+        private void DoMouseUp(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (button == UIMouseButton.Left)
+                buttonDown=false;
+        }
+
+        private void DoMouseDown(UIElement element, Vector2 mousePosition, UIMouseButton button)
+        {
+            if (button == UIMouseButton.Left)
+                buttonDown=true;
+
+        }
+
+
+    
     }
 }
