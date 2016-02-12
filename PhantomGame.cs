@@ -226,6 +226,7 @@ namespace Phantom
             this.Initialize();
 
             Trace.WriteLine("PhantomGame Initialized: " + this.Name);
+            Trace.WriteLine("Sanity Check...");
         }
 
         internal void XnaUpdate(GameTime gameTime)

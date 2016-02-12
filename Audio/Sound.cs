@@ -21,7 +21,7 @@ namespace Phantom.Audio
         {
 #if !NOAUDIO
             if (!HasAudio)
-                return null;
+                return default(Audio.Handle);
             sound = sound.Trim();
             if (!Audio.Instance.audiolist.ContainsKey(sound))
             {
@@ -35,18 +35,35 @@ namespace Phantom.Audio
             // Check if this sound is limited:
             if (info.Limit >= 0 && (info.Limit == 0 || (Audio.Instance.soundLimits.ContainsKey(sound) && Audio.Instance.soundLimits[sound] >= info.Limit)))
             {
-                Debug.WriteLine("Audio limit reached: " + info.Name + " (limit: " + info.Limit + ")");
+               // Trace.WriteLine("Audio limit reached: " + info.Name + " (limit: " + info.Limit + ")");
                 return default(Audio.Handle);
             }
 
             // Don't play if volume is off:
             volume = Audio.Volume(volume, info) * MasterVolume * FXVolume;
             if (volume <= 0)
+            {
+               // Trace.WriteLine("Volume is off for : " + info.Name +"");
                 return default(Audio.Handle);
+            }
+
+            
 
             // Load and create instance: (loading is cached)
             var effect = Audio.Instance.Load(info.Asset);
+
+            if (!HasAudio)
+            {
+                //Trace.WriteLine("Somehow we have no audio!");
+
+                return default(Audio.Handle);
+            }
             var instance = effect.CreateInstance();
+            /*
+            if (Audio.Instance.soundLimits.ContainsKey(sound))
+                Trace.WriteLine("Playing Sound: " + info.Name + " (limit: " + info.Limit + ", playing: " + Audio.Instance.soundLimits[sound] + ")");
+            else
+                Trace.WriteLine("Playing Sound: " + info.Name);*/
 
             instance.Volume = volume;
             instance.Pan = panning;
@@ -72,14 +89,14 @@ namespace Phantom.Audio
         {
 #if !NOAUDIO
             if (!HasAudio)
-                return null;
+                return default(Audio.Handle);
             sound = sound.Trim().ToLower();
             if (function == null)
                 function = TweenFunctions.Linear;
             
             var info = Audio.Instance.audiolist[sound];
             var handle = Play(sound, 0.00001f);
-            if (!handle.Success)
+            if (handle==null || !handle.Success)
                 return handle;
 
             handle.Instance.IsLooped = looped;
@@ -97,6 +114,8 @@ namespace Phantom.Audio
 
         public static void FadeOut(Audio.Handle handle, float duration, TweenFunction function = null)
         {
+            if (handle == null)
+                return;
 #if !NOAUDIO
             if (function == null)
                 function = TweenFunctions.Linear;
@@ -119,6 +138,8 @@ namespace Phantom.Audio
 
         public static void Stop(Audio.Handle sound)
         {
+            if (sound == null)
+                return;
 #if !NOAUDIO
             sound.Instance.IsLooped = false;
             sound.Instance.Stop();
@@ -131,6 +152,8 @@ namespace Phantom.Audio
             for (int i = Audio.Instance.handles.Count - 1; i >= 0; --i)
                 if(Audio.Instance.handles[i].Type == Audio.Type.Sound)
                     Sound.Stop(Audio.Instance.handles[i]);
+
+
         }
         public static void FadeOutAll(float duration, TweenFunction function = null)
         {

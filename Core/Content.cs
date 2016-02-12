@@ -198,17 +198,25 @@ namespace Phantom.Core
                     for (int i = 0; i < assets.Count; i++)
                     {
 						#if !PLATFORM_ANDROID
-						lock (PhantomGame.Game.GlobalRenderLock)
-						#endif
-						{
-							object o;
-							if(assets[i].ToLower().Contains("sound"))
-								o = this.LoadAffixed<SoundEffect>(assets[i]);
-							else
-								o = this.LoadAffixed<object>(assets[i]);
-							if (o is IDisposable)
-								(o as IDisposable).Dispose();
-						}
+                        lock (PhantomGame.Game.GlobalRenderLock)
+#endif
+                        {
+                            object o;
+                            try
+                            {
+                                if (assets[i].ToLower().Contains("sound"))
+                                    o = this.LoadAffixed<SoundEffect>(assets[i]);
+                                else
+                                    o = this.LoadAffixed<object>(assets[i]);
+                                if (o is IDisposable)
+                                    (o as IDisposable).Dispose();
+                            }
+
+                            catch (NoAudioHardwareException e)
+                            {
+                                Sound.HasAudio = false;
+                            }
+                        }
 #if DEBUG
                         this.loaded.Remove(assets[i]);
 #endif
@@ -222,22 +230,22 @@ namespace Phantom.Core
 				lock (PhantomGame.Game.GlobalRenderLock)
 				#endif
 				{
-                    if (assets[i].ToLower().Contains("sound"))
+                    try
                     {
-                        if (Sound.HasAudio)
+                        if (assets[i].ToLower().Contains("sound") || assets[i].ToLower().Contains("audio"))
                         {
-                            try
+                            if (Sound.HasAudio)
                             {
                                 this.LoadAffixed<SoundEffect>(assets[i]);
                             }
-                            catch (NoAudioHardwareException e)
-                            {
-                                Sound.HasAudio = false;
-                            }
                         }
+                        else
+                            this.LoadAffixed<object>(assets[i]);
                     }
-                    else
-                        this.LoadAffixed<object>(assets[i]);
+                    catch (NoAudioHardwareException e)
+                    {
+                        Sound.HasAudio = false;
+                    }
 				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
@@ -318,6 +326,10 @@ namespace Phantom.Core
 						asset = this.manager.Load<T>(assetName+"-"+this.ContentSizeAffix);
 						found = true;
 					}
+                    catch (NoAudioHardwareException e)
+                    {
+                        Sound.HasAudio = false;
+                    }
 					finally
 					{
 						this.HaveAffixAsset.Add(assetName, found);
@@ -327,9 +339,33 @@ namespace Phantom.Core
 				else if(this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
 			}
 
-
-			return this.manager.Load<T>(assetName);
+            
+            try
+            {
+                return this.manager.Load<T>(assetName);
+            }
+            catch (NoAudioHardwareException e)
+            {
+                Sound.HasAudio = false;
+                return default(T);
+            }
+            
 		}
+
+        
+        public bool CheckAudio(string testFile)
+        {
+            try
+            {
+                this.manager.Load<SoundEffect>(testFile);
+                return true;
+            }
+            catch (NoAudioHardwareException e)
+            {
+                Sound.HasAudio = false;
+                return false;
+            }
+        }
 
 #if DEBUG
         public string ReportDebugData(Texture2D texture, float scale)

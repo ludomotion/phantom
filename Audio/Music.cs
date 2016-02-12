@@ -51,6 +51,8 @@ namespace Phantom.Audio
 
             var info = Audio.Instance.audiolist[name];
             var song = Audio.Instance.LoadSong(info.Asset);
+            if (!Sound.HasAudio)
+                return;
 
 			float duration = info.Duration > 0 ? info.Duration : (float)song.Duration.TotalSeconds;
 

@@ -8,6 +8,7 @@ using System.IO;
 using Phantom.Utils;
 using Microsoft.Xna.Framework.Media;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Phantom.Audio
 {
@@ -69,6 +70,8 @@ namespace Phantom.Audio
         public override void Update(float elapsed)
         {
 #if !NOAUDIO
+            if (!Sound.HasAudio)
+                return;
             for (int i = this.handles.Count - 1; i >= 0; --i)
             {
                 var handle = this.handles[i];
@@ -201,8 +204,11 @@ namespace Phantom.Audio
 
         internal void AddHandle(Audio.Handle handle)
         {
+            if (handle == null)
+                return;
             if (!this.handlesMap.ContainsKey(handle.Name) || this.handlesMap[handle.Name] == null)
                 this.handlesMap[handle.Name] = new List<Audio.Handle>();
+
             this.handlesMap[handle.Name].Add(handle);
             this.handles.Add(handle);
 
@@ -215,6 +221,15 @@ namespace Phantom.Audio
         }
         private void RemoveHandle(Audio.Handle handle)
         {
+            if (handle == null)
+                return;
+            //make sure the sound is really stopped!
+            if (handle.Instance != null)
+            {
+                handle.Instance.IsLooped = false;
+                handle.Instance.Stop();
+            }
+
             this.handlesMap[handle.Name].Remove(handle);
             this.handles.Remove(handle);
 
