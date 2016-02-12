@@ -22,7 +22,13 @@ namespace Phantom.Audio
 #if !NOAUDIO
             if (!HasAudio)
                 return null;
-            sound = sound.Trim().ToLower();
+            sound = sound.Trim();
+            if (!Audio.Instance.audiolist.ContainsKey(sound))
+            {
+                Debug.WriteLine("Warning: unknown audio asset '" + sound + "'.");
+                return default(Audio.Handle);
+            }
+
 
             var info = Audio.Instance.audiolist[sound];
 

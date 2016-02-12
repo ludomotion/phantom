@@ -32,7 +32,7 @@ namespace Phantom.Audio
             if (!Sound.HasAudio)
                 return;
 
-            name = name.Trim().ToLower();
+            name = name.Trim();
 
             if (current != null && current.SongInstance != null)
             {
@@ -42,6 +42,12 @@ namespace Phantom.Audio
 			if(current != null && current.Thread != null) {
 				current.Thread.Abort();
 			}
+
+            if (!Audio.Instance.audiolist.ContainsKey(name))
+            {
+                Debug.WriteLine("Warning: unknown audio asset '"+name+"'.");
+                return;
+            }
 
             var info = Audio.Instance.audiolist[name];
             var song = Audio.Instance.LoadSong(info.Asset);
