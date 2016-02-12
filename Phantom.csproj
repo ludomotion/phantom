@@ -31,7 +31,7 @@
     <OutputPath>bin\Windows\AnyCPU\Release</OutputPath>
     <IntermediateOutputPath>obj\Windows\AnyCPU\Release</IntermediateOutputPath>
     <DocumentationFile>bin\Windows\AnyCPU\Release\Phantom.xml</DocumentationFile>
-    <DefineConstants>PLATFORM_WINDOWS;MINIMALRENDERING;FNA</DefineConstants>
+    <DefineConstants>PLATFORM_WINDOWS;FNA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

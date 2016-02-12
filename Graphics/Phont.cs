@@ -162,27 +162,29 @@ namespace Phantom.Graphics
             Sprite spr = this.sprite;
             float spriteScale =scale;
 
+            float scaleUp = (info.Renderer ==null || info.Renderer.Policy == Renderer.ViewportPolicy.None || info.Renderer.Policy == Renderer.ViewportPolicy.Centered) ? 1 : (PhantomGame.Game.Width / PhantomGame.Game.Resolution.Width);
+
             //scale up?
-            if (scale > 1 && larger != null)
+            if (scale > scaleUp && larger != null)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.largerScaleFactor;
                     l = l.larger;
-                } while (spriteScale > 1 && l.larger != null);
+                } while (spriteScale > scaleUp && l.larger != null);
                 spr = l.sprite;
             }
 
             //scale down?
-            if (smaller != null && scale <= this.smallerScaleFactor)
+            if (smaller != null && scale <= this.smallerScaleFactor * scaleUp)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.smallerScaleFactor;
                     l = l.smaller;
-                } while (l.smaller!= null && spriteScale <= l.smallerScaleFactor);
+                } while (l.smaller!= null && spriteScale <= l.smallerScaleFactor * scaleUp);
                 spr = l.sprite;
             }
 
@@ -195,7 +197,7 @@ namespace Phantom.Graphics
             float kerningCenter = -1;
             float kerningBottom = -1;
             float r = 0;
-
+            
             for (int i = 0; i < s.Length; i++)
             {
                 int index = (int)s[i] - 32;
@@ -252,27 +254,29 @@ namespace Phantom.Graphics
             float spriteScale = scale;
             offset *= scale;
 
+            float scaleUp = (info.Renderer == null || info.Renderer.Policy == Renderer.ViewportPolicy.None || info.Renderer.Policy == Renderer.ViewportPolicy.Centered) ? 1 : (PhantomGame.Game.Width / PhantomGame.Game.Resolution.Width);
+
             //scale up?
-            if (scale > 1 && larger != null)
+            if (scale > scaleUp && larger != null)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.largerScaleFactor;
                     l = l.larger;
-                } while (spriteScale > 1 && l.larger != null);
+                } while (spriteScale > scaleUp && l.larger != null);
                 spr = l.sprite;
             }
 
             //scale down?
-            if (smaller != null && scale <= this.smallerScaleFactor)
+            if (smaller != null && scale <= this.smallerScaleFactor * scaleUp)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.smallerScaleFactor;
                     l = l.smaller;
-                } while (l.smaller != null && spriteScale <= l.smallerScaleFactor);
+                } while (l.smaller != null && spriteScale <= l.smallerScaleFactor * scaleUp);
                 spr = l.sprite;
             }
 
@@ -342,27 +346,29 @@ namespace Phantom.Graphics
             Sprite spr = this.sprite;
             float spriteScale = scale;
 
+            float scaleUp = (info.Renderer == null || info.Renderer.Policy == Renderer.ViewportPolicy.None || info.Renderer.Policy == Renderer.ViewportPolicy.Centered) ? 1 : (PhantomGame.Game.Width / PhantomGame.Game.Resolution.Width);
+
             //scale up?
-            if (scale > 1 && larger != null)
+            if (scale > scaleUp && larger != null)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.largerScaleFactor;
                     l = l.larger;
-                } while (spriteScale > 1 && l.larger != null);
+                } while (spriteScale > scaleUp && l.larger != null);
                 spr = l.sprite;
             }
 
             //scale down?
-            if (smaller != null && scale <= this.smallerScaleFactor)
+            if (smaller != null && scale <= this.smallerScaleFactor * scaleUp)
             {
                 Phont l = this;
                 do
                 {
                     spriteScale /= l.smallerScaleFactor;
                     l = l.smaller;
-                } while (l.smaller != null && spriteScale <= l.smallerScaleFactor);
+                } while (l.smaller != null && spriteScale <= l.smallerScaleFactor * scaleUp);
                 spr = l.sprite;
             }
 
@@ -477,8 +483,6 @@ namespace Phantom.Graphics
             }
             return r;
         }
-        
-
     }
 
     public class PhontMono : Phont
