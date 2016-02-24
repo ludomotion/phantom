@@ -1179,5 +1179,31 @@ namespace Phantom.Utils
             }
             return false;
         }
+
+        public static string[] SplitOutsideString(string description, char delimiter)
+        {
+            bool insideDouble = false;
+            bool insideSingle = false;
+            List<string> result = new List<string>();
+            int start = 0;
+            for (int i = 0; i < description.Length; i++)
+            {
+                if (description[i] == '\'' && !insideDouble)
+                {
+                    insideSingle = !insideSingle;
+                }
+                else if (description[i] == '"' && !insideSingle)
+                {
+                    insideDouble = !insideDouble;
+                }
+                else if (description[i] == delimiter && !insideDouble && !insideSingle)
+                {
+                    result.Add(description.Substring(start, i-start));
+                    start = i+1;
+                }
+            }
+            result.Add(description.Substring(start, description.Length - start));
+            return result.ToArray();
+        }
     }
 }
