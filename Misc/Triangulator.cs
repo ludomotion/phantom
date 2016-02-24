@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace Phantom.Misc
 {
@@ -27,7 +29,7 @@ namespace Phantom.Misc
             do
             {
                 //create a list of the reflex points
-                List<int> reflexPoints = new List<int>();
+                //List<int> reflexPoints = new List<int>();
                 //JORIS: Disabled the reflexPoint calculation as it leads to a bug with voronoi cells.
                 //All points were somehow marked as reflex points which caused the triangulator never to get out of this do while loop
                 //This fix seems to work as long as you are sure the vertices define a convex polygon.
@@ -80,12 +82,14 @@ namespace Phantom.Misc
                 for (short i = 0; i < points.Count; i++)
                 {
                     //make sure this point is not a reflex point
-                    if (reflexPoints.Contains(i))
-                        continue;
+                    //if (reflexPoints.Contains(i))
+                    //    continue;
 
                     //get the vertex indices
                     short pim1, pi, pip1;
-                    GetPoints(points, i, out pim1, out pi, out pip1);
+                    pim1 = points[(i + points.Count - 1) % points.Count];
+                    pi = points[i];
+                    pip1 = points[(i + 1) % points.Count];
 
                     //get the actual vertices
                     Vector2 vim1 = vertices[pim1];
@@ -125,7 +129,7 @@ namespace Phantom.Misc
                         points.RemoveAt(i);
 
                         //we have to exit this loop so we can recalculate reflex angles
-                        break;
+                        //break;
                     }
                 }
             } while (points.Count >= 3);
@@ -140,30 +144,6 @@ namespace Phantom.Misc
             }
 
             return indexes;
-        }
-
-        /// <summary>
-        /// Given the list of point indices and the index, returns the three vertex indices.
-        /// </summary>
-        /// <param name="points">The list of points</param>
-        /// <param name="i">The current point</param>
-        /// <param name="pim1">The index of the previous vertex</param>
-        /// <param name="pi">The index of the current vertex</param>
-        /// <param name="pip1">The index of the next vertex</param>
-        private static void GetPoints(List<short> points, short i, out short pim1, out short pi, out short pip1)
-        {
-            //figure out the previous available index
-            int im1 = i - 1;
-            if (im1 < 0)
-                im1 = points.Count - 1;
-
-            //figure out the next available index
-            int ip1 = (i + 1) % points.Count;
-
-            //extract out the vertex indices from the points list
-            pim1 = points[im1];
-            pi = points[i];
-            pip1 = points[ip1];
         }
 
         /// <summary>

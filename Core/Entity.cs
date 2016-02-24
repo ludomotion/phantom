@@ -112,6 +112,17 @@ namespace Phantom.Core
         private Shape shape;
 
         /// <summary>
+        /// Value used for depth sorting. 
+        /// </summary>
+        public float SortValue;
+
+        /// <summary>
+        /// Calculated value used for depth sorting. 
+        /// </summary>
+        internal float CalculatedSortValue;
+
+
+        /// <summary>
         /// Create an entity (it still needs to be added to an EntityLayer)
         /// </summary>
         /// <param name="position"></param>

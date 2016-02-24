@@ -3,13 +3,13 @@ using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 
-#if ANDROID
+#if PLATFORM_ANDROID
 using Android.OS;
 using Android.Util;
-#elif IOS
+#elif PLATFORM_IOS
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
-#elif WINDOWS
+#elif PLATFORM_WINDOWS
 using System.Management;
 #endif
 
@@ -66,10 +66,10 @@ namespace Phantom
 			Unknown
 		}
 
-#if IOS
+#if PLATFORM_IOS
 		[DllImport(MonoTouch.Constants.SystemLibrary)]
 		static extern int sysctlbyname([MarshalAs(UnmanagedType.LPStr)] string property, IntPtr output, IntPtr oldLen, IntPtr newp, uint newlen);
-#elif WINDOWS
+#elif PLATFORM_WINDOWS
         public enum ChassisTypes
         {
             Other = 1,
@@ -237,7 +237,7 @@ namespace Phantom
 
 		public static void RetrieveInfo()
 		{
-#if ANDROID
+#if PLATFORM_ANDROID
 			DisplayMetrics metrics = new DisplayMetrics();
 			Game.Activity.WindowManager.DefaultDisplay.GetMetrics(metrics);
 			ScreenWidth = metrics.WidthPixels;
@@ -246,7 +246,7 @@ namespace Phantom
 			DisplayRealHeight = 2.54f * deviceScreenHeight / metrics.Ydpi;
 			int shortSizeDp = (Math.Min(deviceScreenWidth, deviceScreenHeight) * (int)(DisplayMetricsDensity.Default)) / (int)metrics.DensityDpi;
 
-#if OUYA
+#if PLATFORM_OUYA
 			OS = DeviceOS.Ouya;
 			Form = DeviceForm.Console;
 #else
@@ -260,7 +260,7 @@ namespace Phantom
 			ModelVersion = Build.VERSION.Incremental;
 			PPI = (metrics.Xdpi + metrics.Ydpi) / 2f;
 
-#elif BLACKBERRY
+#elif PLATFORM_BLACKBERRY
 			OS = DeviceOS.BlackBerry;
 			OSVersion = "Unknown";
 			Manufacturer = "BlackBerry";
@@ -270,7 +270,7 @@ namespace Phantom
 			ModelVersion = "UnknownBlackBerryVersion";
 			PPI = 96f;
 
-#elif BSD
+#elif PLATFORM_BSD
 			OS = DeviceOS.BSD;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -280,7 +280,7 @@ namespace Phantom
 			ModelVersion = "UnknownBSDVersion";
 			PPI = 96f;
 
-#elif FLASH
+#elif PLATFORM_FLASH
 			OS = DeviceOS.Flash;
 			OSVersion = "Unknown";
 			Manufacturer = "Adobe";
@@ -290,7 +290,7 @@ namespace Phantom
 			ModelVersion = "UnknownFlashVersion";
 			PPI = 96f;
 
-#elif GAMESTICK
+#elif PLATFORM_GAMESTICK
 			OS = DeviceOS.GameStick;
 			OSVersion = "Unknown";
 			Manufacturer = "Playjam";
@@ -300,7 +300,7 @@ namespace Phantom
 			ModelVersion = "UnknownGameStickVersion";
 			PPI = 96f;
 
-#elif GAIKAI
+#elif PLATFORM_GAIKAI
 			OS = DeviceOS.Gaikai;
 			OSVersion = "Unknown";
 			Manufacturer = "Sony";
@@ -310,7 +310,7 @@ namespace Phantom
 			ModelVersion = "UnknownGaikaiVersion";
 			PPI = 96f;
 
-#elif IOS
+#elif PLATFORM_IOS
 			string hardwareStr = "Unspecified";
 			IntPtr pLen = Marshal.AllocHGlobal(sizeof(int));
 			sysctlbyname(DeviceHardware.HardwareProperty, IntPtr.Zero, pLen, IntPtr.Zero, 0);
@@ -453,7 +453,7 @@ namespace Phantom
 			ScreenWidth = (int)UIScreen.MainScreen.CurrentMode.Size.Width;
 			ScreenHeight = (int)UIScreen.MainScreen.CurrentMode.Size.Height;
 
-#elif LINUX
+#elif PLATFORM_LINUX
 			OS = DeviceOS.Linux;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -463,7 +463,7 @@ namespace Phantom
 			ModelVersion = "UnknownLinuxVersion";
 			PPI = 96f;
 
-#elif MACOS
+#elif PLATFORM_MACOS
 			OS = DeviceOS.MacOSX;
 			OSVersion = "Unknown";
 			Manufacturer = "Apple";
@@ -473,7 +473,7 @@ namespace Phantom
 			ModelVersion = "UnknownMacOSXVersion";
 			PPI = 96f;
 
-#elif ONLIVE
+#elif PLATFORM_ONLIVE
 			OS = DeviceOS.OnLive;
 			OSVersion = "Unknown";
 			Manufacturer = "OnLive";
@@ -483,7 +483,7 @@ namespace Phantom
 			ModelVersion = "UnknownOnLiveVersion";
 			PPI = 96f;
 
-#elif PS3
+#elif PLATFORM_PS3
 			OS = DeviceOS.PlayStation3;
 			OSVersion = "Unknown";
 			Manufacturer = "Sony";
@@ -493,7 +493,7 @@ namespace Phantom
 			ModelVersion = "UnknownPlayStation3Version";
 			PPI = 96f;
 
-#elif PS4
+#elif PLATFORM_PS4
 			OS = DeviceOS.PlayStation4;
 			OSVersion = "Unknown";
 			Manufacturer = "Sony";
@@ -503,7 +503,7 @@ namespace Phantom
 			ModelVersion = "UnknownPlayStation4Version";
 			PPI = 96f;
 
-#elif PSMOBILE
+#elif PLATFORM_PSMOBILE
 			OS = DeviceOS.PSMobile;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -513,7 +513,7 @@ namespace Phantom
 			ModelVersion = "UnknownPSMobileVersion";
 			PPI = 96f;
 
-#elif SHIELD
+#elif PLATFORM_SHIELD
 			OS = DeviceOS.Shield;
 			OSVersion = "Unknown";
 			Manufacturer = "NVidia";
@@ -523,7 +523,7 @@ namespace Phantom
 			ModelVersion = "UnknownShieldVersion";
 			PPI = 96f;
 
-#elif SILVERLIGHT
+#elif PLATFORM_ILVERLIGHT
 			OS = DeviceOS.SilverLight;
 			OSVersion = "Unknown";
 			Manufacturer = "Microsoft";
@@ -533,7 +533,7 @@ namespace Phantom
 			ModelVersion = "UnknownSilverLightVersion";
 			PPI = 96f;
 
-#elif STEAMBOX
+#elif PLATFORM_STEAMBOX
 			OS = DeviceOS.SteamBox;
 			OSVersion = "Unknown";
 			Manufacturer = "Valve";
@@ -543,7 +543,7 @@ namespace Phantom
 			ModelVersion = "UnknownSteamBoxVersion";
 			PPI = 96f;
 
-#elif TIZEN
+#elif PLATFORM_TIZEN
 			OS = DeviceOS.Tizen;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -553,7 +553,7 @@ namespace Phantom
 			ModelVersion = "UnknownTizenVersion";
 			PPI = 96f;
 
-#elif WII
+#elif PLATFORM_WII
 			OS = DeviceOS.Wii;
 			OSVersion = "Unknown";
 			Manufacturer = "Nintendo";
@@ -562,7 +562,7 @@ namespace Phantom
 			Form = DeviceForm.Console;
 			ModelVersion = "UnknownWiiVersion";
 			PPI = 96f;
-#elif WIIU
+#elif PLATFORM_WIIU
 			OS = DeviceOS.WiiU;
 			OSVersion = "Unknown";
 			Manufacturer = "Nintendo";
@@ -572,7 +572,7 @@ namespace Phantom
 			ModelVersion = "UnknownWiiUVersion";
 			PPI = 96f;
 
-#elif WINDOWS8
+#elif PLATFORM_WINDOWS8
 			OS = DeviceOS.Windows8;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -582,7 +582,7 @@ namespace Phantom
 			ModelVersion = "UnknownWindows8Version";
 			PPI = 96f;
 
-#elif WINDOWS_RT
+#elif PLATFORM_WINDOWS_RT
 			OS = DeviceOS.WindowsRT;
 			OSVersion = "Unknown";
 			Manufacturer = "Unknown";
@@ -592,7 +592,7 @@ namespace Phantom
 			ModelVersion = "UnknownWindowsRTVersion";
 			PPI = 96f;
 
-#elif WINDOWS
+#elif PLATFORM_WINDOWS
             string arch = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
 //            int arch = ((String.IsNullOrEmpty(pa) || String.Compare(pa, 0, "x86", 0, 3, true) == 0) ? 32 : 64);
 
@@ -740,7 +740,7 @@ namespace Phantom
 			ModelVersion = "UnknownWindowsPhoneVersion";
 			PPI = 96f;
 
-#elif XBOX
+#elif PLATFORM_XBOX
 			OS = DeviceOS.XBox360;
 			OSVersion = "Unknown";
 			Manufacturer = "Microsoft";
@@ -750,7 +750,7 @@ namespace Phantom
 			ModelVersion = "UnknownXBox360Version";
 			PPI = 96f;
 
-#elif XBOXNG
+#elif PLATFORM_XBOXNG
 			OS = DeviceOS.XBoxNG;
 			OSVersion = "Unknown";
 			Manufacturer = "Microsoft";

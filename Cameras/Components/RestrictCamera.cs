@@ -31,8 +31,8 @@ namespace Phantom.Cameras.Components
 
             if (horizontal)
             {
-                float Left = Camera.Target.X - res.Width * .5f / Camera.Zoom;
-                float Right = Camera.Target.X + res.Width * .5f / Camera.Zoom;
+                float Left = Camera.Target.X - res.Width * .5f / Camera.TargetZoom;
+                float Right = Camera.Target.X + res.Width * .5f / Camera.TargetZoom;
                 if (Left < 0) delta.X = -Left;
                 if (Right > this.layer.Bounds.X)
                 {
@@ -44,8 +44,8 @@ namespace Phantom.Cameras.Components
             }
             if (vertical)
             {
-                float Top = Camera.Target.Y - res.Height * .5f / Camera.Zoom;
-                float Bottom = Camera.Target.Y + res.Height * .5f / Camera.Zoom;
+                float Top = Camera.Target.Y - res.Height * .5f / Camera.TargetZoom;
+                float Bottom = Camera.Target.Y + res.Height * .5f / Camera.TargetZoom;
                 if (Top < 0) delta.Y = -Top;
                 if (Bottom > this.layer.Bounds.Y)
                 {

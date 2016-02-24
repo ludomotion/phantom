@@ -32,5 +32,7 @@ namespace Phantom.Graphics
         public Vector2 Padding;
         public float Elapsed;
 
+        public bool IsTopState;
+
     }
 }

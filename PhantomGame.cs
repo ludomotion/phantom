@@ -12,9 +12,9 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using Phantom.Graphics;
 using Phantom.Utils.Performance;
-#if IOS
+#if PLATFORM_IOS
 using MonoTouch.UIKit;
-#elif ANDROID
+#elif PLATFORM_ANDROID
 #endif
 
 #if TOUCH
@@ -63,9 +63,27 @@ namespace Phantom
 
         public Content Content { get; private set; }
 
-        private float multiplier;
+        protected Action PreRender;
 
-        private IList<GameState> states;
+        private float multiplier;
+#if MINIMALRENDERING
+        private float minimalRendering = -1;
+        public float MinimalRendering
+        {
+            get { return minimalRendering; }
+            set { 
+                if(minimalRendering != -1)
+                    minimalRendering = Math.Max(minimalRendering, value);
+#if DEBUG
+                if (minimalRendering >= 0)
+                    XnaGame.Window.Title = "RENDERING...";
+#endif
+            }
+        }
+#endif
+
+
+        protected IList<GameState> states;
         public GameState CurrentState
         {
             get
@@ -123,7 +141,7 @@ namespace Phantom
 
             XnaGame = new Microsoft.Xna.Framework.Game();
             XnaGame.Exiting += new EventHandler<EventArgs>(this.OnExit);
-#if !ANDROID
+#if !PLATFORM_ANDROID
             XnaGame.Window.Title = this.Name;
 #endif
             XnaGame.Content.RootDirectory = "Content";
@@ -162,8 +180,14 @@ namespace Phantom
             this.graphics.PreferredBackBufferHeight = (int)this.Height;
             this.graphics.IsFullScreen = false;
 #else
+
+			#if PLATFORM_ANDROID
+			this.graphics.PreferredBackBufferWidth = DeviceHardware.ScreenWidth;
+			this.graphics.PreferredBackBufferHeight = DeviceHardware.ScreenHeight;
+			#else
             this.graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
             this.graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+			#endif
             this.graphics.IsFullScreen = true;
 
 			this.graphics.SupportedOrientations = DisplayOrientation.LandscapeLeft | DisplayOrientation.LandscapeRight;
@@ -176,6 +200,8 @@ namespace Phantom
 			int h = this.graphics.PreferredBackBufferHeight;
 
 			this.Resolution = new Viewport(0, 0, w, h);
+
+            XnaGame.Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         protected virtual void LoadContent(Content content)
@@ -229,29 +255,50 @@ namespace Phantom
 
         internal void XnaRender(GameTime gameTime)
         {
-			int startIndex;
-#if DEBUG // Update Profiler
-				Profiler.Instance.BeginRender ();
+#if MINIMALRENDERING
+            if (minimalRendering == 0)
+                return;
+            else if (minimalRendering > 0)
+            {
+                minimalRendering -= Math.Min((float)gameTime.ElapsedGameTime.TotalSeconds, minimalRendering);
+#if DEBUG
+                if (minimalRendering == 0)
+                    XnaGame.Window.Title = "NOT RENDERING!";
+#endif
+            }
 #endif
 
-#if !ANDROID
-                lock (this.GlobalRenderLock)
-#endif
-                {
-                    this.GraphicsDevice.Clear(this.BackgroundColor);
-                }
 
-				for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
-					;
-				for (int i = Math.Max(0,startIndex); i < this.states.Count; i++)
-					if (!this.states [i].OnlyOnTop || i == this.states.Count - 1)
-						this.states [i].Render (null);
-				this.Render (null);
-
-#if DEBUG // Update Profiler
-				Profiler.Instance.EndRender ();
+#if DEBUG
+            // Update Profiler
+            Profiler.Instance.BeginRender();
 #endif
-		}
+
+#if !PLATFORM_ANDROID && !FNA
+            lock (this.GlobalRenderLock)
+#endif
+            {
+                this.GraphicsDevice.Clear(this.BackgroundColor);
+            }
+
+            if (PreRender != null)
+            {
+                PreRender.Invoke();
+            }
+
+            int startIndex;
+            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
+                ;
+            for (int i = Math.Max(0, startIndex); i < this.states.Count; i++)
+                if (!this.states[i].OnlyOnTop || i == this.states.Count - 1)
+                    this.states[i].Render(null);
+            this.Render(null);
+
+#if DEBUG
+            // Update Profiler
+            Profiler.Instance.EndRender();
+#endif
+        }
 
         protected override void OnComponentAdded(Component component)
         {
@@ -298,8 +345,36 @@ namespace Phantom
             {
                 Profiler.Instance.Visible = !Profiler.Instance.Visible;
             });
+            this.Console.Register("fullscreen", "Toggles fullscreen mode", delegate(string[] argv)
+            {
+                this.graphics.IsFullScreen = !this.graphics.IsFullScreen;
+                XnaGame.Window.ClientSizeChanged -= Window_ClientSizeChanged;
+                Window_ClientSizeChanged(null, null);
+            });
 #endif
 
+        }
+
+        private void Window_ClientSizeChanged(object sender, EventArgs e)
+        {
+            XnaGame.Window.ClientSizeChanged -= Window_ClientSizeChanged;
+
+            Viewport previous = this.Resolution;
+            int width = 0;
+            int height = 0;
+
+            if (!this.graphics.IsFullScreen)
+            {
+                width = XnaGame.Window.ClientBounds.Width;
+                height = XnaGame.Window.ClientBounds.Height;
+            }
+
+            this.SetResolution(width, height, this.graphics.IsFullScreen);
+            if(this.states != null)
+                foreach (GameState state in this.states)
+                    state.ViewportChanged(previous, this.Resolution);
+
+            XnaGame.Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         public void SetResolution(int width, int height, bool fullscreen)
@@ -470,7 +545,9 @@ namespace Phantom
 
         public void Exit()
         {
+#if !PLATFORM_IOS
             XnaGame.Exit();
+#endif
         }
 
 
@@ -483,5 +560,18 @@ namespace Phantom
             }
             return null;
         }
+
+#if MINIMALRENDERING
+        public void DisableMinimalRendering()
+        {
+            minimalRendering = -1;
+        }
+
+        public void PauseMinimalRendering()
+        {
+            minimalRendering = 0;
+        }
+#endif
+
     }
 }

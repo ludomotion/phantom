@@ -52,6 +52,7 @@ namespace Phantom.Graphics
         public RenderOptions Options { get; protected set; }
 
         private Layer layer;
+        private GameState state;
         protected SpriteBatch batch;
         protected SpriteSortMode sortMode;
         protected BlendState blendState;
@@ -102,6 +103,7 @@ namespace Phantom.Graphics
         {
             base.OnAncestryChanged();
             this.layer = this.GetAncestor<Layer>();
+            this.state = this.GetAncestor<GameState>();
         }
 
         public override void HandleMessage(Message message)
@@ -134,7 +136,7 @@ namespace Phantom.Graphics
 
             lock (PhantomGame.Game.GlobalRenderLock)
             {
-                if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
+                if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null && this.fx.Parameters["World"]!=null)
                     this.fx.Parameters["World"].SetValue(info.World);
                 this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
                 base.Render(info);
@@ -148,7 +150,7 @@ namespace Phantom.Graphics
             {
                 if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
                     this.fx.Parameters["World"].SetValue(info.World);
-                this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
+				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
                 IList<Component> components = this.Parent.Components;
                 int count = components.Count;
                 for (int i = 0; i < count; i++)
@@ -193,6 +195,8 @@ namespace Phantom.Graphics
             info.Pass = 0;
             info.Batch = this.batch;
             info.GraphicsDevice = PhantomGame.Game.GraphicsDevice;
+
+            info.IsTopState = this.state == PhantomGame.Game.CurrentState;
 
             Viewport resolution = PhantomGame.Game.Resolution;
             Vector2 designSize = PhantomGame.Game.Size;
@@ -360,11 +364,11 @@ namespace Phantom.Graphics
             return BlendState.AlphaBlend;
         }
 
-		internal virtual void OnComponentAddedToLayer(Component component)
+		public virtual void OnComponentAddedToLayer(Component component)
 		{
 		}
 
-		internal virtual void OnComponentRemovedToLayer(Component component)
+        public virtual void OnComponentRemovedToLayer(Component component)
 		{
 		}
 

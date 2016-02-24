@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using System.Reflection;
 using Phantom.Graphics;
 using Phantom.Shapes;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Phantom.Misc
 {
@@ -70,6 +71,44 @@ namespace Phantom.Misc
 					info.Canvas.Stroke();
 			}
 		}
+
+        public static string[] SplitString(string str, SpriteFont font, float width)
+        {
+            List<string> result = new List<string>();
+            string lastPart = "";
+            string currentPart = "";
+            int p = 0;
+            while (str != "")
+            {
+                p++;
+                if (p >= str.Length)
+                {
+                    result.Add(str);
+                    str = "";
+                } 
+                else if (str[p] == ' ')
+                {
+                    currentPart = str.Substring(0, p);
+                    if (font.MeasureString(currentPart).X > width)
+                    {
+                        if (lastPart == "")
+                            lastPart = currentPart;
+                        result.Add(lastPart);
+                        str = str.Substring(lastPart.Length + 1);
+                        lastPart = "";
+                        p = 0;
+
+                    }
+                    else
+                    {
+                        lastPart = currentPart;
+                    }
+                    
+                }
+            }
+
+            return result.ToArray();
+        }
 
 	}
 }

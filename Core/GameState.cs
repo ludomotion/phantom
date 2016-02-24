@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Phantom.Cameras;
+using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace Phantom.Core
 {
@@ -61,6 +63,10 @@ namespace Phantom.Core
         public virtual void BackOnTop()
         {
             this.Input.JustBack = true;
+        }
+
+        public virtual void ViewportChanged(Viewport previous, Viewport viewport)
+        {
         }
     }
 }

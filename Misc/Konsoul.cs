@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Phantom.Core;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Phantom.Assets;
+using Phantom.Core;
+using Phantom.Graphics;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
 
 #if TOUCH
 using Trace = System.Console;
@@ -32,6 +34,7 @@ namespace Phantom.Misc
         public int EchoLines = 0;
 #endif
         public TimeSpan EchoDuration = TimeSpan.FromSeconds(5);
+        public BlendState FontBlendState = BlendState.NonPremultiplied;
     }
 
     struct EchoLine
@@ -51,7 +54,7 @@ namespace Phantom.Misc
         private static string WELCOME = " enter command here - type `help' for information";
         private static string HELP = @"no help yet, survive by your self for now...";
 
-#if !XBOX
+#if !PLATFORM_XBOX
         /**
          * Needed to receive debug output. (from `Debug.WriteLine' etc)
          */
@@ -71,11 +74,11 @@ namespace Phantom.Misc
                 this.console.WriteLine(message);
             }
         }
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
 
         public bool Visible;
 
-        public SpriteFont Font
+        public Phont Font
         {
             get
             {
@@ -85,15 +88,15 @@ namespace Phantom.Misc
 
         private float blinkTimer;
 
-        private KonsoulSettings settings;
+        public KonsoulSettings Settings;
 
         private KeyboardState previousKeyboardState;
         private KeyMap keyMap;
 
-#if !XBOX
+#if !PLATFORM_XBOX
         private readonly KonsoulTraceListener listener;
 #endif
-        private SpriteFont font;
+        private Phont font;
         private SpriteBatch batch;
         private BasicEffect effect;
 
@@ -120,18 +123,20 @@ namespace Phantom.Misc
 
         private Queue<EchoLine> echoQueue;
 
-        public Konsoul(SpriteFont font, KonsoulSettings settings)
+        public Konsoul(Phont font, KonsoulSettings settings)
         {
+            if (font == null)
+                font = PhantomAssets.Courier20Bold;
             this.Visible = false;
             this.font = font;
-            this.settings = settings;
+            this.Settings = settings;
             this.batch = new SpriteBatch(PhantomGame.Game.GraphicsDevice);
             this.effect = new BasicEffect(PhantomGame.Game.GraphicsDevice);
 
             this.input = "";
             this.cursor = 0;
             this.lines = new List<string>();
-            this.promptWidth = this.font.MeasureString(this.settings.Prompt).X;
+            this.promptWidth = this.font.MeasureString(this.Settings.Prompt).X;
             this.wrapBuffer = new List<string>();
             this.nolineBuffer = "";
             this.scrollOffset = 0;
@@ -145,15 +150,15 @@ namespace Phantom.Misc
             this.commands = new Dictionary<string, ConsoleCommand>();
             this.documentation = new Dictionary<string, string>();
 
-            this.echoQueue = new Queue<EchoLine>(this.settings.EchoLines);
+            this.echoQueue = new Queue<EchoLine>(this.Settings.EchoLines);
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             try
             {
                 this.history = new List<string>(System.IO.File.ReadAllLines("konsoul.dat"));
                 if (this.history.Count > 0)
                 {
-                    int.TryParse(this.history[0], out this.settings.LineCount);
+                    int.TryParse(this.history[0], out this.Settings.LineCount);
                     this.history.RemoveAt(0);
                 }
             }
@@ -164,39 +169,43 @@ namespace Phantom.Misc
             {
                 this.AddLines("failed to load history: " + e.Message);
             }
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 			Trace.Listeners.Add(this.listener = new KonsoulTraceListener(this));
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
             this.SetupVertices();
             this.SetupDefaultCommands();
             this.lines.Add("] Konsoul Initialized");
         }
 
-        public Konsoul(SpriteFont font)
+        public Konsoul(Phont font = null)
             : this(font, new KonsoulSettings())
+        {
+        }
+        public Konsoul(KonsoulSettings settings)
+            : this(null, settings)
         {
         }
 
         public override void Dispose()
         {
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
 			Trace.Listeners.Remove(this.listener);
-#endif // !XBOX
+#endif // !PLATFORM_XBOX
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             while (this.history.Count > 0 && this.history[this.history.Count - 1].Trim().ToLower() == "quit")
                 this.history.RemoveAt(this.history.Count - 1);
             try
             {
-                this.history.Insert(0, "" + this.settings.LineCount);
+                this.history.Insert(0, "" + this.Settings.LineCount);
                 System.IO.File.WriteAllLines("konsoul.dat", this.history.ToArray());
             }
             catch (Exception)
             {
             }
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             base.Dispose();
         }
 
@@ -247,7 +256,7 @@ namespace Phantom.Misc
                     maxWidth = Math.Max(k.Length, maxWidth);
                 foreach (string k in this.commands.Keys)
                 {
-#if XBOX
+#if PLATFORM_XBOX
                     builder.Remove(0, builder.Length);
 #else
                     builder.Clear();
@@ -271,9 +280,9 @@ namespace Phantom.Misc
             this.Register("lines", "", delegate(string[] argv)
             {
                 if (argv.Length == 1)
-                    this.settings.EchoLines = this.settings.EchoLines > 0 ? 0 : 4;
+                    this.Settings.EchoLines = this.Settings.EchoLines > 0 ? 0 : 4;
                 else
-                    int.TryParse(argv[1], out this.settings.EchoLines);
+                    int.TryParse(argv[1], out this.Settings.EchoLines);
             });
 
             this.Register("history", "show command history.\n\nuse the -c option to clear the history.", delegate(string[] argv)
@@ -291,7 +300,7 @@ namespace Phantom.Misc
                 }
             });
 
-#if WINDOWS || LINUX || MACOS
+#if PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
             this.Register("dump", "write console scrollback to a file.", delegate(string[] argv)
             {
                 string filename = "dump-" + DateTime.Now.ToString("yyyyMMdd") + ".log";
@@ -307,7 +316,7 @@ namespace Phantom.Misc
                     this.lines.Add(argv[0] + ": failed to write file: " + e.Message);
                 }
             });
-#endif // WINDOWS || LINUX || MACOS
+#endif // PLATFORM_WINDOWS || PLATFORM_LINUX || PLATFORM_MACOS
         }
 
         private void SetupVertices()
@@ -345,14 +354,14 @@ namespace Phantom.Misc
             DateTime now = DateTime.Now;
 			lock (this.echoQueue)
 			{
-				while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Time > this.settings.EchoDuration)
+				while (this.echoQueue.Count > 0 && now - this.echoQueue.Peek().Time > this.Settings.EchoDuration)
 					this.echoQueue.Dequeue();
 			}
 
             // Open and close logics:
             if (!this.Visible)
             {
-                if (current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey))
+                if (current.IsKeyDown(this.Settings.OpenKey) && !previous.IsKeyDown(this.Settings.OpenKey))
                 {
                     if (current.IsKeyDown(Keys.LeftShift) && this.history.Count > 0)
                     {
@@ -360,7 +369,7 @@ namespace Phantom.Misc
                     }
                     else
                     {
-                        this.transition = this.settings.TransitionTime;
+                        this.transition = this.Settings.TransitionTime;
                         this.Visible = true;
                     }
                 }
@@ -368,10 +377,10 @@ namespace Phantom.Misc
                 base.Update(elapsed);
                 return;
             }
-            else if ((current.IsKeyDown(this.settings.OpenKey) && !previous.IsKeyDown(this.settings.OpenKey)) ||
+            else if ((current.IsKeyDown(this.Settings.OpenKey) && !previous.IsKeyDown(this.Settings.OpenKey)) ||
                     (current.IsKeyDown(Keys.Escape) && !previous.IsKeyDown(Keys.Escape)))
             {
-                this.transition = this.settings.TransitionTime;
+                this.transition = this.Settings.TransitionTime;
                 this.Visible = false;
                 this.historySavedInput = null;
                 this.input = "";
@@ -392,17 +401,17 @@ namespace Phantom.Misc
             if (shift && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
                 this.scrollOffset -= 1;
             if (current.IsKeyDown(Keys.PageUp) && !previous.IsKeyDown(Keys.PageUp))
-                this.scrollOffset += this.settings.LineCount;
+                this.scrollOffset += this.Settings.LineCount;
             if (current.IsKeyDown(Keys.PageDown) && !previous.IsKeyDown(Keys.PageDown))
-                this.scrollOffset -= this.settings.LineCount;
+                this.scrollOffset -= this.Settings.LineCount;
             if (shift && current.IsKeyDown(Keys.PageUp) && !previous.IsKeyDown(Keys.PageUp))
                 this.scrollOffset = int.MaxValue;
             if (shift && current.IsKeyDown(Keys.PageDown) && !previous.IsKeyDown(Keys.PageDown))
                 this.scrollOffset = 0;
             if (ctrl && current.IsKeyDown(Keys.Up) && !previous.IsKeyDown(Keys.Up))
-                this.settings.LineCount = Math.Max(0, this.settings.LineCount - (shift ? 5 : 1));
+                this.Settings.LineCount = Math.Max(0, this.Settings.LineCount - (shift ? 5 : 1));
             if (ctrl && current.IsKeyDown(Keys.Down) && !previous.IsKeyDown(Keys.Down))
-                this.settings.LineCount = Math.Min(resolution.Height / this.font.LineSpacing - 1, this.settings.LineCount + (shift ? 5 : 1));
+                this.Settings.LineCount = Math.Min(resolution.Height / (int)this.font.LineSpacing - 1, this.Settings.LineCount + (shift ? 5 : 1));
 
             // Cursor control:
             int lastCursor = this.cursor;
@@ -570,8 +579,12 @@ namespace Phantom.Misc
 
         public override void Render(Graphics.RenderInfo info)
         {
-            float padding = this.settings.Padding;
-            Color color = this.settings.Color;
+            info = new RenderInfo();
+            info.Batch = this.batch;
+
+            float padding = this.Settings.Padding;
+            Color color = this.Settings.Color;
+
             float lineSpace = this.font.LineSpacing;
 
             if (!this.Visible && this.transition <= 0)
@@ -579,13 +592,13 @@ namespace Phantom.Misc
                 if (this.echoQueue.Count > 0)
                 {
                     float ey = padding;
-                    this.batch.Begin();
+                    this.batch.Begin(SpriteSortMode.Deferred, Settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
                     lock (this.echoQueue)
                     {
                         foreach (EchoLine echo in this.echoQueue)
                         {
-                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
-                            this.batch.DrawString(this.font, echo.Line, new Vector2(padding, ey), color);
+                            this.font.DrawString(info, echo.Line, new Vector2(padding, ey) + Vector2.One, new Color(0, 0, 0, 200));
+                            this.font.DrawString(info, echo.Line, new Vector2(padding, ey), color);
                             ey += lineSpace;
                         }
                     }
@@ -594,36 +607,36 @@ namespace Phantom.Misc
                 return;
             }
 
-            float transitionScale = Math.Max(0, this.transition / this.settings.TransitionTime);
+            float transitionScale = Math.Max(0, this.transition / this.Settings.TransitionTime);
             if (this.Visible) transitionScale = 1 - transitionScale;
 
             GraphicsDevice graphicsDevice = PhantomGame.Game.GraphicsDevice;
             Viewport resolution = PhantomGame.Game.Resolution;
-            float height = padding * 2 + lineSpace * (this.settings.LineCount + 1);
+            float height = padding * 2 + lineSpace * (this.Settings.LineCount + 1);
 
             this.effect.World = Matrix.Identity;
             this.effect.Projection = Matrix.CreateOrthographicOffCenter(
                 0, 1, 1f / (height / resolution.Height * transitionScale), 0,
                 0, 1);
-            this.effect.DiffuseColor = this.settings.BackgroundColor.ToVector3();
-            this.effect.Alpha = this.settings.Alpha;
+            this.effect.DiffuseColor = this.Settings.BackgroundColor.ToVector3();
+            this.effect.Alpha = this.Settings.Alpha;
 
             this.effect.CurrentTechnique.Passes[0].Apply();
             graphicsDevice.SetVertexBuffer(this.backgroundBuffer);
             graphicsDevice.Indices = this.backgroundIndex;
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4, 0, 2);
 
-            this.batch.Begin();
+            this.batch.Begin(SpriteSortMode.Deferred, Settings.FontBlendState, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise);
             float y = height * transitionScale - padding - lineSpace;
-            this.batch.DrawString(this.font, this.settings.Prompt + this.input, new Vector2(padding, y), color);
+            this.font.DrawString(info, this.Settings.Prompt + this.input, new Vector2(padding, y), color);
             if (this.input.Length == 0)
-                this.batch.DrawString(this.font, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.settings.Alpha * .5f));
+                this.font.DrawString(info, Konsoul.WELCOME, new Vector2(padding + promptWidth, y), new Color(.2f, .2f, .2f, this.Settings.Alpha * .5f));
             y -= lineSpace;
 
             int count = this.lines.Count;
-            this.scrollOffset = (int)MathHelper.Clamp(this.scrollOffset, 0, count - this.settings.LineCount);
+            this.scrollOffset = (int)MathHelper.Clamp(this.scrollOffset, 0, count - this.Settings.LineCount);
             int index = 1 + this.scrollOffset;
-            while ((index - this.scrollOffset) <= this.settings.LineCount && count - index >= 0)
+            while ((index - this.scrollOffset) <= this.Settings.LineCount && count - index >= 0)
             {
                 string line = this.lines[count - index];
                 if (line.Length > 0)
@@ -631,7 +644,7 @@ namespace Phantom.Misc
                     IList<string> chunks = WordWrap(line, resolution.Width - padding * 2);
                     for (int i = 0; i < chunks.Count; i++)
                     {
-                        this.batch.DrawString(this.font, chunks[i], new Vector2(padding, y), color);
+                        this.font.DrawString(info, chunks[i], new Vector2(padding, y), color);
                         y -= lineSpace;
                     }
                 }
@@ -647,14 +660,14 @@ namespace Phantom.Misc
             // Render cursor:
             if (this.blinkTimer % 2 < 1)
             {
-                Vector2 cursorPosition = this.font.MeasureString(this.input.Substring(0, this.cursor)) + new Vector2(this.settings.Padding + this.promptWidth, 0);
+                Vector2 cursorPosition = this.font.MeasureString(this.input.Substring(0, this.cursor)) + new Vector2(this.Settings.Padding + this.promptWidth, 0);
                 cursorPosition.Y = height * transitionScale - lineSpace - padding;
 
                 this.effect.World = Matrix.CreateTranslation(cursorPosition.X, cursorPosition.Y, 0);
                 this.effect.Projection = Matrix.CreateOrthographicOffCenter(
                     0, resolution.Width, resolution.Height, 0,
                     0, 1);
-                this.effect.DiffuseColor = this.settings.Color.ToVector3();
+                this.effect.DiffuseColor = this.Settings.Color.ToVector3();
                 this.effect.Alpha = 1;
 
                 this.effect.CurrentTechnique.Passes[0].Apply();
@@ -667,7 +680,7 @@ namespace Phantom.Misc
         private IList<string> WordWrap(string text, float widthInPixels)
         {
             this.wrapBuffer.Clear();
-            float wide = this.font.MeasureString("W").X + this.font.Spacing;
+            float wide = this.font.MeasureString("W").X + this.font.CharacterSpacing;
             int guess = (int)(Math.Ceiling(widthInPixels / wide) + 5);
 
             while (text.Length > 0)
@@ -711,7 +724,7 @@ namespace Phantom.Misc
                     trimmed.RemoveAt(trimmed.Count - 1);
                 while (trimmed.Count > 0 && trimmed[0].Length == 0)
                     trimmed.RemoveAt(0);
-#if XBOX
+#if PLATFORM_XBOX
                 documentation = string.Join("\n", trimmed.ToArray());
 #else
                 documentation = string.Join("\n", trimmed);
@@ -727,12 +740,12 @@ namespace Phantom.Misc
             {
                 for (int j = 0; j < lines.Length; ++j)
                 {
-                    IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.settings.Padding * 2);
+                    IList<string> chunks = WordWrap(lines[j], PhantomGame.Game.Resolution.Width - this.Settings.Padding * 2);
                     for (int i = 0; i < chunks.Count; i++)
                         if (chunks[i].Trim().Length > 0)
                             this.echoQueue.Enqueue(new EchoLine(chunks[i], DateTime.Now));
                 }
-                while (this.echoQueue.Count > this.settings.EchoLines)
+                while (this.echoQueue.Count > this.Settings.EchoLines)
                     this.echoQueue.Dequeue();
             }
         }
@@ -752,7 +765,7 @@ namespace Phantom.Misc
             this.nolineBuffer += message;
             while (this.nolineBuffer.Contains("\n"))
             {
-#if XBOX
+#if PLATFORM_XBOX
                 // TODO: Not tested.
                 int ix = this.nolineBuffer.IndexOf('\n');
                 this.AddLines(this.nolineBuffer.Substring(0, ix));

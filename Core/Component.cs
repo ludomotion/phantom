@@ -134,7 +134,7 @@ namespace Phantom.Core
         /// children, and the OnComponentAdded of this component.
         /// </summary>
         /// <param name="child"></param>
-        public void AddComponent(Component child)
+        public virtual void AddComponent(Component child)
         {
             this.components.Add(child);
             this.OnComponentAdded(child);

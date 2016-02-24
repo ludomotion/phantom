@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Phantom.Audio;
 
 #if TOUCH
 using Trace = System.Console;
@@ -196,10 +197,12 @@ namespace Phantom.Core
                     assets = this.contexts[this.activeContexts[j]];
                     for (int i = 0; i < assets.Count; i++)
                     {
+						#if !PLATFORM_ANDROID
 						lock (PhantomGame.Game.GlobalRenderLock)
+						#endif
 						{
 							object o;
-							if(assets[i].Contains("sound"))
+							if(assets[i].ToLower().Contains("sound"))
 								o = this.LoadAffixed<SoundEffect>(assets[i]);
 							else
 								o = this.LoadAffixed<object>(assets[i]);
@@ -214,13 +217,27 @@ namespace Phantom.Core
             }
             assets = this.contexts[contextName];
             for (int i = 0; i < assets.Count; i++)
-            {
+			{
+				#if !PLATFORM_ANDROID && !FNA
 				lock (PhantomGame.Game.GlobalRenderLock)
+				#endif
 				{
-					if(assets[i].Contains("sound"))
-						this.LoadAffixed<SoundEffect>(assets[i]);
-					else
-						this.LoadAffixed<object>(assets[i]);
+					if(assets[i].ToLower().Contains("sound"))
+                    {
+                        if (Sound.HasAudio)
+                        {
+                            try
+                            {
+                                this.LoadAffixed<SoundEffect>(assets[i]);
+                            }
+                            catch (NoAudioHardwareException e)
+                            {
+                                Sound.HasAudio = false;
+                            }
+                        }
+                    }
+                    else
+                        this.LoadAffixed<object>(assets[i]);
 				}
 #if DEBUG
                 this.loaded.Add(assets[i]);
@@ -309,6 +326,7 @@ namespace Phantom.Core
 				}
 				else if(this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
 			}
+
 
 			return this.manager.Load<T>(assetName);
 		}
