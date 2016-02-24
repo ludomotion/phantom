@@ -256,6 +256,45 @@ namespace Phantom.Utils
 
     public static class PhantomComponentNotation
     {
+        public static bool IsAssign(PCNOperator oper)
+        {
+            switch (oper)
+            {
+                case PCNOperator.AdditionAssign:
+                case PCNOperator.Assign:
+                case PCNOperator.BitwiseAndAssign:
+                case PCNOperator.BitwiseOrAssign:
+                case PCNOperator.BitwiseXorAssign:
+                case PCNOperator.Decrement:
+                case PCNOperator.DivisionAssign:
+                case PCNOperator.Increment:
+                case PCNOperator.ModuloAssign:
+                case PCNOperator.MultiplicationAssign:
+                case PCNOperator.NegativeAssign:
+                case PCNOperator.SubtractionAssign:
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsComparison(PCNOperator oper)
+        {
+            switch (oper)
+            {
+                case PCNOperator.BitwiseAnd:
+                case PCNOperator.BitwiseOr:
+                case PCNOperator.BitwiseXor:
+                case PCNOperator.EqualTo:
+                case PCNOperator.GreaterThan:
+                case PCNOperator.GreaterThanOrEqualTo:
+                case PCNOperator.LessThan:
+                case PCNOperator.LessThanOrEqualTo:
+                case PCNOperator.NotEqualTo:
+                    return true;
+            }
+            return false;
+        }
+                    
         public static PCNOperator StringToPCNOperator(string s)
         {
             switch (s)
@@ -775,21 +814,6 @@ namespace Phantom.Utils
                             }
                         }
                         return false;
-                    }
-                    break;
-                case PCNOperator.BitwiseXor:
-                    if (value1 is List<object>)
-                    {
-                        List<object> l = (List<object>)value1;
-                        string s = ValueToString(value2);
-                        for (int i = 0; i < l.Count; i++)
-                        {
-                            if (ValueToString(l[i]) == s)
-                            {
-                                return false;
-                            }
-                        }
-                        return true;
                     }
                     break;
                 case PCNOperator.BitwiseXor:
