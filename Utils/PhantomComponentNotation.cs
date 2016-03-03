@@ -256,6 +256,45 @@ namespace Phantom.Utils
 
     public static class PhantomComponentNotation
     {
+        public static bool IsAssign(PCNOperator oper)
+        {
+            switch (oper)
+            {
+                case PCNOperator.AdditionAssign:
+                case PCNOperator.Assign:
+                case PCNOperator.BitwiseAndAssign:
+                case PCNOperator.BitwiseOrAssign:
+                case PCNOperator.BitwiseXorAssign:
+                case PCNOperator.Decrement:
+                case PCNOperator.DivisionAssign:
+                case PCNOperator.Increment:
+                case PCNOperator.ModuloAssign:
+                case PCNOperator.MultiplicationAssign:
+                case PCNOperator.NegativeAssign:
+                case PCNOperator.SubtractionAssign:
+                    return true;
+            }
+            return false;
+        }
+
+        public static bool IsComparison(PCNOperator oper)
+        {
+            switch (oper)
+            {
+                case PCNOperator.BitwiseAnd:
+                case PCNOperator.BitwiseOr:
+                case PCNOperator.BitwiseXor:
+                case PCNOperator.EqualTo:
+                case PCNOperator.GreaterThan:
+                case PCNOperator.GreaterThanOrEqualTo:
+                case PCNOperator.LessThan:
+                case PCNOperator.LessThanOrEqualTo:
+                case PCNOperator.NotEqualTo:
+                    return true;
+            }
+            return false;
+        }
+                    
         public static PCNOperator StringToPCNOperator(string s)
         {
             switch (s)
@@ -1139,6 +1178,32 @@ namespace Phantom.Utils
                 return true;
             }
             return false;
+        }
+
+        public static string[] SplitOutsideString(string description, char delimiter)
+        {
+            bool insideDouble = false;
+            bool insideSingle = false;
+            List<string> result = new List<string>();
+            int start = 0;
+            for (int i = 0; i < description.Length; i++)
+            {
+                if (description[i] == '\'' && !insideDouble)
+                {
+                    insideSingle = !insideSingle;
+                }
+                else if (description[i] == '"' && !insideSingle)
+                {
+                    insideDouble = !insideDouble;
+                }
+                else if (description[i] == delimiter && !insideDouble && !insideSingle)
+                {
+                    result.Add(description.Substring(start, i-start));
+                    start = i+1;
+                }
+            }
+            result.Add(description.Substring(start, description.Length - start));
+            return result.ToArray();
         }
     }
 }
