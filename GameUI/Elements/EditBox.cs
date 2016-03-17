@@ -30,6 +30,8 @@ namespace Phantom.GameUI.Elements
         private int cursor;
         private Konsoul.KeyMap keyMap;
         private KeyboardState previous;
+        private float downTimer;
+        private int strokeCount;
 
         public Vector2 CaptionPosition;
         public String Caption;
@@ -106,10 +108,39 @@ namespace Phantom.GameUI.Elements
                 //bool ctrl = current.IsKeyDown(Keys.LeftControl) || current.IsKeyDown(Keys.RightControl);
 
                 Keys[] pressedKeys = current.GetPressedKeys();
+                int cnt = 0;
+                for (int i = 0; i < pressedKeys.Length; i++)
+                    if (pressedKeys[i] != Keys.LeftControl && pressedKeys[i] != Keys.LeftShift && pressedKeys[i] != Keys.LeftAlt &&
+                        pressedKeys[i] != Keys.RightControl && pressedKeys[i] != Keys.RightShift && pressedKeys[i] != Keys.RightAlt)
+                        cnt++;
+
+                bool extraStroke= false;
+                if (cnt > 0)
+                {
+                    downTimer += elapsed;
+                    if (strokeCount == 0 && downTimer > 0.5f)
+                    {
+                        downTimer -= 0.5f;
+                        strokeCount++;
+                        extraStroke=true;
+                    }
+                    else if (strokeCount >0 && downTimer > 0.05f)
+                    {
+                        downTimer -= 0.05f;
+                        strokeCount++;
+                        extraStroke=true;
+                    }
+                }
+                else
+                {
+                    downTimer = 0;
+                    strokeCount = 0;
+                }
+
                 for (int i = 0; i < pressedKeys.Length; i++)
                 {
                     Keys k = pressedKeys[i];
-                    if (previous.IsKeyDown(k) || Text.Length >= TextLength)
+                    if ((!extraStroke && previous.IsKeyDown(k)) || Text.Length >= TextLength)
                         continue;
                     char c = this.keyMap.getChar(k, shift ? Konsoul.KeyMap.Modifier.Shift : Konsoul.KeyMap.Modifier.None);
                     if (c != '\0')
@@ -119,14 +150,14 @@ namespace Phantom.GameUI.Elements
                             this.OnChange(this);
                     }
                 }
-                if (current.IsKeyDown(Keys.Back) && !previous.IsKeyDown(Keys.Back) && this.cursor > 0)
+                if (current.IsKeyDown(Keys.Back) && (extraStroke || !previous.IsKeyDown(Keys.Back)) && this.cursor > 0)
                 {
                     this.Text = this.Text.Remove(this.cursor - 1, 1);
                     this.cursor = (int)MathHelper.Clamp(this.cursor - 1, 0, this.Text.Length);
                     if (this.OnChange != null)
                         this.OnChange(this);
                 }
-                if (current.IsKeyDown(Keys.Delete) && !previous.IsKeyDown(Keys.Delete) && this.cursor < this.Text.Length)
+                if (current.IsKeyDown(Keys.Delete) && (extraStroke || !previous.IsKeyDown(Keys.Delete)) && this.cursor < this.Text.Length)
                 {
                     this.Text = this.Text.Remove(this.cursor, 1);
                     if (this.OnChange != null)
