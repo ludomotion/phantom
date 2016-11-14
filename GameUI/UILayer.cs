@@ -83,7 +83,7 @@ namespace Phantom.GameUI
         /// Creates a menu class
         /// </summary>
         /// <param name="renderer">The renderer component that is responsible for rendering the controlss</param>
-        /// <param name="maxPlayers">The number of players that can control the menu simultaneously</param>
+        /// <param name="playerCount">The number of players that can control the menu simultaneously</param>
         public UILayer(Renderer renderer, int playerCount)
         {
             selected = new UIElement[playerCount]; 

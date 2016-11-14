@@ -117,7 +117,6 @@ namespace Phantom.Physics
         /// <summary>
         /// Checks the collisions of an entity in the integrator's entity list
         /// </summary>
-        /// <param name="index">Zero based index of the entity in the integrator's entity list.</param>
         protected virtual void CheckEntityCollision(Entity e)
         {
             if (e.Shape == null)

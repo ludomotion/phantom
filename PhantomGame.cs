@@ -277,8 +277,20 @@ namespace Phantom
 #if !PLATFORM_ANDROID && !FNA
             lock (this.GlobalRenderLock)
 #endif
+            //lock (this.GlobalRenderLock)
             {
-                this.GraphicsDevice.Clear(this.BackgroundColor);
+                //try
+                //{
+                    this.GraphicsDevice.Clear(this.BackgroundColor);
+               // } catch (Exception e)
+                //{
+#if DEBUG
+                    // Update Profiler
+                    //Profiler.Instance.EndRender();
+#endif
+
+                    //return;
+               // }
             }
 
             if (PreRender != null)
