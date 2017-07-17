@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if TOUCH
+using System;
 using Phantom.Core;
 using System.Diagnostics;
 using Phantom.Graphics;
@@ -380,4 +381,5 @@ namespace Phantom
 		}
 	}
 }
+#endif
 

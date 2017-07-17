@@ -854,7 +854,51 @@ namespace Phantom.Misc
                 map[Keys.OemPlus] = new Dictionary<Modifier, char>();
                 map[Keys.OemPlus][Modifier.None] = '=';
                 map[Keys.OemPlus][Modifier.Shift] = '+';
+
+                map[Keys.NumPad0] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad0][Modifier.None] = '0';
+
+                map[Keys.NumPad1] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad1][Modifier.None] = '1';
+
+                map[Keys.NumPad2] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad2][Modifier.None] = '2';
+
+                map[Keys.NumPad3] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad3][Modifier.None] = '3';
+
+                map[Keys.NumPad4] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad4][Modifier.None] = '4';
+
+                map[Keys.NumPad5] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad5][Modifier.None] = '5';
+
+                map[Keys.NumPad6] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad6][Modifier.None] = '6';
+
+                map[Keys.NumPad7] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad7][Modifier.None] = '7';
+
+                map[Keys.NumPad8] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad8][Modifier.None] = '8';
+
+                map[Keys.NumPad9] = new Dictionary<Modifier, char>();
+                map[Keys.NumPad9][Modifier.None] = '9';
+
+                map[Keys.Subtract] = new Dictionary<Modifier, char>();
+                map[Keys.Subtract][Modifier.None] = '-';
+
+                map[Keys.Add] = new Dictionary<Modifier, char>();
+                map[Keys.Add][Modifier.None] = '+';
+
+                map[Keys.Multiply] = new Dictionary<Modifier, char>();
+                map[Keys.Multiply][Modifier.None] = '*';
+
+                map[Keys.Divide] = new Dictionary<Modifier, char>();
+                map[Keys.Divide][Modifier.None] = '/';
+
             }
+
 
             public char getChar(Keys key, Modifier mod)
             {

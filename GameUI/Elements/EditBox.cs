@@ -8,6 +8,7 @@ using Phantom.Utils;
 using Phantom.Core;
 using Phantom.Misc;
 using Microsoft.Xna.Framework.Input;
+using System.Threading;
 
 namespace Phantom.GameUI.Elements
 {
@@ -96,6 +97,28 @@ namespace Phantom.GameUI.Elements
             }
         }
 
+        private string clipboard = "";
+        public String GetClipboardText()
+        {
+            Thread t = new Thread(getClipboard);
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            while (t.IsAlive)
+            {
+            }
+            return clipboard;
+        }
+
+        [STAThread]
+        private void getClipboard()
+        {
+            if (System.Windows.Forms.Clipboard.ContainsText())
+            {
+                clipboard = System.Windows.Forms.Clipboard.GetText(System.Windows.Forms.TextDataFormat.UnicodeText);
+                //Clipboard.SetText(replacementHtmlText, TextDataFormat.UnicodeText);
+            }
+        }
+
 
         public override void Update(float elapsed)
         {
@@ -105,7 +128,25 @@ namespace Phantom.GameUI.Elements
                 timer += elapsed;
 
                 bool shift = current.IsKeyDown(Keys.LeftShift) || current.IsKeyDown(Keys.RightShift);
-                //bool ctrl = current.IsKeyDown(Keys.LeftControl) || current.IsKeyDown(Keys.RightControl);
+                bool ctrl = current.IsKeyDown(Keys.LeftControl) || current.IsKeyDown(Keys.RightControl);
+                if (ctrl && current.IsKeyDown(Keys.V) && previous.IsKeyUp(Keys.V))
+                {
+                    string t = GetClipboardText();
+                    this.Text = this.Text.Insert(this.cursor, t);
+                    this.cursor += t.Length;
+                    this.cursor = Math.Min(this.cursor, TextLength);
+                    if (this.Text.Length > TextLength)
+                        this.Text = this.Text.Substring(0, TextLength);
+                    if (this.OnChange != null)
+                        this.OnChange(this);
+                }
+
+                /*if (ctrl && current.IsKeyDown(Keys.C) && previous.IsKeyUp(Keys.C))
+                {
+                    System.Windows.Forms.Clipboard.SetText(this.Text);
+                    return;
+                }*/
+
 
                 Keys[] pressedKeys = current.GetPressedKeys();
                 int cnt = 0;
@@ -137,17 +178,20 @@ namespace Phantom.GameUI.Elements
                     strokeCount = 0;
                 }
 
-                for (int i = 0; i < pressedKeys.Length; i++)
+                if (!ctrl)
                 {
-                    Keys k = pressedKeys[i];
-                    if ((!extraStroke && previous.IsKeyDown(k)) || Text.Length >= TextLength)
-                        continue;
-                    char c = this.keyMap.getChar(k, shift ? Konsoul.KeyMap.Modifier.Shift : Konsoul.KeyMap.Modifier.None);
-                    if (c != '\0')
+                    for (int i = 0; i < pressedKeys.Length; i++)
                     {
-                        this.Text = this.Text.Insert(this.cursor++, c.ToString());
-                        if (this.OnChange != null)
-                            this.OnChange(this);
+                        Keys k = pressedKeys[i];
+                        if ((!extraStroke && previous.IsKeyDown(k)) || Text.Length >= TextLength)
+                            continue;
+                        char c = this.keyMap.getChar(k, shift ? Konsoul.KeyMap.Modifier.Shift : Konsoul.KeyMap.Modifier.None);
+                        if (c != '\0')
+                        {
+                            this.Text = this.Text.Insert(this.cursor++, c.ToString());
+                            if (this.OnChange != null)
+                                this.OnChange(this);
+                        }
                     }
                 }
                 if (current.IsKeyDown(Keys.Back) && (extraStroke || !previous.IsKeyDown(Keys.Back)) && this.cursor > 0)
