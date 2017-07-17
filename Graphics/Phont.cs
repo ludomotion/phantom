@@ -57,8 +57,8 @@ namespace Phantom.Graphics
             kerningTopRight = new float[8 * 16];
 
             Rectangle sourceRectangle = new Rectangle(0, 0, sprite.Width * 16, sprite.Height * 8);
-            Color[] retrievedColor = new Color[sprite.Width * 16 * sprite.Height * 16];
-            sprite.Texture.GetData<Color>(0, sourceRectangle, retrievedColor, 0, sprite.Width * 16 * sprite.Height * 16);
+            Color[] retrievedColor = new Color[sprite.Width * 16 * sprite.Height * 8];
+            sprite.Texture.GetData<Color>(0, sourceRectangle, retrievedColor, 0, sprite.Width * 16 * sprite.Height * 8);
 
             float f = 1f / 255f;
             for (int y = 0; y < 8; y++)

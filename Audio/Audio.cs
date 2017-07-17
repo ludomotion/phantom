@@ -187,7 +187,14 @@ namespace Phantom.Audio
 
 		internal SoundEffect Load(string asset)
 		{
+#if XNA
+            FileStream fs = new FileStream("Assets/" + asset + Content.SoundExtension, FileMode.Open);
+            SoundEffect snd = SoundEffect.FromStream(fs);
+            fs.Close();
+            return snd;
+#else
 			return game.Content.Load<SoundEffect>(asset);
+#endif
 		}
 
 #if FNA
@@ -226,7 +233,9 @@ namespace Phantom.Audio
             //make sure the sound is really stopped!
             if (handle.Instance != null)
             {
+#if !XNA
                 handle.Instance.IsLooped = false;
+#endif
                 handle.Instance.Stop();
             }
 

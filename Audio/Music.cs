@@ -36,7 +36,11 @@ namespace Phantom.Audio
 
             if (current != null && current.SongInstance != null)
             {
+#if FNA
                 current.SongInstance.Stop();
+#else
+                current.Thread.Abort();
+#endif
             }
 			MediaPlayer.Stop();
 			if(current != null && current.Thread != null) {
@@ -136,7 +140,11 @@ namespace Phantom.Audio
                     current.FadeState = -1;
                     current.FadeDuration = current.FadeTimer = Music.FadeTime;
                     current.FadeFunction = TweenFunctions.Linear;
+#if FNA
                     current.FadeVolume = current.SongInstance.Volume;
+#else
+                    current.FadeVolume = 1f;
+#endif
                 }
                 else
                 {

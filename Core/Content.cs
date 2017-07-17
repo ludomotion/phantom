@@ -8,6 +8,7 @@ using Phantom.Misc;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using Phantom.Audio;
+using System.IO;
 
 #if TOUCH
 using Trace = System.Console;
@@ -55,6 +56,10 @@ namespace Phantom.Core
                 return r;
             }
         }
+#endif
+
+#if XNA
+        public static string SoundExtension = ".wav"; 
 #endif
 
 
@@ -204,7 +209,7 @@ namespace Phantom.Core
                             object o;
                             try
                             {
-                                if (assets[i].ToLower().Contains("sound"))
+                                if (assets[i].ToLower().Contains("sound") || assets[i].ToLower().Contains("audio"))
                                     o = this.LoadAffixed<SoundEffect>(assets[i]);
                                 else
                                     o = this.LoadAffixed<object>(assets[i]);
@@ -236,7 +241,11 @@ namespace Phantom.Core
                         {
                             if (Sound.HasAudio)
                             {
+#if XNA
+                                this.LoadAffixedSoundEffect(assets[i]);
+#else
                                 this.LoadAffixed<SoundEffect>(assets[i]);
+#endif
                             }
                         }
                         else
@@ -332,7 +341,9 @@ namespace Phantom.Core
                     }
 					finally
 					{
+
 						this.HaveAffixAsset.Add(assetName, found);
+
 					}
 					if(found) return asset;
 				}
@@ -342,7 +353,9 @@ namespace Phantom.Core
             
             try
             {
+
                 return this.manager.Load<T>(assetName);
+
             }
             catch (NoAudioHardwareException e)
             {
@@ -352,6 +365,54 @@ namespace Phantom.Core
             
 		}
 
+        private SoundEffect LoadAffixedSoundEffect(string assetName)
+        {
+            if (this.ContentSizeAffix != null)
+            {
+               SoundEffect asset = default(SoundEffect);
+                bool found = false;
+
+                if (!this.HaveAffixAsset.ContainsKey(assetName))
+                {
+                    try
+                    {
+                        asset = this.manager.Load<SoundEffect>(assetName + "-" + this.ContentSizeAffix);
+                        found = true;
+                    }
+                    catch (NoAudioHardwareException e)
+                    {
+                        Sound.HasAudio = false;
+                    }
+                    finally
+                    {
+
+                        this.HaveAffixAsset.Add(assetName, found);
+
+                    }
+                    if (found) return asset;
+                }
+                else if (this.HaveAffixAsset[assetName]) assetName += "-" + this.ContentSizeAffix;
+            }
+
+
+            try
+            {
+                FileStream fs = new FileStream("Assets/" + assetName + SoundExtension, FileMode.Open);
+                SoundEffect snd = SoundEffect.FromStream(fs);
+                fs.Close();
+                return snd;
+
+            }
+            catch (NoAudioHardwareException e)
+            {
+                Sound.HasAudio = false;
+                return default(SoundEffect);
+            }
+
+        }
+
+
+       
         
         public bool CheckAudio(string testFile)
         {
