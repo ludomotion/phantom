@@ -17,7 +17,7 @@ namespace Phantom.Audio
         public static float MasterVolume = 1f;
         public static float FXVolume = 1f;
 
-        public static Audio.Handle Play(string sound, float volume = -1f, float panning = 0f)
+        public static Audio.Handle Play(string sound, float volume = -1f, float panning = 0f, bool looped = false)
         {
 #if !NOAUDIO
             if (!HasAudio)
@@ -67,7 +67,7 @@ namespace Phantom.Audio
 
             instance.Volume = volume;
             instance.Pan = panning;
-            instance.IsLooped = false;
+            instance.IsLooped = looped;
             instance.Play();
 
             var handle = new Audio.Handle
