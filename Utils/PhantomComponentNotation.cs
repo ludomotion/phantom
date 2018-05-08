@@ -855,23 +855,50 @@ namespace Phantom.Utils
                 valueType = PCNValueType.Bool;
             }
             else if (_value is float)
+            {
+                intValue = 0;
                 valueType = PCNValueType.Float;
+            }
             else if (_value is Vector2)
+            {
+                intValue = 0;
                 valueType = PCNValueType.Vector2;
+            }
             else if (_value is Vector3)
+            {
+                intValue = 0;
                 valueType = PCNValueType.Vector3;
+            }
             else if (_value is Vector4)
+            {
+                intValue = 0;
                 valueType = PCNValueType.Vector4;
+            }
             else if (_value is Color)
+            {
+                intValue = 0;
                 valueType = PCNValueType.Color;
+            }
             else if (_value is CalculatedValue)
+            {
+                intValue = 0;
                 valueType = PCNValueType.CalculatedValue;
+            }
             else if (_value is PCNKeyword)
+            {
+                intValue = 0;
                 valueType = PCNValueType.PCNKeyword;
+            }
             else if (_value is List<object>)
+            {
+                intValue = 0;
                 valueType = PCNValueType.List;
+            }
             else
+            {
+                intValue = 0;
                 valueType = PCNValueType.Null;
+            }
         }
 
 

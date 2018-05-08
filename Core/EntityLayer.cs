@@ -156,7 +156,8 @@ namespace Phantom.Core
             EntityRenderer r = this.renderer as EntityRenderer;
             if (r != null)
             {
-                foreach( Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true) )
+                List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
+                foreach( Entity e in list )
                 {
                     if (!e.Ghost && e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
                     {
@@ -165,6 +166,7 @@ namespace Phantom.Core
                             this.RemoveComponent(e);
                     }
                 }
+                this.integrator.ReturnListToPool(list);
             }
 
             // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!
@@ -233,27 +235,53 @@ namespace Phantom.Core
             return integrator.GetEntityCloseTo(position, distance);
         }
 
+
+        private List<Entity> listOfEntities = new List<Entity>();
         public IEnumerable<Entity> GetEntitiesInRectSorted(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            List<Entity> entities = new List<Entity>();
-            foreach (Entity e in integrator.GetEntitiesInRect(topLeft, bottomRight, partial))
+            listOfEntities.Clear();
+            List<Entity> list = integrator.GetEntitiesInRectAsList(topLeft, bottomRight, partial);
+            foreach (Entity e in list)
             {
                 e.CalculatedSortValue = Sort(e);
                 int insertAt = 0;
-                for (int i = entities.Count - 1; i >= 0; i--)
+                for (int i = listOfEntities.Count - 1; i >= 0; i--)
                 {
-                    if (entities[i].CalculatedSortValue <= e.CalculatedSortValue)
+                    if (listOfEntities[i].CalculatedSortValue <= e.CalculatedSortValue)
                     {
                         insertAt = i + 1;
                         break;
                     }
                 }
-                entities.Insert(insertAt, e);
+                listOfEntities.Insert(insertAt, e);
             }
-            for (int i = 0; i < entities.Count; i++)
+            integrator.ReturnListToPool(list);
+            for (int i = 0; i < listOfEntities.Count; i++)
             {
-                yield return entities[i];
+                yield return listOfEntities[i];
             }
+        }
+
+        public List<Entity> GetEntitiesInRectSortedAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            listOfEntities.Clear();
+            List<Entity> list = integrator.GetEntitiesInRectAsList(topLeft, bottomRight, partial);
+            foreach (Entity e in list)
+            {
+                e.CalculatedSortValue = Sort(e);
+                int insertAt = 0;
+                for (int i = listOfEntities.Count - 1; i >= 0; i--)
+                {
+                    if (listOfEntities[i].CalculatedSortValue <= e.CalculatedSortValue)
+                    {
+                        insertAt = i + 1;
+                        break;
+                    }
+                }
+                listOfEntities.Insert(insertAt, e);
+            }
+            integrator.ReturnListToPool(list);
+            return listOfEntities;
         }
 
 
@@ -263,6 +291,19 @@ namespace Phantom.Core
                 return GetEntitiesInRectSorted(topLeft, bottomRight, partial);
             else
                 return integrator.GetEntitiesInRect(topLeft, bottomRight, partial);
+        }
+
+        public List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            if (Sort != null)
+                return GetEntitiesInRectSortedAsList(topLeft, bottomRight, partial);
+            else
+                return integrator.GetEntitiesInRectAsList(topLeft, bottomRight, partial);
+        }
+
+        public void ReturnListToPool(List<Entity> list)
+        {
+            integrator.ReturnListToPool(list);
         }
 
 
@@ -310,9 +351,11 @@ namespace Phantom.Core
                     EntityRenderer r = this.renderer as EntityRenderer;
                     if (r != null)
                     {
-                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                        List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
+                        foreach (Entity e in list)
                             if (filter.Contains(e))
                                 callback(e);
+                        this.integrator.ReturnListToPool(list);
                     }
                     break;
             }
@@ -335,9 +378,11 @@ namespace Phantom.Core
                     EntityRenderer r = this.renderer as EntityRenderer;
                     if (r != null)
                     {
-                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                        List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
+                        foreach (Entity e in list)
                             if (!filter.Contains(e))
                                 callback(e);
+                        this.integrator.ReturnListToPool(list);
                     }
                     break;
             }
@@ -374,13 +419,15 @@ namespace Phantom.Core
                     EntityRenderer r = this.renderer as EntityRenderer;
                     if (r != null)
                     {
-                        foreach (Entity e in this.integrator.GetEntitiesInRect(r.TopLeft, r.BottomRight, true))
+                        List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
+                        foreach (Entity e in list)
                         {
                             if (filter.Contains(e))
                                 callbackIn(e);
                             else
                                 callbackOut(e);
                         }
+                        this.integrator.ReturnListToPool(list);
                     }
                     break;
             }

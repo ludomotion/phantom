@@ -316,6 +316,36 @@ namespace Phantom.Physics
 			}
         }
 
+        public override List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            List<Entity> listOfEntitiesInRect = GetListFromPool();
+            int tX1 = (int)(topLeft.X / this.tileSize);
+            int tY1 = (int)(topLeft.Y / this.tileSize);
+            int tX2 = (int)(bottomRight.X / this.tileSize);
+            int tY2 = (int)(bottomRight.Y / this.tileSize);
+            int minX = Math.Max(tX1 - 1, 0);
+            int maxX = Math.Min(tX2 + 1, this.tilesX - 1);
+            int minY = Math.Max(tY1 - 1, 0);
+            int maxY = Math.Min(tY2 + 1, this.tilesY - 1);
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Tile tt = this.tiles[y * this.tilesX + x];
+                    for (int m = tt.Entities.Count - 1; m >= 0; m--)
+                    {
+                        Entity o = tt.Entities[m];
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
+                            listOfEntitiesInRect.Add(o);
+                    }
+                }
+            }
+            return listOfEntitiesInRect;
+        }
+
+        
+
         public override Entity GetEntityCloseTo(Vector2 position, float distance)
         {
             int tX = (int)(position.X / this.tileSize);

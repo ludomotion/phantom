@@ -209,9 +209,12 @@ namespace Phantom.Shapes
             return new Polygon(newVertices);
         }
 
+        private static Dictionary<int, Vector2[]> pooledArrays = new Dictionary<int, Vector2[]>();
         public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
         {
-            Vector2[] result = new Vector2[this.Vertices.Length];
+            if (!pooledArrays.ContainsKey(this.Vertices.Length))
+                pooledArrays[this.Vertices.Length] = new Vector2[this.Vertices.Length];
+            Vector2[] result = pooledArrays[this.Vertices.Length];
             int found = 0;
             Vector2 intersection = new Vector2();
 
@@ -228,8 +231,15 @@ namespace Phantom.Shapes
                     result[found++] = intersection + this.Entity.Position;
                 }
             }
-
-            Array.Resize(ref result, found);
+            if (found < this.Vertices.Length)
+            {
+                if (!pooledArrays.ContainsKey(found))
+                    pooledArrays[found] = new Vector2[found];
+                Vector2[] resized = pooledArrays[found];
+                for (int i = 0; i < found; i++)
+                    resized[i] = result[i];
+                return resized;
+            }
             return result;
         }
 

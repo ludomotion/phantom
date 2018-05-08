@@ -292,6 +292,44 @@ namespace Phantom.Physics
 					yield return entities[i];
         }
 
+        
+        private List<List<Entity>> entityPoolList = new List<List<Entity>>();
+        public void ReturnListToPool(List<Entity> list)
+        {
+            list.Clear();
+            entityPoolList.Add(list);
+        }
+
+        protected List<Entity> GetListFromPool()
+        {
+            if (entityPoolList.Count > 0)
+            {
+                List<Entity> list = entityPoolList[entityPoolList.Count - 1];
+                entityPoolList.RemoveAt(entityPoolList.Count - 1);
+                return list;
+            }
+            else
+                return new List<Entity>();
+            
+        }
+
+        /// <summary>
+        /// Returns a list of all entities in the indicated rectangle
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        /// 
+        public virtual List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            List<Entity> listOfEntitiesInRect = GetListFromPool();
+            for (int i = 0; i < entities.Count; i++)
+                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
+                    listOfEntitiesInRect.Add(entities[i]);
+            return listOfEntitiesInRect;
+        }
+
+
         /// <summary>
         /// Called by the parents layer when its size is changed, removes or destroys the entities that are outside the new bounds.
         /// </summary>
