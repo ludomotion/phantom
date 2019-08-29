@@ -11,6 +11,8 @@ using System.Threading;
 
 namespace Phantom.Utils
 {
+    public enum PCNValueType { Null, Bool, Int, Float, String, Color, Vector2, Vector3, Vector4, CalculatedValue, List, PCNKeyword }
+
     public class PCNKeyword
     {
         public static string[] Keywords = new string[] { "auto", "odd", "even", "mapWidth", "mapHeight", "symbolCount" };
@@ -818,6 +820,258 @@ namespace Phantom.Utils
                     break;
                 case PCNOperator.BitwiseXor:
                     if (value1 is List<object>)
+                    {
+                        List<object> l = (List<object>)value1;
+                        string s = ValueToString(value2);
+                        for (int i = 0; i < l.Count; i++)
+                        {
+                            if (ValueToString(l[i]) == s)
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    break;
+            }
+            return false;
+        }
+
+        public static void SetValueAndType(object _value, ref PCNValueType valueType, ref int intValue)
+        {
+            if (_value is string)
+            {
+                intValue = ((string)_value).GetHashCode();
+                valueType = PCNValueType.String;
+            }
+            else if (_value is int)
+            {
+                intValue = (int)_value;
+                valueType = PCNValueType.Int;
+            }
+            else if (_value is bool)
+            {
+                intValue = (bool)_value ? 1 : 0;
+                valueType = PCNValueType.Bool;
+            }
+            else if (_value is float)
+                valueType = PCNValueType.Float;
+            else if (_value is Vector2)
+                valueType = PCNValueType.Vector2;
+            else if (_value is Vector3)
+                valueType = PCNValueType.Vector3;
+            else if (_value is Vector4)
+                valueType = PCNValueType.Vector4;
+            else if (_value is Color)
+                valueType = PCNValueType.Color;
+            else if (_value is CalculatedValue)
+                valueType = PCNValueType.CalculatedValue;
+            else if (_value is PCNKeyword)
+                valueType = PCNValueType.PCNKeyword;
+            else if (_value is List<object>)
+                valueType = PCNValueType.List;
+            else
+                valueType = PCNValueType.Null;
+        }
+
+
+        public static bool CompareValues(PCNValueType valueType1, object value1, int intValue1, PCNValueType valueType2, object value2, int intValue2, PCNOperator oper)
+        {
+            if (valueType1 == PCNValueType.CalculatedValue)
+            {
+                value1 = ((CalculatedValue)value1).GetValue();
+                SetValueAndType(value1, ref valueType1, ref intValue1);
+                
+            }
+            if (value2 is CalculatedValue)
+            {
+                value2 = ((CalculatedValue)value2).GetValue();
+                SetValueAndType(value2, ref valueType2, ref intValue2);
+            }
+
+            if (valueType1 == PCNValueType.Bool && valueType2 == PCNValueType.Int)
+            {
+                valueType2 = PCNValueType.Bool;
+                intValue2 = intValue2 > 0 ? 1 : 0;
+            }
+            if (valueType1 == PCNValueType.Bool && valueType2 == PCNValueType.Float)
+            {
+                valueType2 = PCNValueType.Bool; 
+                intValue2 = ((float)value2 > 0) ? 1 : 0;
+            }
+            if (valueType1 == PCNValueType.Bool && valueType2 == PCNValueType.Null)
+            {
+                valueType2 = PCNValueType.Bool; 
+                intValue2 = 0;
+            }
+
+            if (valueType2 == PCNValueType.Bool && valueType1 == PCNValueType.Int)
+            {
+                valueType1 = PCNValueType.Bool;
+                intValue1 = intValue1 > 0 ? 1 : 0;
+            }
+            if (valueType2 == PCNValueType.Bool && valueType1 == PCNValueType.Float)
+            {
+                valueType1 = PCNValueType.Bool;
+                intValue1 = ((float)value1 > 0) ? 1 : 0;
+            }
+            if (valueType2 == PCNValueType.Bool && valueType1 == PCNValueType.Null)
+            {
+                valueType1 = PCNValueType.Bool;
+                intValue1 = 0;
+            }
+
+            if (valueType1 == PCNValueType.Null && valueType2 == PCNValueType.Int)
+            {
+                valueType1 = PCNValueType.Int;
+                intValue1 = 0;
+            }
+            if (valueType1 == PCNValueType.Null && valueType2 == PCNValueType.Float)
+            {
+                valueType1 = PCNValueType.Float;
+                value1 = 0.0f;
+            }
+            if (valueType1 == PCNValueType.Null && valueType2 == PCNValueType.Bool)
+            {
+                valueType1 = PCNValueType.Bool;
+                intValue1 = 0;
+            }
+
+            if (valueType2 == PCNValueType.Null && valueType1 == PCNValueType.Int)
+            {
+                valueType2 = PCNValueType.Int;
+                intValue2 = 0;
+            }
+            if (valueType2 == PCNValueType.Null && valueType1 == PCNValueType.Float)
+            {
+                valueType2 = PCNValueType.Float;
+                value2 = 0.0f;
+            }
+            if (valueType2 == PCNValueType.Null && valueType1 == PCNValueType.Bool)
+            {
+                valueType2 = PCNValueType.Bool;
+                intValue2 = 0;
+            }
+
+
+            switch (oper)
+            {
+                default:
+                case PCNOperator.EqualTo:
+                    if (valueType1 == PCNValueType.Null && valueType2 == PCNValueType.Null)
+                        return true;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 == intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 == (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 == (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Int)
+                        return (float)value1 == intValue2;
+                    if (valueType1 == PCNValueType.String && valueType2 == PCNValueType.String)
+                        return intValue1 == intValue2; //comparing the hashes
+                    if (valueType1 == PCNValueType.Color && valueType2 == PCNValueType.Color)
+                        return (Color)value1 == (Color)value2;
+                    if (valueType1 == PCNValueType.Bool && valueType2 == PCNValueType.Bool)
+                        return intValue1 == intValue2;
+                    if (valueType1 == PCNValueType.Vector2 && valueType2 == PCNValueType.Vector2)
+                        return ((Vector2)value1).X == ((Vector2)value2).X && ((Vector2)value1).Y == ((Vector2)value2).Y;
+                    if (valueType1 == PCNValueType.Vector3 && valueType2 == PCNValueType.Vector3)
+                        return ((Vector3)value1).X == ((Vector3)value2).X && ((Vector3)value1).Y == ((Vector3)value2).Y && ((Vector3)value1).Z == ((Vector3)value2).Z;
+                    if (valueType1 == PCNValueType.Vector4 && valueType2 == PCNValueType.Vector4)
+                        return ((Vector4)value1).X == ((Vector4)value2).X && ((Vector4)value1).Y == ((Vector4)value2).Y && ((Vector4)value1).Z == ((Vector4)value2).Z && ((Vector4)value1).W == ((Vector4)value2).W;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.PCNKeyword && (value2 as PCNKeyword).Value == "even")
+                        return intValue1 % 2 == 0;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.PCNKeyword && (value2 as PCNKeyword).Value == "odd")
+                        return intValue1 % 2 == 1;
+
+                    break;
+                case PCNOperator.NotEqualTo:
+                    if (valueType1 == PCNValueType.Null && valueType2 == PCNValueType.Null)
+                        return false;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 != intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 != (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 != (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Int)
+                        return (float)value1 != intValue2;
+                    if (valueType1 == PCNValueType.String && valueType2 == PCNValueType.String)
+                        return intValue1 != intValue2;
+                    if (valueType1 == PCNValueType.Color && valueType2 == PCNValueType.Color)
+                        return (Color)value1 != (Color)value2;
+                    if (valueType1 == PCNValueType.Bool && valueType2 == PCNValueType.Bool)
+                        return intValue1 != intValue2;
+                    if (valueType1 == PCNValueType.Vector2 && valueType2 == PCNValueType.Vector2)
+                        return ((Vector2)value1).X != ((Vector2)value2).X || ((Vector2)value1).Y != ((Vector2)value2).Y;
+                    if (valueType1 == PCNValueType.Vector3 && valueType2 == PCNValueType.Vector3)
+                        return ((Vector3)value1).X != ((Vector3)value2).X || ((Vector3)value1).Y != ((Vector3)value2).Y || ((Vector3)value1).Z != ((Vector3)value2).Z;
+                    if (valueType1 == PCNValueType.Vector4 && valueType2 == PCNValueType.Vector4)
+                        return ((Vector4)value1).X != ((Vector4)value2).X || ((Vector4)value1).Y != ((Vector4)value2).Y || ((Vector4)value1).Z != ((Vector4)value2).Z || ((Vector4)value1).W != ((Vector4)value2).W;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.PCNKeyword && (value2 as PCNKeyword).Value == "even")
+                        return intValue1 % 2 != 0;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.PCNKeyword && (value2 as PCNKeyword).Value == "odd")
+                        return intValue1 % 2 != 1;
+
+                    return true;
+                case PCNOperator.GreaterThan:
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 > intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 > (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 > (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Int)
+                        return (float)value1 > intValue2;
+                    break;
+                case PCNOperator.GreaterThanOrEqualTo:
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 >= intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 >= (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 >= (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Int)
+                        return (float)value1 >= intValue2;
+                    break;
+                case PCNOperator.LessThan:
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 < intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 < (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 < (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Int)
+                        return (float)value1 < intValue2;
+                    break;
+                case PCNOperator.LessThanOrEqualTo:
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return intValue1 <= intValue2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Float)
+                        return intValue1 <= (float)value2;
+                    if (valueType1 == PCNValueType.Float && valueType2 == PCNValueType.Float)
+                        return (float)value1 <= (float)value2;
+                    if (valueType1 == PCNValueType.Int && valueType2 == PCNValueType.Int)
+                        return (float)value1 <= intValue2;
+                    break;
+                case PCNOperator.BitwiseAnd:
+                    if (valueType1 == PCNValueType.List)
+                    {
+                        List<object> l = (List<object>)value1;
+                        string s = ValueToString(value2);
+                        for (int i = 0; i < l.Count; i++)
+                        {
+                            if (ValueToString(l[i]) == s)
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                    break;
+                case PCNOperator.BitwiseXor:
+                    if (valueType1 == PCNValueType.List)
                     {
                         List<object> l = (List<object>)value1;
                         string s = ValueToString(value2);
