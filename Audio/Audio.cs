@@ -233,9 +233,6 @@ namespace Phantom.Audio
             //make sure the sound is really stopped!
             if (handle.Instance != null)
             {
-#if !XNA
-                handle.Instance.IsLooped = false;
-#endif
                 handle.Instance.Stop();
             }
 
