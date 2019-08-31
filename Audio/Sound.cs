@@ -76,7 +76,7 @@ namespace Phantom.Audio
                 Instance = instance,
                 Name = info.Name,
                 Type = Audio.Type.Sound,
-				Looped = false
+				Looped = looped
             };
             Audio.Instance.AddHandle(handle);
             return handle;
@@ -95,11 +95,9 @@ namespace Phantom.Audio
                 function = TweenFunctions.Linear;
             
             var info = Audio.Instance.audiolist[sound];
-            var handle = Play(sound, 0.00001f);
+            var handle = Play(sound, 0.00001f, 0, looped);
             if (handle==null || !handle.Success)
                 return handle;
-
-            handle.Instance.IsLooped = looped;
 
             handle.FadeState = 1;
             handle.FadeDuration = handle.FadeTimer = duration;
@@ -141,7 +139,6 @@ namespace Phantom.Audio
             if (sound == null)
                 return;
 #if !NOAUDIO
-            sound.Instance.IsLooped = false;
             sound.Instance.Stop();
 #endif
         }

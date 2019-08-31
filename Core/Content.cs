@@ -58,9 +58,6 @@ namespace Phantom.Core
         }
 #endif
 
-#if XNA
-        public static string SoundExtension = ".wav"; 
-#endif
 
 
         public const string DefaultContext = "<default>";
@@ -397,7 +394,7 @@ namespace Phantom.Core
 
             try
             {
-                FileStream fs = new FileStream("Assets/" + assetName + SoundExtension, FileMode.Open);
+                FileStream fs = new FileStream("Assets/" + assetName + ".wav", FileMode.Open);
                 SoundEffect snd = SoundEffect.FromStream(fs);
                 fs.Close();
                 return snd;
