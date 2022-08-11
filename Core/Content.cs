@@ -91,14 +91,14 @@ namespace Phantom.Core
 			this.SelectMatchingSizeAffix();
         }
 
-		/// <summary>
-		/// Registers a content size affix present in the bundle.
-		/// The <c>ContentManager</c> will try to load all content with a matching affix, preceded by a dash (-).
-		/// Example: <c>RegisterSizeAffix(800);</c> will make <c>Load<Texture2D>("sprites/player") look for "sprites/player-800.xnb" before trying "sprites/player.xnb"</c>
-		/// </summary>
-		/// <param name="contentAffixScale">Affix to register.</param>
-		/// <param name="isNoAffixDefault">If set to <c>true</c>, content for this size will be loaded without any affix (this will be the default size).</param>
-		public void RegisterSizeAffix(int contentAffixScale, bool isNoAffixDefault)
+        /// <summary>
+        /// Registers a content size affix present in the bundle.
+        /// The <c>ContentManager</c> will try to load all content with a matching affix, preceded by a dash (-).
+        /// Example: <c>RegisterSizeAffix(800);</c> will make <c>Load<Texture2D>("sprites/player")</Texture2D> look for <Texture2D>"sprites/player-800.xnb"</Texture2D> before trying <Texture2D>"sprites/player.xnb"</Texture2D></c>
+        /// </summary>
+        /// <param name="contentAffixScale">Affix to register.</param>
+        /// <param name="isNoAffixDefault">If set to <c>true</c>, content for this size will be loaded without any affix (this will be the default size).</param>
+        public void RegisterSizeAffix(int contentAffixScale, bool isNoAffixDefault)
 		{
 			if(!ContentSizes.Contains(contentAffixScale)) ContentSizes.Add(contentAffixScale);
 			if(isNoAffixDefault) noAffixSize = contentAffixScale;
@@ -212,7 +212,7 @@ namespace Phantom.Core
                                     (o as IDisposable).Dispose();
                             }
 
-                            catch (NoAudioHardwareException e)
+                            catch (NoAudioHardwareException)
                             {
                                 Sound.HasAudio = false;
                             }
@@ -242,7 +242,7 @@ namespace Phantom.Core
                         else
                             this.LoadAffixed<object>(assets[i]);
                     }
-                    catch (NoAudioHardwareException e)
+                    catch (NoAudioHardwareException)
                     {
                         Sound.HasAudio = false;
                     }
@@ -326,7 +326,7 @@ namespace Phantom.Core
 						asset = this.manager.Load<T>(assetName+"-"+this.ContentSizeAffix);
 						found = true;
 					}
-                    catch (NoAudioHardwareException e)
+                    catch (NoAudioHardwareException)
                     {
                         Sound.HasAudio = false;
                     }
@@ -344,7 +344,7 @@ namespace Phantom.Core
             {
                 return this.manager.Load<T>(assetName);
             }
-            catch (NoAudioHardwareException e)
+            catch (NoAudioHardwareException)
             {
                 Sound.HasAudio = false;
                 return default(T);
@@ -360,7 +360,7 @@ namespace Phantom.Core
                 this.manager.Load<SoundEffect>(testFile);
                 return true;
             }
-            catch (NoAudioHardwareException e)
+            catch (NoAudioHardwareException)
             {
                 Sound.HasAudio = false;
                 return false;
