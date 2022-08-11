@@ -57,6 +57,19 @@ namespace Phantom.Core
             return self.Type == type;
         }
 
+        public override bool Equals(object obj)
+        {
+            Message msg = obj as Message;
+
+            if (msg != null)
+                return obj == msg;
+
+            if (obj is int)
+                return this.Type == (int) obj;
+
+            return false;
+        }
+
         public static bool operator !=(Message self, int type)
         {
             return self.Type != type;
@@ -107,6 +120,11 @@ namespace Phantom.Core
             m.Consumed = false;
             m.Handled = false;
             return m;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }
