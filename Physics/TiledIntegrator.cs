@@ -126,13 +126,17 @@ namespace Phantom.Physics
         {
             base.OnComponentAddedToLayer(component);
             Entity e = component as Entity;
-            if ( e != null )
+            if (e != null)
             {
                 TilePosition tp = e.GetComponentByType<TilePosition>();
                 if (tp == null)
                     e.AddComponent(tp = new TilePosition(this));
                 else
                     tp.SetIntegrater(this);
+
+                if (!tp.Tile.Entities.Contains(e))
+                    tp.Tile.Entities.Add(e);
+
                 this.positions[e] = tp;
             }
         }
