@@ -277,7 +277,6 @@ namespace Phantom.GameUI.Elements
         /// Override this function to implement behavior to respond to mouse and touch clicks at a specific location
         /// </summary>
         /// <param name="position"></param>
-        /// <param name="player"></param>
         /// <param name="button"></param>
         public virtual void ClickAt(Vector2 position, UIMouseButton button)
         {

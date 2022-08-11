@@ -70,6 +70,7 @@ namespace Phantom.Utils
         /// Assembles an entity following the specifications in the blueprint
         /// </summary>
         /// <param name="blueprint">A string describing the entity in PhantomComponentNotion format</param>
+        /// <param name="blueprintName">Assigns a name to the blueprint</param>
         /// <returns></returns>
         static public Entity AssembleEntity(PCNComponent blueprint, string blueprintName)
         {

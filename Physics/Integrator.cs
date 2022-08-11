@@ -117,7 +117,7 @@ namespace Phantom.Physics
         /// <summary>
         /// Checks the collisions of an entity in the integrator's entity list
         /// </summary>
-        /// <param name="index">Zero based index of the entity in the integrator's entity list.</param>
+        /// <param name="e">Zero based index of the entity in the integrator's entity list.</param>
         protected virtual void CheckEntityCollision(Entity e)
         {
             if (e.Shape == null)
@@ -284,6 +284,7 @@ namespace Phantom.Physics
         /// </summary>
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
+        /// <param name="partial"></param>
         /// <returns></returns>
 		public virtual IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
@@ -318,6 +319,7 @@ namespace Phantom.Physics
         /// </summary>
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
+        /// <param name="partial"></param>
         /// <returns></returns>
         /// 
         public virtual List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)

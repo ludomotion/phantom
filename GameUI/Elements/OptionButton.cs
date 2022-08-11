@@ -38,6 +38,7 @@ namespace Phantom.GameUI.Elements
         /// <param name="caption"></param>
         /// <param name="position"></param>
         /// <param name="shape"></param>
+        /// <param name="onChange"></param>
         /// <param name="wrap">Indicates whether the options cycle</param>
         /// <param name="selectedOption"></param>
         /// <param name="options"></param>

@@ -58,6 +58,7 @@ namespace Phantom.GameUI.Elements
         /// <param name="minValue"></param>
         /// <param name="maxValue"></param>
         /// <param name="currentValue"></param>
+        /// <param name="onChange"></param>
         /// <param name="sliderOientation"></param>
         /// <param name="options">The preset options</param>
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, UIAction onChange, SliderOrientation sliderOientation, params string[] options)
@@ -85,6 +86,7 @@ namespace Phantom.GameUI.Elements
         /// <param name="position"></param>
         /// <param name="shape"></param>
         /// <param name="currentOption"></param>
+        /// <param name="onChange"></param>
         /// <param name="orientation"></param>
         /// <param name="options"></param>
         public Slider(string name, string caption, Vector2 position, OABB shape, int currentOption, UIAction onChange, SliderOrientation orientation, params string[] options)
@@ -114,6 +116,7 @@ namespace Phantom.GameUI.Elements
         /// <param name="maxValue"></param>
         /// <param name="currentValue"></param>
         /// <param name="step"></param>
+        /// <param name="onChange"></param>
         /// <param name="orientation"></param>
         /// <param name="snap">The value always snaps to the indicated steps</param>
         public Slider(string name, string caption, Vector2 position, OABB shape, float minValue, float maxValue, float currentValue, float step, UIAction onChange, SliderOrientation orientation, bool snap)

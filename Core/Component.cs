@@ -240,7 +240,6 @@ namespace Phantom.Core
         /// on the Message object.
         /// </summary>
         /// <param name="type">Int representing the message. The Phantom Messages class contains standard messages, you are advised to create a list for messages for your projects</param>
-        /// <param name="data">The data passed along to the message.</param>
         /// <returns>Returns a Message object. Containing the state of the message and the possible result.</returns>
         public Message HandleMessage(int type)
         {

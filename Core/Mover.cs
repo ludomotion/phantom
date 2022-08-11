@@ -157,12 +157,13 @@ namespace Phantom.Core
             this.Velocity += impuls;
         }
 
-		/// <summary>
-		/// Apply bounce and friction (see http://www.metanetsoftware.com/technique/tutorialA.html section --= Bounce and Friction =-- ).
-		/// </summary>
-		/// <param name="friction"></param>
-		/// <param name="bounce"></param>
-		protected virtual void ApplyFrictionBounce(Vector2 normal, float friction, float bounce)
+        /// <summary>
+        /// Apply bounce and friction (see http://www.metanetsoftware.com/technique/tutorialA.html section --= Bounce and Friction =-- ).
+        /// </summary>
+        /// <param name="normal"></param>
+        /// <param name="friction"></param>
+        /// <param name="bounce"></param>
+        protected virtual void ApplyFrictionBounce(Vector2 normal, float friction, float bounce)
 		{
 			if (friction != 0 || bounce != 1)
 			{

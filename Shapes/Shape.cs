@@ -58,7 +58,7 @@ namespace Phantom.Shapes
         /// </summary>
         /// <param name="origin">The projection origin (i.e. light source)</param>
         /// <param name="maxDistance">The maximum distance to project the umbra to (i.e. light falloff distance)</param>
-        /// <param name="lightDiameter">The radius of the light to project soft shadows from, or 0 for hard shadows</param>
+        /// <param name="lightRadius">The radius of the light to project soft shadows from, or 0 for hard shadows</param>
         /// <param name="umbra">The area totally obscured from the origin</param>
         /// <param name="penumbra">The area partially obscured by the origin if the light radius is > 0 (triangles with vertex order: near-obscured, far-obscured, far-unobscured)</param>
         /// <returns>true if an umbra projection was formed</returns>
@@ -90,6 +90,7 @@ namespace Phantom.Shapes
         /// </summary>
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
+        /// <param name="partial"></param>
         /// <returns></returns>
         public abstract bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial);
 

@@ -69,7 +69,7 @@ namespace Phantom.Utils
 	/// Asynchrony.Instance.Create<Component>(() => {
 	///     Thread.Sleep(1000); // Creating an component, or a level...
 	///     return new Entity(Vector2.Zero);
-	/// }, (c) => this.AddComponent(c) ).Start();
+	/// }</Component>, (c) => this.AddComponent(c) ).Start();
 	/// </code>
 	/// </exmaple>
 	public class Asynchrony : Component
