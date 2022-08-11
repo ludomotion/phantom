@@ -11,7 +11,7 @@ namespace Phantom.Cameras.Components
     {
         private float startzoom;
 
-        private float duration;
+        //private float duration;
         private float transition;
 
         private float speed;
