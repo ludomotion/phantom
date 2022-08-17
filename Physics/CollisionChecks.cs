@@ -52,11 +52,11 @@ namespace Phantom.Physics
             CollisionData result = new CollisionData(float.MaxValue);
 
             float inter1 = 0, inter2 = 0;
-            for (int i = 0; i < b.normals.Length; i++)
+            for (int i = 0; i < b.Normals.Length; i++)
             {
-                proj = a.Project(b.normals[i], -delta);
-                inter1 = b.projections[i].Max - proj.Min;
-                inter2 = -(b.projections[i].Min - proj.Max);
+                proj = a.Project(b.Normals[i], -delta);
+                inter1 = b.Projections[i].Max - proj.Min;
+                inter2 = -(b.Projections[i].Min - proj.Max);
 
 #if DEBUG && SATDEBUG
                 Vector2 p = b.Entity.Position;
@@ -69,12 +69,12 @@ namespace Phantom.Physics
                 if (inter1 < inter2 && inter1 < result.Interpenetration)
                 {
                     result.Interpenetration = inter1;
-                    result.Normal = -Vector2.TransformNormal(b.normals[i], rotation);
+                    result.Normal = -Vector2.TransformNormal(b.Normals[i], rotation);
                 }
                 else if (inter2 < result.Interpenetration)
                 {
                     result.Interpenetration = inter2;
-                    result.Normal = Vector2.TransformNormal(b.normals[i], rotation);
+                    result.Normal = Vector2.TransformNormal(b.Normals[i], rotation);
                 }
             }
 
@@ -144,11 +144,11 @@ namespace Phantom.Physics
             delta = Vector2.Transform(delta, Matrix.CreateRotationZ(-b.Entity.Orientation));
             Matrix rot = Matrix.CreateRotationZ(a.Entity.Orientation - b.Entity.Orientation);
 
-            for (int i = 0; i < a.normals.Length; i++)
+            for (int i = 0; i < a.Normals.Length; i++)
             {
-                Polygon.Projection proj = b.Project(Vector2.TransformNormal(a.normals[i], rot), delta);
-                inter1 = a.projections[i].Max - proj.Min;
-                inter2 = -(a.projections[i].Min - proj.Max);
+                Polygon.Projection proj = b.Project(Vector2.TransformNormal(a.Normals[i], rot), delta);
+                inter1 = a.Projections[i].Max - proj.Min;
+                inter2 = -(a.Projections[i].Min - proj.Max);
 
 #if DEBUG && SATDEBUG
                 Vector2 p = a.Entity.Position;
@@ -162,13 +162,13 @@ namespace Phantom.Physics
                 if (inter1 < inter2 && inter1 < result.Interpenetration)
                 {
                     result.Interpenetration = inter1;
-                    result.Normal = Vector2.TransformNormal(a.normals[i], Matrix.CreateRotationZ(a.Entity.Orientation));
+                    result.Normal = Vector2.TransformNormal(a.Normals[i], Matrix.CreateRotationZ(a.Entity.Orientation));
                     lookingAt = b;
                 }
                 else if( inter2 < result.Interpenetration)
                 {
                     result.Interpenetration = inter2;
-                    result.Normal = -Vector2.TransformNormal(a.normals[i], Matrix.CreateRotationZ(a.Entity.Orientation));
+                    result.Normal = -Vector2.TransformNormal(a.Normals[i], Matrix.CreateRotationZ(a.Entity.Orientation));
                     lookingAt = b;
                 }
                 
@@ -178,11 +178,11 @@ namespace Phantom.Physics
             delta = Vector2.Transform(delta, Matrix.CreateRotationZ(-a.Entity.Orientation));
             rot = Matrix.CreateRotationZ(b.Entity.Orientation - a.Entity.Orientation);
 
-            for (int i = 0; i < b.normals.Length; i++)
+            for (int i = 0; i < b.Normals.Length; i++)
             {
-                Polygon.Projection proj = a.Project(Vector2.TransformNormal(b.normals[i], rot), -delta);
-                inter1 = b.projections[i].Max - proj.Min;
-                inter2 = -(b.projections[i].Min - proj.Max);
+                Polygon.Projection proj = a.Project(Vector2.TransformNormal(b.Normals[i], rot), -delta);
+                inter1 = b.Projections[i].Max - proj.Min;
+                inter2 = -(b.Projections[i].Min - proj.Max);
 
 #if DEBUG && SATDEBUG
                 Vector2 p = b.Entity.Position;
@@ -196,13 +196,13 @@ namespace Phantom.Physics
                 if (inter1 < inter2 && inter1 < result.Interpenetration)
                 {
                     result.Interpenetration = inter1;
-                    result.Normal = -Vector2.TransformNormal(b.normals[i], Matrix.CreateRotationZ(b.Entity.Orientation));
+                    result.Normal = -Vector2.TransformNormal(b.Normals[i], Matrix.CreateRotationZ(b.Entity.Orientation));
                     lookingAt = a;
                 }
                 else if (inter2 < result.Interpenetration)
                 {
                     result.Interpenetration = inter2;
-                    result.Normal = Vector2.TransformNormal(b.normals[i], Matrix.CreateRotationZ(b.Entity.Orientation));
+                    result.Normal = Vector2.TransformNormal(b.Normals[i], Matrix.CreateRotationZ(b.Entity.Orientation));
                     lookingAt = a;
                 }
             }

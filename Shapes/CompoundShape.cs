@@ -25,13 +25,20 @@ namespace Phantom.Shapes
         {
             get { return this.roughRadius; }
         }
+
         public override float RoughWidth
         {
             get { return this.roughWidth; }
         }
 
+        public override float RoughHeight
+        {
+            get { return this.roughHeight; }
+        }
+
         private float roughRadius;
         private float roughWidth;
+        private float roughHeight;
 
         private List<Container> shapes;
         private List<CollisionData> results;
@@ -49,7 +56,7 @@ namespace Phantom.Shapes
         {
             if (component is Shape)
             {
-                throw new Exception("don't add sub-shapes as components to a CompoundShape.");
+                throw new Exception("Don't add sub-shapes as components to a CompoundShape.");
             }
             base.OnComponentAdded(component);
         }
@@ -72,10 +79,12 @@ namespace Phantom.Shapes
         {
             roughRadius = 0;
             roughWidth = 0;
+            roughHeight = 0;
             for (int i = 0; i < this.shapes.Count; i++)
             {
                 roughRadius = Math.Max(roughRadius, (this.shapes[i].Offset.Length() + this.shapes[i].Shape.RoughRadius));
                 roughWidth = Math.Max(roughWidth, this.shapes[i].Shape.RoughWidth);
+                roughHeight = Math.Max(roughHeight, this.shapes[i].Shape.RoughHeight);
             }
         }
 

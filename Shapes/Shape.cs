@@ -21,9 +21,14 @@ namespace Phantom.Shapes
         /// </summary>
         public abstract float RoughRadius { get; }
         /// <summary>
-        /// A rough indication of tne shape's width 
+        /// A rough indication of the shape's width 
         /// </summary>
         public abstract float RoughWidth { get; }
+
+        /// <summary>
+        /// A rough indication of the shape's height 
+        /// </summary>
+        public abstract float RoughHeight { get; }
 
         /// <summary>
         /// Generate the collision data for this shape and another shape.

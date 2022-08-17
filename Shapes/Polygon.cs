@@ -39,58 +39,137 @@ namespace Phantom.Shapes
             get { return this.roughWidth; }
         }
 
+        public override float RoughHeight
+        {
+            get { return this.roughHeight; }
+        }
+
         /// <summary>
         /// The vertices that determine the polygon's shape. Independent of orientation.
         /// </summary>
-        public readonly Vector2[] Vertices;
+        public Vector2[] Vertices
+        {
+            get => vertices[v_idx];
+        }
+
+        internal Vector2[] Normals
+        {
+            get => normals[v_idx];
+        }
+
+        internal Projection[] Projections
+        {
+            get => projections[v_idx];
+        }
+
+        // Default index of vertice array
+        private int v_idx;
+
+        // Constants for vertice array
+        private const int v_ini = 0;
+        private const int v_mir = 1;
+
+        private readonly Vector2[][] vertices;
+
         protected float roughRadius;
         protected float roughWidth;
+        protected float roughHeight;
 
         private Vector2[] RotationCache;
         private Vector2[] RotationNormals;
         private float cachedAngle;
 
-        internal Vector2[] normals;
-        internal Projection[] projections;
+        private Vector2[][] normals;
+        private Projection[][] projections;
 
         public Polygon(params Vector2[] vertices)
         {
-            this.Vertices = vertices;
+            this.v_idx = 0;
+            this.vertices = new Vector2[2][];
+            this.normals = new Vector2[2][];
+            this.projections = new Projection[2][];
+            this.vertices[v_ini] = vertices;
             ParsePolygon();
         }
 
         public void SetPolygon(params Vector2[] vertices)
         {
-            cachedAngle = float.NaN;
-            for (int i = 0; i < this.Vertices.Length && i < vertices.Length; i++)
-                this.Vertices[i] = vertices[i];
+            this.v_idx = 0;
+            this.cachedAngle = float.NaN;
+            for (int i = 0; i < this.vertices[v_ini].Length && i < vertices.Length; i++)
+                this.vertices[v_ini][i] = vertices[i];
 
             ParsePolygon();
         }
 
         protected void ParsePolygon() {
+
+            // Calculation for rough width and radius of shape
             this.roughRadius = 0;
             float xmin = float.MaxValue, xmax = float.MinValue;
-            for (int i = 0; i < this.Vertices.Length; i++)
+            float ymin = float.MaxValue, ymax = float.MinValue;
+
+            // Loop over vertices to determine radius and rough size
+            for (int i = 0; i < this.vertices[v_ini].Length; i++)
             {
-                if (this.Vertices[i].LengthSquared() > this.roughRadius)
+                // Assign rough radius
+                if (this.vertices[v_ini][i].LengthSquared() > this.roughRadius)
                 {
-                    this.roughRadius = this.Vertices[i].LengthSquared();
+                    this.roughRadius = this.vertices[v_ini][i].LengthSquared();
                 }
-                xmin = Math.Min(this.Vertices[i].X, xmin);
-                xmax = Math.Max(this.Vertices[i].X, xmax);
+
+                // Assign X minimum and maximum
+                xmin = Math.Min(this.vertices[v_ini][i].X, xmin);
+                xmax = Math.Max(this.vertices[v_ini][i].X, xmax);
+
+                // Assign Y minimum and maximum
+                ymin = Math.Min(this.vertices[v_ini][i].Y, ymin);
+                ymax = Math.Max(this.vertices[v_ini][i].Y, ymax);
             }
+
+            // Assign rough size and radius
             this.roughWidth = Math.Abs(xmin - xmax);
+            this.roughHeight = Math.Abs(ymin - ymax);
             this.roughRadius = (float)Math.Sqrt(this.roughRadius);
-            this.RotationCache = new Vector2[this.Vertices.Length];
-            this.RotationNormals = new Vector2[this.Vertices.Length];
 
-            this.normals = new Vector2[this.Vertices.Length];
+            // Initialize rotation cache and normals
+            this.RotationCache = new Vector2[this.vertices[v_ini].Length];
+            this.RotationNormals = new Vector2[this.vertices[v_ini].Length];
 
-            for (int i = 0; i < this.Vertices.Length; i++)
+            // Create new mirrored array
+            vertices[v_mir] = new Vector2[vertices[v_ini].Length];
+
+            // Calculate mirror
+            // We are reflecting on the X-axis which gives a mirror of the Y axis
+            Vector2 axisXPlus = new Vector2(0, 1);
+            Vector2 axisXMinus = new Vector2(0, -1);
+            Vector2 axisMirror;
+
+            // Loop over all the vertices
+            for (int i = 0; i < this.vertices[v_ini].Length; i++)
             {
-                Vector2 delta = this.Vertices[(i + 1) % this.Vertices.Length] - this.Vertices[i];
-                this.normals[i] = delta.LeftPerproduct().Normalized();
+                // Axis to use
+                axisMirror = (this.vertices[v_ini][i].Y > 0) ? axisXPlus : axisXMinus;
+
+                // Negate each vector
+                Vector2 neg = Vector2.Negate(this.vertices[v_ini][i]);
+
+                // Mirror it on the chosen axis
+                this.vertices[v_mir][i] = Vector2.Reflect(neg, axisMirror);
+            }
+
+            // Calculate normals for normal and mirrored
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                // Create new normal array
+                this.normals[i] = new Vector2[this.vertices[i].Length];
+
+                // Calculate normals
+                for (int j = 0; j < vertices[i].Length; j++)
+                {
+                    Vector2 delta = this.vertices[i][(j + 1) % this.vertices[i].Length] - this.vertices[i][j];
+                    this.normals[i][j] = delta.LeftPerproduct().Normalized();
+                }
             }
 
             //// Remove duplicates:
@@ -114,10 +193,17 @@ namespace Phantom.Shapes
             //        n[c++] = this.normals[i];
             //this.normals = n;
 
+            // Calculate projections for normal and mirrored
+            for (int i = 0; i < normals.Length; i++)
+            {
+                // Create new projection array
+                this.projections[i] = new Projection[this.normals[i].Length];
 
-            this.projections = new Projection[this.normals.Length];
-            for (int i = 0; i < this.normals.Length; i++)
-                this.projections[i] = this.Project(this.normals[i], Vector2.Zero);
+                // Calculate projections
+                for (int j = 0; j < normals[i].Length; j++)
+                    this.projections[i][j] = this.Project(this.normals[i][j], Vector2.Zero);
+
+            }
         }
 
 
@@ -129,7 +215,7 @@ namespace Phantom.Shapes
         public Vector2[] RotatedVertices(float angle)
         {
             if (angle == 0)
-                return this.Vertices;
+                return this.vertices[v_idx];
 
             if (cachedAngle != angle)
                 this.createRotationCache(angle);
@@ -145,7 +231,7 @@ namespace Phantom.Shapes
         internal Vector2[] RotatedNormals(float angle)
         {
             if (angle == 0)
-                return this.normals;
+                return this.normals[v_idx];
 
             if (cachedAngle != angle)
                 this.createRotationCache(angle);
@@ -157,10 +243,10 @@ namespace Phantom.Shapes
         {
             Matrix rotation = Matrix.CreateRotationZ(angle);
 
-            for (int i = 0; i < this.Vertices.Length; i++)
+            for (int i = 0; i < this.vertices[v_idx].Length; i++)
             {
-                this.RotationCache[i] = Vector2.Transform(this.Vertices[i], rotation);
-                this.RotationNormals[i] = Vector2.Transform(this.normals[i], rotation);
+                this.RotationCache[i] = Vector2.Transform(this.vertices[v_idx][i], rotation);
+                this.RotationNormals[i] = Vector2.Transform(this.normals[v_idx][i], rotation);
             }
             
             this.cachedAngle = angle;
@@ -170,9 +256,9 @@ namespace Phantom.Shapes
         {
             float min = float.MaxValue;
             float max = float.MinValue;
-            for (int j = 0; j < this.Vertices.Length; j++)
+            for (int j = 0; j < this.vertices[v_idx].Length; j++)
             {
-                float dot = Vector2.Dot(normal, this.Vertices[j] + delta);
+                float dot = Vector2.Dot(normal, this.vertices[v_idx][j] + delta);
                 min = Math.Min(dot, min);
                 max = Math.Max(dot, max);
             }
@@ -181,40 +267,55 @@ namespace Phantom.Shapes
 
         public override void Scale(float scalar)
         {
+            // Reset cache angle
             this.cachedAngle = 0;
-            for (int j = 0; j < this.Vertices.Length; j++)
-                this.Vertices[j] *= scalar;
-            for (int j = 0; j < this.projections.Length; j++)
+
+            // Adjust vertices scale
+            for (int i = 0; i < vertices.Length; i++)
+                for (int j = 0; j < vertices[i].Length; j++)
+                    this.vertices[i][j] *= scalar;
+
+            // Adjust projection scale
+            for (int i = 0; i < vertices.Length; i++)
             {
-                this.projections[j].Max *= scalar;
-                this.projections[j].Min *= scalar;
+                for (int j = 0; j < vertices[i].Length; j++)
+                {
+                    this.projections[i][j].Max *= scalar;
+                    this.projections[i][j].Min *= scalar;
+                }
             }
+        }
+
+        public void Mirror()
+        {
+            v_idx = (v_idx + 1) & 1;
         }
 
         public Polygon Scaled(float scalar)
         {
-            Vector2[] scaledVertices = new Vector2[this.Vertices.Length];
-            for (int j = 0; j < this.Vertices.Length; j++)
-                scaledVertices[j] = this.Vertices[j] * scalar;
+            Vector2[] scaledVertices = new Vector2[this.vertices[v_idx].Length];
+            for (int j = 0; j < this.vertices[v_idx].Length; j++)
+                scaledVertices[j] = this.vertices[v_idx][j] * scalar;
 
             return new Polygon(scaledVertices);
         }
 
         public Polygon DeepCopy()
         {
-            Vector2[] newVertices = new Vector2[this.Vertices.Length];
-            for (int j = 0; j < this.Vertices.Length; j++)
-                newVertices[j] = new Vector2(this.Vertices[j].X, this.Vertices[j].Y);
+            Vector2[] newVertices = new Vector2[this.vertices[v_idx].Length];
+            for (int j = 0; j < this.vertices[v_idx].Length; j++)
+                newVertices[j] = new Vector2(this.vertices[v_idx][j].X, this.vertices[v_idx][j].Y);
 
             return new Polygon(newVertices);
         }
 
         private static Dictionary<int, Vector2[]> pooledArrays = new Dictionary<int, Vector2[]>();
+
         public override Vector2[] IntersectEdgesWithLine(Vector2 start, Vector2 end)
         {
-            if (!pooledArrays.ContainsKey(this.Vertices.Length))
-                pooledArrays[this.Vertices.Length] = new Vector2[this.Vertices.Length];
-            Vector2[] result = pooledArrays[this.Vertices.Length];
+            if (!pooledArrays.ContainsKey(this.vertices[v_idx].Length))
+                pooledArrays[this.vertices[v_idx].Length] = new Vector2[this.vertices[v_idx].Length];
+            Vector2[] result = pooledArrays[this.vertices[v_idx].Length];
             int found = 0;
             Vector2 intersection = new Vector2();
 
@@ -231,7 +332,7 @@ namespace Phantom.Shapes
                     result[found++] = intersection + this.Entity.Position;
                 }
             }
-            if (found < this.Vertices.Length)
+            if (found < this.vertices[v_idx].Length)
             {
                 if (!pooledArrays.ContainsKey(found))
                     pooledArrays[found] = new Vector2[found];
@@ -257,10 +358,10 @@ namespace Phantom.Shapes
             Vector2[] farPoint1 = new Vector2[verts.Length];
             Vector2[] farPoint2 = new Vector2[verts.Length];
 
-            bool[] facing = new bool[this.normals.Length];
-            bool[] finVisible = new bool[this.normals.Length];
-            bool[] farFinVisible = new bool[this.normals.Length];
-            bool[] boundary = new bool[this.normals.Length];
+            bool[] facing = new bool[this.normals[v_idx].Length];
+            bool[] finVisible = new bool[this.normals[v_idx].Length];
+            bool[] farFinVisible = new bool[this.normals[v_idx].Length];
+            bool[] boundary = new bool[this.normals[v_idx].Length];
 
             Vector2 closest;
             Vector2 delta;
@@ -271,10 +372,10 @@ namespace Phantom.Shapes
             int closestIndex;
             int farthestIndex;
 
-            Vector2[] finLightDirection = new Vector2[this.normals.Length];
-            Vector2[] finDarkDirection = new Vector2[this.normals.Length];
+            Vector2[] finLightDirection = new Vector2[this.normals[v_idx].Length];
+            Vector2[] finDarkDirection = new Vector2[this.normals[v_idx].Length];
 
-            bool[] firstClosest = new bool[this.normals.Length];
+            bool[] firstClosest = new bool[this.normals[v_idx].Length];
 
             for (i = 0; i < numVerts; i++)
             {
@@ -486,10 +587,10 @@ namespace Phantom.Shapes
 				origin = this.Entity.Position;
 			Vector2 delta = position - origin;
 
-            for (int i = 0; i < this.normals.Length; i++)
+            for (int i = 0; i < this.normals[v_idx].Length; i++)
             {
                 float dot = Vector2.Dot(norms[i], delta);
-                if (dot < this.projections[i].Min || dot > this.projections[i].Max)
+                if (dot < this.Projections[i].Min || dot > this.Projections[i].Max)
                     return false;
             }
             return true;
@@ -520,23 +621,13 @@ namespace Phantom.Shapes
 			}
         }
 
-        public override CollisionData Collide(Shape other)
-        {
-            return other.Accept<CollisionData, Polygon>(visitor, this);
-        }
-
-        public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
-        {
-            return visitor.Visit(this, data);
-        }
-
         public override Vector2 ClosestVertice(Vector2 point)
         {
             Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
 
             if (verts.Length == 0) return this.Entity.Position;
             Vector2 result = verts[0] + this.Entity.Position;
-            float dist = (verts[0] + this.Entity.Position - point).LengthSquared(); 
+            float dist = (verts[0] + this.Entity.Position - point).LengthSquared();
             for (int i = 0; i < verts.Length; i++)
             {
                 float d = (verts[i] + this.Entity.Position - point).LengthSquared();
@@ -549,5 +640,14 @@ namespace Phantom.Shapes
             return result;
         }
 
+        public override CollisionData Collide(Shape other)
+        {
+            return other.Accept<CollisionData, Polygon>(visitor, this);
+        }
+
+        public override OUT Accept<OUT, IN>(ShapeVisitor<OUT, IN> visitor, IN data)
+        {
+            return visitor.Visit(this, data);
+        }
     }
 }

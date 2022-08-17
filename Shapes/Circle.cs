@@ -24,12 +24,18 @@ namespace Phantom.Shapes
                 return this.Radius;
             }
         }
+
         public override float RoughWidth
         {
             get
             {
-                return this.Radius * 2;
+                return this.Diameter;
             }
+        }
+
+        public override float RoughHeight
+        {
+            get { return this.Diameter; }
         }
 
         /// <summary>
@@ -37,9 +43,15 @@ namespace Phantom.Shapes
         /// </summary>
         public float Radius { get; protected set; }
 
+        /// <summary>
+        /// The circle's diameter
+        /// </summary>
+        public float Diameter { get; protected set; }
+
         public Circle(float radius)
         {
             this.Radius = radius;
+            this.Diameter = radius * 2;
         }
 
         public override void Scale(float scalar)

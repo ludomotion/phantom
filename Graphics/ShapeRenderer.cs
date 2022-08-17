@@ -101,21 +101,21 @@ namespace Phantom.Graphics
 
 #if DEBUG
             Matrix rot = Matrix.CreateRotationZ(this.Entity.Orientation);
-            for (int i = 0; i < shape.normals.Length; i++)
+            for (int i = 0; i < shape.Normals.Length; i++)
             {
                 c.Begin();
                 c.MoveTo(pos);
-                c.LineTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.RoughRadius*1.5f);
+                c.LineTo(pos + Vector2.TransformNormal(shape.Normals[i], rot) * shape.RoughRadius*1.5f);
                 c.StrokeColor = Color.Green;
                 c.LineWidth = this.thickness;
                 c.Stroke();
             }
 
-            for (int i = 0; i < shape.projections.Length; i++)
+            for (int i = 0; i < shape.Projections.Length; i++)
             {
                 c.Begin();
-                c.MoveTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.projections[i].Max);
-                c.LineTo(pos + Vector2.TransformNormal(shape.normals[i], rot) * shape.projections[i].Min);
+                c.MoveTo(pos + Vector2.TransformNormal(shape.Normals[i], rot) * shape.Projections[i].Max);
+                c.LineTo(pos + Vector2.TransformNormal(shape.Normals[i], rot) * shape.Projections[i].Min);
                 c.StrokeColor = Color.Blue;
                 c.LineWidth = this.thickness;
                 c.Stroke();
