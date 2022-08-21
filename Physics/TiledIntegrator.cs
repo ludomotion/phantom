@@ -8,6 +8,15 @@ using Phantom.Graphics;
 
 namespace Phantom.Physics
 {
+    public struct PrimitiveList
+    {
+        public static int DefaultArraySize = 1;
+        public static int DefaultArrayIncrease = 4;
+
+        public int entitiesIndex;
+        public Entity[] entitiesArray;
+    }
+
     /// <summary>
     /// A TiledIntegrator class is responsible for updating the physics of its entities, and detecting and handling collisions between them.
     /// It divides the world in a number of square tiles to optimize the speed of collision detection. The optimal tile size is the same as the average 
@@ -20,12 +29,18 @@ namespace Phantom.Physics
         {
             public int X;
             public int Y;
-            public List<Entity> Entities;
+
+            public PrimitiveList Entities;
+
             public Tile(int x, int y)
             {
                 this.X = x;
                 this.Y = y;
-                this.Entities = new List<Entity>();
+                this.Entities = new PrimitiveList()
+                {
+                    entitiesIndex = -1,
+                    entitiesArray = new Entity[PrimitiveList.DefaultArraySize]
+                };
             }
         }
 
@@ -50,6 +65,7 @@ namespace Phantom.Physics
         private Dictionary<Entity, TilePosition> positions;
 
         private float tileSize;
+        private float invTileSize;
 
         /// <summary>
         /// The set tile size
@@ -66,10 +82,10 @@ namespace Phantom.Physics
         /// </summary>
         /// <param name="physicsExecutionCount">The number of integration step each frame. For fast paced games with many physics, 4 is good value</param>
         /// <param name="tileSize">The tile size (all tiles are squares), smaller tile perform better, but the collision checks become inaccurate if the entities grow larger than 150% of the tile size.</param>
-        public TiledIntegrator(int physicsExecutionCount, float tileSize)
-            :base(physicsExecutionCount)
+        public TiledIntegrator(int physicsExecutionCount, float tileSize) : base(physicsExecutionCount)
         {
             this.tileSize = tileSize;
+            this.invTileSize = (tileSize == 0f) ? 0f : 1.0f / tileSize;
         }
 
         /// <summary>
@@ -88,8 +104,8 @@ namespace Phantom.Physics
             float w = this.layer.Bounds.X;
             float h = this.layer.Bounds.Y;
 
-            this.tilesX = (int)Math.Ceiling(w / this.tileSize);
-            this.tilesY = (int)Math.Ceiling(h / this.tileSize);
+            this.tilesX = (int)Math.Ceiling(w * invTileSize);
+            this.tilesY = (int)Math.Ceiling(h * invTileSize);
             this.tileCount = this.tilesX * this.tilesY;
 
             this.tiles = new Tile[this.tileCount];
@@ -107,8 +123,8 @@ namespace Phantom.Physics
             float w = bounds.X;
             float h = bounds.Y;
 
-            this.tilesX = (int)Math.Ceiling(w / this.tileSize);
-            this.tilesY = (int)Math.Ceiling(h / this.tileSize);
+            this.tilesX = (int)Math.Ceiling(w * invTileSize);
+            this.tilesY = (int)Math.Ceiling(h * invTileSize);
             this.tileCount = this.tilesX * this.tilesY;
 
             this.tiles = new Tile[this.tileCount];
@@ -134,8 +150,30 @@ namespace Phantom.Physics
                 else
                     tp.SetIntegrater(this);
 
-                if (!tp.Tile.Entities.Contains(e))
-                    tp.Tile.Entities.Add(e);
+                // ************** START CONTAINS IMPLEMENTATION **************
+                // Check if tile contains entity
+                bool contains = false;
+
+                // Loop over all the entities
+                for (int i = tp.Tile.Entities.entitiesIndex; i > -1; i--)
+                {
+                    if (tp.Tile.Entities.entitiesArray[i] == e)
+                    {
+                        contains = true;
+                        break;
+                    }
+                }
+                // ************** END CONTAINS IMPLEMENTATION **************
+
+                if (!contains)
+                {
+                    // ************** START ADD IMPLEMENTATION **************
+                    tp.Tile.Entities.entitiesIndex++;
+                    if (tp.Tile.Entities.entitiesIndex >= tp.Tile.Entities.entitiesArray.Length)
+                        Array.Resize(ref tp.Tile.Entities.entitiesArray, tp.Tile.Entities.entitiesArray.Length * PrimitiveList.DefaultArrayIncrease);
+                    tp.Tile.Entities.entitiesArray[tp.Tile.Entities.entitiesIndex] = e;
+                    // ************** END ADD IMPLEMENTATION **************
+                }
 
                 this.positions[e] = tp;
             }
@@ -150,7 +188,30 @@ namespace Phantom.Physics
             {
                 TilePosition tp = e.GetComponentByType<TilePosition>();
                 if (tp != null) {
-                    tp.Tile.Entities.Remove(e);
+
+                    // ************** START REMOVE IMPLEMENTATION **************
+                    // Loop from back to front
+                    for (int i = tp.Tile.Entities.entitiesIndex; i > -1; i--)
+                    {
+                        // We found it
+                        if (tp.Tile.Entities.entitiesArray[i] == e)
+                        {
+                            // Move all elements down
+                            for (int j = i; j < tp.Tile.Entities.entitiesIndex; j++)
+                                tp.Tile.Entities.entitiesArray[j] = tp.Tile.Entities.entitiesArray[j + 1];
+
+                            // Remove last element
+                            tp.Tile.Entities.entitiesArray[tp.Tile.Entities.entitiesIndex] = null;
+
+                            // Decrement size of array
+                            tp.Tile.Entities.entitiesIndex--;
+
+                            // Break out of loop
+                            break;
+                        }
+                    }
+                    // ************** END REMOVE IMPLEMENTATION **************
+
                     this.positions.Remove(e);
                 }
                 this.positions[e] = tp;
@@ -177,10 +238,10 @@ namespace Phantom.Physics
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY)
                 {
                     Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+                    for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
-                        Entity o = tt.Entities[j];
-                        if (e != o &&  !o.Destroyed && o.Shape != null && (!o.InitiateCollision || e.ID > o.ID || o.UpdateBehaviour == Entity.UpdateBehaviours.NeverUpdate) )
+                        Entity o = tt.Entities.entitiesArray[j];
+                        if (e != o && !o.Destroyed && o.Shape != null && (!o.InitiateCollision || e.ID > o.ID || o.UpdateBehaviour == Entity.UpdateBehaviours.NeverUpdate))
                             this.CheckCollisionBetween(e, o);
                     }
                 }
@@ -232,15 +293,15 @@ namespace Phantom.Physics
             if (float.IsNaN(position.X) || float.IsNaN(position.Y))
                 return this.tiles[0];
             
-            int x = (int)MathHelper.Clamp(position.X / this.tileSize, 0, this.tilesX - 1);
-            int y = (int)MathHelper.Clamp(position.Y / this.tileSize, 0, this.tilesY - 1);
+            int x = (int)MathHelper.Clamp(position.X * this.invTileSize, 0, this.tilesX - 1);
+            int y = (int)MathHelper.Clamp(position.Y * this.invTileSize, 0, this.tilesY - 1);
             return this.tiles[y * this.tilesX + x];
         }
 
         public override Entity GetEntityAt(Vector2 position)
         {
-            int tX = (int)(position.X / this.tileSize);
-            int tY = (int)(position.Y / this.tileSize);
+            int tX = (int)(position.X * this.invTileSize);
+            int tY = (int)(position.Y * this.invTileSize);
             int minX = Math.Max(tX - 1, 0);
             int maxX = Math.Min(tX + 1, this.tilesX - 1);
             int minY = Math.Max(tY - 1, 0);
@@ -253,9 +314,10 @@ namespace Phantom.Physics
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY)
                 {
                     Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+
+                    for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
-                        Entity o = tt.Entities[j];
+                        Entity o = tt.Entities.entitiesArray[j];
                         if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
                             return o;
                     }
@@ -268,8 +330,8 @@ namespace Phantom.Physics
         public override List<Entity> GetEntitiesAt(Vector2 position)
         {
             List<Entity> result = new List<Entity>();
-            int tX = (int)(position.X / this.tileSize);
-            int tY = (int)(position.Y / this.tileSize);
+            int tX = (int)(position.X * this.invTileSize);
+            int tY = (int)(position.Y * this.invTileSize);
             int minX = Math.Max(tX - 1, 0);
             int maxX = Math.Min(tX + 1, this.tilesX - 1);
             int minY = Math.Max(tY - 1, 0);
@@ -282,24 +344,24 @@ namespace Phantom.Physics
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY)
                 {
                     Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+
+                    for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
-                        Entity o = tt.Entities[j];
+                        Entity o = tt.Entities.entitiesArray[j];
                         if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
                             result.Add(o);
                     }
                 }
-
             }
             return result;
         }
 
         public override IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
-            int tX1 = (int)(topLeft.X / this.tileSize);
-            int tY1 = (int)(topLeft.Y / this.tileSize);
-            int tX2 = (int)(bottomRight.X / this.tileSize);
-            int tY2 = (int)(bottomRight.Y / this.tileSize);
+            int tX1 = (int)(topLeft.X * this.invTileSize);
+            int tY1 = (int)(topLeft.Y * this.invTileSize);
+            int tX2 = (int)(bottomRight.X * this.invTileSize);
+            int tY2 = (int)(bottomRight.Y * this.invTileSize);
             int minX = Math.Max(tX1 - 1, 0);
             int maxX = Math.Min(tX2 + 1, this.tilesX - 1);
             int minY = Math.Max(tY1 - 1, 0);
@@ -310,50 +372,74 @@ namespace Phantom.Physics
 				for (int x = minX; x <= maxX; x++)
 				{
 					Tile tt = this.tiles[y * this.tilesX + x];
-					for (int m = tt.Entities.Count - 1; m >= 0; m--)
-					{
-						Entity o = tt.Entities[m];
-						if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
-							yield return o;
-					}
+                    for (int i = 0; i < tt.Entities.entitiesIndex + 1; i++)
+                    {
+                        Entity o = tt.Entities.entitiesArray[i];
+                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
+                            yield return o;
+                    }
 				}
 			}
         }
 
-        public override List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        public PrimitiveList GetEntitiesInRectAsPrimitiveList(ref Vector2 topLeft, ref Vector2 bottomRight, bool partial)
         {
-            List<Entity> listOfEntitiesInRect = GetListFromPool();
-            int tX1 = (int)(topLeft.X / this.tileSize);
-            int tY1 = (int)(topLeft.Y / this.tileSize);
-            int tX2 = (int)(bottomRight.X / this.tileSize);
-            int tY2 = (int)(bottomRight.Y / this.tileSize);
+            //List<Entity> listOfEntitiesInRect = GetListFromPool();
+            int tX1 = (int)(topLeft.X * this.invTileSize);
+            int tY1 = (int)(topLeft.Y * this.invTileSize);
+            int tX2 = (int)(bottomRight.X * this.invTileSize);
+            int tY2 = (int)(bottomRight.Y * this.invTileSize);
             int minX = Math.Max(tX1 - 1, 0);
-            int maxX = Math.Min(tX2 + 1, this.tilesX - 1);
+            int maxX = Math.Min(tX2 + 1, this.tilesX - 1) + 1;
             int minY = Math.Max(tY1 - 1, 0);
-            int maxY = Math.Min(tY2 + 1, this.tilesY - 1);
+            int maxY = Math.Min(tY2 + 1, this.tilesY - 1) + 1;
 
-            for (int y = minY; y <= maxY; y++)
+            // We have no idea how many results we will have
+            // But since this function is called so much
+            // We will use a default size of 64 to avoid resizing
+            // And increase by by 16
+            PrimitiveList primitiveList = new PrimitiveList();
+            primitiveList.entitiesIndex = -1;
+            primitiveList.entitiesArray = new Entity[64];
+
+            // Initialize variables at top just to be sure
+            Tile tile;
+            Entity entity;
+
+            // Loop over results
+            for (int y = minY; y < maxY; y++)
             {
-                for (int x = minX; x <= maxX; x++)
+                for (int x = minX; x < maxX; x++)
                 {
-                    Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int m = tt.Entities.Count - 1; m >= 0; m--)
+                    // Get the tile
+                    tile = this.tiles[y * this.tilesX + x];
+
+                    // Loop over the entities
+                    for (int i = 0; i < tile.Entities.entitiesIndex + 1; i++)
                     {
-                        Entity o = tt.Entities[m];
-                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
-                            listOfEntitiesInRect.Add(o);
+                        entity = tile.Entities.entitiesArray[i];
+                        if(!(entity.Destroyed || entity.Ghost || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
+                        {
+                            // ************** START ADD IMPLEMENTATION **************
+                            primitiveList.entitiesIndex++;
+                            if (primitiveList.entitiesIndex >= primitiveList.entitiesArray.Length)
+                                Array.Resize(ref primitiveList.entitiesArray, primitiveList.entitiesArray.Length * 16);
+                            primitiveList.entitiesArray[primitiveList.entitiesIndex] = entity;
+                            // ************** END ADD IMPLEMENTATION **************
+                        }
                     }
                 }
             }
-            return listOfEntitiesInRect;
+
+            // Return the results
+            return primitiveList;
         }
 
-        
 
         public override Entity GetEntityCloseTo(Vector2 position, float distance)
         {
-            int tX = (int)(position.X / this.tileSize);
-            int tY = (int)(position.Y / this.tileSize);
+            int tX = (int)(position.X * this.invTileSize);
+            int tY = (int)(position.Y * this.invTileSize);
             int minX = Math.Max(tX - 1, 0);
             int maxX = Math.Min(tX + 1, this.tilesX - 1);
             int minY = Math.Max(tY - 1, 0);
@@ -366,14 +452,13 @@ namespace Phantom.Physics
                 if (x >= minX && x <= maxX && y >= minY && y <= maxY)
                 {
                     Tile tt = this.tiles[y * this.tilesX + x];
-                    for (int j = tt.Entities.Count - 1; j >= 0; j--)
+                    for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
-                        Entity o = tt.Entities[j];
+                        Entity o = tt.Entities.entitiesArray[j];
                         if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
                             return o;
                     }
                 }
-
             }
             return null;
         }
