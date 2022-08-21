@@ -382,6 +382,39 @@ namespace Phantom.Physics
 			}
         }
 
+        public override List<Entity> GetEntitiesInRectAsList(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        {
+            List<Entity> listOfEntitiesInRect = GetListFromPool();
+            int tX1 = (int)(topLeft.X * this.invTileSize);
+            int tY1 = (int)(topLeft.Y * this.invTileSize);
+            int tX2 = (int)(bottomRight.X * this.invTileSize);
+            int tY2 = (int)(bottomRight.Y * this.invTileSize);
+            int minX = Math.Max(tX1 - 1, 0);
+            int maxX = Math.Min(tX2 + 1, this.tilesX - 1) + 1;
+            int minY = Math.Max(tY1 - 1, 0);
+            int maxY = Math.Min(tY2 + 1, this.tilesY - 1) + 1;
+
+            // Initialize variables at top just to be sure
+            Tile tile;
+            Entity entity;
+
+            for (int y = minY; y < maxY; y++)
+            {
+                for (int x = minX; x < maxX; x++)
+                {
+                    tile = this.tiles[y * this.tilesX + x];
+                    
+                    for (int i = 0; i < tile.Entities.entitiesIndex + 1; i++)
+                    {
+                        entity = tile.Entities.entitiesArray[i];
+                        if (!(entity.Destroyed || entity.Ghost || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
+                            listOfEntitiesInRect.Add(entity);
+                    }
+                }
+            }
+            return listOfEntitiesInRect;
+        }
+
         public PrimitiveList GetEntitiesInRectAsPrimitiveList(ref Vector2 topLeft, ref Vector2 bottomRight, bool partial)
         {
             //List<Entity> listOfEntitiesInRect = GetListFromPool();
