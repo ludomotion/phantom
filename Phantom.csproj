@@ -42,7 +42,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libraries\FNA.dll</HintPath>
     </Reference>
-    <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -170,6 +169,9 @@
     <Compile Include="Shapes\ShapeVisitor.cs" />
     <Compile Include="Shapes\Visitors\CircleVisitor.cs" />
     <Compile Include="Shapes\Visitors\PolygonVisitor.cs" />
+    <Compile Include="Timer\GameTimer.cs" />
+    <Compile Include="Timer\GameTimerQuery.cs" />
+    <Compile Include="Timer\GameTimerUTC.cs" />
     <Compile Include="Utils\Asynchrony.cs" />
     <Compile Include="Utils\Editor.cs" />
     <Compile Include="Utils\EntityFactory.cs" />

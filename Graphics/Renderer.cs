@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Phantom.Cameras;
+using Phantom.Timer;
 
 namespace Phantom.Graphics
 {
@@ -56,7 +57,7 @@ namespace Phantom.Graphics
         protected SpriteBatch batch;
         protected SpriteSortMode sortMode;
         protected BlendState blendState;
-        private Stopwatch stopWatch;
+        private GameTimer gameTimer;
 
         private Matrix lastWorld;
 
@@ -85,8 +86,14 @@ namespace Phantom.Graphics
                 this.activeRenderPass = this.RenderPassFullLock;
             else
                 this.activeRenderPass = this.RenderPassEndLock;
-            this.stopWatch = new Stopwatch();
-            this.stopWatch.Start();
+
+            // Check if we have access to high resolution time
+            if (GameTimerQuery.Available)
+                gameTimer = new GameTimerQuery();
+
+            // If not we use the UTC clock
+            else
+                gameTimer = new GameTimerUTC();
         }
 
         public Renderer(int passes, ViewportPolicy viewportPolicy)
@@ -120,8 +127,7 @@ namespace Phantom.Graphics
 
             info = this.BuildRenderInfo();
 
-            info.Elapsed = (float)stopWatch.Elapsed.TotalSeconds;
-            stopWatch.Restart();
+            info.Elapsed = gameTimer.ElapsedInSeconds();
 
             info.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
