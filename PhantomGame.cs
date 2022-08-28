@@ -12,6 +12,8 @@ using Microsoft.Xna.Framework.Content;
 using System.Diagnostics;
 using Phantom.Graphics;
 using Phantom.Utils.Performance;
+using System.Runtime.InteropServices;
+using System.IO;
 #if PLATFORM_IOS
 using MonoTouch.UIKit;
 #elif PLATFORM_ANDROID
@@ -29,6 +31,20 @@ namespace Phantom
 {
     public class PhantomGame : Component, IDisposable
     {
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool SetDefaultDllDirectories(int directoryFlags);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        static extern void AddDllDirectory(string lpPathName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+
+        static extern bool SetDllDirectory(string lpPathName);
+
+        const int LOAD_LIBRARY_SEARCH_DEFAULT_DIRS = 0x00001000;
+
         public static PhantomGame Game { get; private set; }
 
 #if DEBUG
