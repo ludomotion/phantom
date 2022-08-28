@@ -221,18 +221,25 @@ namespace Phantom.Audio
         }
         private void RemoveHandle(Audio.Handle handle)
         {
+            // Check if the handle is NULL
             if (handle == null)
                 return;
-            //make sure the sound is really stopped!
-            if (handle.Instance != null)
+
+            // Make sure the sound is really stopped!
+            if (handle.Instance != null && handle.Instance.State != SoundState.Stopped)
             {
+                // Set looping to false
                 handle.Instance.IsLooped = false;
+
+                // Stop the sound instance
                 handle.Instance.Stop();
             }
 
+            // Remove handle for sound
             this.handlesMap[handle.Name].Remove(handle);
             this.handles.Remove(handle);
 
+            // Decrement sound limiter
             if (audiolist[handle.Name].Limit > 0)
                 this.soundLimits[handle.Name] -= 1;
         }
