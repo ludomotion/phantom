@@ -85,24 +85,35 @@ namespace Phantom.Audio
 #endif
         }
 
-        
-
         public static Audio.Handle FadeIn(string sound, bool looped, float duration, TweenFunction function = null, float volume = -1)
         {
 #if !NOAUDIO
+            // Don't play audio if flag is set to false
             if (!HasAudio)
                 return default(Audio.Handle);
+
+            // Trim name
             sound = sound.Trim().ToLower();
+
+            // Smoothing function to use
             if (function == null)
                 function = TweenFunctions.Linear;
             
+            // Information about song
             var info = Audio.Instance.audiolist[sound];
+
+            // Play the sound
             var handle = Play(sound, 0.00001f);
-            if (handle==null || !handle.Success)
+
+            // If it failed
+            if (handle == null || handle.Instance == null ||
+                handle.Instance.State == SoundState.Stopped || !handle.Success)
                 return handle;
 
+            // Loop sound
             handle.Instance.IsLooped = looped;
 
+            // Fade in sound
             handle.FadeState = 1;
             handle.FadeDuration = handle.FadeTimer = duration;
             handle.FadeFunction = function;
