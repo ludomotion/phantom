@@ -8,6 +8,7 @@ using Phantom.Core;
 using System.Reflection;
 using System.Globalization;
 using System.Threading;
+using Phantom.Utils.Encoder;
 
 namespace Phantom.Utils
 {
@@ -517,50 +518,59 @@ namespace Phantom.Utils
             return r;
         }
 
+        // Encoder for text
+        private static IEncoderText<string, string> textEncoder = new EncoderString();
+
         public static object StringToValue(string v)
         {
-            //null
+            // Null
             if (v == "" || v == "null")
                 return null;
 
-
-            //boolean: false
+            // Boolean: false
             if (v == "false")
                 return false;
+
             //boolean: true
             if (v == "true")
                 return true;
-            //string: 'XXX'
+
+            // String single quotes: 'XXX'
+            // This is kept for legacy purposes only,
+            // characters now get properly escaped
             if (v[0] == '\'' && v[v.Length - 1] == '\'')
                 return v.Substring(1, v.Length - 2);
+
+            // String double quotes: "XXX" (encoded characters)
             if (v[0] == '"' && v[v.Length - 1] == '"')
-                return v.Substring(1, v.Length - 2);
-            //list: [X, X, ...]
+                return textEncoder.Decode(v.Substring(1, v.Length - 2));
+
+            // List: [X, X, ...]
             if (v[0] == '[' && v[v.Length - 1] == ']')
                 return StringToList(v);
 
-            //color: #000000
+            // Color: #000000
             if (v.StartsWith("#"))
             {
-                int c = 0;
-                int.TryParse(v.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out c);
+                int.TryParse(v.Substring(1), System.Globalization.NumberStyles.HexNumber, null, out int c);
                 return c.ToColor();
             }
-            //float: 0.0f
+
+            // Float: 0.0f
             if (v[v.Length - 1] == 'f')
             {
-                float f = 0;
-                float.TryParse(v.Substring(0, v.Length - 1), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out f);
+                float.TryParse(v.Substring(0, v.Length - 1), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture.NumberFormat, out float f);
                 return f;
             }
-            //hex: 0x0
+
+            // Hex: 0x0
             if (v.StartsWith("0x"))
             {
-                int c = 0;
-                int.TryParse(v.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out c);
+                int.TryParse(v.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out int c);
                 return c;
             }
-            //vector: (0,0) | (0,0,0) | (0,0,0,0)
+
+            // Vector: (0,0) | (0,0,0) | (0,0,0,0)
             if (v[0] == '(' && v[v.Length - 1] == ')')
             {
                 v = v.Substring(1, v.Length - 2);
@@ -582,18 +592,19 @@ namespace Phantom.Utils
                     return new Vector4(f[0], f[1], f[2], f[3]);
             }
 
-            //keywords
+            // Keywords
             for (int i=0; i<PCNKeyword.Keywords.Length; i++)
                 if (PCNKeyword.Keywords[i] == v)
                     return new PCNKeyword(v);
 
+            // Integer
+            if (int.TryParse(v, out int integer))
+                return integer;
 
-            int j = 0;
-            if (int.TryParse(v, out j))
-                return j;
-            float fl = 0;
-            if (float.TryParse(v, out fl))
-                return fl;
+            // Float
+            if (float.TryParse(v, out float flt))
+                return flt;
+
             return null;
         }
 
@@ -604,58 +615,73 @@ namespace Phantom.Utils
 
         public static string ValueToString(object value, string format)
         {
-            Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            if (value is CalculatedValue)
-                return ((CalculatedValue)value).ToString();
-            if (value is string)
-            {
-                //TODO escape quotes and other characters better
-                if ((value as string).IndexOf('"') >= 0)
-                    return "\'" + value + "\'";
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+
+            if (value is CalculatedValue calculated)
+                return calculated.ToString();
+
+            if (value is string str)
+                return "\"" + textEncoder.Encode(str) + "\"";
+
+            /*
+            {    
+                if (str.IndexOf('"') >= 0)
+                    return "\'" + str + "\'";
                 else
-                    return "\"" + value + "\"";
-            }
-            if (value is bool)
-                return ((bool)value) ? "true" : "false";
-            if (value is PCNKeyword)
-                return ((PCNKeyword)value).Value;
-            if (value is int)
-                return ((int)value).ToString();
-            if (value is Color)
-                return "#" + ((Color)value).R.ToString("X2") + ((Color)value).G.ToString("X2") + ((Color)value).B.ToString("X2");
-            if (value is List<object>)
+                    return "\"" + str + "\"";
+            }*/
+
+            if (value is bool boolean)
+                return boolean ? "true" : "false";
+
+            if (value is PCNKeyword keyword)
+                return keyword.Value;
+
+            if (value is int integer)
+                return integer.ToString();
+
+            if (value is Color color)
+                return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
+
+            if (value is List<object> list)
             {
-                List<Object> v = value as List<object>;
                 string r = "";
-                if (v.Count > 0)
+                if (list.Count > 0)
                 {
-                    r += ValueToString(v[0]);
+                    r += ValueToString(list[0]);
                 }
-                for (int i = 1; i < v.Count; i++)
-                    r += ", " + ValueToString(v[i]);
+                for (int i = 1; i < list.Count; i++)
+                    r += ", " + ValueToString(list[i]);
                 return "[" + r + "]";
             }
+
             if (format == null)
             {
-                if (value is float)
-                    return ((float)value).ToString() + "f";
-                if (value is Vector2)
-                    return "(" + ((Vector2)value).X.ToString() + "," + ((Vector2)value).Y.ToString() + ")";
-                if (value is Vector3)
-                    return "(" + ((Vector3)value).X.ToString() + "," + ((Vector3)value).Y.ToString() + "," + ((Vector3)value).Z.ToString() + ")";
-                if (value is Vector4)
-                    return "(" + ((Vector4)value).X.ToString() + "," + ((Vector4)value).Y.ToString() + "," + ((Vector4)value).Z.ToString() + "," + ((Vector4)value).W.ToString() + ")";
+                if (value is float f)
+                    return f.ToString() + "f";
+
+                if (value is Vector2 vec2)
+                    return "(" + vec2.X.ToString() + "," + vec2.Y.ToString() + ")";
+
+                if (value is Vector3 vec3)
+                    return "(" + vec3.X.ToString() + "," + vec3.Y.ToString() + "," + vec3.Z.ToString() + ")";
+
+                if (value is Vector4 vec4)
+                    return "(" + vec4.X.ToString() + "," + vec4.Y.ToString() + "," + vec4.Z.ToString() + "," + vec4.W.ToString() + ")";
             }
             else
             {
-                if (value is float)
-                    return ((float)value).ToString(format) + "f";
-                if (value is Vector2)
-                    return "(" + ((Vector2)value).X.ToString(format) + "," + ((Vector2)value).Y.ToString(format) + ")";
-                if (value is Vector3)
-                    return "(" + ((Vector3)value).X.ToString(format) + "," + ((Vector3)value).Y.ToString(format) + "," + ((Vector3)value).Z.ToString(format) + ")";
-                if (value is Vector4)
-                    return "(" + ((Vector4)value).X.ToString(format) + "," + ((Vector4)value).Y.ToString(format) + "," + ((Vector4)value).Z.ToString(format) + "," + ((Vector4)value).W.ToString(format) + ")";
+                if (value is float f)
+                    return f.ToString(format) + "f";
+
+                if (value is Vector2 vec2)
+                    return "(" + vec2.X.ToString(format) + "," + vec2.Y.ToString(format) + ")";
+
+                if (value is Vector3 vec3)
+                    return "(" + vec3.X.ToString(format) + "," + vec3.Y.ToString(format) + "," + vec3.Z.ToString(format) + ")";
+
+                if (value is Vector4 vec4)
+                    return "(" + vec4.X.ToString(format) + "," + vec4.Y.ToString(format) + "," + vec4.Z.ToString(format) + "," + vec4.W.ToString(format) + ")";
             }
             return "null";
         }
