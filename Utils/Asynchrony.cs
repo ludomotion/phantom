@@ -16,7 +16,7 @@ namespace Phantom.Utils
 	/// to create tasks that have a callback Action that is executed
 	/// in the GameLoop (main thread) whenever the Task is completed.
 	/// </summary>
-	/// <exmaple>
+	/// <example>
 	/// Just add an instance of this class to your PhantomGame:
 	/// <code>
 	/// PhantomGame.Game.AddComponent(Asynchrony.Instance);
@@ -71,7 +71,7 @@ namespace Phantom.Utils
 	///     return new Entity(Vector2.Zero);
 	/// }</Component>, (c) => this.AddComponent(c) ).Start();
 	/// </code>
-	/// </exmaple>
+	/// </example>
 	public class Asynchrony : Component
 	{
 		/// <summary>Quick access to the Asynchrony instance.</summary>
