@@ -210,7 +210,12 @@
     <Compile Include="Timer\GameTimerQuery.cs" />
     <Compile Include="Timer\GameTimerUTC.cs" />
     <Compile Include="Utils\Asynchrony.cs" />
+    <Compile Include="Utils\CharArrayUtils.cs" />
     <Compile Include="Utils\Editor.cs" />
+    <Compile Include="Utils\Encoder\EncoderCharArray.cs" />
+    <Compile Include="Utils\Encoder\EncoderString.cs" />
+    <Compile Include="Utils\Encoder\EncoderTextConst.cs" />
+    <Compile Include="Utils\Encoder\IEncoderText.cs" />
     <Compile Include="Utils\EntityFactory.cs" />
     <Compile Include="Utils\EntityMap.cs" />
     <Compile Include="Utils\MapLoader.cs" />
@@ -219,6 +224,7 @@
     <Compile Include="Utils\Performance\ProfilerNode.cs" />
     <Compile Include="Utils\Performance\ProfilerStats.cs" />
     <Compile Include="Utils\PhantomComponentNotation.cs" />
+    <Compile Include="Utils\StringBuilderExtensions.cs" />
     <Compile Include="Utils\TweenFunctions.cs" />
   </ItemGroup>
   <ItemGroup>
