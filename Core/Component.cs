@@ -201,8 +201,7 @@ namespace Phantom.Core
             if (message.Consumed)
                 return;
 
-            int count = this.components.Count;
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < this.components.Count; i++)
             {
                 this.components[i].HandleMessage(message);
                 if (message.Consumed)
