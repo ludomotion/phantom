@@ -39,5 +39,17 @@ namespace Phantom.Utils
 
             return builder;
         }
+
+        public static bool Compare(this StringBuilder builder, StringBuilder comp)
+        {
+            if (builder.Length != comp.Length)
+                return false;
+
+            for (int i = 0; i < builder.Length; i++)
+                if (builder[i] != comp[i])
+                    return false;
+
+            return true;
+        }
     }
 }
