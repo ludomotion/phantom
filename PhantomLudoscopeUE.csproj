@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9185C626-8690-4006-A688-DFB4CF640D62}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Phantom</RootNamespace>
+    <AssemblyName>PhantomLudoscopeUE</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>1591,0436</NoWarn>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <OutputPath>bin\Windows\AnyCPU\Debug</OutputPath>
+    <IntermediateOutputPath>obj\Windows\AnyCPU\Debug</IntermediateOutputPath>
+    <DocumentationFile>bin\Windows\AnyCPU\Debug\PhantomLudoscopeUE.xml</DocumentationFile>
+    <DefineConstants>DEBUG;PLATFORM_WINDOWS;MINIMALRENDERING;FNA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <OutputPath>bin\Windows\AnyCPU\Release</OutputPath>
+    <IntermediateOutputPath>obj\Windows\AnyCPU\Release</IntermediateOutputPath>
+    <DocumentationFile>bin\Windows\AnyCPU\Release\PhantomLudoscopeUE.xml</DocumentationFile>
+    <DefineConstants>PLATFORM_WINDOWS;FNA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>PLATFORM_WINDOWS;MINIMALRENDERING;FNA</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <DefineConstants>PLATFORM_WINDOWS;FNA</DefineConstants>
+    <DocumentationFile>bin\x64\Release\PhantomLudoscopeUE.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;PLATFORM_WINDOWS;MINIMALRENDERING;FNA</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Windows\AnyCPU\Debug\PhantomLudoscopeUE.xml</DocumentationFile>
+    <NoWarn>1591,0436</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>PLATFORM_WINDOWS;FNA</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Windows\AnyCPU\Release\PhantomLudoscopeUE.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>1591,0436</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.GamerServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="Microsoft.Xna.Framework.Net, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\PhantomAssets.cs" />
+    <Compile Include="Audio\Audio.cs" />
+    <Compile Include="Audio\AudioInfo.cs" />
+    <Compile Include="Audio\Music.cs" />
+    <Compile Include="Audio\Sound.cs" />
+    <Compile Include="Cameras\Camera.cs" />
+    <Compile Include="Cameras\CameraComponent.cs" />
+    <Compile Include="Cameras\Components\CameraEase.cs" />
+    <Compile Include="Cameras\Components\CameraOffset.cs" />
+    <Compile Include="Cameras\Components\CameraShaker.cs" />
+    <Compile Include="Cameras\Components\CameraZoomShaker.cs" />
+    <Compile Include="Cameras\Components\DeadZone.cs" />
+    <Compile Include="Cameras\Components\DynamicZoom.cs" />
+    <Compile Include="Cameras\Components\FixedTarget.cs" />
+    <Compile Include="Cameras\Components\FollowEntity.cs" />
+    <Compile Include="Cameras\Components\LinearLerp.cs" />
+    <Compile Include="Cameras\Components\LinearZoom.cs" />
+    <Compile Include="Cameras\Components\RestrictCamera.cs" />
+    <Compile Include="Cameras\Components\SinoidLerp.cs" />
+    <Compile Include="Cameras\Components\SinoidZoom.cs" />
+    <Compile Include="Core\Component.cs" />
+    <Compile Include="Core\Content.cs" />
+    <Compile Include="Core\Entity.cs" />
+    <Compile Include="Core\EntityComponent.cs" />
+    <Compile Include="Core\EntityLayer.cs" />
+    <Compile Include="Core\GameState.cs" />
+    <Compile Include="Core\Input.cs" />
+    <Compile Include="Core\InputComponent.cs" />
+    <Compile Include="Core\Layer.cs" />
+    <Compile Include="Core\Message.cs" />
+    <Compile Include="Core\Mover.cs" />
+    <Compile Include="Core\PropertyCollection.cs" />
+    <Compile Include="Core\RenderLayer.cs" />
+    <Compile Include="GameUI\Elements\Button.cs" />
+    <Compile Include="GameUI\Elements\EditBox.cs" />
+    <Compile Include="GameUI\Elements\Label.cs" />
+    <Compile Include="GameUI\Elements\OptionButton.cs" />
+    <Compile Include="GameUI\Elements\TextArea.cs" />
+    <Compile Include="GameUI\Windows\InputDialog.cs" />
+    <Compile Include="GameUI\Windows\Window.cs" />
+    <Compile Include="GameUI\Elements\Slider.cs" />
+    <Compile Include="GameUI\Elements\ToggleButton.cs" />
+    <Compile Include="GameUI\Elements\ToolButton.cs" />
+    <Compile Include="GameUI\Elements\ToolTip.cs" />
+    <Compile Include="GameUI\Handlers\BaseInputHandler.cs" />
+    <Compile Include="GameUI\Elements\Carousel.cs" />
+    <Compile Include="GameUI\Elements\CarouselContainer.cs" />
+    <Compile Include="GameUI\Elements\Container.cs" />
+    <Compile Include="GameUI\Elements\ContainerItem.cs" />
+    <Compile Include="GameUI\Utils\UIDesigner.cs" />
+    <Compile Include="GameUI\Elements\UIElement.cs" />
+    <Compile Include="GameUI\Handlers\GamePadHandler.cs" />
+    <Compile Include="GameUI\Elements\InventoryContainer.cs" />
+    <Compile Include="GameUI\Elements\InventoryContainerItem.cs" />
+    <Compile Include="GameUI\Handlers\KeyboardHandler.cs" />
+    <Compile Include="GameUI\Handlers\KeyboardShortCuts.cs" />
+    <Compile Include="GameUI\UILayer.cs" />
+    <Compile Include="GameUI\Handlers\MouseEntityHandler.cs" />
+    <Compile Include="GameUI\Handlers\MouseHandler.cs" />
+    <Compile Include="GameUI\Elements\MultiContainer.cs" />
+    <Compile Include="GameUI\Handlers\TouchHandler.cs" />
+    <Compile Include="GameUI\Utils\UITweener.cs" />
+    <Compile Include="Graphics\Canvas.cs" />
+    <Compile Include="Graphics\Components\Background.cs" />
+    <Compile Include="Graphics\EntityRenderer.cs" />
+    <Compile Include="Graphics\Phont.cs" />
+    <Compile Include="Graphics\Particles\Particle.cs" />
+    <Compile Include="Graphics\Particles\ParticleLayer.cs" />
+    <Compile Include="Graphics\Particles\ParticlePass.cs" />
+    <Compile Include="Graphics\Renderer.cs" />
+    <Compile Include="Graphics\RenderInfo.cs" />
+    <Compile Include="Graphics\ShapeRenderer.cs" />
+    <Compile Include="Graphics\Sprite.cs" />
+    <Compile Include="Graphics\SpriteRenderer.cs" />
+    <Compile Include="Messages.cs" />
+    <Compile Include="Misc\Components\DelayedMessage.cs" />
+    <Compile Include="Misc\Components\MessageDelay.cs" />
+    <Compile Include="Misc\Components\MessageDelegate.cs" />
+    <Compile Include="Misc\DebugLayer.cs" />
+    <Compile Include="Misc\DeviceHardware.cs" />
+    <Compile Include="Misc\Konsoul.cs" />
+    <Compile Include="Misc\PhantomUtils.AI.cs" />
+    <Compile Include="Misc\PhantomUtils.Graphics.cs" />
+    <Compile Include="Misc\PhantomUtils.Math.cs" />
+    <Compile Include="Misc\PhantomUtils.Misc.cs" />
+    <Compile Include="Misc\Tests\RendererCanvasTest.cs" />
+    <Compile Include="Misc\TouchController.cs" />
+    <Compile Include="Misc\Triangulator.cs" />
+    <Compile Include="Misc\XnaPhantomComponent.cs" />
+    <Compile Include="PhantomGame.cs" />
+    <Compile Include="Physics\CollisionChecks.cs" />
+    <Compile Include="Physics\CollisionData.cs" />
+    <Compile Include="Physics\Components\Atractor.cs" />
+    <Compile Include="Physics\Components\BounceAgainstWorldBoundaries.cs" />
+    <Compile Include="Physics\Components\Gravity.cs" />
+    <Compile Include="Physics\Components\PushAwayFromBoundaries.cs" />
+    <Compile Include="Physics\Components\Rotator.cs" />
+    <Compile Include="Physics\Integrator.cs" />
+    <Compile Include="Physics\TiledIntegrator.cs" />
+    <Compile Include="Physics\TilePosition.cs" />
+    <Compile Include="Shapes\Circle.cs" />
+    <Compile Include="Shapes\CompoundShape.cs" />
+    <Compile Include="Shapes\Filters\AllFlagsFilter.cs" />
+    <Compile Include="Shapes\Filters\AndFilter.cs" />
+    <Compile Include="Shapes\Filters\AngleFilter.cs" />
+    <Compile Include="Shapes\Filters\AnyFlagsFilter.cs" />
+    <Compile Include="Shapes\Filters\DelegateFilter.cs" />
+    <Compile Include="Shapes\Filters\DistanceFilter.cs" />
+    <Compile Include="Shapes\Filters\IFilter.cs" />
+    <Compile Include="Shapes\Filters\NotFilter.cs" />
+    <Compile Include="Shapes\Filters\OrFilter.cs" />
+    <Compile Include="Shapes\OABB.cs" />
+    <Compile Include="Shapes\Polygon.cs" />
+    <Compile Include="Shapes\Shape.cs" />
+    <Compile Include="Shapes\ShapeVisitor.cs" />
+    <Compile Include="Shapes\Visitors\CircleVisitor.cs" />
+    <Compile Include="Shapes\Visitors\PolygonVisitor.cs" />
+    <Compile Include="Timer\GameTimer.cs" />
+    <Compile Include="Timer\GameTimerQuery.cs" />
+    <Compile Include="Timer\GameTimerUTC.cs" />
+    <Compile Include="Utils\Asynchrony.cs" />
+    <Compile Include="Utils\CharArrayUtils.cs" />
+    <Compile Include="Utils\Editor.cs" />
+    <Compile Include="Utils\Encoder\EncoderCharArray.cs" />
+    <Compile Include="Utils\Encoder\EncoderString.cs" />
+    <Compile Include="Utils\Encoder\EncoderTextConst.cs" />
+    <Compile Include="Utils\Encoder\IEncoderText.cs" />
+    <Compile Include="Utils\EntityFactory.cs" />
+    <Compile Include="Utils\EntityMap.cs" />
+    <Compile Include="Utils\MapLoader.cs" />
+    <Compile Include="Utils\Performance\DebugCounter.cs" />
+    <Compile Include="Utils\Performance\Profiler.cs" />
+    <Compile Include="Utils\Performance\ProfilerNode.cs" />
+    <Compile Include="Utils\Performance\ProfilerStats.cs" />
+    <Compile Include="Utils\PhantomComponentNotation.cs" />
+    <Compile Include="Utils\StringBuilderExtensions.cs" />
+    <Compile Include="Utils\TweenFunctions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\sans16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\courier20bold.png" />
+    <EmbeddedResource Include="Assets\white.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
+</Project>
