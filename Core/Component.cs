@@ -22,7 +22,7 @@ namespace Phantom.Core
         /// be used to represent type information. For example an Entity with flag 1 is the player,
         /// while 2 idicates enemies, and so on.
         /// </summary>
-        public uint Flags;
+        public ulong Flags;
 
         /// <summary>
         /// Set the Destroyed flag to true to signal the parent of this component to remove this
@@ -71,7 +71,7 @@ namespace Phantom.Core
         /// </summary>
         public Component()
         {
-            this.Flags = 0;
+            this.Flags = 0UL;
             this.Destroyed = false;
             this.components = new List<Component>();
         }
