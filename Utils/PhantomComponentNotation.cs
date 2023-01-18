@@ -519,7 +519,7 @@ namespace Phantom.Utils
         }
 
         // Encoder for text
-        private static IEncoderText<string, string> textEncoder = new EncoderString();
+        // private static IEncoderText<string, string> textEncoder = new EncoderString();
 
         public static object StringToValue(string v)
         {
@@ -543,7 +543,7 @@ namespace Phantom.Utils
 
             // String double quotes: "XXX" (encoded characters)
             if (v[0] == '"' && v[v.Length - 1] == '"')
-                return textEncoder.Decode(v.Substring(1, v.Length - 2));
+                return v.Substring(1, v.Length - 2);
 
             // List: [X, X, ...]
             if (v[0] == '[' && v[v.Length - 1] == ']')
@@ -620,16 +620,16 @@ namespace Phantom.Utils
             if (value is CalculatedValue calculated)
                 return calculated.ToString();
 
-            if (value is string str)
-                return "\"" + textEncoder.Encode(str) + "\"";
+            //if (value is string str)
+            //    return "\"" + textEncoder.Encode(str) + "\"";
 
-            /*
-            {    
+            if (value is string str)
+            {
                 if (str.IndexOf('"') >= 0)
                     return "\'" + str + "\'";
                 else
                     return "\"" + str + "\"";
-            }*/
+            }
 
             if (value is bool boolean)
                 return boolean ? "true" : "false";
