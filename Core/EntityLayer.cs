@@ -145,12 +145,9 @@ namespace Phantom.Core
             for (int i = this.AlwaysUpdate.Count - 1; i >= 0; i--)
             {
                 Component e = this.AlwaysUpdate[i];
-                if (!e.Ghost)
-                {
-                    e.Update(elapsed);
-                    if (e.Destroyed)
-                        this.RemoveComponent(e);
-                }
+                e.Update(elapsed);
+                if (e.Destroyed)
+                    this.RemoveComponent(e);
             }
 
             EntityRenderer r = this.renderer as EntityRenderer;
@@ -159,7 +156,7 @@ namespace Phantom.Core
                 List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
                 foreach( Entity e in list )
                 {
-                    if (!e.Ghost && e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
+                    if (e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
                     {
                         e.Update(elapsed);
                         if (e.Destroyed)
@@ -439,10 +436,7 @@ namespace Phantom.Core
         public void RemoveGhosts()
         {
             for (int i = Components.Count - 1; i >= 0; i--)
-            {
-                if (Components[i].Ghost)
-                    this.RemoveComponent(Components[i]);
-            }
+                this.RemoveComponent(Components[i]);
         }
 
         public override void HandleMessage(Message message)

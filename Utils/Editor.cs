@@ -172,7 +172,7 @@ namespace Phantom.Utils
             main.AddComponent(new Button(110, y += 32, 480, 24, "Close Editor", CloseEditor));
 
             layerWindow = new Window(100, 100, 500, 500, "Layers");
-            layerWindow.Ghost = true;
+            //layerWindow.Ghost = true;
             for (int i = 0; i < layers.Count; i++)
                 layerWindow.AddComponent(new Button(110, 130+i*32, 480, 24, layers[i].Name, SelectLayer));
         }
@@ -187,7 +187,7 @@ namespace Phantom.Utils
             int width = buttonWidth * 3 + spacing * 4;
             int height = 500;
             entitiesWindow = new Window(100, 100, width, height, name);
-            entitiesWindow.Ghost = true;
+            //entitiesWindow.Ghost = true;
             int x = spacing;
             int y = 20 + spacing;
             bool next = false;
@@ -491,13 +491,14 @@ namespace Phantom.Utils
                     selectedEntity = null;
                 }
             }
+            /*
             if (currentKeyboard.IsKeyDown(Keys.L) && previousKeyboard.IsKeyUp(Keys.L))
             {
                 if (layerWindow.Ghost)
                     layerWindow.Show();
                 else
                     layerWindow.Hide();
-            }
+            }*/
             if ((currentKeyboard.IsKeyDown(Keys.E) && previousKeyboard.IsKeyUp(Keys.E)))
             {
                 if (entitiesWindow == null)

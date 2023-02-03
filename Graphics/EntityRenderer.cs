@@ -68,11 +68,9 @@ namespace Phantom.Graphics
 				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
 				CreateBounds(info, out TopLeft, out BottomRight);
 				foreach (Entity e in this.entityLayer.GetEntitiesInRect(TopLeft, BottomRight, true))
-					if (!e.Ghost)
-						e.Render(info);
+					e.Render(info);
 				foreach (Component c in this.nonEntities)
-					if (!c.Ghost)
-						c.Render(info);
+					c.Render(info);
 				this.batch.End();
 			}
 		}
@@ -81,11 +79,9 @@ namespace Phantom.Graphics
 			this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
             CreateBounds(info, out TopLeft, out BottomRight);
             foreach (Entity e in this.entityLayer.GetEntitiesInRect(TopLeft, BottomRight, true))
-				if (!e.Ghost)
-					e.Render(info);
+				e.Render(info);
 			foreach (Component c in this.nonEntities)
-				if (!c.Ghost)
-					c.Render(info);
+				c.Render(info);
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 				this.batch.End();

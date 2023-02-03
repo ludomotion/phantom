@@ -87,7 +87,7 @@ namespace Phantom.Physics
                         if (i >= this.layer.AlwaysUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
                             i = this.layer.AlwaysUpdate.Count - 1;
                         Entity e = this.layer.AlwaysUpdate[i] as Entity;
-                        if (e != null && !e.Destroyed && !e.Ghost)
+                        if (e != null && !e.Destroyed)
                         {
                             e.Integrate(devidedElapsed);
                             CheckEntityCollision(e);
@@ -101,7 +101,7 @@ namespace Phantom.Physics
                             if (i >= this.layer.VisibleUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
                                 i = this.layer.VisibleUpdate.Count - 1;
                             Entity e = this.layer.VisibleUpdate[i];
-                            if (!e.Destroyed && !e.Ghost && e.Shape.InRect(this.renderer.TopLeft, this.renderer.BottomRight, true))
+                            if (!e.Destroyed && e.Shape.InRect(this.renderer.TopLeft, this.renderer.BottomRight, true))
                             {
                                 e.Integrate(devidedElapsed);
                                 CheckEntityCollision(e);
@@ -147,9 +147,7 @@ namespace Phantom.Physics
         /// <param name="b"></param>
         protected virtual void CheckCollisionBetween(Entity a, Entity b)
         {
-			if (a.Ghost || b.Ghost)
-				return;
-            if (!a.InitiateCollision && !b.InitiateCollision)
+			if (!a.InitiateCollision && !b.InitiateCollision)
                 return;
             if (!a.CanCollideWith(b) || !b.CanCollideWith(a))
                 return;
@@ -237,7 +235,7 @@ namespace Phantom.Physics
         public virtual Entity GetEntityAt(Vector2 position)
         {
             for (int i = 0; i < entities.Count; i++)
-                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InShape(position))
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InShape(position))
                     return entities[i];
             return null;
         }
@@ -260,7 +258,7 @@ namespace Phantom.Physics
         {
             List<Entity> result = new List<Entity>();
             for (int i = 0; i < entities.Count; i++)
-                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InShape(position))
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InShape(position))
                     result.Add(entities[i]);
             return result;
         }
@@ -274,7 +272,7 @@ namespace Phantom.Physics
         public virtual Entity GetEntityCloseTo(Vector2 position, float distance)
         {
             for (int i = 0; i < entities.Count; i++)
-                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.DistanceTo(position).LengthSquared() < distance * distance)
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.DistanceTo(position).LengthSquared() < distance * distance)
                     return entities[i];
             return null;
         }
@@ -289,7 +287,7 @@ namespace Phantom.Physics
 		public virtual IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
 			for (int i = 0; i < entities.Count; i++)
-				if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
+				if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
 					yield return entities[i];
         }
 
@@ -326,7 +324,7 @@ namespace Phantom.Physics
         {
             List<Entity> listOfEntitiesInRect = GetListFromPool();
             for (int i = 0; i < entities.Count; i++)
-                if (!entities[i].Destroyed && !entities[i].Ghost && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
                     listOfEntitiesInRect.Add(entities[i]);
             return listOfEntitiesInRect;
         }

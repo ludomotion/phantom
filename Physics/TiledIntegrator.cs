@@ -318,7 +318,7 @@ namespace Phantom.Physics
                     for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
                         Entity o = tt.Entities.entitiesArray[j];
-                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
+                        if (!o.Destroyed && o.Shape != null && o.Shape.InShape(position))
                             return o;
                     }
                 }
@@ -348,7 +348,7 @@ namespace Phantom.Physics
                     for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
                         Entity o = tt.Entities.entitiesArray[j];
-                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InShape(position))
+                        if (!o.Destroyed && o.Shape != null && o.Shape.InShape(position))
                             result.Add(o);
                     }
                 }
@@ -375,7 +375,7 @@ namespace Phantom.Physics
                     for (int i = 0; i < tt.Entities.entitiesIndex + 1; i++)
                     {
                         Entity o = tt.Entities.entitiesArray[i];
-                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
+                        if (!o.Destroyed && o.Shape != null && o.Shape.InRect(topLeft, bottomRight, partial))
                             yield return o;
                     }
 				}
@@ -407,7 +407,7 @@ namespace Phantom.Physics
                     for (int i = 0; i < tile.Entities.entitiesIndex + 1; i++)
                     {
                         entity = tile.Entities.entitiesArray[i];
-                        if (!(entity.Destroyed || entity.Ghost || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
+                        if (!(entity.Destroyed || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
                             listOfEntitiesInRect.Add(entity);
                     }
                 }
@@ -451,7 +451,7 @@ namespace Phantom.Physics
                     for (int i = 0; i < tile.Entities.entitiesIndex + 1; i++)
                     {
                         entity = tile.Entities.entitiesArray[i];
-                        if(!(entity.Destroyed || entity.Ghost || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
+                        if(!(entity.Destroyed || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
                         {
                             // ************** START ADD IMPLEMENTATION **************
                             primitiveList.entitiesIndex++;
@@ -488,7 +488,7 @@ namespace Phantom.Physics
                     for (int j = 0; j < tt.Entities.entitiesIndex + 1; j++)
                     {
                         Entity o = tt.Entities.entitiesArray[j];
-                        if (!o.Destroyed && !o.Ghost && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
+                        if (!o.Destroyed && o.Shape != null && o.Shape.DistanceTo(position).LengthSquared() < distance * distance)
                             return o;
                     }
                 }

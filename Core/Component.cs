@@ -35,7 +35,7 @@ namespace Phantom.Core
         /// Ghost components will not be updated and are not intergrated if they are part of 
         /// and physics integrator.
         /// </summary>
-        public bool Ghost;
+        // public bool Ghost;
 
         /// <summary>
         /// The PropertyCollection of a component contains an arbitrary set of values stored in
@@ -261,7 +261,7 @@ namespace Phantom.Core
             for (int i = count; i >= 0; i--)
             {
                 Component component = this.components[i];
-                if (!(component == null || component.Ghost))
+                if (component != null)
                 {
                     component.Update(elapsed);
                     if (component.Destroyed)
@@ -324,8 +324,7 @@ namespace Phantom.Core
         {
             int count = this.components.Count;
             for (int i = 0; i < count; i++)
-                if (!this.components[i].Ghost)
-                    this.components[i].Render(info);
+                this.components[i].Render(info);
         }
 
         //*/

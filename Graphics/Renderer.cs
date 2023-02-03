@@ -161,12 +161,9 @@ namespace Phantom.Graphics
                 int count = components.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    if (!components[i].Ghost)
-                    {
-                        if (this == components[i])
-                            this.Parent.Render(info); // TODO: Document and test this!
-                        components[i].Render(info);
-                    }
+                    if (this == components[i])
+                        this.Parent.Render(info); // TODO: Document and test this!
+                    components[i].Render(info);
                 }
                 this.batch.End();
             }
@@ -181,12 +178,9 @@ namespace Phantom.Graphics
             int count = components.Count;
             for (int i = 0; i < count; i++)
             {
-                if (!components[i].Ghost)
-                {
-                    if (this == components[i])
-                        this.Parent.Render(info); // TODO: Document and test this!
-                    components[i].Render(info);
-                }
+                if (this == components[i])
+                    this.Parent.Render(info); // TODO: Document and test this!
+                components[i].Render(info);
             }
             lock (PhantomGame.Game.GlobalRenderLock)
             {
