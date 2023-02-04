@@ -172,27 +172,6 @@ namespace Phantom.Shapes
                 }
             }
 
-            //// Remove duplicates:
-            //int removed = 0;
-            //for (int i = this.normals.Length - 1; i >= 0; i--)
-            //{
-            //    for (int j = 0; j < i; j++)
-            //    {
-            //        if (Math.Abs(Vector2.Dot(this.normals[i], this.normals[j])) == 1)
-            //        {
-            //            this.normals[i] = Vector2.Zero;
-            //            removed += 1;
-            //            break;
-            //        }
-            //    }
-            //}
-            //Vector2[] n = new Vector2[this.normals.Length - removed];
-            //int c = 0;
-            //for (int i = 0; i < this.normals.Length; i++)
-            //    if (this.normals[i].LengthSquared() != 0)
-            //        n[c++] = this.normals[i];
-            //this.normals = n;
-
             // Calculate projections for normal and mirrored
             for (int i = 0; i < normals.Length; i++)
             {
@@ -204,6 +183,10 @@ namespace Phantom.Shapes
                     this.projections[i][j] = this.Project(this.normals[i][j], Vector2.Zero);
 
             }
+
+            // Assign initial rotation and normals
+            RotationCache = this.vertices[v_idx];
+            RotationNormals = this.normals[v_idx];
         }
 
 
@@ -214,9 +197,6 @@ namespace Phantom.Shapes
         /// <returns></returns>
         public Vector2[] RotatedVertices(float angle)
         {
-            if (angle == 0)
-                return this.vertices[v_idx];
-
             if (cachedAngle != angle)
                 this.createRotationCache(angle);
 
@@ -230,9 +210,6 @@ namespace Phantom.Shapes
         /// <returns></returns>
         internal Vector2[] RotatedNormals(float angle)
         {
-            if (angle == 0)
-                return this.normals[v_idx];
-
             if (cachedAngle != angle)
                 this.createRotationCache(angle);
 
@@ -579,13 +556,8 @@ namespace Phantom.Shapes
 
         public override bool InShape(Vector2 position)
         {
-            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
             Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
-
-            Vector2 origin = Vector2.Zero;
-			if( this.Entity != null )
-				origin = this.Entity.Position;
-			Vector2 delta = position - origin;
+            Vector2 delta = position - this.Entity.Position;
 
             for (int i = 0; i < this.normals[v_idx].Length; i++)
             {
@@ -599,11 +571,7 @@ namespace Phantom.Shapes
         public override bool InRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
-            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
-
-            Vector2 origin = Vector2.Zero;
-            if (this.Entity != null)
-                origin = this.Entity.Position;
+            Vector2 origin = this.Entity.Position;
 
 			if (partial)
 			{
