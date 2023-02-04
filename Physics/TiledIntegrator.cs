@@ -430,7 +430,7 @@ namespace Phantom.Physics
             // We have no idea how many results we will have
             // But since this function is called so much
             // We will use a default size of 64 to avoid resizing
-            // And increase by by 16
+            // And multiply by 16 if there are more results
             PrimitiveList primitiveList = new PrimitiveList();
             primitiveList.entitiesIndex = -1;
             primitiveList.entitiesArray = new Entity[64];
