@@ -77,7 +77,7 @@ namespace Phantom.Shapes
 
         private Vector2[] RotationCache;
         private Vector2[] RotationNormals;
-        private float cachedAngle;
+        private float cachedAngle = float.NaN;
 
         private Vector2[][] normals;
         private Projection[][] projections;
@@ -184,9 +184,8 @@ namespace Phantom.Shapes
 
             }
 
-            // Assign initial rotation and normals
-            RotationCache = this.vertices[v_idx];
-            RotationNormals = this.normals[v_idx];
+            // Create initial rotation cache
+            createRotationCache(0f);
         }
 
 
@@ -300,7 +299,6 @@ namespace Phantom.Shapes
             Vector2 relEnd = end - this.Entity.Position;
 
             Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
-            Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
 
             for (int i = 0; i < verts.Length; i++)
             {
@@ -557,7 +555,7 @@ namespace Phantom.Shapes
         public override bool InShape(Vector2 position)
         {
             Vector2[] norms = this.RotatedNormals(this.Entity.Orientation);
-            Vector2 delta = position - this.Entity.Position;
+			Vector2 delta = position - this.Entity.Position;
 
             for (int i = 0; i < this.normals[v_idx].Length; i++)
             {
