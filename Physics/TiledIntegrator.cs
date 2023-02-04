@@ -415,7 +415,7 @@ namespace Phantom.Physics
             return listOfEntitiesInRect;
         }
 
-        public PrimitiveList GetEntitiesInRectAsPrimitiveList(ref Vector2 topLeft, ref Vector2 bottomRight, bool partial)
+        public PrimitiveList GetEntitiesInRectAsPrimitiveList(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             //List<Entity> listOfEntitiesInRect = GetListFromPool();
             int tX1 = (int)(topLeft.X * this.invTileSize);
