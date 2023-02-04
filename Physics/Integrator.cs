@@ -85,15 +85,16 @@ namespace Phantom.Physics
                 {
                     this.Integrate(devidedElapsed);
 
-                    for (int i = this.layer.AlwaysUpdate.Count - 1; i >= 0; i--)
+                    for (int i = this.layer.AlwaysUpdateEntity.Count - 1; i >= 0; i--)
                     {
-                        if (i >= this.layer.AlwaysUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
-                            i = this.layer.AlwaysUpdate.Count - 1;
-                        Entity e = this.layer.AlwaysUpdate[i] as Entity;
-                        if (e != null && !e.Destroyed)
+                        // This might happen if a collision or another update removes two items at once the end of the stack
+                        if (i >= this.layer.AlwaysUpdateEntity.Count) 
+                            i = this.layer.AlwaysUpdateEntity.Count - 1;
+
+                        if (!this.layer.AlwaysUpdateEntity[i].Destroyed)
                         {
-                            e.Integrate(devidedElapsed);
-                            CheckEntityCollision(e);
+                            this.layer.AlwaysUpdateEntity[i].Integrate(devidedElapsed);
+                            CheckEntityCollision(this.layer.AlwaysUpdateEntity[i]);
                         }
                     }
 
@@ -101,8 +102,10 @@ namespace Phantom.Physics
                     {
                         for (int i = this.layer.VisibleUpdate.Count - 1; i >= 0; i--)
                         {
-                            if (i >= this.layer.VisibleUpdate.Count) //This might happen if a collision or another update removes two items at once the end of the stack
+                            // This might happen if a collision or another update removes two items at once the end of the stack
+                            if (i >= this.layer.VisibleUpdate.Count) 
                                 i = this.layer.VisibleUpdate.Count - 1;
+
                             Entity e = this.layer.VisibleUpdate[i];
                             if (!e.Destroyed && e.Shape.InRect(this.renderer.TopLeft, this.renderer.BottomRight, true))
                             {

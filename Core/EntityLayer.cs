@@ -47,8 +47,8 @@ namespace Phantom.Core
         protected Integrator integrator;
 
         internal List<Component> AlwaysUpdate;
+        internal List<Entity> AlwaysUpdateEntity;
         internal List<Entity> VisibleUpdate;
-
 
         /// <summary>
         /// Creates an entityLayer of the specified dimensions.
@@ -61,6 +61,7 @@ namespace Phantom.Core
             :base(width, height)
         {
             this.AlwaysUpdate = new List<Component>();
+            this.AlwaysUpdateEntity = new List<Entity>();
             this.VisibleUpdate = new List<Entity>();
 
             this.renderer = renderer;
@@ -106,6 +107,7 @@ namespace Phantom.Core
                 switch (e.UpdateBehaviour)
                 {
                     case Entity.UpdateBehaviours.AlwaysUpdate:
+                        this.AlwaysUpdateEntity.Add(e);
                         this.AlwaysUpdate.Add(e);
                         break;
                     case Entity.UpdateBehaviours.UpdateWhenVisible:
@@ -130,6 +132,7 @@ namespace Phantom.Core
                 switch (e.UpdateBehaviour)
                 {
                     case Entity.UpdateBehaviours.AlwaysUpdate:
+                        this.AlwaysUpdateEntity.Remove(e);
                         this.AlwaysUpdate.Remove(e);
                         break;
                     case Entity.UpdateBehaviours.UpdateWhenVisible:
@@ -430,6 +433,7 @@ namespace Phantom.Core
             }
 		}
 
+        /*
         /// <summary>
         /// Remove all components that are marked as Ghosts.
         /// </summary>
@@ -437,7 +441,7 @@ namespace Phantom.Core
         {
             for (int i = Components.Count - 1; i >= 0; i--)
                 this.RemoveComponent(Components[i]);
-        }
+        }*/
 
         public override void HandleMessage(Message message)
         {
