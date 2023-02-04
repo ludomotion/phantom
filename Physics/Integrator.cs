@@ -25,6 +25,8 @@ namespace Phantom.Physics
 
         private bool physicsPaused;
         private int physicsExecutionCount;
+        private float physicsExecutionCountInv;
+
         /// <summary>
         /// An internal list of entities contained by the integrator.
         /// </summary>
@@ -40,6 +42,7 @@ namespace Phantom.Physics
         public Integrator(int physicsExecutionCount)
         {
             this.physicsExecutionCount = physicsExecutionCount;
+            this.physicsExecutionCountInv = 1.0f / MathHelper.Max(physicsExecutionCount, 1);
             this.entities = new List<Entity>();
             this.physicsPaused = false;
         }
@@ -76,7 +79,7 @@ namespace Phantom.Physics
             Profiler.BeginProfiling("physics");
             if (!this.physicsPaused)
             {
-                float devidedElapsed = elapsed / this.physicsExecutionCount;
+                float devidedElapsed = elapsed * this.physicsExecutionCountInv;
 
                 for (int t = 0; t < physicsExecutionCount; ++t)
                 {
