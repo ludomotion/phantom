@@ -279,20 +279,22 @@ namespace Phantom.Core
         /// </summary>
         /// <typeparam name="T">The type of asset to load. Model, Effect, SpriteFont, Texture, Texture2D, and TextureCube are all supported by default by the standard Content Pipeline processor, but additional types may be loaded by extending the processor.</typeparam>
         /// <param name="assetName">Asset name, relative to the loader root directory, and not including the .xnb extension.</param>
+        /// <param name="assetExt">In case an extension other then .xnb is going to be used.</param>
         /// <returns>The loaded asset. Repeated calls to load the same asset will return the same object instance.</returns>
-        public T Load<T>(string assetName)
+        public T Load<T>(string assetName, string assetExt = "xnb")
         {
 #if DEBUG
             if (!this.loaded.Contains(assetName))
             {
                 // TODO: Reference to documentation url:
-                Debug.WriteLine("WARNING: Asset '" + assetName + "' is not loaded in the current context!!!");
+                // Does not seem to affect game very much but generates A LOT of spam...
+                //Debug.WriteLine("WARNING: Asset '" + assetName + "' is not loaded in the current context!!!");
             }
 #endif
 			lock (PhantomGame.Game.GlobalRenderLock)
 			{
 #if DEBUG
-				T asset = this.LoadAffixed<T>(assetName);
+				T asset = this.LoadAffixed<T>(assetName, assetExt);
                 if (asset is Texture2D)
                 {
                     this.textureNames[asset as Texture2D] = assetName;
@@ -302,17 +304,18 @@ namespace Phantom.Core
 
 #endif
 
-				return this.LoadAffixed<T>(assetName);
+				return this.LoadAffixed<T>(assetName, assetExt);
 			}
         }
 
-		/// <summary>
-		/// Handles the actual call to <c>ContentManager.Load</c>, adding a content size affix if set.
-		/// </summary>
-		/// <typeparam name="T">The type of asset to load. Model, Effect, SpriteFont, Texture, Texture2D, and TextureCube are all supported by default by the standard Content Pipeline processor, but additional types may be loaded by extending the processor.</typeparam>
-		/// <returns>The loaded asset. Repeated calls to load the same asset will return the same object instance.</returns>
-		/// <param name="assetName">Asset name, relative to the loader root directory, and not including size affixes or file extension.</param>
-		private T LoadAffixed<T>(string assetName)
+        /// <summary>
+        /// Handles the actual call to <c>ContentManager.Load</c>, adding a content size affix if set.
+        /// </summary>
+        /// <typeparam name="T">The type of asset to load. Model, Effect, SpriteFont, Texture, Texture2D, and TextureCube are all supported by default by the standard Content Pipeline processor, but additional types may be loaded by extending the processor.</typeparam>
+        /// <returns>The loaded asset. Repeated calls to load the same asset will return the same object instance.</returns>
+        /// <param name="assetName">Asset name, relative to the loader root directory, and not including size affixes or file extension.</param>
+        /// <param name="assetExt">In case an extension other then .xnb is going to be used.</param>
+        private T LoadAffixed<T>(string assetName, string assetExt = "xnb")
 		{
 			if(this.ContentSizeAffix != null)
 			{
@@ -323,7 +326,7 @@ namespace Phantom.Core
 				{
 					try
 					{
-						asset = this.manager.Load<T>(assetName+"-"+this.ContentSizeAffix);
+						asset = this.manager.Load<T>(assetName+"-"+this.ContentSizeAffix, assetExt);
 						found = true;
 					}
                     catch (NoAudioHardwareException)
@@ -342,7 +345,7 @@ namespace Phantom.Core
             
             try
             {
-                return this.manager.Load<T>(assetName);
+                return this.manager.Load<T>(assetName, assetExt);
             }
             catch (NoAudioHardwareException)
             {
