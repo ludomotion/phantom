@@ -16,7 +16,6 @@ namespace Phantom.Core
     /// </summary>
     public class Component : IDisposable
     {
-
         /// <summary>
         /// A uint that can be used to store arbitrary values. It has no fixed purpose but can
         /// be used to represent type information. For example an Entity with flag 1 is the player,
@@ -33,7 +32,7 @@ namespace Phantom.Core
         /// <summary>
         /// The Ghost flag marks components that are not active, but are not destroyed either. 
         /// Ghost components will not be updated and are not intergrated if they are part of 
-        /// and physics integrator.
+        /// and physics integrator. Not used in unexplored, performance loss for no reason.
         /// </summary>
         // public bool Ghost;
 
@@ -50,21 +49,25 @@ namespace Phantom.Core
         /// add components to this list, and RemoveComponent to remove them from the list. You
         /// can also remove Components by setting their Destroyed flag to true.
         /// </summary>
-        public IList<Component> Components
+        public ReadOnlySpan<Component> Components
         {
             get
             {
-                return this.components.AsReadOnly();
+                return new ReadOnlySpan<Component>(this.components, 0, this.componentsIndex + 1);
             }
         }
+
+        // List of components
+        private static int DefaultArraySize = 1;
+        private static int DefaultArrayIncrease = 4;
+
+        private int componentsIndex;
+        private Component[] components;
 
         /// <summary>
         /// The Component's parent indicates in which Component this Component is set.
         /// </summary>
         public Component Parent { get; private set; }
-
-        private List<Component> components;
-
 
         /// <summary>
         /// The default constructor generates a new Components and sets its flags to 0.
@@ -73,7 +76,8 @@ namespace Phantom.Core
         {
             this.Flags = 0UL;
             this.Destroyed = false;
-            this.components = new List<Component>();
+            this.componentsIndex = -1;
+            this.components = new Component[DefaultArraySize];
         }
 
         /// <summary>
@@ -99,7 +103,7 @@ namespace Phantom.Core
         /// </summary>
         public virtual void OnAncestryChanged()
         {
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 this.components[i].OnAncestryChanged();
         }
@@ -138,7 +142,14 @@ namespace Phantom.Core
         /// <param name="child"></param>
         public virtual void AddComponent(Component child)
         {
-            this.components.Add(child);
+            // ************** START ADD IMPLEMENTATION **************
+            componentsIndex++;
+            if (componentsIndex >= components.Length)
+                Array.Resize(ref components, components.Length * DefaultArrayIncrease);
+            components[componentsIndex] = child;
+            // ************** END ADD IMPLEMENTATION **************
+
+            // Callback
             this.OnComponentAdded(child);
         }
 
@@ -151,7 +162,17 @@ namespace Phantom.Core
         /// <param name="child"></param>
         public void InsertComponent(int index, Component child)
         {
-            this.components.Insert(index, child);
+            // ************** START INSERT IMPLEMENTATION **************
+            index = Math.Min(index, componentsIndex + 1);
+            if (componentsIndex == components.Length - 1)
+                Array.Resize(ref components, components.Length * DefaultArrayIncrease);
+            if (index < componentsIndex + 1)
+                Array.Copy(components, index, components, index + 1, componentsIndex + 1 - index);
+            components[index] = child;
+            componentsIndex++;
+            // ************** END INSERT IMPLEMENTATION **************
+
+            // Callback
             this.OnComponentAdded(child);
         }
 
@@ -164,7 +185,21 @@ namespace Phantom.Core
         /// <param name="child"></param>
         public void InsertBeforeComponent(Component other, Component child)
         {
-            this.components.Insert(this.components.IndexOf(other), child);
+            // ************** START INDEX IMPLEMENTATION **************
+            int index = Array.IndexOf(components, other, 0, componentsIndex + 1);
+            // ************** END INDEX IMPLEMENTATION **************
+
+            // ************** START INSERT IMPLEMENTATION **************
+            index = Math.Min(index, componentsIndex + 1);
+            if (componentsIndex == components.Length - 1)
+                Array.Resize(ref components, components.Length * DefaultArrayIncrease);
+            if (index < componentsIndex + 1)
+                Array.Copy(components, index, components, index + 1, componentsIndex + 1 - index);
+            components[index] = child;
+            componentsIndex++;
+            // ************** END INSERT IMPLEMENTATION **************
+
+            // Callback
             this.OnComponentAdded(child);
         }
 
@@ -175,7 +210,47 @@ namespace Phantom.Core
         /// <param name="child"></param>
         public void RemoveComponent(Component child)
         {
-            this.components.Remove(child);
+            // ************** START HYBRID REMOVE IMPLEMENTATION **************
+            if (componentsIndex < 32)
+            {
+                // ************** START REMOVE IMPLEMENTATION **************
+                // Loop from back to front
+                for (int i = 0; i < componentsIndex + 1; i++)
+                {
+                    // We found it
+                    if (components[i] == child)
+                    {
+                        // Move all elements down
+                        for (int j = i; j < componentsIndex; j++)
+                            components[j] = components[j + 1];
+
+                        // Remove last element
+                        components[componentsIndex] = null;
+
+                        // Decrement size of array
+                        componentsIndex--;
+
+                        // Break out of loop
+                        break;
+                    }
+                }
+                // ************** END REMOVE IMPLEMENTATION **************
+            }
+            else
+            {
+                // ************** START REMOVE IMPLEMENTATION **************
+                int index = Array.IndexOf(components, child, 0, componentsIndex + 1);
+                if (index >= 0)
+                {
+                    Array.Copy(components, index + 1, components, index, componentsIndex - index);
+                    components[componentsIndex] = null;
+                    componentsIndex--;
+                }
+                // ************** END REMOVE IMPLEMENTATION **************
+            }
+            // ************** END HYBRID REMOVE IMPLEMENTATION **************
+
+            // Callback
             child.OnRemove();
             this.OnComponentRemoved(child);
         }
@@ -185,7 +260,7 @@ namespace Phantom.Core
         /// </summary>
         public virtual void ClearComponents()
         {
-            int count = this.components.Count - 1;
+            int count = this.componentsIndex;
             for (int i = count; i >= 0; i--)
                 this.RemoveComponent(this.components[i]);
         }
@@ -201,7 +276,7 @@ namespace Phantom.Core
             if (message.Consumed)
                 return;
 
-            for (int i = 0; i < this.components.Count; i++)
+            for (int i = 0; i < this.componentsIndex + 1; i++)
             {
                 this.components[i].HandleMessage(message);
                 if (message.Consumed)
@@ -257,7 +332,7 @@ namespace Phantom.Core
         /// <param name="elapsed">The time between the current frame and the previous frame, measured in seconds.</param>
         public virtual void Update(float elapsed)
         {
-            int count = this.components.Count - 1;
+            int count = this.componentsIndex;
             for (int i = count; i >= 0; i--)
             {
                 Component component = this.components[i];
@@ -277,7 +352,7 @@ namespace Phantom.Core
         /// <param name="elapsed">The simulated time between the this integration call and the previous call, measured in seconds.</param>
         public virtual void Integrate(float elapsed)
         {
-            int count = this.components.Count - 1;
+            int count = this.componentsIndex;
             for (int i = count; i >= 0; i--)
             {
                 Component component = this.components[i];
@@ -295,8 +370,8 @@ namespace Phantom.Core
         /// <returns>If any of the components contained by each Entity returns false, the entities cannot collide.</returns>
         public virtual bool CanCollideWith(Entity other)
         {
-            int count = this.components.Count;
-            for (int i = 0; i < count; i++ )
+            int count = this.componentsIndex + 1;
+            for (int i = 0; i < count; i++)
                 if (!this.components[i].CanCollideWith(other))
                     return false;
             return true;
@@ -309,7 +384,7 @@ namespace Phantom.Core
         /// <param name="collision"></param>
         public virtual void AfterCollisionWith(Entity other, CollisionData collision)
         {
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 this.components[i].AfterCollisionWith(other, collision);
                 
@@ -322,7 +397,7 @@ namespace Phantom.Core
         /// <param name="info"></param>
         public virtual void Render( RenderInfo info )
         {
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 this.components[i].Render(info);
         }
@@ -338,7 +413,7 @@ namespace Phantom.Core
         {
             Debug.WriteLine("USING DEPRICATED METHOD: GetProperty!");
             
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetProperty(name, ref result))
                     return true;
@@ -354,7 +429,7 @@ namespace Phantom.Core
         public virtual bool GetBoolean(string name, ref bool result)
         {
             Debug.WriteLine("USING DEPRICATED METHOD: GetBoolean!");
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetBoolean(name, ref result))
                     return true;
@@ -370,7 +445,7 @@ namespace Phantom.Core
         public virtual bool GetFloat(string name, ref float result)
         {
             Debug.WriteLine("USING DEPRICATED METHOD: GetFloat!");
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetFloat(name, ref result))
                     return true;
@@ -386,7 +461,7 @@ namespace Phantom.Core
         public virtual bool GetString(string name, ref string result)
         {
             Debug.WriteLine("USING DEPRICATED METHOD: GetString!");
-            int count = this.components.Count;
+            int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)
                 if (this.components[i].GetString(name, ref result))
                     return true;
@@ -403,7 +478,7 @@ namespace Phantom.Core
 		public void RemoveAllComponentsByType<T>()
 		{
             Component component;
-            int count = this.components.Count - 1;
+            int count = this.componentsIndex;
             for (int i = count; i >= 0; i--)
 			{
 				component = this.Components[i];
@@ -419,7 +494,7 @@ namespace Phantom.Core
         /// <returns></returns>
         public IEnumerable<T> GetAllComponentsByType<T>() where T : Component
         {
-            int count = this.Components.Count;
+            int count = this.Components.Length;
             for (int i = 0; i < count; i++)
             {
                 Component component = this.Components[i];
@@ -431,7 +506,7 @@ namespace Phantom.Core
         //TODO Temp function as the function above leads to weird behavior
         public List<T> GetAllComponentsByTypeAsList<T>() where T : Component
         {
-            int count = this.Components.Count;
+            int count = this.Components.Length;
             List<T> result = new List<T>();
             for (int i = 0; i < count; i++)
                 if (this.Components[i] is T t)
@@ -448,7 +523,7 @@ namespace Phantom.Core
         /// <returns></returns>
         public T GetComponentByType<T>(int nth) where T : Component
         {
-            int count = this.Components.Count;
+            int count = this.Components.Length;
             for (int i = 0; i < count; i++)
             {
                 if (Components[i] is T t)
@@ -469,7 +544,7 @@ namespace Phantom.Core
         /// <returns></returns>
         public T GetComponentByType<T>() where T : Component
         {
-            int count = this.Components.Count;
+            int count = this.Components.Length;
             for (int i = 0; i < count; i++)
                 if (Components[i] is T t)
                     return t;

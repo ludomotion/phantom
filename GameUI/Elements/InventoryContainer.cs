@@ -61,7 +61,7 @@ namespace Phantom.GameUI.Elements
                     }
                 }
             }
-            for (int i = 0; i < Components.Count; i++)
+            for (int i = 0; i < Components.Length; i++)
                 Components[i].Render(info);
         }
 

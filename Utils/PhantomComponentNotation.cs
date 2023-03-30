@@ -436,10 +436,10 @@ namespace Phantom.Utils
                     result+="("+members+")";
             }
 
-            if (component.Components.Count > 0)
+            if (component.Components.Length > 0)
             {
                 result += "[";
-                for (int i = 0; i < component.Components.Count; i++)
+                for (int i = 0; i < component.Components.Length; i++)
                 {
                     if (i > 0) 
                         result += ", ";

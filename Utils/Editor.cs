@@ -889,7 +889,7 @@ namespace Phantom.Utils
             Vector2 topLeft = new Vector2(0, 0);
             if (Editing.Camera!=null) 
                 topLeft = new Vector2(info.Camera.Left, info.Camera.Top);
-            for (int i = 0; i < entities.Components.Count; i++)
+            for (int i = 0; i < entities.Components.Length; i++)
             {
                 Entity entity = entities.Components[i] as Entity;
                 if (entity != null && entity.Shape != null && entity.Properties.GetInt("isTile",0)==tiles)

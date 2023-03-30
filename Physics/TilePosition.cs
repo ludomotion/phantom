@@ -49,20 +49,20 @@ namespace Phantom.Physics
             {
                 // ************** START REMOVE IMPLEMENTATION **************
                 // Loop from back to front
-                for (int i = this.Tile.Entities.entitiesIndex; i > -1; i--)
+                for (int i = this.Tile.entitiesIndex; i > -1; i--)
                 {
                     // We found it
-                    if (this.Tile.Entities.entitiesArray[i] == this.Entity)
+                    if (this.Tile.entities[i] == this.Entity)
                     {
                         // Move all elements down
-                        for (int j = i; j < this.Tile.Entities.entitiesIndex; j++)
-                            this.Tile.Entities.entitiesArray[j] = this.Tile.Entities.entitiesArray[j + 1];
+                        for (int j = i; j < this.Tile.entitiesIndex; j++)
+                            this.Tile.entities[j] = this.Tile.entities[j + 1];
 
                         // Remove last element
-                        this.Tile.Entities.entitiesArray[this.Tile.Entities.entitiesIndex] = null;
+                        this.Tile.entities[this.Tile.entitiesIndex] = null;
 
                         // Decrement size of array
-                        this.Tile.Entities.entitiesIndex--;
+                        this.Tile.entitiesIndex--;
 
                         // Break out of loop
                         break;
@@ -86,20 +86,20 @@ namespace Phantom.Physics
             {
                 // ************** START REMOVE IMPLEMENTATION **************
                 // Loop from back to front
-                for (int i = this.Tile.Entities.entitiesIndex; i > -1; i--)
+                for (int i = this.Tile.entitiesIndex; i > -1; i--)
                 {
                     // We found it
-                    if (this.Tile.Entities.entitiesArray[i] == this.Entity)
+                    if (this.Tile.entities[i] == this.Entity)
                     {
                         // Move all elements down
-                        for (int j = i; j < this.Tile.Entities.entitiesIndex; j++)
-                            this.Tile.Entities.entitiesArray[j] = this.Tile.Entities.entitiesArray[j + 1];
+                        for (int j = i; j < this.Tile.entitiesIndex; j++)
+                            this.Tile.entities[j] = this.Tile.entities[j + 1];
 
                         // Remove last element
-                        this.Tile.Entities.entitiesArray[this.Tile.Entities.entitiesIndex] = null;
+                        this.Tile.entities[this.Tile.entitiesIndex] = null;
 
                         // Decrement size of array
-                        this.Tile.Entities.entitiesIndex--;
+                        this.Tile.entitiesIndex--;
 
                         // Break out of loop
                         break;
@@ -111,10 +111,10 @@ namespace Phantom.Physics
             if( this.Tile != null )
             {
                 // ************** START ADD IMPLEMENTATION **************
-                this.Tile.Entities.entitiesIndex++;
-                if (this.Tile.Entities.entitiesIndex >= this.Tile.Entities.entitiesArray.Length)
-                    Array.Resize(ref this.Tile.Entities.entitiesArray, this.Tile.Entities.entitiesArray.Length * PrimitiveList.DefaultArrayIncrease);
-                this.Tile.Entities.entitiesArray[this.Tile.Entities.entitiesIndex] = this.Entity;
+                this.Tile.entitiesIndex++;
+                if (this.Tile.entitiesIndex >= this.Tile.entities.Length)
+                    Array.Resize(ref this.Tile.entities, this.Tile.entities.Length * TiledIntegrator.DefaultArrayIncrease);
+                this.Tile.entities[this.Tile.entitiesIndex] = this.Entity;
                 // ************** END ADD IMPLEMENTATION **************
             }
         }

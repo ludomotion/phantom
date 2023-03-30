@@ -312,7 +312,7 @@ namespace Phantom.Core
             switch (target)
             {
                 case FilterTarget.All:
-                    for (int i = 0; i < this.Components.Count; i++)
+                    for (int i = 0; i < this.Components.Length; i++)
                         if (this.Components[i] is Entity && filter.Contains(this.Components[i] as Entity))
                             yield return this.Components[i] as Entity;
                     break;
@@ -338,7 +338,7 @@ namespace Phantom.Core
             switch (target)
             {
                 case FilterTarget.All:
-                    for (int i = 0; i < this.Components.Count; i++)
+                    for (int i = 0; i < this.Components.Length; i++)
                         if (this.Components[i] is Entity && filter.Contains(this.Components[i] as Entity))
                             callback(this.Components[i] as Entity);
                     break;
@@ -365,7 +365,7 @@ namespace Phantom.Core
             switch (target)
             {
                 case FilterTarget.All:
-                    for (int i = 0; i < this.Components.Count; i++)
+                    for (int i = 0; i < this.Components.Length; i++)
                         if (this.Components[i] is Entity && !filter.Contains(this.Components[i] as Entity))
                             callback(this.Components[i] as Entity);
                     break;
@@ -392,7 +392,7 @@ namespace Phantom.Core
             switch (target)
             {
                 case FilterTarget.All:
-                    for (int i = 0; i < this.Components.Count; i++)
+                    for (int i = 0; i < this.Components.Length; i++)
                     {
                         if (this.Components[i] is Entity)
                         {

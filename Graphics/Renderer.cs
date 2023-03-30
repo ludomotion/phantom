@@ -157,14 +157,13 @@ namespace Phantom.Graphics
                 if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
                     this.fx.Parameters["World"].SetValue(info.World);
 				this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-                IList<Component> components = this.Parent.Components;
-                int count = components.Count;
+                
+                ReadOnlySpan<Component> components = this.Parent.Components;
+                int count = components.Length;
                 for (int i = 0; i < count; i++)
-                {
-                    if (this == components[i])
-                        this.Parent.Render(info); // TODO: Document and test this!
                     components[i].Render(info);
-                }
+
+                this.Parent.Render(info);
                 this.batch.End();
             }
         }
@@ -174,14 +173,13 @@ namespace Phantom.Graphics
             if (this.Options.HasFlag(RenderOptions.ApplyEffect) && this.fx != null)
                 this.fx.Parameters["World"].SetValue(info.World);
             this.batch.Begin(this.sortMode, this.blendState, null, null, null, this.fx, info.World);
-            IList<Component> components = this.Parent.Components;
-            int count = components.Count;
+
+            ReadOnlySpan<Component> components = this.Parent.Components;
+            int count = components.Length;
             for (int i = 0; i < count; i++)
-            {
-                if (this == components[i])
-                    this.Parent.Render(info); // TODO: Document and test this!
                 components[i].Render(info);
-            }
+            this.Parent.Render(info);
+
             lock (PhantomGame.Game.GlobalRenderLock)
             {
                 this.batch.End();

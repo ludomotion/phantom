@@ -261,7 +261,7 @@ namespace Phantom.Utils
                 else if (lines[i].StartsWith("component "))
                 {
                     PCNComponent component = new PCNComponent(lines[i].Substring(10));
-                    for (int j = 0; j < state.Components.Count; j++)
+                    for (int j = 0; j < state.Components.Length; j++)
                     {
                         if (state.Components[j].Properties != null && state.Components[j].Properties.GetString("editable", "") == component.Name)
                         {
@@ -337,7 +337,7 @@ namespace Phantom.Utils
             {
                 if (c is EntityLayer)
                 {
-                    for (int i = c.Components.Count - 1; i >= 0; i--)
+                    for (int i = c.Components.Length - 1; i >= 0; i--)
                     {
                         if (c.Components[i] is Entity)
                             c.RemoveComponent(c.Components[i]);
