@@ -259,8 +259,8 @@ namespace Phantom
             this.Update(elapsed);
             for (int i = this.states.Count - 1; i >= 0 && i < this.states.Count; i--)
             {
-                bool propagate = this.states[i].Propagate;
-                if (!this.states[i].OnlyOnTop || i == this.states.Count - 1)
+                bool propagate = this.states[i].UpdateBelow;
+                if (this.states[i].UpdateBelowTop || i == this.states.Count - 1)
                     this.states[i].Update(elapsed);
                 if (!propagate || this.Paused)
                     break;
@@ -305,10 +305,11 @@ namespace Phantom
             }
 
             int startIndex;
-            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].Transparent; startIndex--)
+            for (startIndex = this.states.Count - 1; startIndex >= 0 && this.states[startIndex].RenderBelow; startIndex--)
                 ;
+
             for (int i = Math.Max(0, startIndex); i < this.states.Count; i++)
-                if (!this.states[i].OnlyOnTop || i == this.states.Count - 1)
+                if (this.states[i].RenderBelowTop || i == this.states.Count - 1)
                     this.states[i].Render(null);
             this.Render(null);
 
@@ -427,137 +428,157 @@ namespace Phantom
             base.HandleMessage(message);
         }
 
-        public void PushState( GameState state )
+        public void PushState(GameState state)
         {
+            // If the state is set
             if (state != null)
             {
+                // If we have a state on top
+                if(this.states.Count > 0)
+                    this.CurrentState.BelowTop();
+
+                // Add the state and put it on top
                 this.states.Add(state);
                 state.OnAdd(this);
-                state.BackOnTop();
+                state.OnTop();
             }
-            Debug.WriteLine("Pushed state: " + this.CurrentState + " (StateCount: " + this.StateCount + ")");
+
+            // Debug information
+            Debug.WriteLine($"Pushed state: {CurrentState} (StateCount: {StateCount})");
         }
 
-        public void PopState()
+        public GameState PopState(bool remove = true)
         {
-            Debug.WriteLine("Popping state: " + this.CurrentState + " (StateCount: " + this.StateCount + ")");
+            // Debug information
+            Debug.WriteLine($"Popping state: {CurrentState} (StateCount: {StateCount})");
+            
+            // If we still have states left
             if (this.states.Count > 0)
             {
+                // State to remove from menus
+                GameState state = this.states[this.states.Count - 1];
+                this.states.RemoveAt(this.states.Count - 1);
+                
+                // Menu is below top
+                state.BelowTop();
+
+                // If state is also to be removed
+                if(remove)
+                    state.OnRemove();
+                
+                // If we still have any states left
+                if (this.states.Count > 0)
+                {
+                    // Debug information
+                    Debug.WriteLine($"{CurrentState} is now on-top. (StateCount: {StateCount})");
+
+                    // Call on top function
+                    this.CurrentState.OnTop();
+                }
+
+                // Return popped state
+                return state;
+            }
+
+            // No state to pop
+            return null;
+        }
+
+        public void PopAndPushState(GameState state)
+        {
+            // Debug information
+            Debug.WriteLine("Popping state: " + this.CurrentState + " and directly pushing " + state + " (StateCount: " + this.StateCount + ")");
+            
+            // Check if we have any states left
+            if(this.states.Count > 0)
+            {
+                // State to remove
                 GameState removed = this.states[this.states.Count - 1];
                 this.states.RemoveAt(this.states.Count - 1);
+
+                // Call removal functions
+                removed.BelowTop();
                 removed.OnRemove();
             }
-            if (this.states.Count > 0)
-            {
-                this.CurrentState.BackOnTop();
-                Debug.WriteLine(this.CurrentState + " is now on-top. (StateCount: " + this.StateCount + ")");
-            }
-        }
 
-        public void SwitchTopStates()
-        {
-            if (this.states.Count > 2)
-            {
-                GameState top = this.states[this.states.Count - 1];
-                this.states[this.states.Count - 1] = this.states[this.states.Count - 2];
-                this.states[this.states.Count - 2] = top;
-                this.CurrentState.BackOnTop();
-                Debug.WriteLine(this.CurrentState + " is now on-top. (StateCount: " + this.StateCount + ")");
-            }
-        }
-
-        public bool PopState(GameState state)
-        {
-            Debug.WriteLine("Popping state: " + state + " (current is: " + this.CurrentState + " (StateCount: " + this.StateCount + "))");
-            if( this.CurrentState == state )
-            {
-                // If the state given is the current state call the PopState() method to correctly handle BackOnTop().
-                this.PopState();
-                return true;
-            }
-            for (int i = this.states.Count - 1; i >= 0; --i)
-            {
-                if (this.states[i] == state)
-                {
-                    this.states.RemoveAt(i);
-                    state.OnRemove();
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public void PopAndPushState( GameState state )
-        {
-            Debug.WriteLine("Popping state: " + this.CurrentState + " and directly pushing " + state + " (StateCount: " + this.StateCount + ")");
-            GameState removed = this.states[this.states.Count - 1];
-            this.states.RemoveAt(this.states.Count - 1);
+            // Add new state on top
             this.states.Add(state);
             state.OnAdd(this);
-            removed.OnRemove();
-            state.BackOnTop();
-        }
-
-        public void ClearAndPushState(GameState state)
-        {
-            Debug.WriteLine("Clearing states and pushing " + state);
-            for (int i = this.states.Count - 1; i >= 0; i--)
-            {
-                this.states[i].OnRemove();
-                this.states.RemoveAt(i);
-            }
-            if (state != null)
-            {
-                this.states.Add(state);
-                state.OnAdd(this);
-                state.BackOnTop();
-            }
+            state.OnTop();
         }
 
         public void PopStateUntil<T>()
         {
+            // Loop over all the states
             for (int i = this.states.Count - 1; i >= 0; i--)
             {
+                // If this is the state we want to stop at
                 if (this.states[i] is T)
+                {
+                    // Call on top
+                    this.states[i].OnTop();
+
+                    // Stop looping
                     break;
+                }
+
+                // Call below top and on remove
+                // Belowtop needs to be called in case the state gets
+                // saved for later use
+                this.states[i].BelowTop();
                 this.states[i].OnRemove();
                 this.states.RemoveAt(i);
             }
         }
 
-        public bool PushBefore(GameState before, GameState state)
+        public void PopStateUntilAndPush<T>(GameState state)
         {
-            for (int i = this.states.Count - 1; i >= 0; --i)
-            {
-                if (this.states[i] == before)
-                {
-					this.states.Insert(i, state);
-					state.OnAdd(this);
-                    return true;
-                }
-            }
-            return false;
-        }
+            // Is the first state on top
+            bool stateToPushOnTop = true;
 
-        public bool ReplaceState(GameState search, GameState replace)
-        {
-            for (int i = this.states.Count - 1; i >= 0; --i)
+            // Loop over all the states
+            for (int i = this.states.Count - 1; i >= 0; i--)
             {
-                if (this.states[i] == search)
+                // If this is the state we want to stop at
+                if (this.states[i] is T)
                 {
-                    this.states[i].OnRemove();
-                    this.states[i] = replace;
-                    replace.OnAdd(this);
-                    return true;
+                    // If the state to push on is already on top
+                    if (stateToPushOnTop)
+                        this.states[i].BelowTop();
+
+                    // Increment counter by one
+                    i += 1;
+
+                    // Set new state on top
+                    this.states.Insert(i, state);
+                    this.states[i].OnAdd(this);
+                    this.states[i].OnTop();
+
+                    // Stop looping
+                    break;
                 }
+
+                // Call below top and on remove
+                // Belowtop needs to be called in case the state gets
+                // saved for later use
+                this.states[i].BelowTop();
+                this.states[i].OnRemove();
+                this.states.RemoveAt(i);
+
+                // Next state is not on top
+                stateToPushOnTop = false;
             }
-            return false;
+
+            // Otherwise state was not found
+            // So we push it on the new empty stack
+            this.states[0] = state;
+            this.states[0].OnTop();
         }
 
         protected virtual void OnDeactivate(object sender, EventArgs e)
         {
-        }
 
+        }
 
         protected virtual void OnExit(object sender, EventArgs e)
         {

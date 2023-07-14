@@ -32,9 +32,9 @@ namespace Phantom.GameUI.Handlers
         private int clickTimes;
         private float notMovedTimer = 0;
         private ToolTip toolTip;
+        private bool mouseUpdate;
 
-        public MouseHandler()
-            : base(0) { }
+        public MouseHandler() : base(0) { }
 
         public override void OnAdd(Component parent)
         {
@@ -52,6 +52,10 @@ namespace Phantom.GameUI.Handlers
             {
                 current = Mouse.GetState();
                 layer.SetSelected(player, layer.GetControlAt(new Vector2(previous.X, previous.Y)));
+            }
+            else if(message == Messages.DoMouseUpdate)
+            {
+                mouseUpdate = true;
             }
             base.HandleMessage(message);
         }
@@ -77,7 +81,7 @@ namespace Phantom.GameUI.Handlers
             previous = current;
             current = Mouse.GetState();
             mousePosition = new Vector2(current.X, current.Y);
-            if (this.renderer != null && this.layer.Camera!=null)
+            if (this.renderer != null && this.layer.Camera != null)
             {
                 Matrix renderMatrix = this.renderer.CreateMatrix();
                 mousePosition = Vector2.Transform(mousePosition, Matrix.Invert(renderMatrix));
@@ -104,8 +108,9 @@ namespace Phantom.GameUI.Handlers
                     this.Hover.OnMouseOver(this.Hover, mousePosition, UIMouseButton.None);
             }
 
-            if (current.X != previous.X || current.Y != previous.Y)
+            if (mouseUpdate || current.X != previous.X || current.Y != previous.Y)
             {
+                mouseUpdate = false;
                 notMovedTimer = 0;
                 if (toolTip != null)
                 {
@@ -116,7 +121,7 @@ namespace Phantom.GameUI.Handlers
                 if (this.Hover != null && this.Hover.OnMouseMove != null)
                     this.Hover.OnMouseMove(this.Hover, mousePosition, UIMouseButton.None);
 
-                //Check which item I am hovering and select it
+                // Check which item I am hovering and select it
                 layer.SetSelected(player, hover);
 
                 if (!dragging && (mousePosition - mouseDownPosition).LengthSquared() > DragDistanceSquared)
@@ -125,7 +130,7 @@ namespace Phantom.GameUI.Handlers
                 if (dragging)
                 {
 
-                    //if dragging update the position
+                    // If dragging update the position
                     if (draggingContent != null)
                     {
                         draggingContent.Position = mousePosition;
@@ -165,7 +170,7 @@ namespace Phantom.GameUI.Handlers
                 
             }
 
-            //Start clicking
+            // Start clicking
             if (PhantomGame.XnaGame.IsActive)
             {
                 if (current.ScrollWheelValue != previous.ScrollWheelValue && hover != null && hover.CanUse(player) && hover.OnScrollWheel != null)

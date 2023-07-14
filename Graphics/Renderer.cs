@@ -300,11 +300,9 @@ namespace Phantom.Graphics
 
             info.RenderTarget = null;
 
-
             this.lastWorld = info.World;
             return info;
         }
-
         public void ChangeOptions(ViewportPolicy viewportPolicy, RenderOptions renderOptions)
         {
             this.Policy = viewportPolicy;

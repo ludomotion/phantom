@@ -183,7 +183,6 @@ namespace Phantom.GameUI.Elements
 
             if (OnChange != null)
                 OnChange(this);
-
         }
 
         public float GetValue()
@@ -191,18 +190,12 @@ namespace Phantom.GameUI.Elements
             return currentValue;
         }
 
-        /// <summary>
-        /// A simple rendering routine for the slider
-        /// </summary>
-        /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
             base.Render(info);
 
-            if (Visible)
+            if (info.Pass == 0 && Visible)
             {
-
-                //Vector2 size = Menu.Font.MeasureString(Caption);
                 Color face = Color.Lerp(UILayer.ColorFace, UILayer.ColorFaceHighLight, this.currentSelected);
                 Color text = Color.Lerp(UILayer.ColorText, UILayer.ColorTextHighLight, this.currentSelected);
 
@@ -258,6 +251,7 @@ namespace Phantom.GameUI.Elements
             rel = MathHelper.Clamp(rel, 0, 1);
             SetValue(minValue + (maxValue - minValue) * rel);*/
         }
+
         private void DoMouseMove(UIElement element, Vector2 mousePosition, UIMouseButton button)
         {
             if (buttonDown)
@@ -287,10 +281,6 @@ namespace Phantom.GameUI.Elements
         {
             if (button == UIMouseButton.Left)
                 buttonDown=true;
-
         }
-
-
-    
     }
 }

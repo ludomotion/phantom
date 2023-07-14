@@ -27,8 +27,8 @@ namespace Phantom.Utils
             public Editor Editor;
             public EditorState(GameState editing)
             {
-                this.Propagate = false;
-                this.Transparent = true;
+                this.UpdateBelow = false;
+                this.RenderBelow = true;
                 renderer = new Renderer(1, Renderer.ViewportPolicy.Fit, Renderer.RenderOptions.Canvas);
                 Editor = new Editor(editing);
                 AddComponent(Editor);

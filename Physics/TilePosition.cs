@@ -75,7 +75,7 @@ namespace Phantom.Physics
         }
 
         /// <summary>
-        /// Changes the tile and updates the new and old tiles' entity list
+        /// Changes the tile and updates the new and old tiles entity list
         /// </summary>
         /// <param name="tile"></param>
         public void SetTile(TiledIntegrator.Tile tile)

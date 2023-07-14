@@ -14,18 +14,29 @@ namespace Phantom.GameUI.Elements
     /// A simple menu button that can be clicked to throw MenuClicked messages in the menu.
     /// It renders a simple button if the menu's renderer has a canvas.
     /// </summary>
-    public class Button : UIElement
+    public class Button : UIAtomizedElement
     {
+        protected Vector2 size;
+
         /// <summary>
         /// The buttons visible caption
         /// </summary>
         public string Caption;
+
+        public override Vector2 Location
+        {
+            get => this.Position;
+            set { this.Position = value; }
+        }
+
+        public override Vector2 Size => size;
 
         public Button(string name, string caption, Vector2 position, Shape shape, UIAction onActivate)
             : base(name, position, shape)
         {
             this.Caption = caption;
             this.OnActivate = onActivate;
+            this.size = (shape as OABB).HalfSize * 2;
         }
 
         public Button(int x, int y, int width, int height, string caption, UIAction onActivate)
@@ -62,8 +73,5 @@ namespace Phantom.GameUI.Elements
                 UILayer.Font.DrawString(info, Caption, p, text, UILayer.DefaultFontScale, 0, size * 0.5f);
             }
         }
-
-
-
     }
 }

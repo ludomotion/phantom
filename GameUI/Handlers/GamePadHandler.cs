@@ -56,10 +56,8 @@ namespace Phantom.GameUI.Handlers
                 EndPress();
             if (current.Buttons.Back == ButtonState.Pressed && previous.Buttons.Back != ButtonState.Pressed)
                 DoKeyBack();
-            
 
             previous = current;
         }
-       
     }
 }

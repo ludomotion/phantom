@@ -143,8 +143,7 @@ namespace Phantom.Core
         /// Creates an entity with mass 1 (it still needs to be added to an EntityLayer).
         /// </summary>
         /// <param name="position"></param>
-        public Entity(Vector2 position)
-            :this(position, 1)
+        public Entity(Vector2 position) : this(position, 1)
         {
         }
 

@@ -395,7 +395,7 @@ namespace Phantom.Core
         /// of a RenderLayer or an EntityLayer.
         /// </summary>
         /// <param name="info"></param>
-        public virtual void Render( RenderInfo info )
+        public virtual void Render(RenderInfo info)
         {
             int count = this.componentsIndex + 1;
             for (int i = 0; i < count; i++)

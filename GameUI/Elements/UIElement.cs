@@ -211,8 +211,14 @@ namespace Phantom.GameUI.Elements
                     pressed = 0;
                     if (OnEndPress != null)
                         OnEndPress(this);
+
                     if (this.Enabled)
+                    {
+                        if (this.Parent is UILayer ui)
+                            ui.LastActivated = this;
+
                         Activate();
+                    }
                 }
             }
             else
@@ -223,8 +229,14 @@ namespace Phantom.GameUI.Elements
                     pressed &= 255 - pl;
                     if (OnEndPress != null)
                         OnEndPress(this);
+
                     if (this.Enabled)
+                    {
+                        if (this.Parent is UILayer ui)
+                            ui.LastActivated = this;
+
                         Activate();
+                    }
                 }
             }
         }
@@ -295,18 +307,17 @@ namespace Phantom.GameUI.Elements
             return (Enabled && Visible && !Tweening && ((PlayerMask & 1 << player) > 0));
         }
 
-
         public virtual bool InControl(Vector2 position)
         {
             return Shape.InShape(position);
         }
 
-        internal virtual void GainFocus()
+        public virtual void GainFocus()
         {
             
         }
 
-        internal virtual void LoseFocus()
+        public virtual void LoseFocus()
         {
             
         }

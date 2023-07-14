@@ -15,48 +15,102 @@ namespace Phantom.GameUI.Elements
     /// A simple menu button that can be clicked to throw MenuClicked messages in the menu.
     /// It renders a simple button if the menu's renderer has a canvas.
     /// </summary>
-    public class EditBox : UIElement
+    public class EditBox : UIAtomizedElement
     {
         public enum ValueType { String, Int, Float, Color }
 
-        /// <summary>
-        /// The buttons visible caption
-        /// </summary>
+        // Border of element
+        protected float border;
+
+        // Related to caption
+        public string Caption;
+        protected bool centered;
+        private Vector2 captionSize;
+        private Vector2 captionDelta;
+        protected Vector2 captionSpacing;
+
+        // Precalculated
+        protected OABB oabb;
+        private Vector2 totalHeight;
+        private Vector2 totalWidth;
+
+        // Related to text
         public string Text;
         public int TextLength;
-        private float w;
-        private float h;
-        private float timer = 0;
+        private string blink = "_";
+        private Vector2 blinkSize;
+
         private int cursor;
-        private Konsoul.KeyMap keyMap;
-        private KeyboardState previous;
+        private float timer;
         private float downTimer;
         private int strokeCount;
 
-        public Vector2 CaptionPosition;
-        public String Caption;
+        private Konsoul.KeyMap keyMap;
+        protected KeyboardState previous;
+
         public UIAction OnEnter;
 
+        public bool Centered
+        {
+            get => centered;
+            set { centered = value; }
+        } 
 
-        public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit, UIAction onEnter)
-            : this(caption, text, new Vector2(left + width * 0.5f, top + height * 0.5f), new OABB(new Vector2(width * 0.5f, height * 0.5f)), 99, onChange, onExit, onEnter)
+        public override Vector2 Size => new Vector2(totalWidth.X, totalHeight.Y);
+
+        public override Vector2 Location
+        {
+            get => this.Position;
+            set { this.Position = value; }
+        }
+
+        public ValueType Type { get; set; }
+
+        // TODO: should be removed along with editor
+        public EditBox(float left, float top, float width, float height, string text, string caption, ValueType type, UIAction onChange, UIAction onExit, UIAction onEnter, bool centered = false, Vector2? captionSpacing = null)
+            : this(caption, text, new Vector2(left + width * 0.5f, top + height * 0.5f), new OABB(new Vector2(width * 0.5f, height * 0.5f)), 99, onChange, onExit, onEnter, centered)
         {
             this.Caption = caption;
-            this.CaptionPosition = new Vector2(-80, 0);
             this.Type = type; 
         }
 
-        public EditBox(string name, string text, Vector2 position, OABB shape, int textLength, UIAction onChange, UIAction onExit, UIAction onEnter)
+        public EditBox(string name, string text, Vector2 position, OABB shape, int textLength, UIAction onChange, UIAction onExit, UIAction onEnter, bool centered, Vector2? captionSpacing = null)
             : base(name, position, shape)
         {
+            // Text
+            this.Text = text;
+            this.TextLength = textLength;
+            this.centered = centered;
+            this.timer = 0f;
+            this.keyMap = new Konsoul.KeyMap();
+            this.blinkSize = UILayer.Font.MeasureString(blink);
+
+            // Callbacks
             this.OnChange = onChange;
             this.OnBlur = onExit;
             this.OnEnter = onEnter;
-            this.Text = text;
-            this.w = shape.HalfSize.X - 4;
-            this.h = UILayer.Font.LineSpacing * 0.5f;
-            this.TextLength = textLength;
-            this.keyMap = new Konsoul.KeyMap();
+
+            // Default values
+            this.border = 2f;
+            this.captionSpacing = captionSpacing ?? new Vector2(0, 10);
+
+            // Precalculated
+            this.oabb = shape;
+            this.captionSize = UILayer.Font.MeasureString(Name);
+            this.totalHeight = new Vector2(0, oabb.HalfSize.Y * 2);
+            this.totalWidth = new Vector2(oabb.HalfSize.X * 2, 0);
+            this.captionDelta = Vector2.Zero;
+
+            // If a name is set some dimensions change
+            if (!(Name == null || Name == ""))
+            {
+                this.totalHeight += this.captionSpacing + new Vector2(0, captionSize.Y);
+                this.totalWidth = new Vector2(Math.Max(captionSize.X, oabb.HalfSize.X * 2), 0);
+                this.captionDelta = (totalHeight * 0.5f) - new Vector2(0, captionSize.Y + this.captionSpacing.Y + oabb.HalfSize.Y - border);
+            }
+
+            //this.w = shape.HalfSize.X - 4;
+            //this.h = UILayer.Font.LineSpacing * 0.5f;
         }
 
         /// <summary>
@@ -65,37 +119,80 @@ namespace Phantom.GameUI.Elements
         /// <param name="info"></param>
         public override void Render(Graphics.RenderInfo info)
         {
-            if (UILayer.Font != null && Visible)
+            if (UILayer.Font != null && this.Visible)
             {
-                Color face = Color.Lerp(UILayer.ColorTextBox, UILayer.ColorTextBoxHighLight, this.currentSelected);
-                Color text = Color.Lerp(UILayer.ColorText, UILayer.ColorTextHighLight, this.currentSelected);
+                Color face = UILayer.ColorTextBox;
+                Color text = UILayer.ColorText;
 
-                if (!Enabled)
+                // Selected control
+                if (this.Enabled)
+                    text = (this.Selected == 0) ? UILayer.ColorTextBox : UILayer.ColorTextHighLight;
+
+                // Disabled
+                else
                 {
-                    face = UILayer.ColorFaceDisabled;
                     text = UILayer.ColorTextDisabled;
+                    face = UILayer.ColorFaceDisabled;   
                 }
 
-				PhantomUtils.DrawShape(info, this.Position, this.Shape, face, UILayer.ColorShadow, 2);
-				//PhantomUtils.DrawShape(info, this.Position - Vector2.One * down, this.Shape, face, UILayer.ColorShadow, 2);
-                Vector2 p = Position;
-                p.Y -= h * UILayer.DefaultFontScale;
-                p.X -= w;
-                p.X = (float)Math.Round(p.X);
-                p.Y = (float)Math.Round(p.Y);
-                string s = Text;
-                if (timer % 0.5f > 0.2f)
-                    s += "_";
-                //info.Batch.DrawString(UILayer.Font, s, p, text);
-                UILayer.Font.DrawString(info, s, p, text, UILayer.DefaultFontScale, 0, new Vector2(0, 0));
+                // Start position draw
+                Vector2 startPos = this.Position;
 
-                if (Caption != null)
+                // Caption
+                if (!(Name == null || Name == ""))
                 {
-                    UILayer.Font.DrawString(info, Caption, p+CaptionPosition, text, UILayer.DefaultFontScale, 0, new Vector2(0, 0));
+                    // Set starting position
+                    startPos = this.Position - totalHeight * 0.5f;
+
+                    // Offset of caption
+                    Vector2 offsetCaption = Vector2.Zero;
+
+                    // Left align if required
+                    if (!centered)
+                        offsetCaption += new Vector2(captionSize.X * 0.5f - oabb.HalfSize.X, 0);
+
+                    // Draw caption
+                    UILayer.Font.DrawString(info, Name, startPos + offsetCaption, text, 1f, 0, new Vector2(captionSize.X * 0.5f, 0));
+
+                    // Move position
+                    startPos.Y += captionSize.Y + captionSpacing.Y + oabb.HalfSize.Y - border;
+                }
+
+                // Input field background
+                PhantomUtils.DrawShape(info, this.Position, this.Shape, face, UILayer.ColorShadow, 2);
+
+                // Text
+                if (this.Focus)
+                    text = UILayer.ColorTextHighLight;
+
+                // Draw Text
+                if (Text != null)
+                {
+                    // Text to draw
+                    string textBlink = Text;
+
+                    // Blink effect
+                    if (Focus && timer % 0.7f < 0.4f)
+                        textBlink += blink;
+
+                    // Position to draw text at
+                    Vector2 m = UILayer.Font.MeasureString(Text);
+                    Vector2 a = Vector2.Zero;
+                    if (!centered)
+                        a.X -= (oabb.HalfSize.X - m.X * 0.5f) - (border + 4f);
+
+                    // If there's no text typed in yet
+                    if (textBlink == blink)
+                    {
+                        a.Y -= UILayer.Font.LineSpacing * 0.5f;
+                        a.X -= blinkSize.X * 0.5f;
+                    }
+
+                    // Drawning text
+                    UILayer.Font.DrawString(info, textBlink, startPos + a, text, UILayer.DefaultFontScale, 0, m * 0.5f);
                 }
             }
         }
-
 
         public override void Update(float elapsed)
         {
@@ -189,12 +286,16 @@ namespace Phantom.GameUI.Elements
             base.Update(elapsed);
         }
 
-        internal override void GainFocus()
+        public override void GainFocus()
         {
             this.cursor = this.Text.Length;
             base.GainFocus();
         }
 
-        public ValueType Type { get; set; }
+        public override bool InControl(Vector2 position)
+        {
+            position += captionDelta;
+            return Shape.InShape(position);
+        }
     }
 }

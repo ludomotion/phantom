@@ -475,7 +475,7 @@ namespace Phantom.Graphics
                     rw += CharacterSpacing;
                 }
             }
-            if (rw>0)
+            if (rw > 0)
             {
                 rw += Math.Max(kerningBottom, Math.Max(kerningCenter, kerningTop));
                 r.X = Math.Max(rw, r.X);

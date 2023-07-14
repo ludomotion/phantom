@@ -168,6 +168,5 @@ namespace Phantom.GameUI.Handlers
         {
             layer.Back();
         }
-       
     }
 }

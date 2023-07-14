@@ -15,17 +15,24 @@ namespace Phantom.Core
     public class GameState : Component
     {
         /// <summary>
-        /// If a GameState is transparent the gameState below this one will also be rendered.
+        /// The gameState below this one will also be rendered.
         /// </summary>
-        public bool Transparent { get; protected set; }
+        public bool RenderBelow { get; set; }
+
         /// <summary>
-        /// Set Propagate to true to allow the gameState below this one to apply updates and update physics.
+        /// The gameState below this one will apply updates and update physics.
         /// </summary>
-        public bool Propagate { get; protected set; }
+        public bool UpdateBelow { get; set; }
+
         /// <summary>
-        /// Set OnlyOnTop to true to prevent this GameState from being rendered or updated when it is not the top state.
+        /// Set RenderBelowTop to false to prevent this GameState from being rendered when it is not the top state.
         /// </summary>
-        public bool OnlyOnTop { get; protected set; }
+        public bool RenderBelowTop { get; set; }
+
+        /// <summary>
+        /// Set UpdateBelowTop to false to prevent this GameState from being updated when it is not the top state.
+        /// </summary>
+        public bool UpdateBelowTop { get; set; }
 
         /// <summary>
         /// DEPRICATED
@@ -37,10 +44,14 @@ namespace Phantom.Core
         /// </summary>
         public Camera Camera { get; protected set; }
 
-
         public GameState()
         {
+            // Input
             this.AddComponent(new Input());
+
+            // Default window properties
+            this.RenderBelowTop = true;
+            this.UpdateBelowTop = true;
         }
 
         protected override void OnComponentAdded(Component component)
@@ -60,7 +71,12 @@ namespace Phantom.Core
 			}
         }
 
-        public virtual void BackOnTop()
+        public virtual void BelowTop()
+        {
+
+        }
+
+        public virtual void OnTop()
         {
             this.Input.JustBack = true;
         }

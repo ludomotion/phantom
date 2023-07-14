@@ -45,8 +45,6 @@ namespace Phantom.GameUI.Elements
         public Vector2 HalfSize;
         public static Sprite Rect;
 
-
-
         public TextArea(string name, Vector2 position, Vector2 size, Phont font, string text, float relativeSize, float relativeLineSpacing, Color[] colors)
             : base(name, position + size * 0.5f, new OABB(size * 0.5f))
         {
@@ -54,9 +52,42 @@ namespace Phantom.GameUI.Elements
             this.font = font;
             this.colors = colors;
             this.text = new List<TextSegment>();
+
+            // Set height of control
             Height = SetText(text, relativeSize, relativeLineSpacing);
+
             this.OnMouseMove = DoMouseMove;
             this.OnMouseOut = DoMouseOut;
+        }
+
+        public override void Render(RenderInfo info)
+        {
+            base.Render(info);
+            if (info.Pass == 0)
+                RenderAt(info, this.Position - HalfSize, this.relativeSize, 0);
+        }
+
+        public void RenderAt(RenderInfo info, Vector2 position, float scale, float orientation)
+        {
+            //if (Rect != null)
+            //    Rect.RenderFrame(info, 0, position + HalfSize * scale / this.relativeSize, new Vector2(HalfSize.X * 2, HalfSize.Y * 2 - 2) * scale / this.relativeSize, 0, Color.Yellow);
+            for (int i = 0; i < text.Count; i++)
+            {
+                Vector2 p = position + text[i].Position.RotateBy(orientation) * scale;
+                Color c = text[i].Color;
+                if (i == hoveringLink)
+                    c = colors[Math.Min(2, colors.Length - 1)];
+                font.DrawString(info, text[i].Text, p, c, scale, orientation);
+
+                if (text[i].Reference.Length > 0)
+                    Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X * 0.5f, text[i].Size.Y * 0.9f) * scale, new Vector2(text[i].Size.X * scale, 2), 0, c);
+            }
+        }
+
+        public void AdjustSize()
+        {
+            HalfSize = new Vector2(HalfSize.X, this.Height * 0.5f);
+            AddComponent(new OABB(HalfSize));
         }
 
         public float SetText(string text)
@@ -109,12 +140,6 @@ namespace Phantom.GameUI.Elements
             max *= relativeSize;
 
             return max;
-        }
-
-        public void AdjustSize()
-        {
-            HalfSize = new Vector2(HalfSize.X, this.Height * 0.5f);
-            AddComponent(new OABB(HalfSize));
         }
 
         private void FinishSegment(string currentSegment, ref Vector2 position, Color color, string reference)
@@ -190,32 +215,6 @@ namespace Phantom.GameUI.Elements
             }
         }
 
-        public override void Render(RenderInfo info)
-        {
-            base.Render(info);
-            if (info.Pass == 0)
-            {
-                RenderAt(info, this.Position - HalfSize, this.relativeSize, 0);
-            }
-        }
-
-        public void RenderAt(RenderInfo info, Vector2 position, float scale, float orientation)
-        {
-            //if (Rect != null)
-            //    Rect.RenderFrame(info, 0, position + HalfSize * scale / this.relativeSize, new Vector2(HalfSize.X * 2, HalfSize.Y * 2 - 2) * scale / this.relativeSize, 0, Color.Yellow);
-
-            for (int i = 0; i < text.Count; i++)
-            {
-                Vector2 p = position + text[i].Position.RotateBy(orientation) * scale;
-                Color c = text[i].Color;
-                if (i == hoveringLink)
-                    c = colors[Math.Min(2, colors.Length - 1)];
-                font.DrawString(info, text[i].Text, p, c, scale, orientation);
-                if (text[i].Reference.Length>0)
-                    Rect.RenderFrame(info, 0, p + new Vector2(text[i].Size.X*0.5f, text[i].Size.Y*0.9f)*scale, new Vector2(text[i].Size.X*scale, 2), 0, c);
-            }
-        }
-
         private void DoMouseOut(UIElement element, Vector2 mousePosition, UIMouseButton button)
         {
             this.hoveringLink = -1;
@@ -239,8 +238,6 @@ namespace Phantom.GameUI.Elements
                 }
             }
         }
-
-
 
         public override void ClickAt(Vector2 position, UIMouseButton button)
         {

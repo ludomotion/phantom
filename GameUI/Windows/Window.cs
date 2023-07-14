@@ -59,8 +59,8 @@ namespace Phantom.GameUI.Windows
             //ui.AddComponent(new UIKeyboardHandler());
             ui.AddComponent(new WindowBackground(new Vector2(left+width*0.5f, top + height*0.5f), new Vector2(width*0.5f, height*0.5f), text));
             ui.AddComponent(new Button("close", "x", new Vector2(left + width - 9, top + 9), new OABB(new Vector2(8, 8)), DoX));
-            this.Transparent = true;
-            this.Propagate = false;
+            this.RenderBelow = true;
+            this.UpdateBelow = false;
         }
 
         public override void AddComponent(Component child)

@@ -80,9 +80,14 @@ namespace Phantom.GameUI
         private Renderer renderer;
 
         /// <summary>
+        /// Last clicked control
+        /// </summary>
+        public UIElement LastActivated;
+
+        /// <summary>
         /// Creates a menu class
         /// </summary>
-        /// <param name="renderer">The renderer component that is responsible for rendering the controlss</param>
+        /// <param name="renderer">The renderer component that is responsible for rendering the controls</param>
         /// <param name="playerCount">The number of players that can control the menu simultaneously</param>
         public UILayer(Renderer renderer, int playerCount)
         {
@@ -130,7 +135,6 @@ namespace Phantom.GameUI
             if (child is UIElement)
                 Controls.Remove((UIElement)child);
         }
-
 
         public override void Render(RenderInfo info)
         {
@@ -197,19 +201,19 @@ namespace Phantom.GameUI
         /// Set the selected control for a controlling player
         /// </summary>
         /// <param name="player"></param>
-        /// <param name="value"></param>
-        public void SetSelected(int player, UIElement value)
+        /// <param name="element"></param>
+        public void SetSelected(int player, UIElement element)
         {
             if (player < 0 || player >= selected.Length)
                 return;
-            if (selected[player] == value)
+            if (selected[player] == element)
                 return;
             if (selected[player] != null)
             {
                 selected[player].CancelPress(player);
                 selected[player].Selected &= 255 - (1 << player);
             }
-            selected[player] = value;
+            selected[player] = element;
             if (selected[player] != null)
                 selected[player].Selected |= 1 << player;
         }
