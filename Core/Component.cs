@@ -177,7 +177,8 @@ namespace Phantom.Core
         }
 
         /// <summary>
-        /// Call this function to insert a child component to this component before a specific component. 
+        /// Call this function to insert a child component to this component before a specific component.
+        /// If it cannot find the specific component it will instead insert it at the end.
         /// This function calls the OnAdd of the child, the OnAncestryChanged of the child and all its
         /// children, and the OnComponentAdded of this component.
         /// </summary>
@@ -187,6 +188,51 @@ namespace Phantom.Core
         {
             // ************** START INDEX IMPLEMENTATION **************
             int index = Array.IndexOf(components, other, 0, componentsIndex + 1);
+
+            // If we can't find it insert it at the end
+            if (index == -1)
+            {
+                AddComponent(child);
+                return;
+            }
+            // ************** END INDEX IMPLEMENTATION **************
+
+            // ************** START INSERT IMPLEMENTATION **************
+            index = Math.Min(index, componentsIndex + 1);
+            if (componentsIndex == components.Length - 1)
+                Array.Resize(ref components, components.Length * DefaultArrayIncrease);
+            if (index < componentsIndex + 1)
+                Array.Copy(components, index, components, index + 1, componentsIndex + 1 - index);
+            components[index] = child;
+            componentsIndex++;
+            // ************** END INSERT IMPLEMENTATION **************
+
+            // Callback
+            this.OnComponentAdded(child);
+        }
+
+        /// <summary>
+        /// Call this function to insert a child component to this component after a specific component.
+        /// If it cannot find the specific component it will instead insert it at the end.
+        /// This function calls the OnAdd of the child, the OnAncestryChanged of the child and all its
+        /// children, and the OnComponentAdded of this component.
+        /// </summary>
+        /// <param name="other">A existing child of the component, the new child is added before this component</param>
+        /// <param name="child"></param>
+        public void InsertAfterComponent(Component other, Component child)
+        {
+            // ************** START INDEX IMPLEMENTATION **************
+            int index = Array.IndexOf(components, other, 0, componentsIndex + 1);
+
+            // If we can't find it insert it at the end
+            if (index == -1)
+            {
+                AddComponent(child);
+                return;
+            }
+
+            // Increase index by 1 to insert it after
+            index++;
             // ************** END INDEX IMPLEMENTATION **************
 
             // ************** START INSERT IMPLEMENTATION **************
