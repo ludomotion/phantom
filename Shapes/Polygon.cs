@@ -587,6 +587,18 @@ namespace Phantom.Shapes
 			}
         }
 
+        public override bool InRectPartial(Vector2 topLeft, Vector2 bottomRight)
+        {
+            Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);
+            Vector2 origin = this.Entity.Position;
+
+            for (int i = 0; i < verts.Length; i++)
+                if (!(verts[i].X + origin.X < topLeft.X || verts[i].X + origin.X > bottomRight.X || verts[i].Y + origin.Y < topLeft.Y || verts[i].Y + origin.Y > bottomRight.Y))
+                    return true;
+
+            return false;
+        }
+
         public override Vector2 ClosestVertice(Vector2 point)
         {
             Vector2[] verts = this.RotatedVertices(this.Entity.Orientation);

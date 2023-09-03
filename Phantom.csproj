@@ -223,6 +223,7 @@
     <Compile Include="Timer\GameTimer.cs" />
     <Compile Include="Timer\GameTimerQuery.cs" />
     <Compile Include="Timer\GameTimerUTC.cs" />
+    <Compile Include="Utils\ArrayPoolExtensions.cs" />
     <Compile Include="Utils\Asynchrony.cs" />
     <Compile Include="Utils\CharArrayUtils.cs" />
     <Compile Include="Utils\Editor.cs" />

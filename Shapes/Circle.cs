@@ -182,7 +182,27 @@ namespace Phantom.Shapes
 				return (this.Entity.Position.X - Radius >= topLeft.X && this.Entity.Position.X + Radius <= bottomRight.X && this.Entity.Position.Y - Radius >= topLeft.Y && this.Entity.Position.Y + Radius <= bottomRight.Y);
         }
 
-		public override CollisionData Collide(Shape other)
+        public override bool InRectPartial(Vector2 topLeft, Vector2 bottomRight)
+        {
+            Vector2 pos = this.Entity.Position;
+
+            if (pos.X + Radius >= topLeft.X && pos.X - Radius <= bottomRight.X && pos.Y + Radius >= topLeft.Y && pos.Y - Radius <= bottomRight.Y)
+            {
+                if (pos.X < topLeft.X && pos.Y < topLeft.Y && (pos - topLeft).Length() < Radius) // in topleft corner
+                    return false;
+                if (pos.X > bottomRight.X && pos.Y < topLeft.Y && (pos - topLeft).Length() < Radius) // in topright corner
+                    return false;
+                if (pos.X > bottomRight.X && pos.Y > bottomRight.Y && (pos - topLeft).Length() < Radius) // in bottomright corner
+                    return false;
+                if (pos.X < topLeft.X && pos.Y > bottomRight.Y && (pos - topLeft).Length() < Radius) // in bottomleft corner
+                    return false;
+                return true;
+            }
+
+            return false;
+        }
+
+        public override CollisionData Collide(Shape other)
 		{
 			#if PLATFORM_IOS
 			// Generic Virtual Methods cannot be called in iOS, due to iOS not allowing JIT-compiling

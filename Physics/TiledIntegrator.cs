@@ -5,6 +5,8 @@ using System.Text;
 using Phantom.Core;
 using Microsoft.Xna.Framework;
 using Phantom.Graphics;
+using System.Buffers;
+using Phantom.Utils;
 
 namespace Phantom.Physics
 {
@@ -407,7 +409,7 @@ namespace Phantom.Physics
             return listOfEntitiesInRect;
         }
 
-        public ReadOnlySpan<Entity> GetEntitiesInRectAsReadOnlySpan(Vector2 topLeft, Vector2 bottomRight, bool partial)
+        public override Entity[] GetPartialEntitiesInRectAsPooledArray(Vector2 topLeft, Vector2 bottomRight, out int length)
         {
             //List<Entity> listOfEntitiesInRect = GetListFromPool();
             int tX1 = (int)(topLeft.X * this.invTileSize);
@@ -419,12 +421,14 @@ namespace Phantom.Physics
             int minY = Math.Max(tY1 - 1, 0);
             int maxY = Math.Min(tY2 + 1, this.tilesY - 1) + 1;
 
-            // We have no idea how many results we will have
-            // But since this function is called so much
-            // We will use a default size of 64 to avoid resizing
-            // And multiply by 16 if there are more results
-            Entity[] lst = new Entity[64];
+            // Start array of (at least 16) elements and multiply be 2 if more space is needed
             int index = -1;
+            int arraySize = 16;
+            Entity[] array = ArrayPool<Entity>.Shared.Rent(arraySize);
+
+            // We need to adjust arraySize because Renting an array returns 
+            // (at least) n elements but possibly more
+            arraySize = array.Length;
 
             // Initialize variables at top just to be sure
             Tile tile;
@@ -442,21 +446,28 @@ namespace Phantom.Physics
                     for (int i = 0; i < tile.entitiesIndex + 1; i++)
                     {
                         entity = tile.entities[i];
-                        if(!(entity.Destroyed || entity.Shape == null || !entity.Shape.InRect(topLeft, bottomRight, partial)))
+                        if(!(entity.Destroyed || entity.Shape == null || !entity.Shape.InRectPartial(topLeft, bottomRight)))
                         {
                             // ************** START ADD IMPLEMENTATION **************
                             index++;
-                            if (index >= lst.Length)
-                                Array.Resize(ref lst, lst.Length * 16);
-                            lst[index] = entity;
+                            if (index >= array.Length)
+                            {
+                                arraySize *= 2;
+                                ArrayPool<Entity>.Shared.Resize(ref array, arraySize);
+                            }
+
+                            array[index] = entities[i];
                             // ************** END ADD IMPLEMENTATION **************
                         }
                     }
                 }
             }
 
+            // Set maximum valid index as length
+            length = index + 1;
+
             // Return result
-            return new ReadOnlySpan<Entity>(lst, 0, index + 1);
+            return array;
         }
 
         public override Entity GetEntityCloseTo(Vector2 position, float distance)

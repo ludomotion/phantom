@@ -6,6 +6,9 @@ using Phantom.Graphics;
 using Phantom.Misc;
 using System.Diagnostics;
 using Phantom.Utils.Performance;
+using System;
+using System.Buffers;
+using Phantom.Utils;
 
 namespace Phantom.Physics
 {
@@ -107,7 +110,7 @@ namespace Phantom.Physics
                                 i = this.layer.VisibleUpdate.Count - 1;
 
                             Entity e = this.layer.VisibleUpdate[i];
-                            if (!e.Destroyed && e.Shape.InRect(this.renderer.TopLeft, this.renderer.BottomRight, true))
+                            if (!e.Destroyed && e.Shape.InRectPartial(this.renderer.TopLeft, this.renderer.BottomRight))
                             {
                                 e.Integrate(devidedElapsed);
                                 CheckEntityCollision(e);
@@ -296,9 +299,9 @@ namespace Phantom.Physics
 				if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InRect(topLeft, bottomRight, partial))
 					yield return entities[i];
         }
-
         
         private List<List<Entity>> entityPoolList = new List<List<Entity>>();
+
         public void ReturnListToPool(List<Entity> list)
         {
             list.Clear();
@@ -335,6 +338,48 @@ namespace Phantom.Physics
             return listOfEntitiesInRect;
         }
 
+        /// <summary>
+        /// Returns a span of all partial entities in the indicated rectangle
+        /// </summary>
+        /// <param name="topLeft"></param>
+        /// <param name="bottomRight"></param>
+        /// <returns></returns>
+        /// 
+        public virtual Entity[] GetPartialEntitiesInRectAsPooledArray(Vector2 topLeft, Vector2 bottomRight, out int length)
+        {
+            // Start array of (at least 16) elements and multiply be 2 if more space is needed
+            int index = -1;
+            int arraySize = 16;
+            Entity[] array = ArrayPool<Entity>.Shared.Rent(arraySize);
+
+            // We need to adjust arraySize because Renting an array returns 
+            // (at least) n elements but possibly more
+            arraySize = array.Length;
+
+            // Loop over entities
+            for (int i = 0; i < entities.Count; i++)
+            {
+                if (!entities[i].Destroyed && entities[i].Shape != null && entities[i].Shape.InRectPartial(topLeft, bottomRight))
+                {
+                    // ************** START ADD IMPLEMENTATION **************
+                    index++;
+                    if (index >= array.Length)
+                    {
+                        arraySize *= 2;
+                        ArrayPool<Entity>.Shared.Resize(ref array, arraySize);
+                    }
+
+                    array[index] = entities[i];
+                    // ************** END ADD IMPLEMENTATION **************
+                }
+            }
+
+            // Set maximum valid index as length
+            length = index + 1;
+
+            // Return result
+            return array;
+        }
 
         /// <summary>
         /// Called by the parents layer when its size is changed, removes or destroys the entities that are outside the new bounds.
@@ -352,7 +397,5 @@ namespace Phantom.Physics
                 }
             }
         }
-
-
 	}
 }

@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Phantom.Shapes.Filters;
 using System.Diagnostics;
 using Phantom.Utils.Performance;
+using System.Buffers;
 
 namespace Phantom.Core
 {
@@ -156,8 +157,23 @@ namespace Phantom.Core
             EntityRenderer r = this.renderer as EntityRenderer;
             if (r != null)
             {
-                List<Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
-                foreach( Entity e in list )
+                // Array with length
+                Entity[] entities = this.integrator.GetPartialEntitiesInRectAsPooledArray(r.TopLeft, r.BottomRight, out int length);
+
+                for (int i = 0; i < length; i++)
+                {
+                    if (entities[i].UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
+                    {
+                        entities[i].Update(elapsed);
+                        if (entities[i].Destroyed)
+                            this.RemoveComponent(entities[i]);
+                    }
+                }
+
+                ArrayPool<Entity>.Shared.Return(entities);
+                /*
+                List <Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
+                foreach (Entity e in list)
                 {
                     if (e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
                     {
@@ -166,15 +182,12 @@ namespace Phantom.Core
                             this.RemoveComponent(e);
                     }
                 }
-                this.integrator.ReturnListToPool(list);
+                this.integrator.ReturnListToPool(list);*/
             }
 
             // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!
             //base.Update(elapsed);
         }
-
-
-        
 
         public override void Render( RenderInfo info )
         {
@@ -306,7 +319,6 @@ namespace Phantom.Core
             integrator.ReturnListToPool(list);
         }
 
-
 		public IEnumerable<Entity> GetEntitiesByFilter(IFilter filter, FilterTarget target)
         {
             switch (target)
@@ -360,6 +372,7 @@ namespace Phantom.Core
                     break;
             }
 		}
+
         public void ExecuteOutFilter(IFilter filter, Action<Entity> callback, FilterTarget target)
         {
             switch (target)
@@ -387,6 +400,7 @@ namespace Phantom.Core
                     break;
             }
 		}
+
         public void ExecuteInOutFilter(IFilter filter, Action<Entity> callbackIn, Action<Entity> callbackOut, FilterTarget target)
         {
             switch (target)
