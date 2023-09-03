@@ -157,7 +157,6 @@ namespace Phantom.Core
             EntityRenderer r = this.renderer as EntityRenderer;
             if (r != null)
             {
-                // Array with length
                 Entity[] entities = this.integrator.GetPartialEntitiesInRectAsPooledArray(r.TopLeft, r.BottomRight, out int length);
 
                 for (int i = 0; i < length; i++)
@@ -171,6 +170,7 @@ namespace Phantom.Core
                 }
 
                 ArrayPool<Entity>.Shared.Return(entities);
+
                 /*
                 List <Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
                 foreach (Entity e in list)

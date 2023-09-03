@@ -347,13 +347,10 @@ namespace Phantom.Physics
         /// 
         public virtual Entity[] GetPartialEntitiesInRectAsPooledArray(Vector2 topLeft, Vector2 bottomRight, out int length)
         {
-            // Start array of (at least 16) elements and multiply be 2 if more space is needed
+            // Start array with 16 elements and multiply be 2 if more space is needed
             int index = -1;
             int arraySize = 16;
             Entity[] array = ArrayPool<Entity>.Shared.Rent(arraySize);
-
-            // We need to adjust arraySize because Renting an array returns 
-            // (at least) n elements but possibly more
             arraySize = array.Length;
 
             // Loop over entities
@@ -374,7 +371,7 @@ namespace Phantom.Physics
                 }
             }
 
-            // Set maximum valid index as length
+            // Length of array is index + 1
             length = index + 1;
 
             // Return result

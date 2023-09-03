@@ -421,13 +421,10 @@ namespace Phantom.Physics
             int minY = Math.Max(tY1 - 1, 0);
             int maxY = Math.Min(tY2 + 1, this.tilesY - 1) + 1;
 
-            // Start array of (at least 16) elements and multiply be 2 if more space is needed
+            // Start array with 16 elements and multiply be 2 if more space is needed
             int index = -1;
             int arraySize = 16;
             Entity[] array = ArrayPool<Entity>.Shared.Rent(arraySize);
-
-            // We need to adjust arraySize because Renting an array returns 
-            // (at least) n elements but possibly more
             arraySize = array.Length;
 
             // Initialize variables at top just to be sure
@@ -456,14 +453,14 @@ namespace Phantom.Physics
                                 ArrayPool<Entity>.Shared.Resize(ref array, arraySize);
                             }
 
-                            array[index] = entities[i];
+                            array[index] = entity;
                             // ************** END ADD IMPLEMENTATION **************
                         }
                     }
                 }
             }
 
-            // Set maximum valid index as length
+            // Length of array is index + 1
             length = index + 1;
 
             // Return result
