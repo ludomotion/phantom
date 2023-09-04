@@ -170,19 +170,6 @@ namespace Phantom.Core
                 }
 
                 ArrayPool<Entity>.Shared.Return(entities);
-
-                /*
-                List <Entity> list = this.integrator.GetEntitiesInRectAsList(r.TopLeft, r.BottomRight, true);
-                foreach (Entity e in list)
-                {
-                    if (e.UpdateBehaviour == Entity.UpdateBehaviours.UpdateWhenVisible)
-                    {
-                        e.Update(elapsed);
-                        if (e.Destroyed)
-                            this.RemoveComponent(e);
-                    }
-                }
-                this.integrator.ReturnListToPool(list);*/
             }
 
             // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!
@@ -250,6 +237,7 @@ namespace Phantom.Core
 
 
         private List<Entity> listOfEntities = new List<Entity>();
+
         public IEnumerable<Entity> GetEntitiesInRectSorted(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
             listOfEntities.Clear();
@@ -296,7 +284,6 @@ namespace Phantom.Core
             integrator.ReturnListToPool(list);
             return listOfEntities;
         }
-
 
         public IEnumerable<Entity> GetEntitiesInRect(Vector2 topLeft, Vector2 bottomRight, bool partial)
         {
