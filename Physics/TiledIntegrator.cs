@@ -423,7 +423,7 @@ namespace Phantom.Physics
 
             // Start array with 16 elements and multiply be 2 if more space is needed
             int index = -1;
-            int arraySize = 16;
+            int arraySize = 512;
             Entity[] array = ArrayPool<Entity>.Shared.Rent(arraySize);
             arraySize = array.Length;
 
