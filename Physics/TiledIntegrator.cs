@@ -450,7 +450,7 @@ namespace Phantom.Physics
                             if (index >= array.Length)
                             {
                                 arraySize *= 2;
-                                ArrayPool<Entity>.Shared.Resize(ref array, arraySize);
+                                ArrayPool<Entity>.Shared.Resize(ref array, arraySize, true);
                             }
 
                             array[index] = entity;

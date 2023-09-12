@@ -52,11 +52,9 @@ namespace Phantom.Misc
             this.phantom.XnaUpdate(gameTime);
         }
 
-
         public void Draw(GameTime gameTime)
         {
             this.phantom.XnaRender(gameTime);
         }
-
     }
 }

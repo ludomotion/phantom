@@ -169,7 +169,7 @@ namespace Phantom.Core
                     }
                 }
 
-                ArrayPool<Entity>.Shared.Return(entities);
+                ArrayPool<Entity>.Shared.Return(entities, true);
             }
 
             // DO NOT CALL BASE UPDATE! WE ARE OVERRIDING THIS BEHAVIOUR!!

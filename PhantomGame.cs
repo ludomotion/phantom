@@ -97,9 +97,9 @@ namespace Phantom
             }
         }
 #endif
-
-
         protected IList<GameState> states;
+        private IList<GameState> removedStates;
+
         public GameState CurrentState
         {
             get
@@ -109,6 +109,7 @@ namespace Phantom
                 return this.states[this.states.Count - 1];
             }
         }
+
         public int StateCount
         {
             get
@@ -172,6 +173,7 @@ namespace Phantom
             this.graphics.ApplyChanges();
 
 			this.states = new List<GameState>();
+            this.removedStates = new List<GameState>();
         }
 
         public override void Dispose()
@@ -252,11 +254,18 @@ namespace Phantom
             elapsed *= this.multiplier;
             this.TotalTime += elapsed;
 
+            for (int i = this.removedStates.Count - 1; i >= 0; i--)
+            {
+                this.removedStates[i].OnRemove();
+                this.removedStates.Remove(this.removedStates[i]);
+            }
+
 #if DEBUG
             Sprite.BeginFrame();
 #endif
 
             this.Update(elapsed);
+
             for (int i = this.states.Count - 1; i >= 0 && i < this.states.Count; i--)
             {
                 bool propagate = this.states[i].UpdateBelow;
@@ -463,8 +472,8 @@ namespace Phantom
                 state.BelowTop();
 
                 // If state is also to be removed
-                if(remove)
-                    state.OnRemove();
+                if (remove)
+                    removedStates.Add(state);
                 
                 // If we still have any states left
                 if (this.states.Count > 0)
@@ -498,7 +507,7 @@ namespace Phantom
 
                 // Call removal functions
                 removed.BelowTop();
-                removed.OnRemove();
+                removedStates.Add(removed);
             }
 
             // Add new state on top
@@ -525,8 +534,8 @@ namespace Phantom
                 // Call below top and on remove
                 // Belowtop needs to be called in case the state gets
                 // saved for later use
+                this.removedStates.Add(this.states[i]);
                 this.states[i].BelowTop();
-                this.states[i].OnRemove();
                 this.states.RemoveAt(i);
             }
         }
@@ -555,14 +564,13 @@ namespace Phantom
                     this.states[i].OnTop();
 
                     // Stop looping
-                    break;
+                    return;
                 }
 
-                // Call below top and on remove
-                // Belowtop needs to be called in case the state gets
-                // saved for later use
+                // Call below top and on remove belowtop needs to be called... 
+                // ... in case the state gets saved for later use
+                this.removedStates.Add(this.states[i]);
                 this.states[i].BelowTop();
-                this.states[i].OnRemove();
                 this.states.RemoveAt(i);
 
                 // Next state is not on top
