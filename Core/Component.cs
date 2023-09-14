@@ -29,11 +29,11 @@ namespace Phantom.Core
         /// </summary>
         public bool Destroyed { get; set; }
 
-        /// <summary>
-        /// The Ghost flag marks components that are not active, but are not destroyed either. 
-        /// Ghost components will not be updated and are not intergrated if they are part of 
-        /// and physics integrator. Not used in unexplored, performance loss for no reason.
-        /// </summary>
+        //// <summary>
+        //// The Ghost flag marks components that are not active, but are not destroyed either. 
+        //// Ghost components will not be updated and are not intergrated if they are part of 
+        //// and physics integrator. Not used in unexplored, performance loss for no reason.
+        //// </summary>
         // public bool Ghost;
 
         /// <summary>

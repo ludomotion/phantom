@@ -343,6 +343,7 @@ namespace Phantom.Physics
         /// </summary>
         /// <param name="topLeft"></param>
         /// <param name="bottomRight"></param>
+        /// <param name="length">Maximum (valid) index of entities, the rest is empty space.</param>
         /// <returns></returns>
         /// 
         public virtual Entity[] GetPartialEntitiesInRectAsPooledArray(Vector2 topLeft, Vector2 bottomRight, out int length)
