@@ -33,8 +33,8 @@ namespace Phantom.Graphics
         private List<CanvasAction> stack;
 
         // Buffers:
-        private static VertexPositionColor[] pixel;
-        private static Dictionary<int, CircleBuffer> circles;
+        private VertexPositionColor[] pixel;
+        private Dictionary<int, CircleBuffer> circles;
 
         public Canvas(GraphicsDevice graphicsDevice)
         {
@@ -58,9 +58,9 @@ namespace Phantom.Graphics
 
         private void SetupGraphics()
         {
-            if (Canvas.pixel == null)
+            if (pixel == null)
             {
-                Canvas.pixel = new VertexPositionColor[] {
+                pixel = new VertexPositionColor[] {
                     new VertexPositionColor(new Vector3(-.5f,-.5f,0),Color.White),
                     new VertexPositionColor(new Vector3(.5f,-.5f,0),Color.White),
                     new VertexPositionColor(new Vector3(-.5f,.5f,0),Color.White),
@@ -70,12 +70,12 @@ namespace Phantom.Graphics
                 };
             }
 
-            // Build multiple cirlce buffers for multiple number of segments:
-            if (Canvas.circles == null)
+            // Build multiple circle buffers for multiple number of segments:
+            if (circles == null)
             {
-                Canvas.circles = new Dictionary<int, CircleBuffer>();
+                circles = new Dictionary<int, CircleBuffer>();
                 for (int i = 16; (i >> 1) < 1920; i <<= 1)
-                    Canvas.circles[i] = new CircleBuffer(i);
+                    circles[i] = new CircleBuffer(i);
             }
 
         }
@@ -93,7 +93,7 @@ namespace Phantom.Graphics
 
             this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
-            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Canvas.pixel, 0, 2);
+            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, pixel, 0, 2);
         }
 
         private void FillCircle(Vector2 position, float radius, Color color)
@@ -159,7 +159,7 @@ namespace Phantom.Graphics
 
             this.effect.GraphicsDevice.BlendState = BlendState.AlphaBlend;
             this.effect.CurrentTechnique.Passes[0].Apply();
-            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, Canvas.pixel, 0, 2);
+            this.device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleList, pixel, 0, 2);
 
         }
 
@@ -451,8 +451,7 @@ namespace Phantom.Graphics
             this.LineTo(new Vector2(x, y));
         }
 
-
-        private static void GetCircleBufferByRadius(float radius, out int segments, out CircleBuffer circle)
+        private void GetCircleBufferByRadius(float radius, out int segments, out CircleBuffer circle)
         {
 #if DEBUG
             if (radius <= 0)
@@ -460,12 +459,12 @@ namespace Phantom.Graphics
 #endif
             int guess = (int)Math.Max(12, Math.Log(radius) * (Math.Log(radius) * .75) * 12);
             segments = (int)Math.Pow(2, Math.Ceiling(Math.Log(guess) / Math.Log(2)));
-            if (!Canvas.circles.ContainsKey(segments))
+            if (!circles.ContainsKey(segments))
             {
-                Canvas.circles[segments] = new CircleBuffer(segments);
+                circles[segments] = new CircleBuffer(segments);
                 Debug.WriteLine("new CircleBuffer created for {0} segments.", segments);
             }
-            circle = Canvas.circles[segments];
+            circle = circles[segments];
         }
 
         private class CircleBuffer
