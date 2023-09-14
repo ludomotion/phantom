@@ -536,12 +536,10 @@ namespace Phantom.Utils
                 return true;
 
             // String single quotes: 'XXX'
-            // This is kept for legacy purposes only,
-            // characters now get properly escaped
             if (v[0] == '\'' && v[v.Length - 1] == '\'')
                 return v.Substring(1, v.Length - 2);
 
-            // String double quotes: "XXX" (encoded characters)
+            // String double quotes: "XXX"
             if (v[0] == '"' && v[v.Length - 1] == '"')
                 return v.Substring(1, v.Length - 2);
 
@@ -593,7 +591,7 @@ namespace Phantom.Utils
             }
 
             // Keywords
-            for (int i=0; i<PCNKeyword.Keywords.Length; i++)
+            for (int i = 0; i < PCNKeyword.Keywords.Length; i++)
                 if (PCNKeyword.Keywords[i] == v)
                     return new PCNKeyword(v);
 
@@ -619,9 +617,6 @@ namespace Phantom.Utils
 
             if (value is CalculatedValue calculated)
                 return calculated.ToString();
-
-            //if (value is string str)
-            //    return "\"" + textEncoder.Encode(str) + "\"";
 
             if (value is string str)
             {
