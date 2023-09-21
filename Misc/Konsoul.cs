@@ -179,12 +179,10 @@ namespace Phantom.Misc
             this.lines.Add("] Konsoul Initialized");
         }
 
-        public Konsoul(Phont font = null)
-            : this(font, new KonsoulSettings())
+        public Konsoul(Phont font = null) : this(font, new KonsoulSettings())
         {
         }
-        public Konsoul(KonsoulSettings settings)
-            : this(null, settings)
+        public Konsoul(KonsoulSettings settings) : this(null, settings)
         {
         }
 
@@ -697,6 +695,11 @@ namespace Phantom.Misc
         public void Clear()
         {
             this.lines.Clear();
+        }
+
+        public void ClearRegisteredCommands()
+        {
+            this.commands = new Dictionary<string, ConsoleCommand>();
         }
 
         public void Register(string name, string documentation, ConsoleCommand command)
