@@ -18,8 +18,6 @@ publish
 *.pgd
 *.rsp
 *.sbr
-*.sln
-*.sln.docstates
 *.suo
 *.tlb
 *.tlh
