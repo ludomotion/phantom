@@ -101,7 +101,7 @@ namespace Phantom.GameUI
             {
                 PhantomGame.Game.Console.Register("edit_ui", "Allows control over the ui elements with the mouse to reposition them.", delegate(string[] argv)
                 {
-                    for (int i = 0; i < this.Components.Count; i++)
+                    for (int i = 0; i < this.Components.Length; i++)
                     {
                         if (Components[i] is MouseHandler)
                             RemoveComponent(Components[i]);
