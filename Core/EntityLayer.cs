@@ -187,12 +187,18 @@ namespace Phantom.Core
         /// </summary>
         public override void ClearComponents()
         {
+            this.AlwaysUpdate.Clear();
+            this.AlwaysUpdateEntity.Clear();
+            this.VisibleUpdate.Clear();
+
             base.ClearComponents();
             this.integrator.ClearComponents();
             this.integrator.ClearEntities();
             this.renderer.ClearComponents();
-            this.AddComponent(this.renderer);
-            this.AddComponent(this.integrator);
+            this.integrator = null;
+            this.renderer = null;
+            //this.AddComponent(this.renderer);
+            //this.AddComponent(this.integrator);            
         }
 
         /// <summary>
