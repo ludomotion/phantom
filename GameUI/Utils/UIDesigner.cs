@@ -65,7 +65,7 @@ namespace Phantom.GameUI.Utils
 #if PLATFORM_WINDOWS
             Thread thread = new Thread(new ThreadStart(() =>
             {
-                System.Windows.Forms.Clipboard.SetText(code);
+                SDL2.SDL.SDL_SetClipboardText(code);
                 Trace.WriteLine("Code copied to clipboard.");
             }));
             thread.SetApartmentState(ApartmentState.STA);
