@@ -2,6 +2,8 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using System.Reflection;
+using static SDL2.SDL;
+using SDL2;
 
 #if PLATFORM_ANDROID
 using Android.OS;
@@ -712,8 +714,18 @@ namespace Phantom
             System.Drawing.Graphics g = System.Drawing.Graphics.FromHwnd(IntPtr.Zero);
             IntPtr desktop = g.GetHdc();
 
-            ScreenWidth = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-            ScreenHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
+            //SDL_DisplayMode DM;
+            //SDL_GetCurrentDisplayMode(0, &DM);
+            //auto Width = DM.w;
+            //auto Height = DM.h;
+
+			// Fetch display mode
+            SDL2.SDL.SDL_DisplayMode mode;
+			SDL2.SDL.SDL_GetCurrentDisplayMode(0, out mode);
+
+			// Set screen width and height
+			ScreenWidth = mode.w;
+			ScreenHeight = mode.h;
 
             int Xdpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSX);
             int Ydpi = GetDeviceCaps(desktop, (int)DeviceCap.LOGPIXELSY); 
